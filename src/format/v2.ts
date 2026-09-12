@@ -132,7 +132,7 @@ export function parseMeta(text: string | undefined): { meta: V2Meta; error: stri
 
   const { v: version, rows, ...extra } = parsed;
   if (version !== undefined && version !== 2) {
-    return { meta: empty, error: `Unsupported layout format version: ${String(version)}` };
+    return { meta: empty, error: `Unsupported layout format version: ${JSON.stringify(version)}` };
   }
 
   return {

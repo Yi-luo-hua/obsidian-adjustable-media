@@ -7,7 +7,8 @@
 | 命令 | 作用 |
 | --- | --- |
 | `npm ci` | 安装依赖 |
-| `npm run check` | 类型检查 + 测试，每次改动后都必须通过 |
+| `npm run check` | 类型检查 + lint + 测试，每次改动后都必须通过 |
+| `npm run lint` | 用官方插件审核的规则（`eslint-plugin-obsidianmd`）检查代码 |
 | `npm run dev` | 监听源码，生成带 sourcemap 的开发版 `main.js` |
 | `npm run build` | 类型检查 + 生产构建（压缩、无 sourcemap） |
 | `npm run release` | 生产构建，并在 `dist/adjustable-media/` 生成发布文件；会检查三处版本号是否一致 |

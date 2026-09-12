@@ -8,7 +8,7 @@
 - `package.json` 的 `version`
 - `versions.json`：新增一行，把新版本映射到 `manifest.json` 里的 `minAppVersion`
 
-同时在 `CHANGELOG.md` 写好这一版的变化，并按需要修改 `docs/RELEASE_NOTES_TEMPLATE.md`。
+同时在 `CHANGELOG.md` 写好这一版的条目，标题写成 `## 0.1.0 - 2026-09-12` 的形式。Release 的说明由 `scripts/release-notes.mjs` 生成：先是这一条目，后面接 `docs/RELEASE_NOTES_TEMPLATE.md` 里的安装说明。可以用 `node scripts/release-notes.mjs` 预览。
 
 ## 2. 本地检查
 
@@ -34,7 +34,7 @@ git tag 0.1.0
 git push origin 0.1.0
 ```
 
-推送后，`.github/workflows/release.yml` 会检查标签和 `manifest.json` 的版本是否一致，运行测试和构建，然后创建一个**草稿** Release，附上上面四个文件，说明取自 `docs/RELEASE_NOTES_TEMPLATE.md`。
+推送后，`.github/workflows/release.yml` 会检查标签和 `manifest.json` 的版本是否一致，运行测试和构建，然后创建一个**草稿** Release，附上上面四个文件和生成好的说明。
 
 ## 4. 发布
 

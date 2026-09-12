@@ -1,7 +1,8 @@
 name: Release
 
 # Pushing a version tag (e.g. 0.1.0, matching manifest.json) builds the plugin and creates a
-# draft GitHub release with the files users install. Review the draft, then publish it by hand.
+# draft GitHub release with the files users install. The notes are this version's CHANGELOG entry
+# plus docs/RELEASE_NOTES_TEMPLATE.md. Review the draft, then publish it by hand.
 on:
   push:
     tags:
@@ -29,6 +30,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run release
+      - run: node scripts/release-notes.mjs > dist/release-notes.md
       - name: Create a draft release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -37,5 +39,5 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             --draft \
             --title "Adjustable Media $GITHUB_REF_NAME" \
-            --notes-file docs/RELEASE_NOTES_TEMPLATE.md \
+            --notes-file dist/release-notes.md \
             "dist/$id/main.js" "dist/$id/manifest.json" "dist/$id/styles.css" "dist/$id/sha256sums.txt"

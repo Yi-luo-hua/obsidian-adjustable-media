@@ -1,7 +1,3 @@
-## Changes
-
-(Copy this version's entry from CHANGELOG.md before publishing.)
-
 ## Installation
 
 Download `main.js`, `manifest.json` and `styles.css` from this release and put them in:

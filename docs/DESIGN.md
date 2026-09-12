@@ -83,10 +83,10 @@
 - **阅读视图下不能写编辑器**：阅读模式的视图仍然有编辑器对象，但写它只会改到隐藏的内容，既不存盘也不刷新，切到别的笔记时修改会被丢弃。所以阅读模式下改用 `vault.process`。
 - **注释的可见性**：不装插件时，阅读视图不显示 `<!-- -->` 注释，实时预览显示成灰字。同一行的大图在没有插件时会上下排列。
 - **重命名**：重命名块内的图片后，Obsidian 会更新嵌入文本，Markdown 链接会按「最短路径」改写，块结构不受影响。
-- **拖入 / 粘贴附件**：Obsidian 依次触发 `editor-drop` / `editor-paste`（带文件名），把附件存进库里，再用一个**没有 `userEvent`** 的事务插入 `![[文件名]]`，全程几十毫秒。一次拖入多个文件时，每个文件单独一个事务，除最后一个外都带一个空行。事件里的光标位置不可靠。自动转换因此按「事件记下预期数量 → 收集随后没有 `userEvent` 的嵌入插入」来实现。
+- **拖入 / 粘贴附件**：Obsidian 依次触发 `editor-drop` / `editor-paste`（带文件名），把附件存进库里，再用一个**没有 `userEvent`** 的事务插入 `![[文件名]]`，全程几十毫秒。一次拖入多个文件时，每个文件单独一个事务，除最后一个外都带一个空行。事件里的光标位置不可靠。自动转换因此按「记下预期数量 → 收集随后没有 `userEvent` 的嵌入插入」来实现。预期数量取自编辑器上的 DOM `drop` / `paste` 事件（CM6 `domEventHandlers`，最高优先级，只读取文件列表，不处理也不拦截事件），而不是 `editor-drop` / `editor-paste`：官方审核规则要求这两个事件的处理函数调用 `preventDefault()`，而那样会让 Obsidian 不再插入附件。
 - **发布到 Hexo**：`marked` 会把 `<!-- vml … -->` 原样输出为 HTML 注释，页面上不可见。
 
 ## 5. 测试
 
-- `npm run check`：类型检查加 `node:test` 单元测试。纯模块的测试在 `tests/*.test.ts`，操作编辑器的逻辑用 `tests/support/memoryEditor.ts` 代替真实编辑器。
+- `npm run check`：类型检查、lint（官方审核用的 `eslint-plugin-obsidianmd` 规则）加 `node:test` 单元测试。纯模块的测试在 `tests/*.test.ts`，操作编辑器的逻辑用 `tests/support/memoryEditor.ts` 代替真实编辑器。
 - 界面和 Obsidian 集成的部分在测试库里实测，流程见 [AGENTS.md](../AGENTS.md)。会改动笔记的实测，先备份笔记，测完恢复并用哈希值核对。

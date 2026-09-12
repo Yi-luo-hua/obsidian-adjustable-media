@@ -69,7 +69,7 @@ npm run check
 npm run dev
 ```
 
-`npm run check` type-checks and runs the tests; `npm run dev` rebuilds `main.js` on every change. The storage format and architecture are described in [docs/DESIGN.md](docs/DESIGN.md) (Chinese), and the release process in [docs/RELEASE.md](docs/RELEASE.md).
+`npm run check` type-checks, lints with the rules of the Obsidian plugin review ([eslint-plugin-obsidianmd](https://github.com/obsidianmd/eslint-plugin)) and runs the tests; `npm run dev` rebuilds `main.js` on every change. The storage format and architecture are described in [docs/DESIGN.md](docs/DESIGN.md) (Chinese), and the release process in [docs/RELEASE.md](docs/RELEASE.md).
 
 ## Credits
 

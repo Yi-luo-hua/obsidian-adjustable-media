@@ -1,5 +1,5 @@
 import { editorInfoField, type Plugin } from "obsidian";
-import { Transaction, type Extension } from "@codemirror/state";
+import { Prec, Transaction, type Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 
 import { mediaKindOf, readEmbedRow } from "../format/v2.ts";
@@ -47,7 +47,8 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
     }
   });
 
-  const expect = (path: string | undefined, files: FileList | null | undefined): void => {
+  const expect = (view: EditorView, files: FileList | null | undefined): void => {
+    const path = view.state.field(editorInfoField, false)?.file?.path;
     if (!enabled() || !path || !files) {
       return;
     }
@@ -62,14 +63,21 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
     if (previous) {
       forget(path, previous);
     }
-    pending.set(path, { expected: count, seen: 0, positions: [], deadline: Date.now() + WINDOW_MS, view: null, timer: null });
+    pending.set(path, { expected: count, seen: 0, positions: [], deadline: Date.now() + WINDOW_MS, view, timer: null });
   };
 
-  plugin.registerEvent(plugin.app.workspace.on("editor-drop", (evt, _editor, info) => {
-    expect(info.file?.path, evt.dataTransfer?.files);
-  }));
-  plugin.registerEvent(plugin.app.workspace.on("editor-paste", (evt, _editor, info) => {
-    expect(info.file?.path, evt.clipboardData?.files);
+  // Only take note of the drop or paste: Obsidian still stores the file and inserts its embed, so
+  // the event is neither handled nor prevented here. Highest precedence runs this before any
+  // editor handler that might stop the event.
+  const watchInput = Prec.highest(EditorView.domEventHandlers({
+    drop: (evt, view) => {
+      expect(view, evt.dataTransfer?.files);
+      return false;
+    },
+    paste: (evt, view) => {
+      expect(view, evt.clipboardData?.files);
+      return false;
+    },
   }));
 
   const convert = (path: string, entry: Pending): void => {
@@ -108,7 +116,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
     entry.timer = window.setTimeout(() => convert(path, entry), wait);
   };
 
-  return EditorView.updateListener.of((update) => {
+  const collect = EditorView.updateListener.of((update) => {
     if (!update.docChanged) {
       return;
     }
@@ -155,4 +163,6 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
       schedule(path, entry);
     }
   });
+
+  return [watchInput, collect];
 }
