@@ -6,7 +6,7 @@ import { DEFAULT_SETTINGS, VmlSettingTab, readSettings, type VmlSettings } from 
 import { livePreviewExtension } from "./src/view/livePreview";
 import { registerReadingView } from "./src/view/readingView";
 
-export default class VisualMediaLayoutPlugin extends Plugin {
+export default class AdjustableMediaPlugin extends Plugin {
   settings: VmlSettings = { ...DEFAULT_SETTINGS };
 
   override async onload(): Promise<void> {
