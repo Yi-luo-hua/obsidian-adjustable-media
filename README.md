@@ -58,12 +58,12 @@ Each line between the two comments is one row. Row heights, widths, alignment an
 
 ## Installation
 
-Adjustable Media isn't in the Community plugins directory yet. Until it is, you can install it in either of these ways.
+**From Community plugins**
 
-**With BRAT**
+1. Open **Settings → Community plugins** and turn off Restricted mode if it's on.
+2. Click **Browse**, search for **Adjustable Media**, then click **Install** and **Enable**.
 
-1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) from Community plugins.
-2. In BRAT's settings, click **Add Beta plugin** and enter `Yi-luo-hua/obsidian-adjustable-media`.
+You can also open the [plugin's page](https://obsidian.md/plugins?id=adjustable-media) and click **Add to Obsidian**.
 
 **Manually**
 

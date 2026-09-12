@@ -2,7 +2,7 @@
 
 ## Official downloads
 
-Install Adjustable Media from Community plugins once it's listed, or from the GitHub releases of this repository.
+Install Adjustable Media from Community plugins in Obsidian, or from the GitHub releases of this repository.
 
 Don't install builds from cloud drive links, chat attachments, reposted zip files or third-party mirrors.
 

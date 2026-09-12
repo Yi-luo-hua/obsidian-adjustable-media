@@ -1,5 +1,13 @@
 # Installing Adjustable Media
 
+## From Community plugins
+
+1. Open Settings → Community plugins and turn off Restricted mode if it's on.
+2. Click Browse, search for Adjustable Media, then click Install and Enable.
+3. If you want automatic conversion of dropped and pasted media, turn it on in the plugin's settings.
+
+Obsidian tells you when an update is available, under Settings → Community plugins.
+
 ## From GitHub releases
 
 1. Open the latest release of this repository.

@@ -58,12 +58,12 @@
 
 ## 安装
 
-Adjustable Media 还没有进入官方插件库，在那之前可以用下面任一种方式安装。
+**从第三方插件市场安装**
 
-**用 BRAT 安装**
+1. 打开「设置 → 第三方插件」，如果开着安全模式，先关掉。
+2. 点 **浏览**，搜索 **Adjustable Media**，点 **安装**，再点 **启用**。
 
-1. 在第三方插件市场里安装 [BRAT](https://github.com/TfTHacker/obsidian42-brat)。
-2. 在 BRAT 的设置里点 **Add Beta plugin**，填入 `Yi-luo-hua/obsidian-adjustable-media`。
+也可以打开[插件页面](https://obsidian.md/plugins?id=adjustable-media)，点 **Add to Obsidian**。
 
 **手动安装**
 
