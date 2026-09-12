@@ -1,0 +1,14 @@
+node_modules/
+dist/
+
+# Build output; shipped through GitHub Releases only.
+main.js
+
+# Plugin settings Obsidian writes when a test vault links to this folder.
+data.json
+
+.DS_Store
+
+*.log
+npm-debug.log*
+

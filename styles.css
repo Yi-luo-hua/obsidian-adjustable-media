@@ -1,0 +1,269 @@
+.vml-layout {
+  margin: 0.75em 0;
+}
+
+.vml-live-preview {
+  position: relative;
+}
+
+.vml-layout__warning {
+  color: var(--text-warning);
+  font-size: var(--font-ui-smaller);
+  margin-bottom: 4px;
+}
+
+.vml-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+  margin: 8px 0;
+  position: relative;
+}
+
+.vml-row--single {
+  justify-content: center;
+}
+
+.vml-row--single[data-align="left"] {
+  justify-content: flex-start;
+}
+
+.vml-row--single[data-align="right"] {
+  justify-content: flex-end;
+}
+
+.vml-item {
+  flex: var(--vml-grow, 1) 1 0;
+  min-width: 0;
+  position: relative;
+}
+
+.vml-row--single .vml-item {
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+
+.vml-item--sized {
+  width: var(--vml-item-width);
+}
+
+.vml-item__media {
+  background: var(--background-secondary);
+  border-radius: var(--radius-s);
+  display: block;
+  height: var(--vml-row-height);
+  object-fit: cover;
+  width: 100%;
+}
+
+.vml-item--weighted .vml-item__media {
+  object-fit: contain;
+}
+
+.vml-row--single .vml-item__media {
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  width: auto;
+}
+
+.vml-row--single .vml-item--sized .vml-item__media {
+  width: 100%;
+}
+
+.vml-item__missing {
+  align-items: center;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  display: flex;
+  font-size: var(--font-ui-small);
+  height: var(--vml-row-height);
+  justify-content: center;
+  padding: 8px;
+  text-align: center;
+}
+
+.vml-item__caption {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.vml-item__caption[data-align="center"] {
+  text-align: center;
+}
+
+.vml-edit-source {
+  opacity: 0;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  transition: opacity 120ms ease;
+}
+
+.vml-live-preview:hover .vml-edit-source,
+.vml-edit-source:focus-visible {
+  opacity: 1;
+}
+
+/* Interactions */
+
+.vml-layout--interactive .vml-item {
+  cursor: grab;
+}
+
+.vml-layout--dragging,
+.vml-layout--dragging .vml-item {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.vml-layout--interactive .vml-item:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+.vml-item--dragging {
+  opacity: 0.5;
+}
+
+.vml-drop-before::before,
+.vml-drop-after::after {
+  background: var(--interactive-accent);
+  border-radius: 2px;
+  bottom: 0;
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 3px;
+  z-index: 3;
+}
+
+.vml-drop-before::before {
+  left: -6px;
+}
+
+.vml-drop-after::after {
+  right: -6px;
+}
+
+.vml-drop-row-before::before,
+.vml-drop-row-after::after {
+  background: var(--interactive-accent);
+  border-radius: 2px;
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  z-index: 3;
+}
+
+.vml-drop-row-before::before {
+  top: -6px;
+}
+
+.vml-drop-row-after::after {
+  bottom: -6px;
+}
+
+.vml-handle {
+  opacity: 0;
+  position: absolute;
+  touch-action: none;
+  transition: opacity 120ms ease;
+  z-index: 2;
+}
+
+.vml-layout--interactive .vml-row:hover .vml-handle,
+.vml-layout--interactive .vml-item:focus-within .vml-handle,
+.vml-handle.is-active {
+  opacity: 1;
+}
+
+.vml-row__height-handle {
+  bottom: -7px;
+  cursor: ns-resize;
+  height: 10px;
+  left: 0;
+  right: 0;
+}
+
+.vml-row__height-handle::after {
+  background: var(--interactive-accent);
+  border-radius: 1px;
+  content: "";
+  height: 2px;
+  left: 40%;
+  position: absolute;
+  right: 40%;
+  top: 4px;
+}
+
+.vml-item__col-handle {
+  bottom: 0;
+  cursor: col-resize;
+  right: -8px;
+  top: 0;
+  width: 8px;
+}
+
+.vml-item__col-handle::after {
+  background: var(--interactive-accent);
+  border-radius: 1px;
+  bottom: 20%;
+  content: "";
+  left: 3px;
+  position: absolute;
+  top: 20%;
+  width: 2px;
+}
+
+.vml-item__width-handle {
+  background: linear-gradient(135deg, transparent 50%, var(--interactive-accent) 50%);
+  border-radius: 2px;
+  bottom: 4px;
+  cursor: nwse-resize;
+  height: 14px;
+  right: 4px;
+  width: 14px;
+}
+
+.vml-item__grip {
+  align-items: center;
+  background: var(--background-primary);
+  border-radius: var(--radius-s);
+  cursor: grab;
+  display: flex;
+  height: 24px;
+  justify-content: center;
+  left: 4px;
+  top: 4px;
+  width: 24px;
+}
+
+.vml-caption-modal__text {
+  resize: vertical;
+  width: 100%;
+}
+
+.vml-caption-modal__align {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.vml-caption-modal__align button.is-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.vml-remove-list {
+  margin: 8px 0;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-left: 1.2em;
+}

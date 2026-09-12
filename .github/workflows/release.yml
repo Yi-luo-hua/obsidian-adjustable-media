@@ -1,0 +1,41 @@
+name: Release
+
+# Pushing a version tag (e.g. 0.1.0, matching manifest.json) builds the plugin and creates a
+# draft GitHub release with the files users install. Review the draft, then publish it by hand.
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - name: Check the tag matches manifest.json
+        run: |
+          version=$(node -p "require('./manifest.json').version")
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match manifest.json version $version"
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm test
+      - run: npm run release
+      - name: Create a draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          id=$(node -p "require('./manifest.json').id")
+          gh release create "$GITHUB_REF_NAME" \
+            --draft \
+            --title "Adjustable Media $GITHUB_REF_NAME" \
+            --notes-file docs/RELEASE_NOTES_TEMPLATE.md \
+            "dist/$id/main.js" "dist/$id/manifest.json" "dist/$id/styles.css" "dist/$id/sha256sums.txt"
