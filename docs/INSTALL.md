@@ -3,7 +3,7 @@
 ## From GitHub releases
 
 1. Open the latest release of this repository.
-2. Download `main.js`, `manifest.json` and `styles.css`. You can check them against `sha256sums.txt` from the same release.
+2. Download `main.js`, `manifest.json` and `styles.css`. To check that they were built from this repository, see [Verifying a release](../SECURITY.md#verifying-a-release).
 3. Create this folder in your vault:
 
    ```text

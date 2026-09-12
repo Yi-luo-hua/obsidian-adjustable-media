@@ -14,6 +14,10 @@ Restart Obsidian and enable Adjustable Media in Settings → Community plugins.
 - Desktop only
 - Plugin ID: `adjustable-media`
 
-## Checksums
+## Verifying the files
 
-Check the downloaded files against `sha256sums.txt`.
+These files are built by GitHub Actions from the tagged source and come with build provenance attestations. To check a downloaded file with the GitHub CLI:
+
+```bash
+gh attestation verify main.js --repo Yi-luo-hua/obsidian-adjustable-media
+```

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2 - 2026-09-12
+
+- Release files come with GitHub build provenance attestations, which you can check with `gh attestation verify`. Releases no longer include `sha256sums.txt`.
+- The README explains when the plugin reads all notes in the vault.
+
 ## 0.1.1 - 2026-09-12
 
 - Automatic conversion also picks up images and videos dragged in from Obsidian's file list.

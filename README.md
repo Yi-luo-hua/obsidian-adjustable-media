@@ -87,6 +87,8 @@ More answers in the [FAQ](docs/FAQ.md).
 
 Everything runs on your device. The plugin makes no network requests and collects nothing. Web images in your notes are loaded by Obsidian itself.
 
+The plugin only reads the notes it shows or changes. The one exception is **Remove layout comments from all notes…**, which reads every note in the vault to find the layouts to remove, and only when you run it.
+
 ## Feedback
 
 Found a bug or have an idea? [Open an issue](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues).

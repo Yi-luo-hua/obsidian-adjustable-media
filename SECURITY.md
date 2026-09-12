@@ -2,9 +2,17 @@
 
 ## Official downloads
 
-Install Adjustable Media from Community plugins once it's listed, or from the GitHub releases of this repository. Each release includes `sha256sums.txt` for checking `main.js`, `manifest.json` and `styles.css`.
+Install Adjustable Media from Community plugins once it's listed, or from the GitHub releases of this repository.
 
 Don't install builds from cloud drive links, chat attachments, reposted zip files or third-party mirrors.
+
+## Verifying a release
+
+Release files are built by GitHub Actions from the tagged source and come with [build provenance attestations](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds). With the [GitHub CLI](https://cli.github.com), you can check a downloaded file like this:
+
+```bash
+gh attestation verify main.js --repo Yi-luo-hua/obsidian-adjustable-media
+```
 
 ## Reporting a vulnerability
 
@@ -20,4 +28,4 @@ Include:
 
 ## Scope
 
-The plugin runs locally and makes no network requests of its own. It changes notes only in response to layout actions you take, or through automatic conversion if you turn it on.
+The plugin runs locally and makes no network requests of its own. It changes notes only in response to layout actions you take, or through automatic conversion if you turn it on. It reads every note in the vault only when you run **Remove layout comments from all notes…**, to find the layouts to remove.

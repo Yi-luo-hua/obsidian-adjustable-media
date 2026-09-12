@@ -1,5 +1,4 @@
-import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 
 const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
@@ -16,19 +15,14 @@ if (versions[manifest.version] !== manifest.minAppVersion) {
   throw new Error(`versions.json must map ${manifest.version} to minAppVersion ${manifest.minAppVersion}`);
 }
 
+// Only the files Obsidian downloads. The release workflow attests their build provenance.
 const releaseDir = path.join("dist", manifest.id);
 const releaseFiles = ["main.js", "manifest.json", "styles.css"];
 
 await rm(releaseDir, { force: true, recursive: true });
 await mkdir(releaseDir, { recursive: true });
-
-const checksumLines = [];
 for (const file of releaseFiles) {
-  const input = await readFile(file);
   await copyFile(file, path.join(releaseDir, file));
-  checksumLines.push(`${createHash("sha256").update(input).digest("hex")}  ${file}`);
 }
-
-await writeFile(path.join(releaseDir, "sha256sums.txt"), `${checksumLines.join("\n")}\n`);
 
 console.log(`Prepared ${manifest.name} ${manifest.version} in ${releaseDir}`);

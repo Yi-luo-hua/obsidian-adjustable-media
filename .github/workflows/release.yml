@@ -1,8 +1,9 @@
 name: Release
 
 # Pushing a version tag (e.g. 0.1.0, matching manifest.json) builds the plugin and creates a
-# draft GitHub release with the files users install. The notes are this version's CHANGELOG entry
-# plus docs/RELEASE_NOTES_TEMPLATE.md. Review the draft, then publish it by hand.
+# draft GitHub release with the files Obsidian installs, plus build provenance attestations for them.
+# The notes are this version's CHANGELOG entry plus docs/RELEASE_NOTES_TEMPLATE.md. Review the
+# draft, then publish it by hand.
 on:
   push:
     tags:
@@ -10,6 +11,9 @@ on:
 
 permissions:
   contents: write
+  # Needed to sign and store the build provenance attestations.
+  id-token: write
+  attestations: write
 
 jobs:
   release:
@@ -31,6 +35,13 @@ jobs:
       - run: npm test
       - run: npm run release
       - run: node scripts/release-notes.mjs > dist/release-notes.md
+      - name: Attest the build provenance of the release files
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: |
+            dist/adjustable-media/main.js
+            dist/adjustable-media/manifest.json
+            dist/adjustable-media/styles.css
       - name: Create a draft release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -40,4 +51,4 @@ jobs:
             --draft \
             --title "$GITHUB_REF_NAME" \
             --notes-file dist/release-notes.md \
-            "dist/$id/main.js" "dist/$id/manifest.json" "dist/$id/styles.css" "dist/$id/sha256sums.txt"
+            "dist/$id/main.js" "dist/$id/manifest.json" "dist/$id/styles.css"

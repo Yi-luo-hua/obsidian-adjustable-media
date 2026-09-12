@@ -42,4 +42,4 @@ No. It runs entirely on your device. Web images referenced in your notes are loa
 
 ## Where should I download it?
 
-From Community plugins once it's listed. Until then, use [BRAT](https://github.com/TfTHacker/obsidian42-brat) or download the files from this repository's GitHub releases. Each release includes `sha256sums.txt` to check the files.
+From Community plugins once it's listed. Until then, use [BRAT](https://github.com/TfTHacker/obsidian42-brat) or download the files from this repository's GitHub releases. The release files come with build provenance attestations; see [Verifying a release](../SECURITY.md#verifying-a-release).

@@ -20,7 +20,7 @@ npm run check
 npm run release
 ```
 
-`npm run release` 会做生产构建，并在 `dist/adjustable-media/` 里生成 `main.js`、`manifest.json`、`styles.css` 和 `sha256sums.txt`。
+`npm run release` 会做生产构建，并在 `dist/adjustable-media/` 里生成 `main.js`、`manifest.json`、`styles.css`。只放 Obsidian 会下载的这三个文件，多余的文件会被社区目录的审核标出来。
 
 ## 3. 推送版本标签
 
@@ -34,7 +34,7 @@ git tag 0.1.0
 git push origin 0.1.0
 ```
 
-推送后，`.github/workflows/release.yml` 会检查标签和 `manifest.json` 的版本是否一致，运行测试和构建，然后创建一个**草稿** Release，附上上面四个文件和生成好的说明。
+推送后，`.github/workflows/release.yml` 会检查标签和 `manifest.json` 的版本是否一致，运行测试和构建，然后创建一个**草稿** Release，附上上面三个文件和生成好的说明，并为这三个文件生成构建来源证明（artifact attestation）。用户可以用 `gh attestation verify main.js --repo Yi-luo-hua/obsidian-adjustable-media` 验证文件确实是从这个仓库构建的。
 
 ## 4. 发布
 
