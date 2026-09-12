@@ -9,9 +9,12 @@ Your notes keep ordinary embeds. The layout lives in a single HTML comment, so a
 ## Features
 
 - **Rows of up to four** images or videos at the same height, in reading view and live preview.
-- **Drag to rearrange**: reorder items, start a new row, or move an item into another layout in the same note.
-- **Resize with the mouse**: a row's height, how two items share a row, or the width of a single item.
+- **A visible frame** in live preview shows where each layout begins and ends, and resizes the whole layout.
+- **Drag to rearrange**: reorder items, start a new row, move an item into another layout, or drag any image of the note into a layout.
+- **Place single images freely**: drag one left or right within its row; it snaps to left, center and right.
+- **Resize with the mouse**: the whole layout, a row's height, how two items share a row, or the width of a single item.
 - **Captions and alignment** from the right-click menu.
+- **View images**: double-click one in live preview to zoom and pan.
 - **Videos keep their controls**: they move by a small grip, so seeking and volume still work.
 - **Automatic layouts** (optional): media you drop or paste, from your computer or from Obsidian's file list, is laid out for you.
 - **No lock-in**: remove the plugin and your images are still there as plain embeds.
@@ -20,19 +23,30 @@ Your notes keep ordinary embeds. The layout lives in a single HTML comment, so a
 
 ### Create a layout
 
-Select some lines of image or video embeds (or put the cursor on one), open the command palette and run **Adjustable Media: Wrap selected media in a layout**. The embeds are placed in rows of up to four, in order.
+Dropped and pasted images stay ordinary embeds. To turn one into a layout, in live preview:
 
-You can also turn on **Convert dropped and pasted media** in the plugin settings. From then on, media you drop into a note (from your computer or from Obsidian's file list) or paste is wrapped in a layout, or joins the layout right above it.
+- right-click the image and choose **Wrap in a layout**, or
+- click the image, then run **Adjustable Media: Wrap selected media in a layout** from the command palette. Assign it a hotkey in **Settings → Hotkeys** to do this in one keystroke.
+
+The command also wraps several lines of embeds at once: select them first. The embeds are placed in rows of up to four, in order.
+
+Once a note has a layout, you can drag any other image of the note straight into it.
+
+If you want every drop and paste laid out for you, turn on **Convert dropped and pasted media** in the plugin settings. Media you then drop (from your computer or from Obsidian's file list) or paste is wrapped in a layout, or joins the layout right above it.
 
 ### Arrange and resize
 
 | To | Do this |
 | --- | --- |
 | Move an item | Drag it: beside another item, between two rows for a new row, or onto another layout in the same note. |
+| Add an image to a layout | In live preview, drag the image from the note onto the layout. It works for images on a line of their own, or on a line of images only. |
+| Place a single image | Drag it left or right within its row. It snaps to left, center and right, and can stop anywhere in between. |
 | Move a video | Drag the grip in its top-left corner. |
+| Resize the whole layout | In live preview, drag the frame: its right edge for the width, its bottom edge for the height of every row, its corner for both at once. |
 | Change a row's height | Drag the row's bottom edge. |
 | Change how two items share a row | Drag the gap between them. |
-| Resize a single item | Drag its bottom-right corner. |
+| Resize a single item | Drag the small corner handle on the image. |
+| View an image | Double-click it in live preview: scroll to zoom, drag to pan, arrow keys for the layout's other images. In reading view, click it. |
 | Add a caption, align, move an item out, or reveal the file | Right-click it, or press <kbd>Shift</kbd>+<kbd>F10</kbd> when it's focused. The menu also has Obsidian's usual file actions, such as revealing the file in the file list. |
 | Edit the source | In live preview, click **Edit source** in the layout's corner, or move the cursor into the layout. |
 

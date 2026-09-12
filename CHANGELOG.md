@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- In live preview, a glowing frame shows where each layout begins and ends. Drag its right edge to change the layout's width, its bottom edge to scale the height of every row, or its corner to scale both.
+- Drag an image from anywhere in the note into a layout, in live preview. Images on a line with other text stay where they are.
+- Drag a single image left or right within its row to place it anywhere; it snaps to left, center and right. Those three are stored as before; other positions use the new `offset` setting.
+- Right-click an image in live preview and choose **Wrap in a layout**. You can also click an image and run **Wrap selected media in a layout**, for example from a hotkey.
+- Double-click an image in a layout in live preview to view it: scroll to zoom, drag to pan, arrow keys for the layout's other images, Esc to close.
+- A click at the end of a drag no longer opens Obsidian's image viewer in reading view.
+- New layout setting `width` for the whole layout. Older versions of the plugin show such layouts at full width and keep the setting.
+
 ## 0.1.2 - 2026-09-12
 
 - Release files come with GitHub build provenance attestations, which you can check with `gh attestation verify`. Releases no longer include `sha256sums.txt`.

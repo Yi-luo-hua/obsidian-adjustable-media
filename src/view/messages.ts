@@ -76,6 +76,10 @@ const MESSAGES = {
     zh: "取消",
     en: "Cancel",
   },
+  close: {
+    zh: "关闭",
+    en: "Close",
+  },
   dragHandle: {
     zh: "拖动以调整位置",
     en: "Drag to move",
@@ -91,6 +95,22 @@ const MESSAGES = {
   resizeWidth: {
     zh: "拖动调整宽度",
     en: "Drag to resize the width",
+  },
+  resizeBlockWidth: {
+    zh: "拖动调整布局的宽度",
+    en: "Drag to resize the layout's width",
+  },
+  resizeBlockHeight: {
+    zh: "拖动按比例调整所有行的高度",
+    en: "Drag to scale the height of every row",
+  },
+  resizeBlock: {
+    zh: "拖动等比缩放布局",
+    en: "Drag to scale the layout",
+  },
+  wrapInLayout: {
+    zh: "包成布局块",
+    en: "Wrap in a layout",
   },
   settingAutoConvert: {
     zh: "自动转换拖入或粘贴的图片、视频",

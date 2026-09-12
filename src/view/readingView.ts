@@ -64,7 +64,7 @@ export function registerReadingView(plugin: Plugin): void {
       editable: isEditable(block),
       warning: blockWarning(block),
     });
-    attachInteractions(root, { app: plugin.app, sourcePath: ctx.sourcePath, block, model });
+    attachInteractions(root, { app: plugin.app, sourcePath: ctx.sourcePath, block, model, live: false });
   });
 
   // Obsidian keeps the rendered section of any text that did not change. A settings-only change

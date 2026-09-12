@@ -18,6 +18,9 @@ interface LivePreviewState {
  * Live preview. Each v2 block is replaced with its rendered layout; while the cursor or a selection
  * touches the block, its source shows again (docs/DESIGN.md, section 4). The note is parsed only when
  * it changes; a cursor move just recomputes which blocks show their source.
+ *
+ * An editor showing a note with editable layouts gets the class `vml-has-layouts`: images outside
+ * the layouts can then be dragged into them, and show a grab cursor.
  */
 export function livePreviewExtension(app: App): Extension {
   const field = StateField.define<LivePreviewState>({
@@ -32,7 +35,12 @@ export function livePreviewExtension(app: App): Extension {
       }
       return value;
     },
-    provide: (self) => EditorView.decorations.from(self, (value) => value.decorations),
+    provide: (self) => [
+      EditorView.decorations.from(self, (value) => value.decorations),
+      EditorView.editorAttributes.from(self, (value): Record<string, string> => (
+        value.blocks.some(isEditable) ? { class: "vml-has-layouts" } : {}
+      )),
+    ],
   });
   return Prec.high(field);
 }
@@ -93,9 +101,9 @@ class LayoutWidget extends WidgetType {
       editable: isEditable(this.block),
       warning: blockWarning(this.block),
     });
-    attachInteractions(root, { app: this.app, sourcePath: this.sourcePath, block: this.block, model });
+    attachInteractions(root, { app: this.app, sourcePath: this.sourcePath, block: this.block, model, live: true });
 
-    const button = el.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
+    const button = root.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
     button.addEventListener("click", (event) => {
       event.preventDefault();
       // Resolve the position at click time; the block may have moved since the widget was drawn.

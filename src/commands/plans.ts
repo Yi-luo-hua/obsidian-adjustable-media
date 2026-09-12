@@ -35,7 +35,7 @@ export function planMergeWithNext(lines: readonly string[], line: number): LineC
   }
 
   const first = modelFromBlock(current);
-  const merged = { rows: [...first.rows, ...modelFromBlock(next).rows], extra: first.extra };
+  const merged = { ...first, rows: [...first.rows, ...modelFromBlock(next).rows] };
   return { from: current.openLine, to: next.closeLine, replacement: serializeBlock(metaFromModel(merged), rowEmbeds(merged)) };
 }
 

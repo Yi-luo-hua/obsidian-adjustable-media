@@ -72,6 +72,7 @@ export const DEFAULT_ROW_HEIGHT = 220;
 export const MIN_ROW_HEIGHT = 80;
 export const MAX_ROW_HEIGHT = 900;
 export const MAX_EMBEDS_PER_ROW = 4;
+export const MIN_BLOCK_WIDTH = 0.2;
 
 const IMAGE_EXTENSIONS = new Set(["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]);
 const VIDEO_EXTENSIONS = new Set(["mkv", "mov", "mp4", "ogv", "webm"]);
@@ -168,27 +169,37 @@ export interface RowSettings {
   widths: number[] | null;
   width: number | null;
   align: Align | null;
+  /** Free horizontal position of a single item; takes precedence over align. */
+  offset: number | null;
   captions: Array<string | null> | null;
   captionAlign: CaptionAlign | null;
   /** Keys this version does not understand, written back unchanged. */
   extra: V2RowMeta;
 }
 
-const ROW_KEYS = new Set(["height", "widths", "width", "align", "captions", "captionAlign"]);
+const ROW_KEYS = new Set(["height", "widths", "width", "align", "offset", "captions", "captionAlign"]);
 
 export function readRowMeta(meta: V2RowMeta, embedCount: number): RowSettings {
   const height = finiteNumber(meta.height);
   const width = finiteNumber(meta.width);
+  const offset = finiteNumber(meta.offset);
 
   return {
     height: height === null ? null : clamp(Math.round(height), MIN_ROW_HEIGHT, MAX_ROW_HEIGHT),
     widths: positiveNumbers(meta.widths, embedCount),
     width: embedCount === 1 && width !== null && width >= 0.1 && width <= 1 ? width : null,
     align: embedCount === 1 && isAlign(meta.align) ? meta.align : null,
+    offset: embedCount === 1 && offset !== null && offset >= 0 && offset <= 1 ? offset : null,
     captions: captionList(meta.captions, embedCount),
     captionAlign: meta.captionAlign === "left" || meta.captionAlign === "center" ? meta.captionAlign : null,
     extra: Object.fromEntries(Object.entries(meta).filter(([key]) => !ROW_KEYS.has(key))),
   };
+}
+
+/** The block's share of the container width (top-level `width`); null when unset, invalid or full. */
+export function readBlockWidth(value: unknown): number | null {
+  const width = finiteNumber(value);
+  return width !== null && width >= MIN_BLOCK_WIDTH && width < 1 ? width : null;
 }
 
 /** Writes the opening comment. Settings are omitted entirely when there are none, to keep the line short. */

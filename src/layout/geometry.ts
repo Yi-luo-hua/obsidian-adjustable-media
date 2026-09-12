@@ -105,6 +105,20 @@ export function resizePair(widths: readonly number[], index: number, delta: numb
   return result;
 }
 
+/**
+ * Horizontal position of a single item dragged sideways by `delta`: how much of the row's free
+ * space lies left of it, from 0 (left) to 1 (right). It snaps to left, center and right within
+ * `snap` pixels. `free` is the row width minus the item width.
+ */
+export function positionOffset(startLeft: number, delta: number, free: number, snap: number): number {
+  if (free <= 0) {
+    return 0.5;
+  }
+  const left = Math.min(free, Math.max(0, startLeft + delta));
+  const snapped = [0, 0.5, 1].find((at) => Math.abs(left - at * free) <= snap);
+  return snapped ?? Math.round((left / free) * 1000) / 1000;
+}
+
 function beside(box: ItemBox, x: number): MoveTarget {
   const side = x < (box.rect.left + box.rect.right) / 2 ? "before" : "after";
   return { kind: "beside", position: { row: box.row, index: box.index }, side };

@@ -1,7 +1,7 @@
 import type { App } from "obsidian";
 
 import { DEFAULT_ROW_HEIGHT } from "../format/v2.ts";
-import type { LayoutItem, LayoutModel, LayoutRow } from "../layout/model.ts";
+import { rowOffset, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
 import { resolveMedia } from "./media.ts";
 import { t } from "./messages.ts";
 
@@ -37,33 +37,60 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
       renderRow(root, row, rowIndex, options);
     }
   }
+  applySizing(root, options.model);
   return root;
+}
+
+/**
+ * Applies the sizes a model sets: the block's width, row heights, and the width and position of
+ * single items. Rendering uses it, and so do resize gestures, to preview a model and to restore it.
+ */
+export function applySizing(root: HTMLElement, model: LayoutModel): void {
+  root.toggleClass("vml-layout--sized", model.width !== null);
+  root.setCssProps({ "--vml-block-width": model.width === null ? "" : `${model.width * 100}%` });
+
+  for (const rowEl of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) {
+    const row = model.rows[Number(rowEl.dataset.row)];
+    if (!row) {
+      continue;
+    }
+    rowEl.setCssProps({ "--vml-row-height": `${row.height ?? DEFAULT_ROW_HEIGHT}px` });
+
+    const item = row.items[0];
+    const itemEl = rowEl.querySelector<HTMLElement>(".vml-item");
+    if (row.items.length !== 1 || !item || !itemEl) {
+      continue;
+    }
+    rowEl.setCssProps({ "--vml-offset": String(rowOffset(row)) });
+    const width = singleWidth(row, item);
+    itemEl.toggleClass("vml-item--sized", width !== null);
+    itemEl.setCssProps({ "--vml-item-width": width ?? "" });
+  }
 }
 
 function renderRow(root: HTMLElement, row: LayoutRow, rowIndex: number, options: LayoutViewOptions): void {
   const rowEl = root.createDiv({ cls: "vml-row", attr: { "data-row": String(rowIndex) } });
-  rowEl.setCssProps({ "--vml-row-height": `${row.height ?? DEFAULT_ROW_HEIGHT}px` });
-  if (row.items.length === 1) {
-    rowEl.addClass("vml-row--single");
-    rowEl.dataset.align = row.align ?? "center";
-  }
+  const single = row.items.length === 1;
+  rowEl.toggleClass("vml-row--single", single);
 
+  // A single item sits between two spacers that share the row's free space in the ratio of its
+  // position, so any position works whatever the item's width.
+  if (single) {
+    rowEl.createDiv({ cls: "vml-row__spacer" });
+  }
   row.items.forEach((item, index) => {
     renderItem(rowEl, row, item, index, options);
   });
+  if (single) {
+    rowEl.createDiv({ cls: "vml-row__spacer vml-row__spacer--after" });
+  }
 }
 
 function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index: number, options: LayoutViewOptions): void {
   const itemEl = rowEl.createDiv({ cls: "vml-item", attr: { "data-index": String(index) } });
   const single = row.items.length === 1;
 
-  if (single) {
-    const width = row.width !== null ? `${row.width * 100}%` : item.embed.nativeWidth ? `${item.embed.nativeWidth}px` : null;
-    if (width) {
-      itemEl.addClass("vml-item--sized");
-      itemEl.setCssProps({ "--vml-item-width": width });
-    }
-  } else if (item.weight !== null) {
+  if (!single && item.weight !== null) {
     itemEl.addClass("vml-item--weighted");
     itemEl.setCssProps({ "--vml-grow": String(item.weight) });
   }
@@ -96,6 +123,13 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
       text: item.caption,
     });
   }
+}
+
+function singleWidth(row: LayoutRow, item: LayoutItem): string | null {
+  if (row.width !== null) {
+    return `${row.width * 100}%`;
+  }
+  return item.embed.nativeWidth ? `${item.embed.nativeWidth}px` : null;
 }
 
 function shareByAspectRatio(itemEl: HTMLElement, width: number, height: number): void {

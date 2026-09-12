@@ -1,7 +1,10 @@
 import {
+  DEFAULT_ROW_HEIGHT,
   MAX_EMBEDS_PER_ROW,
   MAX_ROW_HEIGHT,
+  MIN_BLOCK_WIDTH,
   MIN_ROW_HEIGHT,
+  readBlockWidth,
   readRowMeta,
   type Align,
   type CaptionAlign,
@@ -33,6 +36,8 @@ export interface LayoutRow {
   width: number | null;
   /** Single-item rows only. */
   align: Align | null;
+  /** Free horizontal position, 0 (left) to 1 (right); single-item rows only, overrides align. */
+  offset: number | null;
   captionAlign: CaptionAlign | null;
   /** Row keys this version does not understand, written back unchanged. */
   extra: V2RowMeta;
@@ -40,6 +45,8 @@ export interface LayoutRow {
 
 export interface LayoutModel {
   rows: LayoutRow[];
+  /** The block's share of the container width; null means full width. */
+  width: number | null;
   extra: Record<string, unknown>;
 }
 
@@ -53,7 +60,10 @@ export type MoveTarget =
   /** A new row inserted before `beforeRow`, counted before the move; `rows.length` appends. */
   | { kind: "newRow"; beforeRow: number };
 
+const ALIGN_OFFSETS: ReadonlyArray<readonly [Align, number]> = [["left", 0], ["center", 0.5], ["right", 1]];
+
 export function modelFromBlock(block: V2Block): LayoutModel {
+  const { width, ...extra } = block.meta.extra;
   return {
     rows: block.rows.map((row, rowIndex) => {
       const settings = readRowMeta(block.meta.rows[rowIndex] ?? {}, row.embeds.length);
@@ -66,11 +76,13 @@ export function modelFromBlock(block: V2Block): LayoutModel {
         height: settings.height,
         width: settings.width,
         align: settings.align,
+        offset: settings.offset,
         captionAlign: settings.captionAlign,
         extra: settings.extra,
       };
     }),
-    extra: { ...block.meta.extra },
+    width: readBlockWidth(width),
+    extra,
   };
 }
 
@@ -88,7 +100,9 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       if (single && row.width !== null) {
         meta.width = row.width;
       }
-      if (single && row.align !== null) {
+      if (single && row.offset !== null) {
+        meta.offset = row.offset;
+      } else if (single && row.align !== null) {
         meta.align = row.align;
       }
       if (row.items.some((item) => item.caption !== null)) {
@@ -99,12 +113,18 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       }
       return meta;
     }),
-    extra: { ...model.extra },
+    extra: model.width === null ? { ...model.extra } : { width: model.width, ...model.extra },
   };
 }
 
 export function rowEmbeds(model: LayoutModel): V2Embed[][] {
   return model.rows.map((row) => row.items.map((item) => item.embed));
+}
+
+/** Where a single item sits, from 0 (left) to 1 (right). */
+export function rowOffset(row: LayoutRow): number {
+  const align = row.align ?? "center";
+  return row.offset ?? ALIGN_OFFSETS.find(([name]) => name === align)?.[1] ?? 0.5;
 }
 
 export function moveItem(model: LayoutModel, source: ItemPosition, target: MoveTarget): LayoutModel {
@@ -157,7 +177,7 @@ export function removeItem(model: LayoutModel, position: ItemPosition): { model:
   return { model: { ...model, rows: rows.filter((row) => row.items.length > 0) }, item };
 }
 
-/** Adds an item taken from another layout, e.g. one dragged across blocks. */
+/** Adds an item taken from another layout or from a plain line, e.g. one dragged in. */
 export function insertItem(model: LayoutModel, item: LayoutItem, target: MoveTarget): LayoutModel {
   const rows = cloneRows(model.rows);
 
@@ -175,6 +195,7 @@ export function insertItem(model: LayoutModel, item: LayoutItem, target: MoveTar
       height: null,
       width: null,
       align: null,
+      offset: null,
       captionAlign: null,
       extra: {},
     });
@@ -187,10 +208,7 @@ export function setRowHeight(model: LayoutModel, rowIndex: number, height: numbe
   if (!Number.isFinite(height)) {
     return model;
   }
-  return updateRow(model, rowIndex, (row) => ({
-    ...row,
-    height: Math.min(MAX_ROW_HEIGHT, Math.max(MIN_ROW_HEIGHT, Math.round(height))),
-  }));
+  return updateRow(model, rowIndex, (row) => ({ ...row, height: clampHeight(height) }));
 }
 
 export function setWeights(model: LayoutModel, rowIndex: number, weights: readonly number[]): LayoutModel {
@@ -211,14 +229,58 @@ export function setSingleWidth(model: LayoutModel, rowIndex: number, width: numb
   if (model.rows[rowIndex]?.items.length !== 1 || !Number.isFinite(width)) {
     return model;
   }
-  return updateRow(model, rowIndex, (row) => ({ ...row, width: Math.min(1, Math.max(0.1, width)) }));
+  return updateRow(model, rowIndex, (row) => ({ ...row, width: clampSingleWidth(width) }));
 }
 
 export function setAlign(model: LayoutModel, rowIndex: number, align: Align): LayoutModel {
   if (model.rows[rowIndex]?.items.length !== 1) {
     return model;
   }
-  return updateRow(model, rowIndex, (row) => ({ ...row, align }));
+  return updateRow(model, rowIndex, (row) => ({ ...row, align, offset: null }));
+}
+
+/**
+ * Places a single item anywhere from 0 (left) to 1 (right). Left, center and right are stored as
+ * `align`, which older versions of the plugin understand too; anything in between as `offset`.
+ */
+export function setPosition(model: LayoutModel, rowIndex: number, offset: number): LayoutModel {
+  if (model.rows[rowIndex]?.items.length !== 1 || !Number.isFinite(offset)) {
+    return model;
+  }
+  const value = round(Math.min(1, Math.max(0, offset)));
+  const align = ALIGN_OFFSETS.find(([, at]) => at === value)?.[0];
+  return updateRow(model, rowIndex, (row) => (align ? { ...row, align, offset: null } : { ...row, align: null, offset: value }));
+}
+
+/** Sets the block's share of the container width; full width is the default and is not stored. */
+export function setBlockWidth(model: LayoutModel, width: number): LayoutModel {
+  if (!Number.isFinite(width)) {
+    return model;
+  }
+  const value = round(Math.min(1, Math.max(MIN_BLOCK_WIDTH, width)));
+  return { ...model, width: value >= 1 ? null : value };
+}
+
+/**
+ * Scales every row's height by `factor`. With `singleWidths`, rows of a single item grow too, by
+ * scaling their width; their height follows it. A row without a stored width uses the share it
+ * currently takes up, given by `singleWidths` for that row. When the container itself scales,
+ * pass 1 for `singleWidthFactor`: keep that share instead of scaling single items twice.
+ */
+export function scaleRows(model: LayoutModel, factor: number, singleWidths?: ReadonlyArray<number | null>, singleWidthFactor = factor): LayoutModel {
+  if (!Number.isFinite(factor) || factor <= 0) {
+    return model;
+  }
+  return {
+    ...model,
+    rows: model.rows.map((row, index) => {
+      if (row.items.length !== 1) {
+        return { ...row, height: clampHeight((row.height ?? DEFAULT_ROW_HEIGHT) * factor) };
+      }
+      const current = row.width ?? singleWidths?.[index] ?? null;
+      return singleWidths && current !== null ? { ...row, width: clampSingleWidth(round(current * singleWidthFactor)) } : row;
+    }),
+  };
 }
 
 export function setCaption(model: LayoutModel, position: ItemPosition, caption: string | null): LayoutModel {
@@ -253,7 +315,7 @@ function rebalance(rows: LayoutRow[]): LayoutRow[] {
 }
 
 function rowLike(row: LayoutRow): LayoutRow {
-  return { items: [], height: row.height, width: null, align: null, captionAlign: row.captionAlign, extra: {} };
+  return { items: [], height: row.height, width: null, align: null, offset: null, captionAlign: row.captionAlign, extra: {} };
 }
 
 function averageWeight(row: LayoutRow): number | null {
@@ -271,4 +333,16 @@ function updateRow(model: LayoutModel, rowIndex: number, update: (row: LayoutRow
 
 function cloneRows(rows: readonly LayoutRow[]): LayoutRow[] {
   return rows.map((row) => ({ ...row, items: [...row.items] }));
+}
+
+function clampHeight(height: number): number {
+  return Math.min(MAX_ROW_HEIGHT, Math.max(MIN_ROW_HEIGHT, Math.round(height)));
+}
+
+function clampSingleWidth(width: number): number {
+  return Math.min(1, Math.max(0.1, width));
+}
+
+function round(value: number): number {
+  return Math.round(value * 1000) / 1000;
 }
