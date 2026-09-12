@@ -40,18 +40,14 @@ git push origin 0.1.0
 
 在 GitHub 上打开草稿 Release，核对说明和附件，确认无误后手动点「Publish release」。
 
-## 5. 提交到官方插件库（只在第一次）
+## 5. 提交到社区插件目录（只在第一次）
 
-第一个 Release 正式发布之后，向 `obsidianmd/obsidian-releases` 提交 PR，在 `community-plugins.json` 末尾加入：
+插件现在不再通过给 `obsidianmd/obsidian-releases` 发 PR 提交，而是在 [community.obsidian.md](https://community.obsidian.md) 提交（官方文档：[Submit your plugin](https://docs.obsidian.md/Plugins/Releasing/Submit+your+plugin)）：
 
-```json
-{
-  "id": "adjustable-media",
-  "name": "Adjustable Media",
-  "author": "Yi-luo-hua",
-  "description": "Arrange images and videos side by side, then drag to reorder and resize them. Notes keep plain embeds plus an HTML comment, so they stay readable without the plugin.",
-  "repo": "Yi-luo-hua/obsidian-adjustable-media"
-}
-```
+1. 用 Obsidian 账号登录 community.obsidian.md。
+2. 在个人资料的 **GitHub** 一栏点 **Connect**，关联 GitHub 账号。这是只读授权，用来验证仓库归属。
+3. 在侧栏的 **Plugins** 页点 **New plugin**，**GitHub repository URL** 填 `https://github.com/Yi-luo-hua/obsidian-adjustable-media`，**Owner** 选自己，同意开发者政策后点 **Submit**。
 
-`id`、`name`、`description` 必须和 `manifest.json` 完全一致。PR 会先经过自动检查，再由人工审核；审核意见在 PR 里回复。之后的版本只要发布新的 Release，不需要再提交 PR。
+目录读取默认分支 HEAD 上的 `manifest.json`，安装时下载标签与其中 `version` 相同的 Release，所以提交前两者都要就绪。提交后会自动审核，需要修改的地方会显示在目录页面上；改完后发布一个版本号更高的新 Release。插件上架后，之后的版本只要发布新的 Release 即可。
+
+建议在个人资料里打开 **Action required notifications**：插件检查失败或需要处理时会收到邮件。
