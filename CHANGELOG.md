@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 - 2026-09-13
+
+- Refresh the English and Chinese README with reorganized feature descriptions, usage instructions, and a demo image.
+- Refine Chinese interface wording and layout block terminology in the design documentation.
+
 ## 0.2.0 - 2026-09-13
 
 - In live preview, a glowing frame shows where each layout begins and ends. Drag its right edge to change the layout's width, its bottom edge to scale the height of every row, or its corner to scale both.

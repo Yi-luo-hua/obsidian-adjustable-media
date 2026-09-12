@@ -5,7 +5,7 @@ import type { V2Block } from "../format/v2.ts";
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
   unreadableSettings: {
-    zh: "布局设置无法读取，已按默认值显示；修好之前不能在这里调整布局。",
+    zh: "布局块设置无法读取，已按默认值显示；修好之前不能在这里调整布局块。",
     en: "Layout settings could not be read, so defaults are shown. Layout editing is off until they are fixed.",
   },
   missingMedia: {
@@ -33,11 +33,11 @@ const MESSAGES = {
     en: "Align right",
   },
   moveOut: {
-    zh: "移出布局",
+    zh: "移出布局块",
     en: "Move out of layout",
   },
   writeNotFound: {
-    zh: "布局已在别处被改动，这次修改没有写入，请重试。",
+    zh: "布局块已在别处被改动，这次修改没有写入，请重试。",
     en: "The layout changed elsewhere, so this change was not saved. Please try again.",
   },
   writeAmbiguous: {
@@ -97,7 +97,7 @@ const MESSAGES = {
     en: "Drag to resize the width",
   },
   resizeBlockWidth: {
-    zh: "拖动调整布局的宽度",
+    zh: "拖动调整布局块的宽度",
     en: "Drag to resize the layout's width",
   },
   resizeBlockHeight: {
@@ -105,7 +105,7 @@ const MESSAGES = {
     en: "Drag to scale the height of every row",
   },
   resizeBlock: {
-    zh: "拖动等比缩放布局",
+    zh: "拖动等比缩放布局块",
     en: "Drag to scale the layout",
   },
   wrapInLayout: {
@@ -133,7 +133,7 @@ const MESSAGES = {
     en: "Remove the layout comments here",
   },
   cmdRemoveAll: {
-    zh: "移除所有笔记中的布局注释…",
+    zh: "移除所有笔记中的布局块注释…",
     en: "Remove layout comments from all notes…",
   },
   wrapNothing: {
@@ -149,7 +149,7 @@ const MESSAGES = {
     en: "The cursor is not in a layout block.",
   },
   removeAllTitle: {
-    zh: "移除布局注释",
+    zh: "移除布局块注释",
     en: "Remove layout comments",
   },
   removeAllSummary: {

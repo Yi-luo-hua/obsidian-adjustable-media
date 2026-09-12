@@ -1,65 +1,68 @@
 # Adjustable Media
 
-Put images and videos side by side in your Obsidian notes, then drag them into place and resize them with the mouse.
+Arrange, resize, and lay out images and videos in Obsidian like a modern canvas using layout blocks — stored via lightweight HTML comments, keeping 100% native Markdown with zero format lock-in.
 
-Your notes keep ordinary embeds. The layout lives in a single HTML comment, so a note still reads fine without the plugin, on GitHub, or wherever you publish it.
+[English](README.md) · [简体中文](README.zh-CN.md)
 
-[中文说明](README.zh-CN.md)
+![Adjustable Media Preview](assets/demo.jpg)
+
+---
 
 ## Features
 
-- **Rows of up to four** images or videos at the same height, in reading view and live preview.
-- **A visible frame** in live preview shows where each layout begins and ends, and resizes the whole layout.
-- **Drag to rearrange**: reorder items, start a new row, move an item into another layout, or drag any image of the note into a layout.
-- **Place single images freely**: drag one left or right within its row; it snaps to left, center and right.
-- **Resize with the mouse**: the whole layout, a row's height, how two items share a row, or the width of a single item.
-- **Captions and alignment** from the right-click menu.
-- **View images**: double-click one in live preview to zoom and pan.
-- **Videos keep their controls**: they move by a small grip, so seeking and volume still work.
-- **Automatic layouts** (optional): media you drop or paste, from your computer or from Obsidian's file list, is laid out for you.
-- **No lock-in**: remove the plugin and your images are still there as plain embeds.
+### 🎨 Fluid, Intuitive Mouse-Driven Layout
 
-## How to use
+- **Side-by-Side & Grids**: Place images and videos side by side (up to 4 per row) with automatic height equalization.
+- **Direct Mouse Resizing**: Drag the gap between two images to adjust column widths, drag a row's bottom edge to change height, or drag the outer frame to scale the entire layout block.
+- **Free Single-Image Placement**: Slide a single image left or right across its row, with smooth magnetic snapping to left, center, and right.
+- **Flexible Drag-and-Drop Reordering**: Drag an item to reorder within a row, drop between rows to start a new row, or drag loose images from your note directly into an existing layout block.
+- **Double-Click Image Viewer**: In editing mode, double-click any image in a layout block to inspect it up close; supports mouse wheel zoom, click-and-drag panning, and left/right arrow keys to switch between images in the block.
+- **Video Playback**: Videos feature a dedicated drag button in the top-left corner, ensuring layout drags never accidentally trigger playback or the timeline scrubber.
 
-### Create a layout
+### 🛡️ Zero Lock-in, Permanent Data Safety
 
-Dropped and pasted images stay ordinary embeds. To turn one into a layout, in live preview:
+- **Native Markdown Syntax**: Notes store standard Obsidian media embeds (`![[...]]` or `![...](...)`).
+- **Minimal Comment Storage**: Layout block settings are stored compactly inside a pair of HTML comments (`<!-- vml ... -->` ... `<!-- /vml -->`).
+- **Seamless Multi-Platform & Publishing Compatibility**: Even with the plugin disabled, on mobile, pushed to GitHub, or published to Hexo / Quartz / personal blogs, media still renders cleanly as ordinary embeds without clutter or broken tags.
+- **Refactor-Proof**: Renaming or moving image and video files in Obsidian automatically updates links, keeping layouts completely intact.
 
-- right-click the image and choose **Wrap in a layout**, or
-- click the image, then run **Adjustable Media: Wrap selected media in a layout** from the command palette. Assign it a hotkey in **Settings → Hotkeys** to do this in one keystroke.
+### ⚡ Intuitive Editing Workflow
 
-The command also wraps several lines of embeds at once: select them first. The embeds are placed in rows of up to four, in order.
+- **WYSIWYG with Instant Source Switching**: Features an illuminated control frame in editing mode; moving the cursor inside or clicking "Edit source" smoothly switches to plain Markdown text for effortless transitions between visual and handwritten editing.
+- **Automatic Layouts (Optional)**: When enabled in settings, multiple images or videos dropped from your computer or pasted will automatically be packaged into layout blocks.
+- **Single-Transaction Safe Writes**: All modifications execute through a single editor transaction (with native Undo/Redo support), strictly verifying context anchors before writing, never altering untouched lines, blank lines, or indentations.
 
-Once a note has a layout, you can drag any other image of the note straight into it.
+---
 
-If you want every drop and paste laid out for you, turn on **Convert dropped and pasted media** in the plugin settings. Media you then drop (from your computer or from Obsidian's file list) or paste is wrapped in a layout, or joins the layout right above it.
+## Quick Start
 
-### Arrange and resize
+### 1. Create a Layout Block
 
-| To | Do this |
-| --- | --- |
-| Move an item | Drag it: beside another item, between two rows for a new row, or onto another layout in the same note. |
-| Add an image to a layout | In live preview, drag the image from the note onto the layout. It works for images on a line of their own, or on a line of images only. |
-| Place a single image | Drag it left or right within its row. It snaps to left, center and right, and can stop anywhere in between. |
-| Move a video | Drag the grip in its top-left corner. |
-| Resize the whole layout | In live preview, drag the frame: its right edge for the width, its bottom edge for the height of every row, its corner for both at once. |
-| Change a row's height | Drag the row's bottom edge. |
-| Change how two items share a row | Drag the gap between them. |
-| Resize a single item | Drag the small corner handle on the image. |
-| View an image | Double-click it in live preview: scroll to zoom, drag to pan, arrow keys for the layout's other images. In reading view, click it. |
-| Add a caption, align, move an item out, or reveal the file | Right-click it, or press <kbd>Shift</kbd>+<kbd>F10</kbd> when it's focused. The menu also has Obsidian's usual file actions, such as revealing the file in the file list. |
-| Edit the source | In live preview, click **Edit source** in the layout's corner, or move the cursor into the layout. |
+- **Right-Click Menu**: In Live Preview, right-click any image or video and choose **Wrap in a layout block**.
+- **Command / Hotkey**: Select one or more lines of media embeds and run `Adjustable Media: Wrap selected media in a layout block` (assign a dedicated hotkey in Settings → Hotkeys).
+- **Drag & Drop**: When a layout block already exists in your note, drag standalone images from the note directly into it.
 
-Press <kbd>Esc</kbd> while dragging to cancel.
+### 2. Common Interactions
 
-### Commands
+| Goal | Action |
+| :--- | :--- |
+| **Adjust column width ratio** | Drag the gap between two items |
+| **Change row height** | Drag the bottom edge of the row |
+| **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner for proportional scale) |
+| **Position a single item** | Drag the image horizontally; snaps smoothly to left, center, and right |
+| **Reorder or move items** | Drag and drop onto adjacent spots, between rows (to split into a new row), or into another layout block |
+| **Move a video** | Drag the dedicated handle in the top-left corner of the video |
+| **Full-screen image viewer** | Double-click an image in Live Preview (scroll to zoom, drag to pan, arrow keys to switch); single-click in Reading View |
+| **Captions** | Right-click an item to edit captions and alignment |
+| **Move out of layout block** | Right-click an item and choose to remove it from the layout block |
+| **Cancel drag gesture** | Press <kbd>Esc</kbd> anytime during a drag to cancel |
+| **View/edit source** | Click the "Edit source" button in the top-left corner of the layout block |
 
-- **Wrap selected media in a layout**
-- **Merge with the next layout**: joins two layouts that only have blank lines between them.
-- **Remove the layout comments here**: turns the layout under the cursor back into plain embeds.
-- **Remove layout comments from all notes…**: lists every note it would change and does nothing until you confirm.
+---
 
-## What's stored in your note
+## How It Works
+
+Adjustable Media introduces no custom syntax. Your notes contain only standard embeds wrapped in clean HTML comments:
 
 ```markdown
 <!-- vml {"v":2,"rows":[{"height":240,"widths":[1,1.4]}]} -->
@@ -68,58 +71,39 @@ Press <kbd>Esc</kbd> while dragging to cancel.
 <!-- /vml -->
 ```
 
-Each line between the two comments is one row. Row heights, widths, alignment and captions go into the opening comment; a layout without settings is just `<!-- vml -->`. The plugin never rewrites the embeds themselves, so renaming or moving a file updates its links as usual.
+- The opening comment stores only essential parameters (row height, width ratios, captions, alignment), with zero unnecessary overhead.
+- Embed syntax remains completely untouched, fully compatible with file renaming and moving.
+- If you ever decide to stop using the plugin, run `Remove layout block comments from all notes…` to cleanly restore plain Markdown in one step.
 
-## Installation
+---
 
-**From Community plugins**
+## Installation & Requirements
 
-1. Open **Settings → Community plugins** and turn off Restricted mode if it's on.
-2. Click **Browse**, search for **Adjustable Media**, then click **Install** and **Enable**.
+- **Requirements**: Obsidian 1.5.0 or newer (Desktop).
 
-You can also open the [plugin's page](https://obsidian.md/plugins?id=adjustable-media) and click **Add to Obsidian**.
+### Method 1: Community Plugins (Recommended)
 
-**Manually**
+1. In Obsidian, open **Settings → Community plugins** and turn off Restricted mode.
+2. Click **Browse**, search for **Adjustable Media**.
+3. Click **Install**, then **Enable**.
 
-1. Download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest).
-2. Put them in `<your vault>/.obsidian/plugins/adjustable-media/`.
-3. Restart Obsidian and enable **Adjustable Media** in **Settings → Community plugins**.
+### Method 2: Manual Installation
 
-Desktop only for now. Requires Obsidian 1.5.0 or newer; tested with 1.13.7.
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest).
+2. Place them into `<your vault>/.obsidian/plugins/adjustable-media/`.
+3. Restart Obsidian and enable **Adjustable Media** in Community plugins.
 
-## Good to know
+---
 
-- A layout starts at the beginning of a line, so it can't sit inside a callout, a quote or a list.
-- Every line in a layout may only hold image or video embeds. A layout with anything else in it is left alone and shows as normal Markdown.
-- If a layout's settings can't be read, for example after a hand edit went wrong, the layout is shown with default settings and a notice. The plugin won't change it until the settings are fixed.
-- Without the plugin, live preview shows the comments as a faint line. Reading view, GitHub and most publishing tools hide them.
-- To uninstall cleanly, run **Remove layout comments from all notes…** first. You don't have to: the images display either way.
+## Notes
 
-More answers in the [FAQ](docs/FAQ.md).
+- Layout blocks must start at the beginning of a line (not nested inside quotes, callouts, or lists).
+- Each line inside a layout block must contain only image or video embeds. If mixed with plain text, the plugin automatically leaves it untouched to render as normal Markdown.
+- Completely offline & private: zero network requests, zero telemetry.
 
-## Privacy
+---
 
-Everything runs on your device. The plugin makes no network requests and collects nothing. Web images in your notes are loaded by Obsidian itself.
+## License & Acknowledgments
 
-The plugin only reads the notes it shows or changes. The one exception is **Remove layout comments from all notes…**, which reads every note in the vault to find the layouts to remove, and only when you run it.
-
-## Feedback
-
-Found a bug or have an idea? [Open an issue](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues).
-
-## Development
-
-```bash
-npm ci
-npm run dev
-```
-
-`npm run dev` rebuilds `main.js` on every change. Before opening a pull request, run `npm run check`: it type-checks, lints with the rules of the Obsidian plugin review ([eslint-plugin-obsidianmd](https://github.com/obsidianmd/eslint-plugin)) and runs the tests. The storage format and architecture are described in [docs/DESIGN.md](docs/DESIGN.md) (in Chinese).
-
-## Credits
-
-This project started from [Fall-Makito/visual-media-layout](https://github.com/Fall-Makito/visual-media-layout) and has since been rewritten around a different storage format.
-
-## License
-
-[MIT](LICENSE)
+- Released under the [MIT License](LICENSE).
+- Originally inspired by [Fall-Makito/visual-media-layout](https://github.com/Fall-Makito/visual-media-layout), and rewritten from the ground up with a resilient comment-based storage model and safe transactional pipeline.
