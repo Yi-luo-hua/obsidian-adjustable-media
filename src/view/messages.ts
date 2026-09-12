@@ -20,10 +20,6 @@ const MESSAGES = {
     zh: "编辑图注…",
     en: "Edit caption…",
   },
-  revealInFolder: {
-    zh: "在文件夹中显示",
-    en: "Reveal in folder",
-  },
   alignLeft: {
     zh: "左对齐",
     en: "Align left",
@@ -55,14 +51,6 @@ const MESSAGES = {
   fileMissing: {
     zh: "找不到这篇笔记，修改没有写入。",
     en: "The note could not be found, so the change was not saved.",
-  },
-  notVaultFile: {
-    zh: "这个媒体不是库里的文件。",
-    en: "This media is not a file in the vault.",
-  },
-  explorerMissing: {
-    zh: "没有打开文件列表。",
-    en: "The file explorer is not open.",
   },
   captionTitle: {
     zh: "图注",

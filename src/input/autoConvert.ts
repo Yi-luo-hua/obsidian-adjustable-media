@@ -6,11 +6,14 @@ import { mediaKindOf, readEmbedRow } from "../format/v2.ts";
 import { planWrap } from "./insertion.ts";
 
 const WINDOW_MS = 10_000;
+/** Files dragged from Obsidian's own file list are inserted right away. */
+const INTERNAL_WINDOW_MS = 2_000;
 const SETTLE_MS = 300;
 const OWN_EVENT = "vml.autoconvert";
 
 interface Pending {
-  expected: number;
+  /** Embeds to wait for; null when the drop doesn't say, as with files from Obsidian's file list. */
+  expected: number | null;
   seen: number;
   /** Start of each inserted embed line, kept mapped through later changes. */
   positions: number[];
@@ -22,7 +25,8 @@ interface Pending {
 /**
  * Automatic conversion. How Obsidian inserts dropped and pasted files: docs/DESIGN.md, section 4.
  *
- * A drop or paste of media files records how many embeds to expect in that note. Obsidian then
+ * A drop or paste of media files records how many embeds to expect in that note (a drag from
+ * Obsidian's own file list doesn't say, so it waits a short while instead). Obsidian then
  * stores each file and inserts its embed with a transaction that carries no user event. Those
  * insertions are collected and, once all have arrived, wrapped in a layout or appended to the
  * layout right above them. Typing, undo and everything else in the note are never touched.
@@ -47,35 +51,44 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
     }
   });
 
-  const expect = (view: EditorView, files: FileList | null | undefined): void => {
+  const expect = (view: EditorView, expected: number | null, windowMs: number): void => {
     const path = view.state.field(editorInfoField, false)?.file?.path;
-    if (!enabled() || !path || !files) {
+    if (!enabled() || !path) {
       return;
     }
-    const count = Array.from(files).filter((file) => (
-      mediaKindOf(file.name) !== null || file.type.startsWith("image/") || file.type.startsWith("video/")
-    )).length;
-    if (count === 0) {
-      return;
-    }
-
     const previous = pending.get(path);
     if (previous) {
       forget(path, previous);
     }
-    pending.set(path, { expected: count, seen: 0, positions: [], deadline: Date.now() + WINDOW_MS, view, timer: null });
+    pending.set(path, { expected, seen: 0, positions: [], deadline: Date.now() + windowMs, view, timer: null });
   };
+  const mediaCount = (files: FileList | null | undefined): number => Array.from(files ?? []).filter((file) => (
+    mediaKindOf(file.name) !== null || file.type.startsWith("image/") || file.type.startsWith("video/")
+  )).length;
 
   // Only take note of the drop or paste: Obsidian still stores the file and inserts its embed, so
   // the event is neither handled nor prevented here. Highest precedence runs this before any
   // editor handler that might stop the event.
   const watchInput = Prec.highest(EditorView.domEventHandlers({
     drop: (evt, view) => {
-      expect(view, evt.dataTransfer?.files);
+      const files = evt.dataTransfer?.files;
+      if (files && files.length > 0) {
+        const count = mediaCount(files);
+        if (count > 0) {
+          expect(view, count, WINDOW_MS);
+        }
+      } else {
+        // A drag from Obsidian's own file list carries no files: Obsidian inserts the embeds itself,
+        // without a user event, as it does for files from outside. Anything else it drops is no embed.
+        expect(view, null, INTERNAL_WINDOW_MS);
+      }
       return false;
     },
     paste: (evt, view) => {
-      expect(view, evt.clipboardData?.files);
+      const count = mediaCount(evt.clipboardData?.files);
+      if (count > 0) {
+        expect(view, count, WINDOW_MS);
+      }
       return false;
     },
   }));
@@ -111,8 +124,10 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
     if (entry.timer !== null) {
       window.clearTimeout(entry.timer);
     }
-    // All expected embeds arrived: convert shortly. Otherwise wait for the rest until the deadline.
-    const wait = entry.seen >= entry.expected ? SETTLE_MS : Math.max(0, entry.deadline - Date.now());
+    // All expected embeds arrived, or their number is unknown: convert shortly after the last one.
+    // Otherwise wait for the rest until the deadline.
+    const done = entry.expected === null || entry.seen >= entry.expected;
+    const wait = done ? SETTLE_MS : Math.max(0, entry.deadline - Date.now());
     entry.timer = window.setTimeout(() => convert(path, entry), wait);
   };
 

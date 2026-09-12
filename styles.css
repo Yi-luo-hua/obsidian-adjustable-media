@@ -237,6 +237,13 @@
   width: 14px;
 }
 
+.vml-item__width-handle--left {
+  background: linear-gradient(225deg, transparent 50%, var(--interactive-accent) 50%);
+  cursor: nesw-resize;
+  left: 4px;
+  right: auto;
+}
+
 .vml-item__grip {
   align-items: center;
   background: var(--background-primary);

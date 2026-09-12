@@ -13,7 +13,7 @@ Your notes keep ordinary embeds. The layout lives in a single HTML comment, so a
 - **Resize with the mouse**: a row's height, how two items share a row, or the width of a single item.
 - **Captions and alignment** from the right-click menu.
 - **Videos keep their controls**: they move by a small grip, so seeking and volume still work.
-- **Automatic layouts** (optional): media you drop or paste is laid out for you.
+- **Automatic layouts** (optional): media you drop or paste, from your computer or from Obsidian's file list, is laid out for you.
 - **No lock-in**: remove the plugin and your images are still there as plain embeds.
 
 ## How to use
@@ -22,7 +22,7 @@ Your notes keep ordinary embeds. The layout lives in a single HTML comment, so a
 
 Select some lines of image or video embeds (or put the cursor on one), open the command palette and run **Adjustable Media: Wrap selected media in a layout**. The embeds are placed in rows of up to four, in order.
 
-You can also turn on **Convert dropped and pasted media** in the plugin settings. From then on, media you drop or paste into a note is wrapped in a layout, or joins the layout right above it.
+You can also turn on **Convert dropped and pasted media** in the plugin settings. From then on, media you drop into a note (from your computer or from Obsidian's file list) or paste is wrapped in a layout, or joins the layout right above it.
 
 ### Arrange and resize
 
@@ -33,7 +33,7 @@ You can also turn on **Convert dropped and pasted media** in the plugin settings
 | Change a row's height | Drag the row's bottom edge. |
 | Change how two items share a row | Drag the gap between them. |
 | Resize a single item | Drag its bottom-right corner. |
-| Add a caption, align, reveal the file, or move an item out | Right-click it, or press <kbd>Shift</kbd>+<kbd>F10</kbd> when it's focused. |
+| Add a caption, align, move an item out, or reveal the file | Right-click it, or press <kbd>Shift</kbd>+<kbd>F10</kbd> when it's focused. The menu also has Obsidian's usual file actions, such as revealing the file in the file list. |
 | Edit the source | In live preview, click **Edit source** in the layout's corner, or move the cursor into the layout. |
 
 Press <kbd>Esc</kbd> while dragging to cancel.

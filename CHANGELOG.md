@@ -1,10 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 - 2026-09-12
 
+- Automatic conversion also picks up images and videos dragged in from Obsidian's file list.
+- The right-click menu now has Obsidian's own file actions for the media, such as revealing it in the file list or the system's file manager, instead of a separate "Reveal in folder" item.
 - The setting appears in Obsidian's settings search (Obsidian 1.13 and later).
 - Fixed: in reading view, changing a row's height, the column widths, a caption or the alignment didn't show until the note was reopened, and the next change to that layout failed.
 - Fixed: clicking a resize handle without dragging changed the note, and could switch a row to fixed column widths.
+- Fixed: the width handle of a right-aligned item is on its left edge now, so it follows the pointer.
 - Videos show the normal pointer, since they move by their grip.
 
 ## 0.1.0 - 2026-09-12

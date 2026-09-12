@@ -1,6 +1,6 @@
 import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
-import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_ROW_HEIGHT, type V2Block, type V2Embed } from "../format/v2.ts";
+import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_ROW_HEIGHT, type V2Block } from "../format/v2.ts";
 import { isEditable, planModelEdit, planMoveOut, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
 import { dropTarget, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
@@ -237,7 +237,9 @@ function setUpRow(rowEl: HTMLElement, row: number, context: LayoutContext): void
 
 function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, align: string, context: LayoutContext): void {
   const handle = itemEl.createDiv({ cls: "vml-handle vml-item__width-handle", attr: { "aria-label": t("resizeWidth"), role: "separator" } });
-  // The handle sits at the right edge: a centered item grows on both sides, a right-aligned one to the left.
+  // The handle sits on the edge that moves: the right one, or the left one for a right-aligned item.
+  // A centered item grows on both sides, so its edge moves half as far as its width changes.
+  handle.toggleClass("vml-item__width-handle--left", align === "right");
   const factor = align === "center" ? 2 : align === "right" ? -1 : 1;
 
   handle.addEventListener("pointerdown", (event) => {
@@ -367,7 +369,9 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   }
 
   const menu = new Menu();
-  menu.addItem((entry) => entry.setTitle(t("editCaption")).setIcon("text").onClick(() => {
+  // Each group has its own section: Obsidian separates sections and lists these before the file
+  // actions added at the end.
+  menu.addItem((entry) => entry.setTitle(t("editCaption")).setIcon("text").setSection("vml-caption").onClick(() => {
     const currentAlign = row.captionAlign ?? "left";
     new CaptionModal(context.app, item.caption ?? "", currentAlign, (caption, align) => {
       let model = setCaption(context.model, position, caption);
@@ -377,18 +381,15 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
       void commit(context, [planModelEdit(context.block, model)]);
     }).open();
   }));
-  menu.addItem((entry) => entry.setTitle(t("revealInFolder")).setIcon("folder-open").onClick(() => {
-    revealInFolder(context, item.embed);
-  }));
 
   // Alignment only means something for a row with a single item.
   if (row.items.length === 1) {
-    menu.addSeparator();
     const choices = [["left", "alignLeft", "align-left"], ["center", "alignCenter", "align-center"], ["right", "alignRight", "align-right"]] as const;
     for (const [align, label, icon] of choices) {
       menu.addItem((entry) => entry
         .setTitle(t(label))
         .setIcon(icon)
+        .setSection("vml-align")
         .setChecked((row.align ?? "center") === align)
         .onClick(() => {
           void commit(context, [planModelEdit(context.block, setAlign(context.model, position.row, align))]);
@@ -397,36 +398,25 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   }
 
   // Nothing is deleted: the embed goes on its own line right after the block.
-  menu.addSeparator();
-  menu.addItem((entry) => entry.setTitle(t("moveOut")).setIcon("log-out").onClick(() => {
+  menu.addItem((entry) => entry.setTitle(t("moveOut")).setIcon("log-out").setSection("vml-move").onClick(() => {
     const taken = removeItem(context.model, position);
     if (taken) {
       void commit(context, [planMoveOut(context.block, taken.model, taken.item.embed)]);
     }
   }));
 
+  // Obsidian's own actions for the media file, as on any link: reveal it in the file list or the
+  // system's file manager, open it, copy its path, and whatever other plugins add.
+  const media = resolveMedia(context.app, item.embed, context.sourcePath);
+  if (media?.file) {
+    context.app.workspace.trigger("file-menu", menu, media.file, "link-context-menu");
+  }
+
   if (at instanceof MouseEvent) {
     menu.showAtMouseEvent(at);
   } else {
     menu.showAtPosition(at);
   }
-}
-
-function revealInFolder(context: LayoutContext, embed: V2Embed): void {
-  const media = resolveMedia(context.app, embed, context.sourcePath);
-  if (!media?.file) {
-    new Notice(t("notVaultFile"));
-    return;
-  }
-
-  const explorer = context.app.workspace.getLeavesOfType("file-explorer")[0]?.view as unknown as
-    | { revealInFolder?: (file: TFile) => void }
-    | undefined;
-  if (!explorer?.revealInFolder) {
-    new Notice(t("explorerMissing"));
-    return;
-  }
-  explorer.revealInFolder(media.file);
 }
 
 async function commit(context: LayoutContext, edits: Array<BlockEdit | null>): Promise<void> {

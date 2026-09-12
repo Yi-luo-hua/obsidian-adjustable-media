@@ -38,6 +38,6 @@ jobs:
           id=$(node -p "require('./manifest.json').id")
           gh release create "$GITHUB_REF_NAME" \
             --draft \
-            --title "Adjustable Media $GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
             --notes-file dist/release-notes.md \
             "dist/$id/main.js" "dist/$id/manifest.json" "dist/$id/styles.css" "dist/$id/sha256sums.txt"
