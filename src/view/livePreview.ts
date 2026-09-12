@@ -16,7 +16,7 @@ interface LivePreviewState {
 
 /**
  * Live preview. Each v2 block is replaced with its rendered layout; while the cursor or a selection
- * touches the block, its source shows again (verified in phase 1, S2). The note is parsed only when
+ * touches the block, its source shows again (docs/DESIGN.md, section 4). The note is parsed only when
  * it changes; a cursor move just recomputes which blocks show their source.
  */
 export function livePreviewExtension(app: App): Extension {
@@ -41,7 +41,9 @@ function parseBlocks(state: EditorState): V2Block[] {
   if (!state.field(editorLivePreviewField, false)) {
     return [];
   }
-  return findV2Blocks(state.doc.toString().split("\n"));
+  // Runs on every change of every note, and most notes have no layouts.
+  const text = state.doc.toString();
+  return text.includes("<!-- vml") ? findV2Blocks(text.split("\n")) : [];
 }
 
 function withDecorations(app: App, state: EditorState, blocks: V2Block[]): LivePreviewState {

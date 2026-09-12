@@ -16,6 +16,10 @@ Yes. Keep in mind:
 - Every line between them may only contain image or video embeds, with or without spaces between them. A layout that also contains text is left alone and displays as normal Markdown.
 - Settings are matched to rows by position. If you reorder embeds by hand, column widths and captions may no longer line up; set them again.
 
+## Can I put a layout inside a callout, a quote or a list?
+
+No. The layout comments must start at the beginning of a line, and a layout inside a callout, quote or list item is shown as normal Markdown.
+
 ## Why does a layout say its settings could not be read?
 
 The JSON in its opening comment is invalid, or it was written by a newer version of the plugin. The layout is shown with default settings and the plugin won't rewrite it, so nothing it couldn't read is lost. Fix the JSON and it works again.
@@ -38,4 +42,4 @@ No. It runs entirely on your device. Web images referenced in your notes are loa
 
 ## Where should I download it?
 
-From Community plugins once it's listed, or from this repository's GitHub releases. Each release includes `sha256sums.txt` to check the files.
+From Community plugins once it's listed. Until then, use [BRAT](https://github.com/TfTHacker/obsidian42-brat) or download the files from this repository's GitHub releases. Each release includes `sha256sums.txt` to check the files.

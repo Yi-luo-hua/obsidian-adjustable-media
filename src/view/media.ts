@@ -9,7 +9,7 @@ export interface ResolvedMedia {
 }
 
 /**
- * Finds the file an embed points to (F2). Link targets are already decoded by the parser; vault
+ * Finds the file an embed points to. Link targets are already decoded by the parser; vault
  * links resolve the way Obsidian resolves them from the note, plus "./" and "../" paths, which
  * Markdown links written with relative paths use.
  */

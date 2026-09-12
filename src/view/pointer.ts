@@ -7,7 +7,7 @@ export interface PointerHandlers {
 
 /**
  * Follows one pointer gesture that started with `start` on `target`. It always ends exactly once,
- * including when the system cancels the gesture, which the v1 renderer never handled (F5).
+ * including when the system cancels the gesture.
  *
  * Moves and releases are heard on the document: with pointer capture they are retargeted to
  * `target` and bubble up; without it (the pointer was already released) nothing is missed either.

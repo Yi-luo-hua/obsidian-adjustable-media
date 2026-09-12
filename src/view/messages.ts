@@ -2,7 +2,7 @@ import { moment } from "obsidian";
 
 import type { V2Block } from "../format/v2.ts";
 
-// UI text follows Obsidian's language: Chinese for zh locales, English otherwise (U2).
+// UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
   unreadableSettings: {
     zh: "布局设置无法读取，已按默认值显示；修好之前不能在这里调整布局。",

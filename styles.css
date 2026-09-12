@@ -115,6 +115,11 @@
   cursor: grab;
 }
 
+/* Videos move by their grip; the video itself keeps its own controls. */
+.vml-layout--interactive .vml-item--video {
+  cursor: auto;
+}
+
 .vml-layout--dragging,
 .vml-layout--dragging .vml-item {
   cursor: grabbing;

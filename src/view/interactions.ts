@@ -50,7 +50,7 @@ const DROP_CLASSES = ["vml-drop-before", "vml-drop-after", "vml-drop-row-before"
  * Makes a rendered layout editable: drag to reorder (also into other blocks of the same note in the
  * same pane), resize rows, columns and single items, and a context menu. Every change goes through
  * the layout model and the write-back layer; the view never edits the note itself. Blocks that are
- * not editable (section 3.4) stay display-only.
+ * not editable (docs/DESIGN.md, section 1.3) stay display-only.
  */
 export function attachInteractions(root: HTMLElement, context: LayoutContext): void {
   contexts.set(root, context);
@@ -89,7 +89,7 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
     }
   });
 
-  // Dragging on a video would fight its seek bar and volume (F4), so videos move by a grip.
+  // Dragging on a video would fight its seek bar and volume, so videos move by a grip.
   let dragFrom = itemEl;
   if (item.embed.kind === "video") {
     dragFrom = itemEl.createDiv({ cls: "vml-handle vml-item__grip", attr: { "aria-label": t("dragHandle"), role: "button" } });
@@ -156,7 +156,7 @@ function findDrop(root: HTMLElement, context: LayoutContext, x: number, y: numbe
   if (!targetRoot || !targetContext || targetContext.sourcePath !== context.sourcePath || !isEditable(targetContext.block)) {
     return null;
   }
-  // The same note open in two panes would otherwise let one drag edit a block twice (F6).
+  // The same note open in two panes would otherwise let one drag edit a block twice.
   if (targetRoot.closest(".workspace-leaf") !== root.closest(".workspace-leaf")) {
     return null;
   }
@@ -251,17 +251,22 @@ function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, 
     const startWidthProp = itemEl.style.getPropertyValue("--vml-item-width");
     const wasSized = itemEl.hasClass("vml-item--sized");
     let fraction = startWidth / rowWidth;
+    let moved = false;
     handle.addClass("is-active");
 
     trackPointer(handle, event, {
       onMove(move) {
+        moved = true;
         fraction = Math.min(1, Math.max(0.1, (startWidth + (move.clientX - event.clientX) * factor) / rowWidth));
         itemEl.addClass("vml-item--sized");
         itemEl.setCssProps({ "--vml-item-width": `${fraction * 100}%` });
       },
       onEnd() {
         handle.removeClass("is-active");
-        void commit(context, [planModelEdit(context.block, setSingleWidth(context.model, row, round(fraction)))]);
+        // A click without a drag must not write anything.
+        if (moved) {
+          void commit(context, [planModelEdit(context.block, setSingleWidth(context.model, row, round(fraction)))]);
+        }
       },
       onCancel() {
         handle.removeClass("is-active");
@@ -285,16 +290,20 @@ function setUpHeightHandle(rowEl: HTMLElement, row: number, startHeight: number,
     event.preventDefault();
     event.stopPropagation();
     let height = startHeight;
+    let moved = false;
     handle.addClass("is-active");
 
     trackPointer(handle, event, {
       onMove(move) {
+        moved = true;
         height = Math.min(MAX_ROW_HEIGHT, Math.max(MIN_ROW_HEIGHT, startHeight + move.clientY - event.clientY));
         rowEl.setCssProps({ "--vml-row-height": `${height}px` });
       },
       onEnd() {
         handle.removeClass("is-active");
-        void commit(context, [planModelEdit(context.block, setRowHeight(context.model, row, height))]);
+        if (moved) {
+          void commit(context, [planModelEdit(context.block, setRowHeight(context.model, row, height))]);
+        }
       },
       onCancel() {
         handle.removeClass("is-active");
@@ -320,10 +329,12 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
     const startGrow = itemEls.map((el) => el.style.getPropertyValue("--vml-grow"));
     const startWeighted = itemEls.map((el) => el.hasClass("vml-item--weighted"));
     let widths = startWidths;
+    let moved = false;
     handle.addClass("is-active");
 
     trackPointer(handle, event, {
       onMove(move) {
+        moved = true;
         widths = resizePair(startWidths, index, move.clientX - event.clientX, MIN_COLUMN_WIDTH);
         itemEls.forEach((el, i) => {
           el.addClass("vml-item--weighted");
@@ -332,7 +343,10 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
       },
       onEnd() {
         handle.removeClass("is-active");
-        void commit(context, [planModelEdit(context.block, setWeights(context.model, row, weightsFromWidths(widths)))]);
+        // Without a drag, the row would silently switch from shares by aspect ratio to fixed widths.
+        if (moved) {
+          void commit(context, [planModelEdit(context.block, setWeights(context.model, row, weightsFromWidths(widths)))]);
+        }
       },
       onCancel() {
         handle.removeClass("is-active");
@@ -367,7 +381,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     revealInFolder(context, item.embed);
   }));
 
-  // Alignment only means something for a row with a single item (F7).
+  // Alignment only means something for a row with a single item.
   if (row.items.length === 1) {
     menu.addSeparator();
     const choices = [["left", "alignLeft", "align-left"], ["center", "alignCenter", "align-center"], ["right", "alignRight", "align-right"]] as const;
@@ -382,7 +396,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     }
   }
 
-  // Replaces v1's instant Delete/Backspace removal (D6): the embed is kept, right after the block.
+  // Nothing is deleted: the embed goes on its own line right after the block.
   menu.addSeparator();
   menu.addItem((entry) => entry.setTitle(t("moveOut")).setIcon("log-out").onClick(() => {
     const taken = removeItem(context.model, position);

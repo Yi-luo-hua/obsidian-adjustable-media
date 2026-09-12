@@ -20,7 +20,7 @@ interface Pending {
 }
 
 /**
- * Automatic conversion (D1, verified in phase 1 as S6).
+ * Automatic conversion. How Obsidian inserts dropped and pasted files: docs/DESIGN.md, section 4.
  *
  * A drop or paste of media files records how many embeds to expect in that note. Obsidian then
  * stores each file and inserts its embed with a transaction that carries no user event. Those
@@ -40,7 +40,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
       pending.delete(path);
     }
   };
-  // Pending timers must not fire after the plugin is gone (F9).
+  // Pending timers must not fire after the plugin is gone.
   plugin.register(() => {
     for (const [path, entry] of Array.from(pending)) {
       forget(path, entry);

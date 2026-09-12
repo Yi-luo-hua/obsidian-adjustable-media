@@ -3,7 +3,7 @@ import { PluginSettingTab, Setting, type App, type Plugin, type SettingDefinitio
 import { t } from "./view/messages.ts";
 
 export interface VmlSettings {
-  /** Wrap dropped or pasted media in a layout. Off by default (D1). */
+  /** Wrap dropped or pasted media in a layout. Off by default, since it changes the note. */
   autoConvert: boolean;
 }
 
@@ -11,7 +11,7 @@ export const DEFAULT_SETTINGS: VmlSettings = {
   autoConvert: false,
 };
 
-/** Reads only the keys this version knows; v1's settings are not carried over. */
+/** Reads only the keys this version knows; anything else in the saved data is dropped. */
 export function readSettings(saved: unknown): VmlSettings {
   const record = typeof saved === "object" && saved !== null ? saved as Record<string, unknown> : {};
   return {

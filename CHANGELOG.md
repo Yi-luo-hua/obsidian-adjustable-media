@@ -3,6 +3,9 @@
 ## Unreleased
 
 - The setting appears in Obsidian's settings search (Obsidian 1.13 and later).
+- Fixed: in reading view, changing a row's height, the column widths, a caption or the alignment didn't show until the note was reopened, and the next change to that layout failed.
+- Fixed: clicking a resize handle without dragging changed the note, and could switch a row to fixed column widths.
+- Videos show the normal pointer, since they move by their grip.
 
 ## 0.1.0 - 2026-09-12
 

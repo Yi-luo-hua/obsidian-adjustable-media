@@ -1,12 +1,51 @@
 # Adjustable Media
 
-Arrange images and videos side by side in your notes, then drag to reorder and resize them. Up to four items share a row, all at the same height.
+Put images and videos side by side in your Obsidian notes, then drag them into place and resize them with the mouse.
 
-Your notes keep ordinary embeds. The layout is stored in a single HTML comment, so a note still reads fine without the plugin, on GitHub, or wherever you publish it.
+Your notes keep ordinary embeds. The layout lives in a single HTML comment, so a note still reads fine without the plugin, on GitHub, or wherever you publish it.
 
 [中文说明](README.zh-CN.md)
 
-## What a layout looks like in the note
+## Features
+
+- **Rows of up to four** images or videos at the same height, in reading view and live preview.
+- **Drag to rearrange**: reorder items, start a new row, or move an item into another layout in the same note.
+- **Resize with the mouse**: a row's height, how two items share a row, or the width of a single item.
+- **Captions and alignment** from the right-click menu.
+- **Videos keep their controls**: they move by a small grip, so seeking and volume still work.
+- **Automatic layouts** (optional): media you drop or paste is laid out for you.
+- **No lock-in**: remove the plugin and your images are still there as plain embeds.
+
+## How to use
+
+### Create a layout
+
+Select some lines of image or video embeds (or put the cursor on one), open the command palette and run **Adjustable Media: Wrap selected media in a layout**. The embeds are placed in rows of up to four, in order.
+
+You can also turn on **Convert dropped and pasted media** in the plugin settings. From then on, media you drop or paste into a note is wrapped in a layout, or joins the layout right above it.
+
+### Arrange and resize
+
+| To | Do this |
+| --- | --- |
+| Move an item | Drag it: beside another item, between two rows for a new row, or onto another layout in the same note. |
+| Move a video | Drag the grip in its top-left corner. |
+| Change a row's height | Drag the row's bottom edge. |
+| Change how two items share a row | Drag the gap between them. |
+| Resize a single item | Drag its bottom-right corner. |
+| Add a caption, align, reveal the file, or move an item out | Right-click it, or press <kbd>Shift</kbd>+<kbd>F10</kbd> when it's focused. |
+| Edit the source | In live preview, click **Edit source** in the layout's corner, or move the cursor into the layout. |
+
+Press <kbd>Esc</kbd> while dragging to cancel.
+
+### Commands
+
+- **Wrap selected media in a layout**
+- **Merge with the next layout**: joins two layouts that only have blank lines between them.
+- **Remove the layout comments here**: turns the layout under the cursor back into plain embeds.
+- **Remove layout comments from all notes…**: lists every note it would change and does nothing until you confirm.
+
+## What's stored in your note
 
 ```markdown
 <!-- vml {"v":2,"rows":[{"height":240,"widths":[1,1.4]}]} -->
@@ -15,61 +54,51 @@ Your notes keep ordinary embeds. The layout is stored in a single HTML comment, 
 <!-- /vml -->
 ```
 
-- Each line between the two comments is one row of image or video embeds (`![[…]]` or `![…](…)`).
-- Row height, column widths, the width and alignment of a single item, and captions are stored in the opening comment. A layout without settings is just `<!-- vml -->`.
-- The plugin never rewrites the embeds themselves. It only changes the settings or moves whole embeds, so renaming a file updates its links as usual.
-
-## Features
-
-- Layouts render in reading view and live preview. In live preview, putting the cursor inside a layout shows its source.
-- Drag an item to reorder it, to start a new row, or into another layout in the same note.
-- Drag the bottom edge of a row to change its height, the gap between two items to change their widths, or the corner of a single item to change its width.
-- Right-click an item to edit its caption, reveal the file, align a single item, or move it out of the layout.
-- Videos move by the grip in their top-left corner, so their playback controls keep working.
-- Commands:
-  - Wrap selected media in a layout
-  - Merge with the next layout
-  - Remove the layout comments here
-  - Remove layout comments from all notes (shows a preview first)
-- Optional automatic conversion, off by default: media you drop or paste is wrapped in a layout, or joins the layout right above it.
+Each line between the two comments is one row. Row heights, widths, alignment and captions go into the opening comment; a layout without settings is just `<!-- vml -->`. The plugin never rewrites the embeds themselves, so renaming or moving a file updates its links as usual.
 
 ## Installation
 
-Desktop only. Tested with Obsidian 1.13.7.
+Adjustable Media isn't in the Community plugins directory yet. Until it is, you can install it in either of these ways.
 
-Until the plugin is listed in Community plugins:
+**With BRAT**
 
-1. Download `main.js`, `manifest.json` and `styles.css` from the latest [release](../../releases).
+1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) from Community plugins.
+2. In BRAT's settings, click **Add Beta plugin** and enter `Yi-luo-hua/obsidian-adjustable-media`.
+
+**Manually**
+
+1. Download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest).
 2. Put them in `<your vault>/.obsidian/plugins/adjustable-media/`.
-3. Restart Obsidian and enable Adjustable Media in Settings → Community plugins.
+3. Restart Obsidian and enable **Adjustable Media** in **Settings → Community plugins**.
 
-More detail in [docs/INSTALL.md](docs/INSTALL.md).
-
-## Removing the plugin
-
-Disable or delete it. Your notes are left with plain embeds and comments that don't show up in reading view, so the images keep displaying. To remove the comments as well, run "Remove layout comments from all notes" before you uninstall.
+Desktop only for now. Requires Obsidian 1.5.0 or newer; tested with 1.13.7.
 
 ## Good to know
 
-- If a layout's settings can't be read, for example after a manual edit went wrong, the layout is shown with default settings and a notice, and the plugin won't rewrite it until the settings are fixed.
+- A layout starts at the beginning of a line, so it can't sit inside a callout, a quote or a list.
+- Every line in a layout may only hold image or video embeds. A layout with anything else in it is left alone and shows as normal Markdown.
+- If a layout's settings can't be read, for example after a hand edit went wrong, the layout is shown with default settings and a notice. The plugin won't change it until the settings are fixed.
 - Without the plugin, live preview shows the comments as a faint line. Reading view, GitHub and most publishing tools hide them.
-- Automatic conversion only touches the lines inserted by a drop or paste. Typing never triggers it.
+- To uninstall cleanly, run **Remove layout comments from all notes…** first. You don't have to: the images display either way.
 
-See the [FAQ](docs/FAQ.md) for more.
+More answers in the [FAQ](docs/FAQ.md).
 
 ## Privacy
 
-Everything runs on your device. The plugin makes no network requests and collects nothing. Web images referenced in your notes are loaded by Obsidian itself.
+Everything runs on your device. The plugin makes no network requests and collects nothing. Web images in your notes are loaded by Obsidian itself.
+
+## Feedback
+
+Found a bug or have an idea? [Open an issue](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues).
 
 ## Development
 
 ```bash
 npm ci
-npm run check
 npm run dev
 ```
 
-`npm run check` type-checks, lints with the rules of the Obsidian plugin review ([eslint-plugin-obsidianmd](https://github.com/obsidianmd/eslint-plugin)) and runs the tests; `npm run dev` rebuilds `main.js` on every change. The storage format and architecture are described in [docs/DESIGN.md](docs/DESIGN.md) (Chinese), and the release process in [docs/RELEASE.md](docs/RELEASE.md).
+`npm run dev` rebuilds `main.js` on every change. Before opening a pull request, run `npm run check`: it type-checks, lints with the rules of the Obsidian plugin review ([eslint-plugin-obsidianmd](https://github.com/obsidianmd/eslint-plugin)) and runs the tests. The storage format and architecture are described in [docs/DESIGN.md](docs/DESIGN.md) (in Chinese).
 
 ## Credits
 

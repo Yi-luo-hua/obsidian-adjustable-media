@@ -4,7 +4,7 @@ import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts"
 import { metaFromModel, rowEmbeds, type LayoutModel } from "./model.ts";
 
 /**
- * Turns layout changes into validated line edits (D2, D3).
+ * Turns layout changes into validated line edits (docs/DESIGN.md, section 3).
  *
  * An edit is anchored to the exact lines its block had when it was rendered. Before writing, the
  * anchor must still be at its line, or, if the note shifted since, appear exactly once elsewhere in
@@ -39,7 +39,7 @@ export type ResolveResult = { ok: true; changes: LineChange[] } | EditFailure;
 /**
  * Only blocks that were read completely may be rewritten. With unreadable settings (a typo, or a
  * newer format version) or non-embed text in the body, a rewrite would silently drop what we could
- * not read, so such blocks are displayed but never written to (section 3.4).
+ * not read, so such blocks are displayed but never written to (docs/DESIGN.md, section 1.3).
  */
 export function isEditable(block: V2Block): boolean {
   return block.metaError === null && block.invalidLine === null;

@@ -83,7 +83,7 @@ async function openRemoveAll(app: App): Promise<void> {
   new RemoveAllModal(app, found).open();
 }
 
-/** Batch removal shows exactly what will change and does nothing until confirmed (D7). */
+/** Batch removal shows exactly what will change and does nothing until confirmed. */
 class RemoveAllModal extends Modal {
   private readonly notes: NoteLayouts[];
 

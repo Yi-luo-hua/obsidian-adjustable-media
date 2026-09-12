@@ -9,7 +9,7 @@ import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts"
  *
  * Every non-blank body line is one layout row. Settings live in the opening comment and are
  * matched to rows by position. The embeds themselves are never rewritten, only moved verbatim.
- * See docs/REVIEW_AND_PLAN.md, section 3.
+ * See docs/DESIGN.md, section 1.
  */
 
 export type MediaKind = "image" | "video";
@@ -148,7 +148,7 @@ export function resolveRow(block: V2Block, rowIndex: number): ResolvedRow {
   return resolveRowMeta(block.meta.rows[rowIndex] ?? {}, block.rows[rowIndex]?.embeds.length ?? 0);
 }
 
-/** Applies the tolerance rules of section 3.4: anything missing or invalid falls back to a default. */
+/** Applies the tolerance rules (docs/DESIGN.md, section 1.3): anything missing or invalid falls back to a default. */
 export function resolveRowMeta(meta: V2RowMeta, embedCount: number): ResolvedRow {
   const settings = readRowMeta(meta, embedCount);
 

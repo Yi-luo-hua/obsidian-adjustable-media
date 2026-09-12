@@ -11,7 +11,7 @@ export interface WrapOptions {
 /**
  * Plans how the given media lines become a layout: their embeds are gathered in order into rows
  * of at most four and wrapped in a new block, or appended to the block right above. The lines may
- * be separated by blank lines (a multi-file drop inserts them that way, S6), which are dropped.
+ * be separated by blank lines (a multi-file drop inserts them that way), which are dropped.
  *
  * Returns null, touching nothing, when a line holds anything but media embeds, is not plain text,
  * already belongs to a block, or when other content sits between the lines.

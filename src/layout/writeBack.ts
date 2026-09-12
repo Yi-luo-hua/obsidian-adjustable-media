@@ -5,7 +5,7 @@ import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure 
 export type WriteResult = { ok: true } | EditFailure;
 
 /**
- * The only place layout changes are written to a note (D2).
+ * The only place layout changes are written to a note (docs/DESIGN.md, section 3).
  *
  * If the note is being edited (source or live preview) in some pane, the change goes through that
  * editor as one transaction: unsaved typing is kept and the change can be undone. Otherwise the
@@ -13,7 +13,7 @@ export type WriteResult = { ok: true } | EditFailure;
  * and nothing is written on mismatch.
  *
  * A view in reading mode still has an editor, but changing it only updates the hidden buffer: the
- * note is neither saved nor re-rendered (found in the test vault, phase 3). Reading mode therefore
+ * note is neither saved nor re-rendered (docs/DESIGN.md, section 4). Reading mode therefore
  * writes the file, and Obsidian reloads the view from it.
  */
 export async function writeBlockEdits(app: App, file: TFile, edits: readonly BlockEdit[]): Promise<WriteResult> {

@@ -80,6 +80,7 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
       img.addEventListener("load", () => shareByAspectRatio(itemEl, img.naturalWidth, img.naturalHeight), { once: true });
     }
   } else {
+    itemEl.addClass("vml-item--video");
     const video = itemEl.createEl("video", { cls: "vml-item__media", attr: { src: media.url } });
     video.controls = true;
     video.preload = "metadata";
