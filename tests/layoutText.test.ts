@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { planMergeWithNext } from "../src/commands/plans.ts";
-import { blockWrap, findV2Blocks, serializeOpener, type V2Block } from "../src/format/v2.ts";
+import { blockWrap, findV2Blocks, readBlockValign, serializeOpener, type V2Block } from "../src/format/v2.ts";
 import { planWrap } from "../src/input/insertion.ts";
 import { addedTextLine, applyEditsToText, planAddText, planModelEdit, planMoveOut, planUnwrap, type BlockEdit } from "../src/layout/edits.ts";
 import {
@@ -16,6 +16,7 @@ import {
   setBlockWidth,
   setRowHeight,
   setSkip,
+  setValign,
   setWrap,
 } from "../src/layout/model.ts";
 import { planPlacement } from "../src/layout/placement.ts";
@@ -168,4 +169,21 @@ test("unwrapping and moving a layout keep its text; merging leaves layouts with 
   // New media below a layout with text get a layout of their own.
   const dropped = ["<!-- vml -->", "![[a.png]]", "说明", "<!-- /vml -->", "", "![[new.png]]"];
   assert.deepEqual(planWrap(dropped, [5], { mergeWithPrevious: true }), { from: 5, to: 5, replacement: ["<!-- vml -->", "![[new.png]]", "<!-- /vml -->"] });
+});
+
+test("text lines up with the media at the top, in the middle or at the bottom", () => {
+  assert.deepEqual(["top", "center", "bottom", "middle", 1, undefined].map(readBlockValign), [null, "center", "bottom", null, null, null]);
+
+  const lines = ['<!-- vml {"v":2,"valign":"center"} -->', "说明", "![[a.png]]", "<!-- /vml -->"];
+  const model = modelFromBlock(block(lines));
+  assert.equal(model.valign, "center");
+  assert.equal(setValign(model, "center"), model);
+  assert.equal(serializeOpener(metaFromModel(setValign(model, "top"))), "<!-- vml -->");
+  // A settings change: only the opening comment is rewritten.
+  assert.deepEqual(apply(lines, [planModelEdit(block(lines), setValign(model, "bottom"))]), ['<!-- vml {"v":2,"valign":"bottom","rows":[]} -->', ...lines.slice(1)]);
+
+  // Without text beside the media it means nothing: it cannot be set, and goes when the comment is written.
+  const plain = modelFromBlock(block(['<!-- vml {"v":2,"valign":"bottom"} -->', "![[a.png]]", "<!-- /vml -->"]));
+  assert.equal(setValign(plain, "center"), plain);
+  assert.equal(serializeOpener(metaFromModel(plain)), "<!-- vml -->");
 });

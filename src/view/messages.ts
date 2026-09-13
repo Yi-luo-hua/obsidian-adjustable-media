@@ -64,6 +64,18 @@ const MESSAGES = {
     zh: "在右侧添加文字",
     en: "Add text on the right",
   },
+  textTop: {
+    zh: "文字顶端对齐",
+    en: "Text at the top",
+  },
+  textCenter: {
+    zh: "文字垂直居中",
+    en: "Text in the middle",
+  },
+  textBottom: {
+    zh: "文字底端对齐",
+    en: "Text at the bottom",
+  },
   writeNotFound: {
     zh: "布局块已在别处被改动，这次修改没有写入，请重试。",
     en: "The layout changed elsewhere, so this change was not saved. Please try again.",

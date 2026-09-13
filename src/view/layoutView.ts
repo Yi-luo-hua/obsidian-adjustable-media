@@ -59,6 +59,9 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
   }
   const columns = hasText(model);
   root.toggleClass("vml-layout--columns", columns);
+  if (columns && model.valign !== null) {
+    root.addClass(`vml-layout--valign-${model.valign}`);
+  }
   if (model.text.left !== null) {
     renderText(root, "left", model.text.left, options);
   }

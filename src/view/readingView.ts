@@ -1,6 +1,7 @@
 import { MarkdownRenderChild, MarkdownView, type Plugin } from "obsidian";
 
 import { findV2Blocks, hasSideText, type V2Block } from "../format/v2.ts";
+import { drawnFrom, isStale, recordDrawn, type Drawn } from "../layout/drawn.ts";
 import { isEditable } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { attachInteractions } from "./interactions.ts";
@@ -10,14 +11,6 @@ import { keepWrapped } from "./readingWrap.ts";
 
 const RERENDER_ATTEMPTS = 5;
 const RERENDER_RETRY_MS = 100;
-
-/** What the layouts drawn for a note show beyond the section each is drawn in. */
-interface Drawn {
-  /** The layout comment lines of the note. */
-  comments: string;
-  /** Every line of each layout with text beside its media, in order; null for one not drawn yet. */
-  texts: Array<string | null>;
-}
 
 /**
  * Reading view. Obsidian renders each paragraph as its own section, and the embed lines of a block
@@ -35,21 +28,12 @@ export function registerReadingView(plugin: Plugin): void {
     if (text !== lastText) {
       lastText = text;
       lastBlocks = findBlocks(text);
-      lastState = layoutState(lastBlocks);
+      lastState = drawnFrom(lastBlocks);
     }
   };
 
-  // What the layouts drawn for each note show, by path. Only drawing a layout updates it: a section
-  // left empty, because its text is drawn in another one, shows nothing of the text it was made from.
+  // What the layouts drawn for each note show, by path.
   const drawn = new Map<string, Drawn>();
-  const recordDrawn = (path: string, block: V2Block): void => {
-    const previous = drawn.get(path);
-    const index = lastBlocks.filter(hasSideText).indexOf(block);
-    const texts = index < 0
-      ? previous?.texts ?? lastState.texts.map(() => null)
-      : lastState.texts.map((text, i) => (i === index ? text : previous?.texts[i] ?? null));
-    drawn.set(path, { comments: lastState.comments, texts });
-  };
 
   plugin.registerMarkdownPostProcessor((el, ctx) => {
     const info = ctx.getSectionInfo(el);
@@ -79,7 +63,7 @@ export function registerReadingView(plugin: Plugin): void {
       }
     }
 
-    recordDrawn(ctx.sourcePath, block);
+    drawn.set(ctx.sourcePath, recordDrawn(drawn.get(ctx.sourcePath), lastState, lastBlocks.filter(hasSideText).indexOf(block)));
     const child = new MarkdownRenderChild(el);
     ctx.addChild(child);
     el.empty();
@@ -108,7 +92,7 @@ export function registerReadingView(plugin: Plugin): void {
     if (previous === undefined) {
       return;
     }
-    const current = layoutState(findBlocks(data));
+    const current = drawnFrom(findBlocks(data));
     if (!isStale(previous, current)) {
       return;
     }
@@ -140,21 +124,4 @@ function rerenderWhenCurrent(view: MarkdownView, data: string, attempts: number)
 
 function findBlocks(text: string): V2Block[] {
   return text.includes("<!-- vml") ? findV2Blocks(text.split("\n")) : [];
-}
-
-function layoutState(blocks: readonly V2Block[]): Drawn {
-  return {
-    comments: blocks.map((block) => `${block.lines[0] ?? ""}\n${block.lines[block.lines.length - 1] ?? ""}`).join("\n"),
-    texts: blocks.filter(hasSideText).map((block) => block.lines.join("\n")),
-  };
-}
-
-/**
- * Whether the drawn layouts miss something of the note's current text. A layout with text that has
- * not been drawn yet misses nothing: it will be drawn from the text of its time.
- */
-function isStale(drawn: Drawn, current: Drawn): boolean {
-  return drawn.comments !== current.comments
-    || drawn.texts.length !== current.texts.length
-    || drawn.texts.some((text, index) => text !== null && text !== current.texts[index]);
 }

@@ -20,6 +20,7 @@ import {
   setPosition,
   setRowHeight,
   setSingleWidth,
+  setValign,
   setWeights,
   setWrap,
   type ItemPosition,
@@ -673,6 +674,21 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, root: HTMLEleme
         .setChecked(context.model.wrap === side)
         .onClick(() => {
           void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWrap(context.model, side))]);
+        }));
+    }
+  }
+
+  // Text beside the media lines up with them at the top, in the middle or at the bottom.
+  if (hasText(context.model)) {
+    const aligns = [["top", "textTop", "align-vertical-justify-start"], ["center", "textCenter", "align-vertical-justify-center"], ["bottom", "textBottom", "align-vertical-justify-end"]] as const;
+    for (const [valign, label, icon] of aligns) {
+      menu.addItem((entry) => entry
+        .setTitle(t(label))
+        .setIcon(icon)
+        .setSection("vml-valign")
+        .setChecked((context.model.valign ?? "top") === valign)
+        .onClick(() => {
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setValign(context.model, valign))]);
         }));
     }
   }

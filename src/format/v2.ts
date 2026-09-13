@@ -21,6 +21,8 @@ export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
 /** The side a layout floats to, with the note's own text wrapping around it. */
 export type WrapSide = "left" | "right";
+/** How the text beside a layout's media lines up with them vertically. */
+export type TextAlign = "top" | "center" | "bottom";
 export type V2RowMeta = Record<string, unknown>;
 
 export interface V2Meta {
@@ -236,6 +238,11 @@ export function readBlockWrap(value: unknown): WrapSide | null {
 export function readBlockSkip(value: unknown): number | null {
   const skip = finiteNumber(value);
   return skip !== null && skip >= 1 && skip <= MAX_WRAP_SKIP ? Math.round(skip) : null;
+}
+
+/** How the text beside the media lines up with them (top-level `valign`); null when unset, invalid or the top. */
+export function readBlockValign(value: unknown): TextAlign | null {
+  return value === "center" || value === "bottom" ? value : null;
 }
 
 /** Writes the opening comment. Settings are omitted entirely when there are none, to keep the line short. */

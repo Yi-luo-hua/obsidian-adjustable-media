@@ -9,11 +9,13 @@ import {
   MIN_ROW_HEIGHT,
   hasSideText,
   readBlockSkip,
+  readBlockValign,
   readBlockWidth,
   readBlockWrap,
   readRowMeta,
   type Align,
   type CaptionAlign,
+  type TextAlign,
   type V2Block,
   type V2Embed,
   type V2Meta,
@@ -72,6 +74,8 @@ export interface LayoutModel {
   skip: number | null;
   /** Text beside the media. A layout with text does not float. */
   text: LayoutText;
+  /** How that text lines up with the media; null means at the top. */
+  valign: TextAlign | null;
   extra: Record<string, unknown>;
 }
 
@@ -88,7 +92,7 @@ export type MoveTarget =
 const ALIGN_OFFSETS: ReadonlyArray<readonly [Align, number]> = [["left", 0], ["center", 0.5], ["right", 1]];
 
 export function modelFromBlock(block: V2Block): LayoutModel {
-  const { width, wrap, skip, ...rest } = block.meta.extra;
+  const { width, wrap, skip, valign, ...rest } = block.meta.extra;
   // A layout with text beside its media does not float; its wrap settings are kept as written.
   const columns = hasSideText(block);
   const extra = columns ? { ...definedOnly({ wrap, skip }), ...rest } : rest;
@@ -113,6 +117,7 @@ export function modelFromBlock(block: V2Block): LayoutModel {
     wrap: columns ? null : readBlockWrap(wrap),
     skip: columns ? null : readBlockSkip(skip),
     text: { left: markdownOf(block.leftText), right: markdownOf(block.rightText) },
+    valign: readBlockValign(valign),
     extra,
   };
 }
@@ -156,8 +161,9 @@ export function metaFromModel(model: LayoutModel): V2Meta {
     extra: {
       ...(model.width === null ? {} : { width: model.width }),
       ...(model.wrap === null ? {} : { wrap: model.wrap }),
-      // Without wrapping, skip means nothing.
+      // Without wrapping, skip means nothing; without text beside the media, neither does valign.
       ...(model.wrap === null || model.skip === null ? {} : { skip: model.skip }),
+      ...(model.valign === null || !hasText(model) ? {} : { valign: model.valign }),
       ...model.extra,
     },
   };
@@ -350,6 +356,12 @@ export function setSkip(model: LayoutModel, skip: number): LayoutModel {
   const value = Math.min(MAX_WRAP_SKIP, Math.max(0, Math.round(skip)));
   const next = value === 0 ? null : value;
   return next === model.skip ? model : { ...model, skip: next };
+}
+
+/** Lines the text beside the media up with them: at the top (the default), in the middle or at the bottom. */
+export function setValign(model: LayoutModel, valign: TextAlign): LayoutModel {
+  const next = valign === "top" ? null : valign;
+  return !hasText(model) || next === model.valign ? model : { ...model, valign: next };
 }
 
 /**

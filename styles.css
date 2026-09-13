@@ -20,6 +20,15 @@
   width: auto;
 }
 
+/* The text lines up with the media at the top, in the middle or at the bottom. */
+.vml-layout--valign-center {
+  align-items: center;
+}
+
+.vml-layout--valign-bottom {
+  align-items: flex-end;
+}
+
 .vml-layout__media {
   flex: 0 0 var(--vml-block-width, 40%);
   min-width: 0;
