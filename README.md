@@ -62,7 +62,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 | **Captions** | Right-click an item to edit captions and alignment |
 | **Move out of layout block** | Right-click an item and choose to remove it from the layout block |
 | **Cancel drag gesture** | Press <kbd>Esc</kbd> anytime during a drag to cancel |
-| **View/edit source** | Click the "Edit source" button in the top-left corner of the layout block |
+| **View/edit source** | Click the "Edit source" button in the top-right corner of the layout block (of its media, when there is text beside them) |
 
 ---
 

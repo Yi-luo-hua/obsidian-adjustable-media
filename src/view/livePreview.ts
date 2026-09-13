@@ -154,7 +154,9 @@ class LayoutWidget extends WidgetType {
     }
     setUpText(view, el, root, this.block);
 
-    const button = root.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
+    // On the media, where it hides none of the text beside them.
+    const buttonHost = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
+    const button = buttonHost.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
     button.addEventListener("click", (event) => {
       event.preventDefault();
       // Resolve the position at click time; the block may have moved since the widget was drawn.
