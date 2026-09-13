@@ -77,7 +77,7 @@ test("text before the first row goes left of the media and text after the last r
 });
 
 test("a layout with text does not float, and its wrap settings stay as written", () => {
-  const opener = '<!-- vml {"v":2,"width":0.3,"wrap":"left","skip":2,"rows":[]} -->';
+  const opener = '<!-- vml {"v":2,"width":0.3,"wrap":"left","skip":2} -->';
   const withText = block([opener, "说明", "![[a.png]]", "<!-- /vml -->"]);
   const model = modelFromBlock(withText);
   assert.equal(blockWrap(withText), null);
@@ -180,7 +180,7 @@ test("text lines up with the media at the top, in the middle or at the bottom", 
   assert.equal(setValign(model, "center"), model);
   assert.equal(serializeOpener(metaFromModel(setValign(model, "top"))), "<!-- vml -->");
   // A settings change: only the opening comment is rewritten.
-  assert.deepEqual(apply(lines, [planModelEdit(block(lines), setValign(model, "bottom"))]), ['<!-- vml {"v":2,"valign":"bottom","rows":[]} -->', ...lines.slice(1)]);
+  assert.deepEqual(apply(lines, [planModelEdit(block(lines), setValign(model, "bottom"))]), ['<!-- vml {"v":2,"valign":"bottom"} -->', ...lines.slice(1)]);
 
   // Without text beside the media it means nothing: it cannot be set, and goes when the comment is written.
   const plain = modelFromBlock(block(['<!-- vml {"v":2,"valign":"bottom"} -->', "![[a.png]]", "<!-- /vml -->"]));

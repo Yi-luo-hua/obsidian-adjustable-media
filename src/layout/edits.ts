@@ -48,8 +48,9 @@ export type ResolveResult = { ok: true; changes: LineChange[] } | EditFailure;
 
 /**
  * Only blocks that were read completely may be rewritten. With unreadable settings (a typo, or a
- * newer format version) or non-embed text in the body, a rewrite would silently drop what we could
- * not read, so such blocks are displayed but never written to (docs/DESIGN.md, section 1.3).
+ * newer format version) or text out of place in the body (between two rows, or without any), a
+ * rewrite would silently drop what we could not read, so such blocks are displayed but never
+ * written to (docs/DESIGN.md, section 1.3).
  */
 export function isEditable(block: V2Block): boolean {
   return block.metaError === null && block.invalidLine === null;

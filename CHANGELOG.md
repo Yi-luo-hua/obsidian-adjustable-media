@@ -9,6 +9,7 @@
 - While a layout shows its source in live preview, the images and videos in it are thumbnails, so the note no longer jumps by the height of the images. A wrapped layout keeps floating beside its source.
 - Images and videos shown before get their size up front when a layout is drawn again, so layouts no longer change shape once their media has loaded.
 - Removing a layout at the top of a note also removes the blank line after it.
+- The opening comment of a layout with only layout-wide settings no longer ends in an empty `"rows":[]`.
 
 ## 0.2.1 - 2026-09-13
 

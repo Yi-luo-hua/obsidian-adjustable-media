@@ -252,7 +252,8 @@ export function serializeOpener(meta: V2Meta): string {
     return "<!-- vml -->";
   }
 
-  const json = JSON.stringify({ v: 2, ...meta.extra, rows }, roundNumbers)
+  // Without row settings, `rows` is left out too: every version reads a missing `rows` as none.
+  const json = JSON.stringify({ v: 2, ...meta.extra, ...(rows.length > 0 ? { rows } : {}) }, roundNumbers)
     // "--" may only appear inside strings; escaping it keeps the comment from closing early.
     .replace(/--/g, "-\\u002d")
     // An odd number of "%%" would make the whole line read as an Obsidian comment.

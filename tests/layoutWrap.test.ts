@@ -45,7 +45,7 @@ test("wrap and skip are read from the opening comment; invalid values count as u
 });
 
 test("wrap settings round-trip, and unset or meaningless ones stay out of the comment", () => {
-  const opener = '<!-- vml {"v":2,"width":0.3,"wrap":"right","skip":2,"theme":"x","rows":[]} -->';
+  const opener = '<!-- vml {"v":2,"width":0.3,"wrap":"right","skip":2,"theme":"x"} -->';
   assert.equal(serializeOpener(metaFromModel(model(opener))), opener);
   // Without wrapping, skip means nothing.
   assert.equal(serializeOpener(metaFromModel(model('<!-- vml {"skip":2} -->'))), "<!-- vml -->");
@@ -56,7 +56,7 @@ test("wrapping gives a full-width layout room for text and caps a wide one", () 
   const full = model("<!-- vml -->");
   const left = setWrap(full, "left");
   assert.deepEqual([left.wrap, left.width, effectiveWidth(left)], ["left", 0.4, 0.4]);
-  assert.equal(serializeOpener(metaFromModel(left)), '<!-- vml {"v":2,"width":0.4,"wrap":"left","rows":[]} -->');
+  assert.equal(serializeOpener(metaFromModel(left)), '<!-- vml {"v":2,"width":0.4,"wrap":"left"} -->');
   assert.equal(setWrap(model('<!-- vml {"width":0.95} -->'), "right").width, 0.8);
   assert.equal(setWrap(left, "left"), left);
 
@@ -131,7 +131,7 @@ const note = [
   "第三段", // 8
 ];
 const LAYOUT = ["<!-- vml -->", "![[a.png]]", "<!-- /vml -->"];
-const WRAPPED_LEFT = '<!-- vml {"v":2,"width":0.4,"wrap":"left","rows":[]} -->';
+const WRAPPED_LEFT = '<!-- vml {"v":2,"width":0.4,"wrap":"left"} -->';
 
 test("in front of itself or of the next paragraph, a block stays where it is", () => {
   const layout = block(note);
@@ -142,7 +142,7 @@ test("in front of itself or of the next paragraph, a block stays where it is", (
 
   // Only the opening comment changes.
   assert.deepEqual(apply(note, planPlacement(note, layout, { line: 6, wrap: "right", skip: 2 })), [
-    "第一段", "", '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2,"rows":[]} -->', "![[a.png]]", "<!-- /vml -->", "", "第二段", "", "第三段",
+    "第一段", "", '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', "![[a.png]]", "<!-- /vml -->", "", "第二段", "", "第三段",
   ]);
 });
 
@@ -171,7 +171,7 @@ test("a block that wraps text sits right on top of that text", () => {
   // Moved away again, it leaves that text as it found it.
   const glued = ["a", "", WRAPPED_LEFT, "![[a.png]]", "<!-- /vml -->", "b", "", "c"];
   assert.deepEqual(apply(glued, planPlacement(glued, block(glued), { line: 7, wrap: null, skip: 0 })), [
-    "a", "", "b", "", '<!-- vml {"v":2,"width":0.4,"rows":[]} -->', "![[a.png]]", "<!-- /vml -->", "", "c",
+    "a", "", "b", "", '<!-- vml {"v":2,"width":0.4} -->', "![[a.png]]", "<!-- /vml -->", "", "c",
   ]);
 });
 
