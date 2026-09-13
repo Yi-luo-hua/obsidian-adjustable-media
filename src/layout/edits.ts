@@ -1,6 +1,7 @@
 import type { EditorChangeLike, EditorLike } from "../editor/editorLike.ts";
 import {
   CLOSE_LINE,
+  findV2Blocks,
   hasSideText,
   serializeBlock,
   serializeOpener,
@@ -90,29 +91,66 @@ export function planMoveOut(block: V2Block, model: LayoutModel, embed: V2Embed):
   return anchored(block, 0, block.lines.length - 1, rest.length === 0 ? [embed.raw] : [...rest, "", embed.raw]);
 }
 
-/**
- * Makes room for text on one side of the media: a blank line at the top of the block's body (left)
- * or at its bottom (right), for the user to type on. The plugin never writes the text itself.
- * Returns null when that side has text already or the block is not editable.
- */
-export function planAddText(block: V2Block, side: TextSide): BlockEdit | null {
-  const at = addedTextLine(block, side);
-  if (at === null) {
-    return null;
-  }
-  // The comment next to the new line is written back exactly as it was.
-  const edge = side === "left" ? 0 : block.lines.length - 1;
-  const comment = block.lines[edge] ?? "";
-  return anchored(block, edge, edge, side === "left" ? [comment, ""] : ["", comment]);
+/** What planColumnText makes of the text typed on one side of a layout's media. */
+export interface ColumnTextPlan {
+  /** Whether the text can go on that side as it is. */
+  fits: boolean;
+  /** The edit; null when there is nothing to write, because the text is there already or does not fit. */
+  edit: BlockEdit | null;
 }
 
-/** Where the blank line of planAddText ends up, counted from the block's opening line; null when there is none. */
-export function addedTextLine(block: V2Block, side: TextSide): number | null {
-  const text = side === "left" ? block.leftText : block.rightText;
-  if (!isEditable(block) || block.rows.length === 0 || text !== null) {
-    return null;
+/**
+ * Puts `text`, typed in the layout itself, on one side of the media (docs/DESIGN.md, section 3).
+ * Only that side's own lines change: from its first line to its last, or, on a side without text
+ * yet, new lines at the top of the body (left) or at its bottom (right). Blank lines around the
+ * text are left out, and no text at all takes the side's lines out. The block must read back with
+ * its opening comment, rows and other side as they were and this text on the side: a line of media
+ * embeds, a code fence or a layout comment would change what the block is, so such text does not
+ * fit and nothing is written.
+ */
+export function planColumnText(block: V2Block, side: TextSide, text: string): ColumnTextPlan {
+  if (!isEditable(block) || block.rows.length === 0) {
+    return { fits: false, edit: null };
   }
-  return side === "left" ? 1 : block.lines.length - 1;
+  const lines = withoutBlankEdges(text.split("\n"));
+  if (sameLines(lines, textOf(block, side))) {
+    return { fits: true, edit: null };
+  }
+
+  const part = side === "left" ? block.leftText : block.rightText;
+  let edit: BlockEdit;
+  if (part) {
+    edit = anchored(block, part.from - block.openLine, part.to - block.openLine, lines);
+  } else {
+    // The comment next to the new lines is written back exactly as it was.
+    const edge = side === "left" ? 0 : block.lines.length - 1;
+    const comment = block.lines[edge] ?? "";
+    edit = anchored(block, edge, edge, side === "left" ? [comment, ...lines] : [...lines, comment]);
+  }
+
+  const after = [...block.lines];
+  after.splice(edit.start, edit.end - edit.start + 1, ...edit.replacement);
+  const [reread, ...others] = findV2Blocks(after);
+  const fits = reread !== undefined
+    && others.length === 0
+    && reread.openLine === 0
+    && reread.closeLine === after.length - 1
+    && onlyColumnTextDiffers(block, reread, side, lines);
+  return fits ? { fits, edit } : { fits: false, edit: null };
+}
+
+/**
+ * Whether `after` is `before` with nothing changed but the text on `side`, which now reads `lines`
+ * (blank lines around them aside): the same opening comment, rows and text on the other side, and
+ * still a block that can be edited.
+ */
+export function onlyColumnTextDiffers(before: V2Block, after: V2Block, side: TextSide, lines: readonly string[]): boolean {
+  const other = side === "left" ? "right" : "left";
+  return isEditable(after)
+    && after.lines[0] === before.lines[0]
+    && sameRows(after, before.rows.map((row) => row.embeds))
+    && sameLines(textOf(after, other), textOf(before, other))
+    && sameLines(textOf(after, side), withoutBlankEdges(lines));
 }
 
 /** Removes the two layout comments and leaves the body exactly as written. */
@@ -274,6 +312,26 @@ function blockLines(block: V2Block, meta: V2Meta, embeds: ReadonlyArray<readonly
     ...lines.slice(1, -1),
     ...block.lines.slice(last.line - block.openLine + 1),
   ];
+}
+
+function textOf(block: V2Block, side: TextSide): readonly string[] {
+  return (side === "left" ? block.leftText : block.rightText)?.lines ?? [];
+}
+
+function withoutBlankEdges(lines: readonly string[]): string[] {
+  let start = 0;
+  let end = lines.length;
+  while (start < end && (lines[start] ?? "").trim() === "") {
+    start += 1;
+  }
+  while (end > start && (lines[end - 1] ?? "").trim() === "") {
+    end -= 1;
+  }
+  return lines.slice(start, end);
+}
+
+function sameLines(a: readonly string[], b: readonly string[]): boolean {
+  return a.length === b.length && a.every((line, index) => line === b[index]);
 }
 
 /** What stays of a block that loses its last embed: its text, left then right, as separate paragraphs. */

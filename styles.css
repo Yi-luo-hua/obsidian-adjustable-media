@@ -52,9 +52,49 @@
   margin-bottom: 0;
 }
 
-/* In live preview a click on the text shows its source. */
+/* In live preview the text is typed right in the layout: a click swaps it for a box with its source. */
 .vml-live-preview .vml-layout__text {
   cursor: text;
+}
+
+.vml-layout__text > textarea.vml-text-editor {
+  background: var(--background-primary);
+  border: 1px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.6);
+  border-radius: var(--radius-s);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text-normal);
+  display: block;
+  font: inherit;
+  height: var(--vml-edit-height, auto);
+  line-height: var(--line-height-normal);
+  margin: -3px -7px;
+  min-height: 2em;
+  overflow: hidden;
+  padding: 2px 6px;
+  resize: none;
+  white-space: pre-wrap;
+  width: calc(100% + 14px);
+}
+
+.vml-layout__text > textarea.vml-text-editor:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.2);
+}
+
+.vml-layout__text > textarea.vml-text-editor.is-invalid {
+  border-color: var(--text-error);
+}
+
+.vml-text-editor__note {
+  color: var(--text-error);
+  display: none;
+  font-size: var(--font-ui-smaller);
+  margin-top: 6px;
+}
+
+.vml-text-editor.is-invalid + .vml-text-editor__note {
+  display: block;
 }
 
 .vml-live-preview {

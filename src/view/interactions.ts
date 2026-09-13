@@ -1,8 +1,7 @@
-import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
-import { EditorView } from "@codemirror/view";
+import { Menu, Notice, TFile, setIcon, type App, type Editor } from "obsidian";
 
-import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, findV2Blocks, type TextSide, type V2Block } from "../format/v2.ts";
-import { addedTextLine, isEditable, planAddText, planModelEdit, planMoveOut, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
+import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
+import { isEditable, planModelEdit, planMoveOut, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
 import { dropTarget, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
   effectiveWidth,
@@ -43,6 +42,8 @@ export interface LayoutContext {
   model: LayoutModel;
   /** Live preview: the layout gets a frame to resize it by, and its images open in the plugin's viewer. */
   live: boolean;
+  /** Live preview: starts typing the text on one side of the media right in the layout. */
+  editText?: (side: TextSide) => void;
 }
 
 export interface DropState {
@@ -162,8 +163,8 @@ export function swallowNextClick(doc: Document): void {
   window.setTimeout(() => doc.removeEventListener("click", swallow, { capture: true }), 0);
 }
 
-/** Writes planned edits to the note. Returns whether the note changed. */
-export async function commitEdits(app: App, sourcePath: string, edits: Array<BlockEdit | null>): Promise<boolean> {
+/** Writes planned edits to the note, through `editor` if given (see writeBlockEdits). Returns whether the note changed. */
+export async function commitEdits(app: App, sourcePath: string, edits: Array<BlockEdit | null>, editor?: Editor): Promise<boolean> {
   const planned = edits.filter((edit): edit is BlockEdit => edit !== null);
   if (planned.length === 0) {
     return false;
@@ -175,7 +176,7 @@ export async function commitEdits(app: App, sourcePath: string, edits: Array<Blo
     return false;
   }
 
-  const result = await writeBlockEdits(app, file, planned);
+  const result = await writeBlockEdits(app, file, planned, editor);
   if (!result.ok) {
     new Notice(t(FAILURE_MESSAGES[result.reason]));
   }
@@ -230,13 +231,13 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
   itemEl.addEventListener("contextmenu", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    showItemMenu(event, root, context, position);
+    showItemMenu(event, context, position);
   });
   itemEl.addEventListener("keydown", (event) => {
     if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
       event.preventDefault();
       const rect = itemEl.getBoundingClientRect();
-      showItemMenu({ x: rect.left + 16, y: rect.top + 16 }, root, context, position);
+      showItemMenu({ x: rect.left + 16, y: rect.top + 16 }, context, position);
     }
   });
 
@@ -626,7 +627,7 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
   });
 }
 
-function showItemMenu(at: MouseEvent | { x: number; y: number }, root: HTMLElement, context: LayoutContext, position: ItemPosition): void {
+function showItemMenu(at: MouseEvent | { x: number; y: number }, context: LayoutContext, position: ItemPosition): void {
   const row = context.model.rows[position.row];
   const item = row?.items[position.index];
   if (!row || !item) {
@@ -693,13 +694,16 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, root: HTMLEleme
     }
   }
 
-  // Text beside the media is typed in the note itself, in live preview.
-  if (context.live) {
+  // Text beside the media is typed right in the layout, in live preview.
+  const { editText } = context;
+  if (editText) {
     const sides = [["left", "addTextLeft", "panel-left-open"], ["right", "addTextRight", "panel-right-open"]] as const;
     for (const [side, label, icon] of sides) {
-      if (addedTextLine(context.block, side) !== null) {
+      if ((side === "left" ? context.block.leftText : context.block.rightText) === null) {
+        // Once the menu has closed: a submenu still opening loads its keys (Enter among them) a moment
+        // later, above those of a text box opened right away (docs/DESIGN.md, section 4.2).
         menu.addItem((entry) => entry.setTitle(t(label)).setIcon(icon).setSection("vml-text").onClick(() => {
-          void addText(root, context, side);
+          window.setTimeout(() => editText(side), 0);
         }));
       }
     }
@@ -724,28 +728,6 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, root: HTMLEleme
     menu.showAtMouseEvent(at);
   } else {
     menu.showAtPosition(at);
-  }
-}
-
-/** Gives the block a blank line for text on one side and puts the cursor on it, showing the block's source. */
-async function addText(root: HTMLElement, context: LayoutContext, side: TextSide): Promise<void> {
-  // Found first: once the note changes, the layout is drawn anew and `root` leaves the editor.
-  const editorEl = root.closest<HTMLElement>(".cm-editor");
-  const view = editorEl ? EditorView.findFromDOM(editorEl) : null;
-  const edit = planAddText(context.block, side);
-  const at = addedTextLine(context.block, side);
-  if (!view || !edit || at === null || !(await commitEdits(context.app, context.sourcePath, [edit]))) {
-    return;
-  }
-
-  const expected = [...context.block.lines];
-  expected.splice(edit.start, edit.end - edit.start + 1, ...edit.replacement);
-  const matches = findV2Blocks(view.state.doc.toString().split("\n"))
-    .filter((candidate) => candidate.lines.length === expected.length && candidate.lines.every((line, index) => line === expected[index]));
-  const block = matches.length === 1 ? matches[0] : undefined;
-  if (block) {
-    view.dispatch({ selection: { anchor: view.state.doc.line(block.openLine + at + 1).from }, scrollIntoView: true });
-    view.focus();
   }
 }
 

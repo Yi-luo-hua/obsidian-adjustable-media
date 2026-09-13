@@ -76,6 +76,10 @@ const MESSAGES = {
     zh: "文字底端对齐",
     en: "Text at the bottom",
   },
+  textNotSaved: {
+    zh: "这样写会改变布局块本身（例如只有图片的一行、代码围栏或布局注释），暂不保存。",
+    en: "This would change the layout block itself (a line of media embeds only, a code fence or a layout comment), so it is not saved.",
+  },
   writeNotFound: {
     zh: "布局块已在别处被改动，这次修改没有写入，请重试。",
     en: "The layout changed elsewhere, so this change was not saved. Please try again.",

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { planMergeWithNext } from "../src/commands/plans.ts";
 import { blockWrap, findV2Blocks, readBlockValign, serializeOpener, type V2Block } from "../src/format/v2.ts";
 import { planWrap } from "../src/input/insertion.ts";
-import { addedTextLine, applyEditsToText, planAddText, planModelEdit, planMoveOut, planUnwrap, type BlockEdit } from "../src/layout/edits.ts";
+import { applyEditsToText, onlyColumnTextDiffers, planColumnText, planModelEdit, planMoveOut, planUnwrap, type BlockEdit } from "../src/layout/edits.ts";
 import {
   effectiveWidth,
   hasText,
@@ -139,19 +139,41 @@ test("a layout losing its last embed leaves its text as plain paragraphs", () =>
   ]);
 });
 
-test("adding text makes room with a blank line; the plugin never writes the text", () => {
-  const lines = ["前文", "<!-- vml -->", "![[a.png]]", "<!-- /vml -->"];
-  const found = block(lines);
-  assert.deepEqual(apply(lines, [planAddText(found, "left")]), ["前文", "<!-- vml -->", "", "![[a.png]]", "<!-- /vml -->"]);
-  assert.equal(addedTextLine(found, "left"), 1);
-  assert.deepEqual(apply(lines, [planAddText(found, "right")]), ["前文", "<!-- vml -->", "![[a.png]]", "", "<!-- /vml -->"]);
-  assert.equal(addedTextLine(found, "right"), 2);
+test("text typed in the layout replaces only its side's lines, and only when the block reads back as meant", () => {
+  const found = block(note);
+  const typed = planColumnText(found, "right", "改过的右侧文字\n\n- 列表\n- 新的一项\n");
+  assert.equal(typed.fits, true);
+  assert.deepEqual(apply(note, [typed.edit]), [...note.slice(0, 10), "改过的右侧文字", "", "- 列表", "- 新的一项", ...note.slice(13)]);
+  // The same text, blank lines around it aside, writes nothing.
+  assert.deepEqual(planColumnText(found, "left", "\n## 左侧标题\n\n左侧第一段，\n第二行。  \n\n"), { fits: true, edit: null });
 
-  // A side with text already needs no room; a block that cannot be edited gets none.
-  const withLeft = block(["<!-- vml -->", "左", "![[a.png]]", "<!-- /vml -->"]);
-  assert.equal(planAddText(withLeft, "left"), null);
-  assert.ok(planAddText(withLeft, "right"));
-  assert.equal(planAddText(block(['<!-- vml {"v":3} -->', "![[a.png]]", "<!-- /vml -->"]), "left"), null);
+  // A side without text gets its first lines at the top of the body (left) or at its bottom (right).
+  const plain = ["前文", "<!-- vml -->", "![[a.png]]", "<!-- /vml -->"];
+  assert.deepEqual(apply(plain, [planColumnText(block(plain), "left", "左").edit]), ["前文", "<!-- vml -->", "左", "![[a.png]]", "<!-- /vml -->"]);
+  assert.deepEqual(apply(plain, [planColumnText(block(plain), "right", "右\n第二行").edit]), ["前文", "<!-- vml -->", "![[a.png]]", "右", "第二行", "<!-- /vml -->"]);
+  assert.deepEqual(planColumnText(block(plain), "right", "  \n"), { fits: true, edit: null });
+
+  // No text takes the side's lines out.
+  const both = ["<!-- vml -->", "左", "![[a.png]]", "右", "<!-- /vml -->"];
+  assert.deepEqual(apply(both, [planColumnText(block(both), "left", "").edit]), ["<!-- vml -->", "![[a.png]]", "右", "<!-- /vml -->"]);
+
+  // Text that would change what the block is does not fit, and nothing is written.
+  for (const text of ["右\n![[b.png]]", "```\n代码", "<!-- /vml -->", "<!-- vml -->", "%%"]) {
+    assert.deepEqual(planColumnText(block(both), "right", text), { fits: false, edit: null }, text);
+  }
+  assert.deepEqual(planColumnText(block(['<!-- vml {"v":3} -->', "右", "![[a.png]]", "<!-- /vml -->"]), "left", "x"), { fits: false, edit: null });
+});
+
+test("a change to the note that is only the typed text keeps the layout as it is", () => {
+  const before = block(["<!-- vml -->", "左", "![[a.png]]", "右", "<!-- /vml -->"]);
+  const typed = block(["<!-- vml -->", "左边改了", "第二行", "![[a.png]]", "右", "<!-- /vml -->"]);
+  assert.equal(onlyColumnTextDiffers(before, typed, "left", ["左边改了", "第二行", ""]), true);
+  assert.equal(onlyColumnTextDiffers(before, typed, "left", ["左边改了"]), false);
+  assert.equal(onlyColumnTextDiffers(before, typed, "right", ["右"]), false);
+  const settings = block(['<!-- vml {"v":2,"width":0.5} -->', "左边改了", "第二行", "![[a.png]]", "右", "<!-- /vml -->"]);
+  assert.equal(onlyColumnTextDiffers(before, settings, "left", ["左边改了", "第二行"]), false);
+  const rows = block(["<!-- vml -->", "左", "![[b.png]]", "右", "<!-- /vml -->"]);
+  assert.equal(onlyColumnTextDiffers(before, rows, "left", ["左"]), false);
 });
 
 test("unwrapping and moving a layout keep its text; merging leaves layouts with text alone", () => {
