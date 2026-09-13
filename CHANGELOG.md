@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Text wrap, like LaTeX's `wrapfigure`: a layout can float to the left or right of the note's own text. The paragraphs, lists, quotes, headings, code and tables after it wrap around it and continue at full width below it, in reading view and live preview. Choose **Float left, wrap text**, **Float right, wrap text** or **No text wrap** in the right-click menu. New layout settings `wrap` and `skip`; older versions of the plugin show such layouts without wrapping and keep the settings.
+- Text beside the media, like side-by-side minipages: text written in a layout before its media shows in a column on their left, text after them in a column on their right. It is ordinary Markdown and always stays exactly as you wrote it; the layout's width is the width of its media column. In live preview, click the text to edit it, or right-click an image and choose **Add text on the left** or **Add text on the right**. A layout with text does not float and is not merged with other layouts. Older versions of the plugin show such layouts as plain Markdown and never change them.
+- Move a whole layout in live preview by the grip on top of its frame. Dropped in the middle of the text, it goes between two paragraphs; dropped in the left or right third, it floats on that side, starting at the line you point at.
+- A layout that floats right has its width handles on its left edge.
+- While a layout shows its source in live preview, the images and videos in it are thumbnails, so the note no longer jumps by the height of the images. A wrapped layout keeps floating beside its source.
+- Images and videos shown before get their size up front when a layout is drawn again, so layouts no longer change shape once their media has loaded.
+- Removing a layout at the top of a note also removes the blank line after it.
+
 ## 0.2.1 - 2026-09-13
 
 - Refresh the English and Chinese README with reorganized feature descriptions, usage instructions, and a demo image.

@@ -1,10 +1,16 @@
 import {
   DEFAULT_ROW_HEIGHT,
+  DEFAULT_WRAP_WIDTH,
   MAX_EMBEDS_PER_ROW,
   MAX_ROW_HEIGHT,
+  MAX_WRAP_SKIP,
+  MAX_WRAP_WIDTH,
   MIN_BLOCK_WIDTH,
   MIN_ROW_HEIGHT,
+  hasSideText,
+  readBlockSkip,
   readBlockWidth,
+  readBlockWrap,
   readRowMeta,
   type Align,
   type CaptionAlign,
@@ -12,6 +18,8 @@ import {
   type V2Embed,
   type V2Meta,
   type V2RowMeta,
+  type V2Text,
+  type WrapSide,
 } from "../format/v2.ts";
 
 /**
@@ -43,10 +51,27 @@ export interface LayoutRow {
   extra: V2RowMeta;
 }
 
+/** Text written in the block beside its media, drawn as Markdown. */
+export interface LayoutText {
+  /** The lines before the first row, shown left of the media. */
+  left: string | null;
+  /** The lines after the last row, shown right of the media. */
+  right: string | null;
+}
+
 export interface LayoutModel {
   rows: LayoutRow[];
-  /** The block's share of the container width; null means full width. */
+  /**
+   * The block's share of the container width, taken by its media; null means full width, or
+   * DEFAULT_WRAP_WIDTH with text beside the layout (wrapped, or written in the block).
+   */
   width: number | null;
+  /** The side the layout floats to, with the note's text wrapping around it; null means no wrapping. */
+  wrap: WrapSide | null;
+  /** How many lines below its place a wrapped layout starts; null starts it right there. */
+  skip: number | null;
+  /** Text beside the media. A layout with text does not float. */
+  text: LayoutText;
   extra: Record<string, unknown>;
 }
 
@@ -63,7 +88,10 @@ export type MoveTarget =
 const ALIGN_OFFSETS: ReadonlyArray<readonly [Align, number]> = [["left", 0], ["center", 0.5], ["right", 1]];
 
 export function modelFromBlock(block: V2Block): LayoutModel {
-  const { width, ...extra } = block.meta.extra;
+  const { width, wrap, skip, ...rest } = block.meta.extra;
+  // A layout with text beside its media does not float; its wrap settings are kept as written.
+  const columns = hasSideText(block);
+  const extra = columns ? { ...definedOnly({ wrap, skip }), ...rest } : rest;
   return {
     rows: block.rows.map((row, rowIndex) => {
       const settings = readRowMeta(block.meta.rows[rowIndex] ?? {}, row.embeds.length);
@@ -82,8 +110,20 @@ export function modelFromBlock(block: V2Block): LayoutModel {
       };
     }),
     width: readBlockWidth(width),
+    wrap: columns ? null : readBlockWrap(wrap),
+    skip: columns ? null : readBlockSkip(skip),
+    text: { left: markdownOf(block.leftText), right: markdownOf(block.rightText) },
     extra,
   };
+}
+
+function markdownOf(text: V2Text | null): string | null {
+  return text === null ? null : text.lines.join("\n");
+}
+
+/** Whether the layout has text beside its media. */
+export function hasText(model: LayoutModel): boolean {
+  return model.text.left !== null || model.text.right !== null;
 }
 
 export function metaFromModel(model: LayoutModel): V2Meta {
@@ -113,7 +153,13 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       }
       return meta;
     }),
-    extra: model.width === null ? { ...model.extra } : { width: model.width, ...model.extra },
+    extra: {
+      ...(model.width === null ? {} : { width: model.width }),
+      ...(model.wrap === null ? {} : { wrap: model.wrap }),
+      // Without wrapping, skip means nothing.
+      ...(model.wrap === null || model.skip === null ? {} : { skip: model.skip }),
+      ...model.extra,
+    },
   };
 }
 
@@ -252,13 +298,58 @@ export function setPosition(model: LayoutModel, rowIndex: number, offset: number
   return updateRow(model, rowIndex, (row) => (align ? { ...row, align, offset: null } : { ...row, align: null, offset: value }));
 }
 
-/** Sets the block's share of the container width; full width is the default and is not stored. */
+/**
+ * Sets the block's share of the container width. Full width is the default and is not stored; a
+ * layout with text beside it stays narrow enough to leave the text room (maxBlockWidth).
+ */
 export function setBlockWidth(model: LayoutModel, width: number): LayoutModel {
   if (!Number.isFinite(width)) {
     return model;
   }
-  const value = round(Math.min(1, Math.max(MIN_BLOCK_WIDTH, width)));
+  const value = round(Math.min(maxBlockWidth(model), Math.max(MIN_BLOCK_WIDTH, width)));
   return { ...model, width: value >= 1 ? null : value };
+}
+
+/** The widest a layout may be: full width, or MAX_WRAP_WIDTH with text beside it. */
+export function maxBlockWidth(model: LayoutModel): number {
+  return besideText(model) ? MAX_WRAP_WIDTH : 1;
+}
+
+/** The share of the container width a layout's media is drawn at; null means full width. */
+export function effectiveWidth(model: LayoutModel): number | null {
+  return model.width ?? (besideText(model) ? DEFAULT_WRAP_WIDTH : null);
+}
+
+/** Whether text sits beside the layout: the note's text around its float, or its own text. */
+function besideText(model: LayoutModel): boolean {
+  return model.wrap !== null || hasText(model);
+}
+
+/**
+ * Floats the layout to one side with the note's text wrapping around it, or stops the wrapping
+ * (null). The text needs room beside the layout: a layout at full width gets DEFAULT_WRAP_WIDTH and
+ * a wider one than MAX_WRAP_WIDTH is narrowed to it. Without wrapping, `skip` means nothing and goes.
+ * A layout with text beside its media does not float and stays as it is.
+ */
+export function setWrap(model: LayoutModel, wrap: WrapSide | null): LayoutModel {
+  if (hasText(model)) {
+    return model;
+  }
+  if (wrap === null) {
+    return model.wrap === null && model.skip === null ? model : { ...model, wrap: null, skip: null };
+  }
+  const width = Math.min(model.width ?? DEFAULT_WRAP_WIDTH, MAX_WRAP_WIDTH);
+  return model.wrap === wrap && model.width === width ? model : { ...model, wrap, width };
+}
+
+/** How many lines below its place a wrapped layout starts; 0 starts it right there. */
+export function setSkip(model: LayoutModel, skip: number): LayoutModel {
+  if (model.wrap === null || !Number.isFinite(skip)) {
+    return model;
+  }
+  const value = Math.min(MAX_WRAP_SKIP, Math.max(0, Math.round(skip)));
+  const next = value === 0 ? null : value;
+  return next === model.skip ? model : { ...model, skip: next };
 }
 
 /**
@@ -345,4 +436,8 @@ function clampSingleWidth(width: number): number {
 
 function round(value: number): number {
   return Math.round(value * 1000) / 1000;
+}
+
+function definedOnly(values: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(values).filter(([, value]) => value !== undefined));
 }

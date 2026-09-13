@@ -1,5 +1,15 @@
 import type { EditorChangeLike, EditorLike } from "../editor/editorLike.ts";
-import { CLOSE_LINE, serializeBlock, serializeOpener, type V2Block, type V2Embed } from "../format/v2.ts";
+import {
+  CLOSE_LINE,
+  hasSideText,
+  serializeBlock,
+  serializeOpener,
+  type TextSide,
+  type V2Block,
+  type V2Embed,
+  type V2Meta,
+  type V2Text,
+} from "../format/v2.ts";
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
 import { metaFromModel, rowEmbeds, type LayoutModel } from "./model.ts";
 
@@ -47,7 +57,8 @@ export function isEditable(block: V2Block): boolean {
 
 /**
  * Plans the edit for a changed model. A settings-only change rewrites just the opening comment and
- * keeps the body as the user wrote it; moving embeds rewrites the block; an empty model removes it.
+ * keeps the body as the user wrote it; moving embeds rewrites the rows, and the text beside them
+ * stays exactly as written; an empty model removes the block, leaving only its text.
  * Returns null when there is nothing to write or the block is not editable.
  */
 export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | null {
@@ -57,7 +68,7 @@ export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | n
   const embeds = rowEmbeds(model);
   const lastLine = block.lines.length - 1;
   if (embeds.length === 0) {
-    return anchored(block, 0, lastLine, []);
+    return anchored(block, 0, lastLine, textLines(block));
   }
 
   const meta = metaFromModel(model);
@@ -65,7 +76,7 @@ export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | n
     const opener = serializeOpener(meta);
     return opener === block.lines[0] ? null : anchored(block, 0, 0, [opener]);
   }
-  return anchored(block, 0, lastLine, serializeBlock(meta, embeds));
+  return anchored(block, 0, lastLine, blockLines(block, meta, embeds));
 }
 
 /** Rewrites the block without the embed and puts the embed on its own line right after it. */
@@ -74,10 +85,33 @@ export function planMoveOut(block: V2Block, model: LayoutModel, embed: V2Embed):
     return null;
   }
   const embeds = rowEmbeds(model);
-  const replacement = embeds.length === 0
-    ? [embed.raw]
-    : [...serializeBlock(metaFromModel(model), embeds), "", embed.raw];
-  return anchored(block, 0, block.lines.length - 1, replacement);
+  const rest = embeds.length === 0 ? textLines(block) : blockLines(block, metaFromModel(model), embeds);
+  return anchored(block, 0, block.lines.length - 1, rest.length === 0 ? [embed.raw] : [...rest, "", embed.raw]);
+}
+
+/**
+ * Makes room for text on one side of the media: a blank line at the top of the block's body (left)
+ * or at its bottom (right), for the user to type on. The plugin never writes the text itself.
+ * Returns null when that side has text already or the block is not editable.
+ */
+export function planAddText(block: V2Block, side: TextSide): BlockEdit | null {
+  const at = addedTextLine(block, side);
+  if (at === null) {
+    return null;
+  }
+  // The comment next to the new line is written back exactly as it was.
+  const edge = side === "left" ? 0 : block.lines.length - 1;
+  const comment = block.lines[edge] ?? "";
+  return anchored(block, edge, edge, side === "left" ? [comment, ""] : ["", comment]);
+}
+
+/** Where the blank line of planAddText ends up, counted from the block's opening line; null when there is none. */
+export function addedTextLine(block: V2Block, side: TextSide): number | null {
+  const text = side === "left" ? block.leftText : block.rightText;
+  if (!isEditable(block) || block.rows.length === 0 || text !== null) {
+    return null;
+  }
+  return side === "left" ? 1 : block.lines.length - 1;
 }
 
 /** Removes the two layout comments and leaves the body exactly as written. */
@@ -111,8 +145,9 @@ export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit
 
     const from = at + edit.start;
     let to = at + edit.end;
-    // Removing a block between two blank lines would leave a double gap; take one of them along.
-    if (edit.replacement.length === 0 && isBlank(normalized[from - 1]) && isBlank(normalized[to + 1])) {
+    // Removing a block between two blank lines would leave a double gap, and one at the top of the
+    // note a leading blank line; take one of them along.
+    if (edit.replacement.length === 0 && (from === 0 || isBlank(normalized[from - 1])) && isBlank(normalized[to + 1])) {
       to += 1;
     }
     changes.push({ from, to, replacement: edit.replacement });
@@ -219,6 +254,31 @@ function sameRows(block: V2Block, embeds: ReadonlyArray<readonly V2Embed[]>): bo
       const target = embeds[index] ?? [];
       return row.embeds.length === target.length && row.embeds.every((embed, column) => embed.raw === target[column]?.raw);
     });
+}
+
+/**
+ * The block with new rows. Everything before its first row and after its last one, the text beside
+ * the media included, stays exactly as written.
+ */
+function blockLines(block: V2Block, meta: V2Meta, embeds: ReadonlyArray<readonly V2Embed[]>): string[] {
+  const lines = serializeBlock(meta, embeds);
+  const first = block.rows[0];
+  const last = block.rows[block.rows.length - 1];
+  if (!hasSideText(block) || !first || !last) {
+    return lines;
+  }
+  return [
+    lines[0] ?? "",
+    ...block.lines.slice(1, first.line - block.openLine),
+    ...lines.slice(1, -1),
+    ...block.lines.slice(last.line - block.openLine + 1),
+  ];
+}
+
+/** What stays of a block that loses its last embed: its text, left then right, as separate paragraphs. */
+function textLines(block: V2Block): string[] {
+  const parts = [block.leftText, block.rightText].filter((part): part is V2Text => part !== null);
+  return parts.flatMap((part, index) => (index === 0 ? part.lines : ["", ...part.lines]));
 }
 
 function anchored(block: V2Block, start: number, end: number, replacement: string[]): BlockEdit {

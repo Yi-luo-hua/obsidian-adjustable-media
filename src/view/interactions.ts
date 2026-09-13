@@ -1,10 +1,14 @@
 import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
+import { EditorView } from "@codemirror/view";
 
-import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type V2Block } from "../format/v2.ts";
-import { isEditable, planModelEdit, planMoveOut, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
+import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, findV2Blocks, type TextSide, type V2Block } from "../format/v2.ts";
+import { addedTextLine, isEditable, planAddText, planModelEdit, planMoveOut, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
 import { dropTarget, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
+  effectiveWidth,
+  hasText,
   insertItem,
+  maxBlockWidth,
   moveItem,
   removeItem,
   rowOffset,
@@ -17,6 +21,7 @@ import {
   setRowHeight,
   setSingleWidth,
   setWeights,
+  setWrap,
   type ItemPosition,
   type LayoutModel,
   type MoveTarget,
@@ -224,13 +229,13 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
   itemEl.addEventListener("contextmenu", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    showItemMenu(event, context, position);
+    showItemMenu(event, root, context, position);
   });
   itemEl.addEventListener("keydown", (event) => {
     if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
       event.preventDefault();
       const rect = itemEl.getBoundingClientRect();
-      showItemMenu({ x: rect.left + 16, y: rect.top + 16 }, context, position);
+      showItemMenu({ x: rect.left + 16, y: rect.top + 16 }, root, context, position);
     }
   });
 
@@ -526,31 +531,45 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
 /**
  * The frame around a layout in live preview: its right edge sets the layout's width, its bottom
  * edge scales the height of every row, and its corner scales both, keeping the images' proportions.
+ * With text beside the media, the handles sit on the media's column, which the width belongs to.
  */
 function setUpFrame(root: HTMLElement, context: LayoutContext): void {
+  const box = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
+  const { left, right } = context.model.text;
+  // The width handles sit on the edge that moves as the layout grows. A layout floating right, or
+  // media with text on their left only, grow to the left; media between two texts grow both ways.
+  const mirrored = context.model.wrap === "right" || (left !== null && right === null);
+  const direction = (mirrored ? -1 : 1) * (left !== null && right !== null ? 2 : 1);
   for (const edge of ["right", "bottom", "corner"] as const) {
-    const handle = root.createDiv({
+    const handle = box.createDiv({
       cls: `vml-handle vml-frame__handle vml-frame__handle--${edge}`,
       attr: { "aria-label": t(FRAME_LABELS[edge]), role: "separator" },
     });
+    handle.toggleClass("vml-frame__handle--mirrored", mirrored && edge !== "bottom");
     handle.addEventListener("pointerdown", (event) => {
       if (event.button !== 0) {
         return;
       }
       event.preventDefault();
       event.stopPropagation();
-      resizeBlock(root, handle, edge, context, event);
+      resizeBlock(root, box, handle, edge, context, event, direction);
     });
   }
 }
 
-function resizeBlock(root: HTMLElement, handle: HTMLElement, edge: FrameEdge, context: LayoutContext, start: PointerEvent): void {
-  const available = root.parentElement?.getBoundingClientRect().width ?? 0;
-  const rect = root.getBoundingClientRect();
+/**
+ * Resizes the layout by one of its frame's handles. `box` is what the width applies to, and the
+ * pointer moves its edge by `direction` times its own distance: negative for a left edge, two for a
+ * box that grows both ways.
+ */
+function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, edge: FrameEdge, context: LayoutContext, start: PointerEvent, direction: number): void {
+  // The width is a share of the layout's container; with text beside the media, of the layout's own content.
+  const available = box === root ? (root.parentElement?.getBoundingClientRect().width ?? 0) : contentWidth(root);
+  const rect = box.getBoundingClientRect();
   if (available <= 0 || rect.width <= 0) {
     return;
   }
-  const startWidth = context.model.width ?? Math.min(1, rect.width / available);
+  const startWidth = effectiveWidth(context.model) ?? Math.min(1, rect.width / available);
   const rowEls = Array.from(root.querySelectorAll<HTMLElement>(".vml-row"));
   const rowsHeight = rowEls.reduce((sum, rowEl) => sum + rowEl.getBoundingClientRect().height, 0);
   // Single items without a stored width scale from the share of their row they take up now.
@@ -573,7 +592,7 @@ function resizeBlock(root: HTMLElement, handle: HTMLElement, edge: FrameEdge, co
   trackPointer(handle, start, {
     onMove(move) {
       moved = true;
-      const dx = move.clientX - start.clientX;
+      const dx = (move.clientX - start.clientX) * direction;
       const dy = move.clientY - start.clientY;
       if (edge === "right") {
         next = setBlockWidth(context.model, (rect.width + dx) / available);
@@ -582,7 +601,8 @@ function resizeBlock(root: HTMLElement, handle: HTMLElement, edge: FrameEdge, co
         next = scaleRows(context.model, scale, singleWidths);
       } else {
         // The layout's width stays within its limits, so the rows scale by the same factor as it.
-        const scale = clamp((rect.width + dx) / rect.width, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, 1 / startWidth));
+        const widest = maxBlockWidth(context.model) / startWidth;
+        const scale = clamp((rect.width + dx) / rect.width, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, widest));
         next = scaleRows(setBlockWidth(context.model, startWidth * scale), scale, singleWidths, 1);
       }
       applySizing(root, next);
@@ -605,7 +625,7 @@ function resizeBlock(root: HTMLElement, handle: HTMLElement, edge: FrameEdge, co
   });
 }
 
-function showItemMenu(at: MouseEvent | { x: number; y: number }, context: LayoutContext, position: ItemPosition): void {
+function showItemMenu(at: MouseEvent | { x: number; y: number }, root: HTMLElement, context: LayoutContext, position: ItemPosition): void {
   const row = context.model.rows[position.row];
   const item = row?.items[position.index];
   if (!row || !item) {
@@ -641,6 +661,34 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     }
   }
 
+  // The whole layout floats to one side with the note's text wrapping around it, or stands alone.
+  // A layout with text beside its media does not float.
+  if (!hasText(context.model)) {
+    const wraps = [[null, "wrapNone", "square"], ["left", "wrapLeft", "panel-left"], ["right", "wrapRight", "panel-right"]] as const;
+    for (const [side, label, icon] of wraps) {
+      menu.addItem((entry) => entry
+        .setTitle(t(label))
+        .setIcon(icon)
+        .setSection("vml-wrap")
+        .setChecked(context.model.wrap === side)
+        .onClick(() => {
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWrap(context.model, side))]);
+        }));
+    }
+  }
+
+  // Text beside the media is typed in the note itself, in live preview.
+  if (context.live) {
+    const sides = [["left", "addTextLeft", "panel-left-open"], ["right", "addTextRight", "panel-right-open"]] as const;
+    for (const [side, label, icon] of sides) {
+      if (addedTextLine(context.block, side) !== null) {
+        menu.addItem((entry) => entry.setTitle(t(label)).setIcon(icon).setSection("vml-text").onClick(() => {
+          void addText(root, context, side);
+        }));
+      }
+    }
+  }
+
   // Nothing is deleted: the embed goes on its own line right after the block.
   menu.addItem((entry) => entry.setTitle(t("moveOut")).setIcon("log-out").setSection("vml-move").onClick(() => {
     const taken = removeItem(context.model, position);
@@ -661,6 +709,33 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   } else {
     menu.showAtPosition(at);
   }
+}
+
+/** Gives the block a blank line for text on one side and puts the cursor on it, showing the block's source. */
+async function addText(root: HTMLElement, context: LayoutContext, side: TextSide): Promise<void> {
+  // Found first: once the note changes, the layout is drawn anew and `root` leaves the editor.
+  const editorEl = root.closest<HTMLElement>(".cm-editor");
+  const view = editorEl ? EditorView.findFromDOM(editorEl) : null;
+  const edit = planAddText(context.block, side);
+  const at = addedTextLine(context.block, side);
+  if (!view || !edit || at === null || !(await commitEdits(context.app, context.sourcePath, [edit]))) {
+    return;
+  }
+
+  const expected = [...context.block.lines];
+  expected.splice(edit.start, edit.end - edit.start + 1, ...edit.replacement);
+  const matches = findV2Blocks(view.state.doc.toString().split("\n"))
+    .filter((candidate) => candidate.lines.length === expected.length && candidate.lines.every((line, index) => line === expected[index]));
+  const block = matches.length === 1 ? matches[0] : undefined;
+  if (block) {
+    view.dispatch({ selection: { anchor: view.state.doc.line(block.openLine + at + 1).from }, scrollIntoView: true });
+    view.focus();
+  }
+}
+
+function contentWidth(el: HTMLElement): number {
+  const style = getComputedStyle(el);
+  return el.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
 }
 
 function clamp(value: number, min: number, max: number): number {

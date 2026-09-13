@@ -1,0 +1,171 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import { planMergeWithNext } from "../src/commands/plans.ts";
+import { blockWrap, findV2Blocks, serializeOpener, type V2Block } from "../src/format/v2.ts";
+import { planWrap } from "../src/input/insertion.ts";
+import { addedTextLine, applyEditsToText, planAddText, planModelEdit, planMoveOut, planUnwrap, type BlockEdit } from "../src/layout/edits.ts";
+import {
+  effectiveWidth,
+  hasText,
+  maxBlockWidth,
+  metaFromModel,
+  modelFromBlock,
+  moveItem,
+  removeItem,
+  setBlockWidth,
+  setRowHeight,
+  setSkip,
+  setWrap,
+} from "../src/layout/model.ts";
+import { planPlacement } from "../src/layout/placement.ts";
+
+function block(lines: readonly string[], index = 0): V2Block {
+  const found = findV2Blocks(lines)[index];
+  assert.ok(found, `expected block #${index}`);
+  return found;
+}
+
+function apply(lines: readonly string[], edits: ReadonlyArray<BlockEdit | null> | null): string[] {
+  assert.ok(edits);
+  const planned = edits.filter((edit): edit is BlockEdit => edit !== null);
+  assert.equal(planned.length, edits.length, "expected every edit to be planned");
+  const result = applyEditsToText(lines.join("\n"), planned);
+  assert.ok(result.ok, `expected success, got ${JSON.stringify(result)}`);
+  return result.text.split("\n");
+}
+
+const note = [
+  "前文", // 0
+  "", // 1
+  '<!-- vml {"v":2,"width":0.5,"rows":[{"height":300}]} -->', // 2
+  "## 左侧标题", // 3
+  "", // 4
+  "左侧第一段，", // 5
+  "第二行。  ", // 6
+  "![[a.png]] ![[b.png]]", // 7
+  "", // 8
+  "![[c.png]]", // 9
+  "右侧文字", // 10
+  "", // 11
+  "- 列表", // 12
+  "<!-- /vml -->", // 13
+  "", // 14
+  "后文", // 15
+];
+
+test("text before the first row goes left of the media and text after the last row right", () => {
+  const found = block(note);
+  assert.equal(found.invalidLine, null);
+  assert.deepEqual(found.rows.map((row) => row.line), [7, 9]);
+  assert.deepEqual(found.leftText, { from: 3, to: 6, lines: note.slice(3, 7) });
+  assert.deepEqual(found.rightText, { from: 10, to: 12, lines: note.slice(10, 13) });
+
+  const model = modelFromBlock(found);
+  assert.deepEqual(model.text, { left: "## 左侧标题\n\n左侧第一段，\n第二行。  ", right: "右侧文字\n\n- 列表" });
+  // Row settings belong to rows only; text lines are not counted.
+  assert.deepEqual(model.rows.map((row) => row.height), [300, null]);
+
+  // Anything but media embeds is text: a note embed, or media with words after it.
+  const mixed = block(["<!-- vml -->\r", "![[a.png]]\r", "![[笔记]]\r", "![[b.png]] 说明\r", "<!-- /vml -->\r"]);
+  assert.equal(mixed.leftText, null);
+  assert.deepEqual(mixed.rightText?.lines, ["![[笔记]]", "![[b.png]] 说明"]);
+
+  const plain = block(["<!-- vml -->", "![[a.png]]", "<!-- /vml -->"]);
+  assert.deepEqual([plain.leftText, plain.rightText, hasText(modelFromBlock(plain))], [null, null, false]);
+});
+
+test("a layout with text does not float, and its wrap settings stay as written", () => {
+  const opener = '<!-- vml {"v":2,"width":0.3,"wrap":"left","skip":2,"rows":[]} -->';
+  const withText = block([opener, "说明", "![[a.png]]", "<!-- /vml -->"]);
+  const model = modelFromBlock(withText);
+  assert.equal(blockWrap(withText), null);
+  assert.deepEqual([model.wrap, model.skip, hasText(model)], [null, null, true]);
+  assert.equal(setWrap(model, "right"), model);
+  assert.equal(setSkip(model, 3), model);
+  assert.equal(serializeOpener(metaFromModel(model)), opener);
+  assert.equal(serializeOpener(metaFromModel(setBlockWidth(model, 0.5))), opener.replace("0.3", "0.5"));
+
+  assert.equal(blockWrap(block([opener, "![[a.png]]", "<!-- /vml -->"])), "left");
+});
+
+test("text beside the media leaves it a default width and a cap", () => {
+  const model = modelFromBlock(block(["<!-- vml -->", "![[a.png]]", "说明", "<!-- /vml -->"]));
+  assert.deepEqual([effectiveWidth(model), maxBlockWidth(model), setBlockWidth(model, 1).width], [0.4, 0.8, 0.8]);
+});
+
+test("new rows keep the text beside them exactly as written", () => {
+  const found = block(note);
+  const model = modelFromBlock(found);
+
+  const moved = moveItem(model, { row: 1, index: 0 }, { kind: "beside", position: { row: 0, index: 1 }, side: "after" });
+  assert.deepEqual(apply(note, [planModelEdit(found, moved)]), [
+    ...note.slice(0, 3),
+    ...note.slice(3, 7),
+    "![[a.png]] ![[b.png]] ![[c.png]]",
+    ...note.slice(10),
+  ]);
+
+  // A settings change still rewrites only the opening comment.
+  const taller = apply(note, [planModelEdit(found, setRowHeight(model, 1, 260))]);
+  assert.deepEqual(taller.filter((line, index) => line !== note[index]), ['<!-- vml {"v":2,"width":0.5,"rows":[{"height":300},{"height":260}]} -->']);
+
+  // CRLF stays CRLF, the text lines included.
+  const crlf = note.join("\r\n");
+  const result = applyEditsToText(crlf, [planModelEdit(block(crlf.split("\n")), moved) as BlockEdit]);
+  assert.ok(result.ok);
+  assert.equal(result.text, apply(note, [planModelEdit(found, moved)]).join("\r\n"));
+});
+
+test("a layout losing its last embed leaves its text as plain paragraphs", () => {
+  const lines = ["<!-- vml -->", "左", "![[a.png]]", "右", "<!-- /vml -->"];
+  const found = block(lines);
+  const taken = removeItem(modelFromBlock(found), { row: 0, index: 0 });
+  assert.ok(taken);
+  assert.deepEqual(apply(lines, [planModelEdit(found, taken.model)]), ["左", "", "右"]);
+  assert.deepEqual(apply(lines, [planMoveOut(found, taken.model, taken.item.embed)]), ["左", "", "右", "", "![[a.png]]"]);
+
+  const two = ["<!-- vml -->", "![[a.png]] ![[b.png]]", "右", "<!-- /vml -->"];
+  const rest = removeItem(modelFromBlock(block(two)), { row: 0, index: 1 });
+  assert.ok(rest);
+  assert.deepEqual(apply(two, [planMoveOut(block(two), rest.model, rest.item.embed)]), [
+    "<!-- vml -->",
+    "![[a.png]]",
+    "右",
+    "<!-- /vml -->",
+    "",
+    "![[b.png]]",
+  ]);
+});
+
+test("adding text makes room with a blank line; the plugin never writes the text", () => {
+  const lines = ["前文", "<!-- vml -->", "![[a.png]]", "<!-- /vml -->"];
+  const found = block(lines);
+  assert.deepEqual(apply(lines, [planAddText(found, "left")]), ["前文", "<!-- vml -->", "", "![[a.png]]", "<!-- /vml -->"]);
+  assert.equal(addedTextLine(found, "left"), 1);
+  assert.deepEqual(apply(lines, [planAddText(found, "right")]), ["前文", "<!-- vml -->", "![[a.png]]", "", "<!-- /vml -->"]);
+  assert.equal(addedTextLine(found, "right"), 2);
+
+  // A side with text already needs no room; a block that cannot be edited gets none.
+  const withLeft = block(["<!-- vml -->", "左", "![[a.png]]", "<!-- /vml -->"]);
+  assert.equal(planAddText(withLeft, "left"), null);
+  assert.ok(planAddText(withLeft, "right"));
+  assert.equal(planAddText(block(['<!-- vml {"v":3} -->', "![[a.png]]", "<!-- /vml -->"]), "left"), null);
+});
+
+test("unwrapping and moving a layout keep its text; merging leaves layouts with text alone", () => {
+  const found = block(note);
+  assert.deepEqual(apply(note, [planUnwrap(found)]), [...note.slice(0, 2), ...note.slice(3, 13), ...note.slice(14)]);
+
+  // A layout with text moves verbatim, and dropped beside the text it still does not float.
+  const moved = apply(note, planPlacement(note, found, { line: 0, wrap: "left", skip: 2 }));
+  assert.deepEqual(moved, [...note.slice(2, 14), "", "前文", "", "后文"]);
+
+  const pair = ["<!-- vml -->", "![[a.png]]", "说明", "<!-- /vml -->", "", "<!-- vml -->", "![[b.png]]", "<!-- /vml -->"];
+  assert.equal(planMergeWithNext(pair, 0), null);
+  assert.equal(planMergeWithNext(pair.slice(4).concat(["", ...pair.slice(0, 4)]), 1), null);
+
+  // New media below a layout with text get a layout of their own.
+  const dropped = ["<!-- vml -->", "![[a.png]]", "说明", "<!-- /vml -->", "", "![[new.png]]"];
+  assert.deepEqual(planWrap(dropped, [5], { mergeWithPrevious: true }), { from: 5, to: 5, replacement: ["<!-- vml -->", "![[new.png]]", "<!-- /vml -->"] });
+});

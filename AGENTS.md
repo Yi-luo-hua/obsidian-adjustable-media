@@ -49,8 +49,9 @@
 - 测试库在 Obsidian 里打开时，可以用 Obsidian 命令行驱动，不必手动点界面（测试库名为 `vml-test-vault`）：
   - `obsidian vault=vml-test-vault plugin:reload id=adjustable-media`：重新加载插件；
   - `obsidian vault=vml-test-vault dev:errors`：查看加载错误；
-  - `obsidian vault=vml-test-vault eval "code=..."`：在应用里执行 JS（这里不能 `require('obsidian')`，JS 里只用单引号）；
+  - `obsidian vault=vml-test-vault eval "code=..."`：在应用里执行 JS（这里不能 `require('obsidian')`，JS 里只用单引号）。`code=` 里只放一行短代码，多行脚本先存成文件，再用 `code=eval(require('fs').readFileSync('<路径>','utf8'))` 执行：把多行脚本直接当参数传入时，命令行桥接生成的 JSON 无效，Obsidian 主进程抛出未捕获的异常并弹出模态错误框，关掉它之前命令行一直没有响应；
   - `obsidian vault=vml-test-vault dev:screenshot "path=..."`：截图。窗口在后台时截图会落后一帧，连截两次，取第二张。
+- 测试库窗口被其他窗口完全挡住时，页面处于 hidden 状态，`requestAnimationFrame` 不再触发，CodeMirror 也就不测量、不重排，实测数据全都不可信。先执行一次 `obsidian vault=vml-test-vault eval "code=require('@electron/remote').getCurrentWebContents().setBackgroundThrottling(false)"`，重启 Obsidian 前一直有效。
 - 会改动测试笔记的实测，先把笔记备份，测完恢复并用哈希值核对。
 
 ## Git

@@ -65,7 +65,7 @@ test("a settings-only change rewrites just the opening comment and keeps the bod
   assert.deepEqual(apply(note, [taller(nth(note, 0))]), [...note.slice(0, 2), TALLER, ...note.slice(3)]);
 });
 
-test("blocks with unreadable settings or other text are never rewritten", () => {
+test("blocks with unreadable settings or text between rows are never rewritten", () => {
   const newer = nth(['<!-- vml {"v":3,"rows":[{"height":300}]} -->', "![[a.png]]", "![[b.png]]", "<!-- /vml -->"], 0);
   assert.equal(isEditable(newer), false);
   assert.equal(planModelEdit(newer, moveItem(modelFromBlock(newer), { row: 1, index: 0 }, { kind: "newRow", beforeRow: 0 })), null);
@@ -73,7 +73,7 @@ test("blocks with unreadable settings or other text are never rewritten", () => 
   assert.ok(taken);
   assert.equal(planMoveOut(newer, taken.model, taken.item.embed), null);
 
-  const mixed = nth(["<!-- vml -->", "![[a.png]]", "说明文字", "<!-- /vml -->"], 0);
+  const mixed = nth(["<!-- vml -->", "![[a.png]]", "说明文字", "![[b.png]]", "<!-- /vml -->"], 0);
   assert.equal(isEditable(mixed), false);
   assert.equal(planModelEdit(mixed, setRowHeight(modelFromBlock(mixed), 0, 300)), null);
 
