@@ -52,38 +52,50 @@
   margin-bottom: 0;
 }
 
-/* In live preview the text is typed right in the layout: a click swaps it for a box with its source. */
+/*
+ * In live preview the text is typed right in the layout: a click swaps it for an editor of its own,
+ * which draws the source in the styles of the note's editor (docs/DESIGN.md, section 4.2).
+ */
 .vml-live-preview .vml-layout__text {
   cursor: text;
 }
 
-.vml-layout__text > textarea.vml-text-editor {
+.vml-layout__text > div.vml-text-editor {
   background: var(--background-primary);
   border: 1px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.6);
   border-radius: var(--radius-s);
-  box-shadow: none;
-  box-sizing: border-box;
-  color: var(--text-normal);
-  display: block;
-  font: inherit;
-  height: var(--vml-edit-height, auto);
-  line-height: var(--line-height-normal);
   margin: -3px -7px;
-  min-height: 2em;
-  overflow: hidden;
   padding: 2px 6px;
-  resize: none;
-  white-space: pre-wrap;
-  width: calc(100% + 14px);
 }
 
-.vml-layout__text > textarea.vml-text-editor:focus {
+.vml-layout__text > div.vml-text-editor:focus-within {
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 2px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.2);
 }
 
-.vml-layout__text > textarea.vml-text-editor.is-invalid {
+.vml-layout__text > div.vml-text-editor.is-invalid {
   border-color: var(--text-error);
+}
+
+/* The column's editor sits inside the note's editor, but takes none of its file margins, code font or focus outline. */
+.vml-text-editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+.vml-text-editor .cm-editor .cm-scroller {
+  font-family: inherit;
+  line-height: inherit;
+  overflow: visible;
+  padding: 0;
+}
+
+.vml-text-editor .cm-editor .cm-content {
+  padding: 0;
+}
+
+/* As in the drawn column, the first line starts right at the top, a heading's spacing aside. */
+.vml-text-editor .cm-editor .cm-content > .cm-line:first-child {
+  padding-top: 0;
 }
 
 .vml-text-editor__note {
@@ -146,12 +158,6 @@
   box-shadow:
     0 0 0 4px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.25),
     0 0 24px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.55);
-}
-
-.markdown-preview-view .vml-layout--drop-target {
-  border-radius: 8px;
-  outline: 2px dashed var(--interactive-accent);
-  outline-offset: 4px;
 }
 
 .vml-layout__warning {

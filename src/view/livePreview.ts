@@ -173,7 +173,7 @@ function drawWidget(el: HTMLElement, view: EditorView, app: App, block: V2Block,
   component.load();
   components.set(el, component);
   const root = renderLayout(el, { app, sourcePath, model, editable: isEditable(block), warning: blockWarning(block), component });
-  const context: LayoutContext = { app, sourcePath, block, model, live: true };
+  const context: LayoutContext = { app, sourcePath, block, model };
   const host: TextEditHost = {
     el,
     root,
@@ -181,6 +181,7 @@ function drawWidget(el: HTMLElement, view: EditorView, app: App, block: V2Block,
     sourcePath,
     context,
     editor: view.state.field(editorInfoField, false)?.editor,
+    view,
     redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, editing),
   };
   if (isEditable(block)) {

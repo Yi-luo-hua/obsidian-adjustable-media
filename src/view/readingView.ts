@@ -2,9 +2,7 @@ import { MarkdownRenderChild, MarkdownView, type Plugin } from "obsidian";
 
 import { findV2Blocks, hasSideText, type V2Block } from "../format/v2.ts";
 import { drawnFrom, isStale, recordDrawn, type Drawn } from "../layout/drawn.ts";
-import { isEditable } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
-import { attachInteractions } from "./interactions.ts";
 import { renderLayout } from "./layoutView.ts";
 import { blockWarning } from "./messages.ts";
 import { keepWrapped } from "./readingWrap.ts";
@@ -18,6 +16,9 @@ const RERENDER_RETRY_MS = 100;
  * entirely inside a block body is replaced with the layout of the rows it holds. A layout with text
  * beside its media is drawn whole in the section of its first line, and its other sections are left
  * empty. Transcluded notes have no section info and keep Obsidian's own rendering.
+ *
+ * Layouts are only shown here; they are changed in live preview. A click on one of their images
+ * opens Obsidian's image viewer, as for any image in reading view.
  */
 export function registerReadingView(plugin: Plugin): void {
   // Sections of one note arrive one after another with the same text; parse it once.
@@ -73,11 +74,10 @@ export function registerReadingView(plugin: Plugin): void {
       sourcePath: ctx.sourcePath,
       model,
       rowIndices,
-      editable: isEditable(block),
+      editable: false,
       warning: blockWarning(block),
       component: child,
     });
-    attachInteractions(root, { app: plugin.app, sourcePath: ctx.sourcePath, block, model, live: false });
     if (model.wrap !== null) {
       child.register(keepWrapped(el, root, model.wrap));
     }
@@ -85,8 +85,8 @@ export function registerReadingView(plugin: Plugin): void {
 
   // Obsidian keeps the rendered section of any text that did not change. A settings-only change
   // rewrites just the opening comment, so the section with the embeds would go on showing the old
-  // layout, with settings the next edit no longer matches; a change to the text beside a layout's
-  // media may reach only a section the layout is not drawn in. Re-render that note's reading views.
+  // layout; a change to the text beside a layout's media may reach only a section the layout is not
+  // drawn in. Re-render that note's reading views.
   plugin.registerEvent(plugin.app.metadataCache.on("changed", (file, data) => {
     const previous = drawn.get(file.path);
     if (previous === undefined) {

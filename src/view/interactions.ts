@@ -35,14 +35,13 @@ import { MediaViewer, type ViewerImage } from "./mediaViewer.ts";
 import { t, type MessageKey } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
 
+/** A layout drawn in live preview, as its interactions see it. Reading view only shows layouts. */
 export interface LayoutContext {
   app: App;
   sourcePath: string;
   block: V2Block;
   model: LayoutModel;
-  /** Live preview: the layout gets a frame to resize it by, and its images open in the plugin's viewer. */
-  live: boolean;
-  /** Live preview: starts typing the text on one side of the media right in the layout. */
+  /** Starts typing the text on one side of the media right in the layout. */
   editText?: (side: TextSide) => void;
 }
 
@@ -76,17 +75,15 @@ const FRAME_LABELS: Record<FrameEdge, MessageKey> = {
 const DROP_CLASSES = ["vml-drop-before", "vml-drop-after", "vml-drop-row-before", "vml-drop-row-after", "vml-layout--drop-target"];
 
 /**
- * Makes a rendered layout editable: drag to reorder (also into other blocks of the same note in the
- * same pane) or to move a single item sideways, resize rows, columns, single items and, in live
- * preview, the whole layout by its frame, and a context menu. Every change goes through the layout
- * model and the write-back layer; the view never edits the note itself. Blocks that are not editable
- * (docs/DESIGN.md, section 1.3) stay display-only.
+ * Makes a layout drawn in live preview editable: drag to reorder (also into other blocks of the same
+ * note in the same pane) or to move a single item sideways, resize rows, columns, single items and the
+ * whole layout by its frame, and a context menu. Its images open in the plugin's viewer. Every change
+ * goes through the layout model and the write-back layer; the view never edits the note itself.
+ * Blocks that are not editable (docs/DESIGN.md, section 1.3) stay display-only.
  */
 export function attachInteractions(root: HTMLElement, context: LayoutContext): void {
   contexts.set(root, context);
-  if (context.live) {
-    setUpViewer(root, context);
-  }
+  setUpViewer(root, context);
   if (!isEditable(context.block)) {
     return;
   }
@@ -99,9 +96,7 @@ export function attachInteractions(root: HTMLElement, context: LayoutContext): v
       setUpItem(root, itemEl, { row, index: Number(itemEl.dataset.index) }, context);
     }
   }
-  if (context.live) {
-    setUpFrame(root, context);
-  }
+  setUpFrame(root, context);
 }
 
 /** Where an item dragged from `leaf` would land in a layout of the note at (x, y), if anywhere. */
@@ -151,8 +146,8 @@ export function clearDropIndicators(doc: Document): void {
 }
 
 /**
- * The browser still reports a click where a drag ends. Reading view would open Obsidian's image
- * viewer for it and live preview would select the image, so the click right after a drag is dropped.
+ * The browser still reports a click where a drag ends, and live preview would select the image under
+ * the pointer for it, so the click right after a drag is dropped.
  */
 export function swallowNextClick(doc: Document): void {
   const swallow = (event: MouseEvent): void => {
@@ -362,7 +357,7 @@ function measureSideways(rowEl: HTMLElement, itemEl: HTMLElement): { left: numbe
 }
 
 async function dropItem(source: LayoutContext, from: ItemPosition, drop: DropState): Promise<void> {
-  // A reading-view block split by blank lines is rendered in several sections of one block.
+  // Within the same layout the item just moves.
   if (drop.context.block.openLine === source.block.openLine) {
     const moved = moveItem(source.model, from, drop.target);
     if (moved !== source.model) {
@@ -694,7 +689,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     }
   }
 
-  // Text beside the media is typed right in the layout, in live preview.
+  // Text beside the media is typed right in the layout.
   const { editText } = context;
   if (editText) {
     const sides = [["left", "addTextLeft", "panel-left-open"], ["right", "addTextRight", "panel-right-open"]] as const;

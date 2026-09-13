@@ -1,18 +1,21 @@
 import { Scope, type App, type Editor } from "obsidian";
+import type { EditorView, ViewUpdate } from "@codemirror/view";
 
 import { blockWrap, type TextSide, type V2Block } from "../format/v2.ts";
 import { onlyColumnTextDiffers, planColumnText } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
+import { createColumnEditor } from "./columnEditor.ts";
 import { commitEdits, type LayoutContext } from "./interactions.ts";
 import { t } from "./messages.ts";
 
 /**
  * Typing the text beside a layout's media right in the layout, in live preview (docs/DESIGN.md,
- * sections 3 and 4.2). A click on a text column swaps its drawn Markdown for a text box holding the
- * column's source; the rest of the layout stays as it is. Every change goes into the note at once,
- * through its editor, so the note's own undo history holds it. While the box is in use, the layout
- * keeps its element when the note changes, so nothing interrupts the typing, input methods included;
- * leaving the box draws the layout again from the note.
+ * sections 3 and 4.2). A click on a text column swaps its drawn Markdown for an editor of its own
+ * holding the column's source, in the styles of the note's editor (columnEditor.ts); the rest of the
+ * layout stays as it is. Every change goes into the note at once, through its editor, so the note's
+ * own undo history holds it. While the column is typed in, the layout keeps its element when the note
+ * changes, so nothing interrupts the typing, input methods included; leaving the column's editor
+ * draws the layout again from the note.
  */
 
 /** A layout drawn in live preview, as far as typing in it goes. */
@@ -25,6 +28,8 @@ export interface TextEditHost {
   sourcePath: string;
   /** The editor showing the note, which the typed text goes into. */
   editor: Editor | undefined;
+  /** The same editor's CodeMirror view, whose Markdown language and indentation the column's editor takes on. */
+  view: EditorView;
   /** What the layout's interactions work on, kept up to date while its text is typed in. */
   context: LayoutContext;
   /** Draws the layout again from `block`; with `side`, that side shows a text column even without text. */
@@ -80,13 +85,16 @@ export function stopTextEdit(el: HTMLElement): void {
 class TextEditSession {
   private readonly host: TextEditHost;
   private readonly side: TextSide;
-  private readonly box: HTMLTextAreaElement;
-  // Obsidian's hotkeys act on the note's editor, not on this box: none of them while typing here.
+  /** The frame around the column's editor. */
+  private readonly box: HTMLElement;
+  private readonly editor: EditorView;
+  // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here.
   private readonly scope = new Scope();
   private block: V2Block;
   /** The text going into the note right now; the note holds it once the write is done. */
   private writing: string | null = null;
-  private composing = false;
+  /** Whether the editor holds a change the note does not have yet, typed while an input method composes. */
+  private pending = false;
   private pushed = false;
   private ended = false;
 
@@ -95,42 +103,61 @@ class TextEditSession {
     this.side = side;
     this.block = host.context.block;
     column.empty();
+    // The source is drawn as the note's editor draws its text, not as rendered Markdown.
+    column.removeClass("markdown-rendered");
     column.addClass("vml-layout__text--editing");
-    this.box = column.createEl("textarea", { cls: "vml-text-editor" });
+    this.box = column.createDiv({ cls: "vml-text-editor" });
     column.createDiv({ cls: "vml-text-editor__note", text: t("textNotSaved") });
-    this.box.value = source;
-    this.scope.register([], "Escape", () => {
-      this.box.blur();
+    this.editor = createColumnEditor({
+      parent: this.box,
+      note: host.view,
+      text: source,
+      caret,
+      onUpdate: (update) => this.updated(update),
+    });
+    this.scope.register([], "Escape", (event) => {
+      // Esc during an input method's composition cancels the composition.
+      if (event.isComposing) {
+        return true;
+      }
+      this.editor.contentDOM.blur();
       return false;
     });
 
-    this.box.addEventListener("blur", () => this.end());
-    this.box.addEventListener("input", (event) => {
-      this.fit();
-      // An input method's text goes in once it is composed.
-      if (!this.composing && !(event instanceof InputEvent && event.isComposing)) {
-        this.write();
+    const content = this.editor.contentDOM;
+    // Focus leaving the editor ends the typing, once it has settled elsewhere. Another window taking
+    // the focus leaves the editor focused in this one, and the typing goes on on return.
+    content.addEventListener("focusout", () => {
+      window.setTimeout(() => {
+        if (content.doc.activeElement !== content) {
+          this.end();
+        }
+      }, 0);
+    });
+    // Composed text goes in with the editor's next update; this covers an editor that reports none.
+    content.addEventListener("compositionend", () => {
+      window.setTimeout(() => {
+        if (this.pending) {
+          this.write();
+        }
+      }, 0);
+    });
+    // The frame's padding takes no focus from the editor.
+    this.box.addEventListener("mousedown", (event) => {
+      if (event.target === this.box) {
+        event.preventDefault();
       }
     });
-    this.box.addEventListener("compositionstart", () => {
-      this.composing = true;
-    });
-    this.box.addEventListener("compositionend", () => {
-      this.composing = false;
-      this.write();
-    });
-    // The editor's own menu would act on the note, not on this box.
-    this.box.addEventListener("contextmenu", (event) => event.stopPropagation());
+    // The menu of the note's editor would act on the note, not on this editor.
+    this.editor.dom.addEventListener("contextmenu", (event) => event.stopPropagation());
 
-    this.fit();
-    this.box.focus({ preventScroll: true });
-    this.box.setSelectionRange(caret, caret);
+    this.editor.focus();
     this.pushScope();
   }
 
   /** Whether `block`, the layout's block after a change to the note, holds just the typed text: then the layout stays. */
   accepts(block: V2Block): boolean {
-    const text = this.writing ?? this.box.value;
+    const text = this.writing ?? this.editor.state.doc.toString();
     if (this.ended || blockWrap(block) !== blockWrap(this.block) || !onlyColumnTextDiffers(this.block, block, this.side, text.split("\n"))) {
       this.abort();
       return false;
@@ -148,13 +175,12 @@ class TextEditSession {
     }
   }
 
-  /** Leaves the box: what is left is written, and the layout is drawn again from the note. */
+  /** Leaves the editor: what is left is written, and the layout is drawn again from the note. */
   private end(): void {
     if (this.ended) {
       return;
     }
-    this.composing = false;
-    this.write();
+    this.write(true);
     if (this.ended) {
       return;
     }
@@ -162,12 +188,26 @@ class TextEditSession {
     this.host.redraw(this.block);
   }
 
-  /** Puts the box's text into the note, when it fits there and differs from what the note holds. */
-  private write(): void {
-    if (this.ended || this.composing) {
+  /** Writes each change; one typed while an input method composes, once the composition ends. */
+  private updated(update: ViewUpdate): void {
+    if (update.docChanged) {
+      this.pending = true;
+    }
+    if (this.pending) {
+      this.write();
+    }
+  }
+
+  /**
+   * Puts the editor's text into the note, when it fits there and differs from what the note holds.
+   * Waits while an input method composes, unless `now`.
+   */
+  private write(now = false): void {
+    if (this.ended || (!now && (this.editor.composing || this.editor.compositionStarted))) {
       return;
     }
-    const text = this.box.value;
+    this.pending = false;
+    const text = this.editor.state.doc.toString();
     const plan = planColumnText(this.block, this.side, text);
     this.box.toggleClass("is-invalid", !plan.fits);
     if (!plan.edit) {
@@ -187,6 +227,7 @@ class TextEditSession {
   private finish(): void {
     this.ended = true;
     this.popScope();
+    this.editor.destroy();
     if (sessions.get(this.host.el) === this) {
       sessions.delete(this.host.el);
     }
@@ -204,12 +245,6 @@ class TextEditSession {
       this.host.app.keymap.popScope(this.scope);
       this.pushed = false;
     }
-  }
-
-  /** Makes the box as high as its text. */
-  private fit(): void {
-    this.box.setCssProps({ "--vml-edit-height": "auto" });
-    this.box.setCssProps({ "--vml-edit-height": `${this.box.scrollHeight + 2}px` });
   }
 }
 
