@@ -36,6 +36,50 @@ const MESSAGES = {
     zh: "移出布局块",
     en: "Move out of layout",
   },
+  wrapNone: {
+    zh: "不环绕文字",
+    en: "No text wrap",
+  },
+  wrapLeft: {
+    zh: "图片靠左，文字环绕",
+    en: "Float left, wrap text",
+  },
+  wrapRight: {
+    zh: "图片靠右，文字环绕",
+    en: "Float right, wrap text",
+  },
+  moveLayout: {
+    zh: "拖动以移动布局块",
+    en: "Drag to move the layout",
+  },
+  dropSkip: {
+    zh: "下移 {lines} 行",
+    en: "{lines} lines down",
+  },
+  addTextLeft: {
+    zh: "在左侧添加文字",
+    en: "Add text on the left",
+  },
+  addTextRight: {
+    zh: "在右侧添加文字",
+    en: "Add text on the right",
+  },
+  textTop: {
+    zh: "文字顶端对齐",
+    en: "Text at the top",
+  },
+  textCenter: {
+    zh: "文字垂直居中",
+    en: "Text in the middle",
+  },
+  textBottom: {
+    zh: "文字底端对齐",
+    en: "Text at the bottom",
+  },
+  textNotSaved: {
+    zh: "这样写会改变布局块本身（例如只有图片的一行、代码围栏或布局注释），暂不保存。",
+    en: "This would change the layout block itself (a line of media embeds only, a code fence or a layout comment), so it is not saved.",
+  },
   writeNotFound: {
     zh: "布局块已在别处被改动，这次修改没有写入，请重试。",
     en: "The layout changed elsewhere, so this change was not saved. Please try again.",
@@ -141,8 +185,8 @@ const MESSAGES = {
     en: "The selection must contain only image or video embeds that are not already in a layout.",
   },
   mergeNothing: {
-    zh: "光标所在的布局块后面没有紧挨着的布局块，或者其中一个块不能编辑。",
-    en: "There is no editable layout block right after this one.",
+    zh: "光标所在的布局块后面没有紧挨着的布局块，或者其中一个块不能编辑、带有文字。",
+    en: "There is no layout block right after this one, or one of the two cannot be edited or has text beside its media.",
   },
   unwrapNothing: {
     zh: "光标不在布局块里。",

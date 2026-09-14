@@ -59,7 +59,7 @@ test("the block width is read from the opening comment and not stored at full wi
   const layout = model(['<!-- vml {"v":2,"width":0.5} -->', "![[a.png]]", "<!-- /vml -->"]);
 
   assert.equal(layout.width, 0.5);
-  assert.equal(serializeOpener(metaFromModel(layout)), '<!-- vml {"v":2,"width":0.5,"rows":[]} -->');
+  assert.equal(serializeOpener(metaFromModel(layout)), '<!-- vml {"v":2,"width":0.5} -->');
   assert.equal(setBlockWidth(layout, 0.05).width, 0.2);
   assert.equal(setBlockWidth(layout, 0.6666).width, 0.667);
   assert.equal(serializeOpener(metaFromModel(setBlockWidth(layout, 1.4))), "<!-- vml -->");

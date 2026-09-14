@@ -90,9 +90,11 @@ test("parses Markdown destinations: encoding, parentheses, angle brackets and ti
   );
 });
 
-test("a row with text, or an embed that is not media, makes the block invalid", () => {
+test("text between two rows, or text without any row, makes the block invalid", () => {
+  // A line with anything but media embeds is text, and text alone is not a layout.
   assert.equal(block(["<!-- vml -->", "![[a.png]] 说明", CLOSE()]).invalidLine, 1);
-  assert.equal(block(["<!-- vml -->", "![[a.png]]", "![[笔记]]", CLOSE()]).invalidLine, 2);
+  assert.equal(block(["<!-- vml -->", "![[a.png]]", "说明", "![[b.png]]", CLOSE()]).invalidLine, 2);
+  assert.equal(block(["<!-- vml -->", "左", "![[a.png]]", "![[笔记]]", "", "![[b.png]]", CLOSE()]).invalidLine, 3);
 });
 
 test("blank body lines are skipped and CRLF is tolerated", () => {

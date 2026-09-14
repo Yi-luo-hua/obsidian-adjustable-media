@@ -15,6 +15,9 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 - **Side-by-Side & Grids**: Place images and videos side by side (up to 4 per row) with automatic height equalization.
 - **Direct Mouse Resizing**: Drag the gap between two images to adjust column widths, drag a row's bottom edge to change height, or drag the outer frame to scale the entire layout block.
 - **Free Single-Image Placement**: Slide a single image left or right across its row, with smooth magnetic snapping to left, center, and right.
+- **Text Wrap, like LaTeX's `wrapfigure`**: Float a layout to the left or right and let the note's own paragraphs, lists, quotes, headings and code flow around it, then continue at full width below it. The text beside it is ordinary note text: type right next to the image and it reflows as you go.
+- **Text Beside Images, like Side-by-Side Minipages**: Write text in a layout block before its media for a column on their left, after them for a column on their right, or both. It is ordinary Markdown (headings, lists, quotes, links), and the media keep the layout's width in the middle. The text lines up with the media at the top, in the middle or at the bottom. In Live Preview, click the text to edit it right in the layout, where it keeps the look of Live Preview (headings, bold text, bullets, task boxes, links) and the keys work as in the note: <kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, <kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>I</kbd> and <kbd>Ctrl</kbd>+<kbd>K</kbd> format. Or right-click an image and choose **Add text on the left** or **Add text on the right** to start one.
+- **Move Whole Layouts**: Drag the grip on top of a layout's frame to move the whole block. Drop it in the middle of the text to place it between paragraphs, or in the left or right third to float it there, starting at the line you point at.
 - **Flexible Drag-and-Drop Reordering**: Drag an item to reorder within a row, drop between rows to start a new row, or drag loose images from your note directly into an existing layout block.
 - **Double-Click Image Viewer**: In editing mode, double-click any image in a layout block to inspect it up close; supports mouse wheel zoom, click-and-drag panning, and left/right arrow keys to switch between images in the block.
 - **Video Playback**: Videos feature a dedicated drag button in the top-left corner, ensuring layout drags never accidentally trigger playback or the timeline scrubber.
@@ -48,15 +51,18 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 | :--- | :--- |
 | **Adjust column width ratio** | Drag the gap between two items |
 | **Change row height** | Drag the bottom edge of the row |
-| **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner for proportional scale) |
+| **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner for proportional scale; a layout floating right uses its left edge and bottom-left corner; with text beside the media, the handles sit on the media column) |
 | **Position a single item** | Drag the image horizontally; snaps smoothly to left, center, and right |
 | **Reorder or move items** | Drag and drop onto adjacent spots, between rows (to split into a new row), or into another layout block |
+| **Wrap text around a layout** | Right-click an item and choose **Float left, wrap text** or **Float right, wrap text**; **No text wrap** takes it back |
+| **Put text beside the media** | Right-click an item and choose **Add text on the left** or **Add text on the right**, then type right there; later, click the text to edit it in place (<kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, <kbd>Ctrl</kbd>+<kbd>B</kbd>/<kbd>I</kbd>/<kbd>K</kbd> format; <kbd>Esc</kbd> or a click elsewhere finishes). The same menu lines the text up with the media at the top, in the middle or at the bottom |
+| **Move the whole layout** | Drag the grip on top of the frame: the left or right third of the text floats it there from the line you point at, the middle places it between paragraphs |
 | **Move a video** | Drag the dedicated handle in the top-left corner of the video |
 | **Full-screen image viewer** | Double-click an image in Live Preview (scroll to zoom, drag to pan, arrow keys to switch); single-click in Reading View |
 | **Captions** | Right-click an item to edit captions and alignment |
 | **Move out of layout block** | Right-click an item and choose to remove it from the layout block |
 | **Cancel drag gesture** | Press <kbd>Esc</kbd> anytime during a drag to cancel |
-| **View/edit source** | Click the "Edit source" button in the top-left corner of the layout block |
+| **View/edit source** | Click the "Edit source" button in the top-right corner of the layout block (of its media, when there is text beside them) |
 
 ---
 
@@ -72,6 +78,27 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 ```
 
 - The opening comment stores only essential parameters (row height, width ratios, captions, alignment), with zero unnecessary overhead.
+- A layout that wraps text sits right above the text that wraps around it, and says which side it floats to:
+
+  ```markdown
+  <!-- vml {"v":2,"width":0.4,"wrap":"left"} -->
+  ![[portrait.png]]
+  <!-- /vml -->
+  This paragraph flows around the image, then continues at full width below it.
+  ```
+
+  Without the plugin, the image simply shows above that paragraph.
+- Text written in a layout before its media shows in a column on their left, text after them in a column on their right:
+
+  ```markdown
+  <!-- vml {"v":2,"width":0.4} -->
+  Text on the left: several lines or paragraphs, lists, quotes.
+  ![[beach.png]]
+  Text on the right.
+  <!-- /vml -->
+  ```
+
+  Without the plugin, the text and the image show one after the other.
 - Embed syntax remains completely untouched, fully compatible with file renaming and moving.
 - If you ever decide to stop using the plugin, run `Remove layout block comments from all notes…` to cleanly restore plain Markdown in one step.
 
@@ -98,7 +125,8 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 ## Notes
 
 - Layout blocks must start at the beginning of a line (not nested inside quotes, callouts, or lists).
-- Each line inside a layout block must contain only image or video embeds. If mixed with plain text, the plugin automatically leaves it untouched to render as normal Markdown.
+- Reading View only shows layout blocks; change them in Live Preview.
+- Text inside a layout block goes before its first row of media (left column) or after its last row (right column). Text between two rows, or a block without media, is left untouched and renders as normal Markdown. A layout with text beside its media does not wrap the note's text.
 - Completely offline & private: zero network requests, zero telemetry.
 
 ---

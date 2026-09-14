@@ -6,8 +6,129 @@
   width: var(--vml-block-width);
 }
 
+/*
+ * A layout with text beside its media (docs/DESIGN.md, section 1.1): the media keep the block's width
+ * in a column of their own, and the text columns share what is left.
+ */
+.vml-layout--columns {
+  align-items: flex-start;
+  display: flex;
+  gap: 1.5em;
+}
+
+.vml-layout--columns.vml-layout--sized {
+  width: auto;
+}
+
+/* The text lines up with the media at the top, in the middle or at the bottom. */
+.vml-layout--valign-center {
+  align-items: center;
+}
+
+.vml-layout--valign-bottom {
+  align-items: flex-end;
+}
+
+.vml-layout__media {
+  flex: 0 0 var(--vml-block-width, 40%);
+  min-width: 0;
+  position: relative;
+}
+
+/* In live preview the editor's pre-wrap would turn the line breaks between Obsidian's elements into blank lines. */
+.vml-layout__text {
+  flex: 1 1 0;
+  margin: 8px 0;
+  min-width: 0;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.vml-layout__text > :first-child {
+  margin-top: 0;
+}
+
+.vml-layout__text > :last-child {
+  margin-bottom: 0;
+}
+
+/*
+ * In live preview the text is typed right in the layout: a click swaps it for an editor of its own,
+ * which draws the source in the styles of the note's editor (docs/DESIGN.md, section 4.2).
+ */
+.vml-live-preview .vml-layout__text {
+  cursor: text;
+}
+
+.vml-layout__text > div.vml-text-editor {
+  background: var(--background-primary);
+  border: 1px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.6);
+  border-radius: var(--radius-s);
+  margin: -3px -7px;
+  padding: 2px 6px;
+}
+
+.vml-layout__text > div.vml-text-editor:focus-within {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.2);
+}
+
+.vml-layout__text > div.vml-text-editor.is-invalid {
+  border-color: var(--text-error);
+}
+
+/* The column's editor sits inside the note's editor, but takes none of its file margins, code font or focus outline. */
+.vml-text-editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+.vml-text-editor .cm-editor .cm-scroller {
+  font-family: inherit;
+  line-height: inherit;
+  overflow: visible;
+  padding: 0;
+}
+
+.vml-text-editor .cm-editor .cm-content {
+  padding: 0;
+}
+
+/* As in the drawn column, the first line starts right at the top, a heading's spacing aside. */
+.vml-text-editor .cm-editor .cm-content > .cm-line:first-child {
+  padding-top: 0;
+}
+
+/* Away from the cursor, a blank line takes the room of a paragraph break, as in the drawn column. */
+.vml-text-editor .cm-editor .cm-content > .cm-line.vml-blank-line {
+  line-height: var(--p-spacing, 1rem);
+}
+
+.vml-text-editor__note {
+  color: var(--text-error);
+  display: none;
+  font-size: var(--font-ui-smaller);
+  margin-top: 6px;
+}
+
+.vml-text-editor.is-invalid + .vml-text-editor__note {
+  display: block;
+}
+
 .vml-live-preview {
   position: relative;
+}
+
+/*
+ * CodeMirror measures a widget by its box and ignores margins, so a layout's spacing is padding of
+ * its widget. As a margin it could reach out of a widget whose painting is not contained
+ * (see .vml-has-wraps below), and every line after it would be placed too high.
+ */
+.vml-live-preview:not(.vml-live-preview--wrap) {
+  padding: 0.75em 0;
+}
+
+.vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout {
+  margin: 0;
 }
 
 /* In live preview a glowing frame shows where a layout begins and ends; its edges resize it. */
@@ -42,12 +163,6 @@
   box-shadow:
     0 0 0 4px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.25),
     0 0 24px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.55);
-}
-
-.markdown-preview-view .vml-layout--drop-target {
-  border-radius: 8px;
-  outline: 2px dashed var(--interactive-accent);
-  outline-offset: 4px;
 }
 
 .vml-layout__warning {
@@ -110,7 +225,7 @@
   height: auto;
   max-width: 100%;
   object-fit: contain;
-  width: auto;
+  width: var(--vml-natural-width, auto);
 }
 
 .vml-row--single .vml-item--sized .vml-item__media {
@@ -283,6 +398,8 @@ body.vml-is-dragging * {
 .vml-layout--interactive .vml-row:hover .vml-handle,
 .vml-layout--interactive .vml-item:focus-within .vml-handle,
 .vml-live-preview .vml-layout--interactive:hover > .vml-frame__handle,
+.vml-live-preview .vml-layout--interactive:hover > .vml-layout__media > .vml-frame__handle,
+.vml-live-preview .vml-layout--interactive:hover > .vml-frame__move,
 .vml-handle.is-active {
   opacity: 1;
 }
@@ -355,7 +472,10 @@ body.vml-is-dragging * {
   width: 24px;
 }
 
-/* The frame's handles sit on its right edge, bottom edge and bottom-right corner. */
+/*
+ * The frame's handles sit on its right edge, bottom edge and bottom-right corner; with text beside the
+ * media, on those of the media's column.
+ */
 .vml-frame__handle {
   z-index: 4;
 }
@@ -413,6 +533,241 @@ body.vml-is-dragging * {
   left: 0;
   top: 0;
   width: 12px;
+}
+
+/* A layout floating right grows to the left: its width handles sit on its left edge. */
+.vml-frame__handle--right.vml-frame__handle--mirrored {
+  left: -7px;
+  right: auto;
+}
+
+.vml-frame__handle--corner.vml-frame__handle--mirrored {
+  cursor: nesw-resize;
+  left: -8px;
+  right: auto;
+}
+
+/* The grip on top of the frame moves the whole layout. */
+.vml-frame__move {
+  align-items: center;
+  background: var(--interactive-accent);
+  border-radius: var(--radius-l);
+  box-shadow: 0 0 6px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.6);
+  color: var(--text-on-accent);
+  cursor: grab;
+  display: flex;
+  height: 14px;
+  justify-content: center;
+  left: calc(50% - 20px);
+  top: -8px;
+  width: 40px;
+  z-index: 4;
+}
+
+.vml-frame__move svg {
+  height: 14px;
+  width: 14px;
+}
+
+.vml-layout--moving {
+  opacity: 0.4;
+}
+
+/* Where a moved layout will go: its outline beside the text, or a line between two paragraphs. */
+.vml-block-drop {
+  background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.08);
+  border: 2px dashed var(--interactive-accent);
+  border-radius: var(--radius-m);
+  box-sizing: border-box;
+  height: var(--vml-drop-height, 0);
+  left: 0;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  transform: translate(var(--vml-drop-x, 0), var(--vml-drop-y, 0));
+  width: var(--vml-drop-width, 0);
+  z-index: var(--layer-dragged-item, 80);
+}
+
+.vml-block-drop--line {
+  background-color: var(--interactive-accent);
+  border: none;
+  border-radius: 2px;
+  height: 3px;
+}
+
+.vml-block-drop.is-hidden {
+  display: none;
+}
+
+.vml-block-drop__label {
+  background: var(--interactive-accent);
+  border-radius: var(--radius-s);
+  color: var(--text-on-accent);
+  font-size: var(--font-ui-smaller);
+  left: 6px;
+  padding: 1px 6px;
+  position: absolute;
+  top: 6px;
+  white-space: nowrap;
+}
+
+.vml-block-drop--line .vml-block-drop__label {
+  top: -22px;
+}
+
+/*
+ * Text wrapping (docs/DESIGN.md, section 4). A wrapped layout floats beside the note's own text; one
+ * that starts further down floats below an empty, zero-width float as high as the lines it skips.
+ */
+.vml-layout--wrap-left {
+  clear: left;
+  float: left;
+  margin: 0.25em 1.5em 0.5em 0;
+}
+
+.vml-layout--wrap-right {
+  clear: right;
+  float: right;
+  margin: 0.25em 0 0.5em 1.5em;
+}
+
+.vml-wrap-skip {
+  height: calc(var(--vml-skip, 0) * 1lh);
+  width: 0;
+}
+
+.vml-wrap-skip--left {
+  float: left;
+}
+
+.vml-wrap-skip--right {
+  float: right;
+}
+
+/*
+ * Reading view: every section beside a wrapped layout holds a hidden stand-in for the float. The
+ * stand-in of the first of them shows once nothing before it, the layout's section or another section
+ * with a stand-in, is in the page any more. Its box generates nothing itself, so margins still collapse.
+ */
+.vml-rv-proxy {
+  display: none;
+}
+
+.markdown-preview-sizer > .vml-rv-host:not(.vml-rv-anchor ~ .vml-rv-host, .vml-rv-host ~ .vml-rv-host) > .vml-rv-proxy {
+  display: contents;
+}
+
+/* Reading view: a layout that does not wrap starts below the floats before it. */
+.markdown-rendered .vml-layout:not(.vml-layout--wrap) {
+  clear: both;
+}
+
+/*
+ * Reading view: lists (so nested ones keep their indent), a quote's bar, a callout's box, a rule and
+ * display math sit beside a float as a whole.
+ */
+.markdown-rendered:has(.vml-layout--wrap) :is(ul, ol, blockquote, .callout, hr, .math-block) {
+  display: flow-root;
+}
+
+/*
+ * Live preview. A wrapped layout's widget is a zero-height anchor the layout floats out of. Obsidian
+ * contains the painting of every block widget, which would keep the float inside.
+ */
+.markdown-source-view.mod-cm6 .cm-content > .vml-live-preview--wrap[contenteditable="false"] {
+  contain: none !important;
+}
+
+/* The editor's lines are positioned, so they would paint and take clicks above a plain float. */
+.vml-live-preview .vml-layout--wrap {
+  z-index: 1;
+}
+
+/* In a note with wrapped layouts no line clears floats: headings wrap too. */
+.vml-has-wraps .cm-content > .cm-line {
+  clear: none;
+}
+
+/*
+ * Obsidian measures the hanging indent of lists and quotes from the content's edge, which beside a
+ * float lies under the float. Laid out on their own, such lines sit beside the float as a whole and
+ * are measured from their own edge; code and rules draw their background beside it too.
+ */
+.vml-has-wraps .cm-content > .cm-line:is(.HyperMD-list-line, .HyperMD-quote, .HyperMD-codeblock, .HyperMD-hr, [style*="text-indent"]) {
+  display: flow-root;
+}
+
+/*
+ * A layout that does not wrap starts below the floats before it. The clearance stays inside its
+ * widget, whose height CodeMirror measures, so the widget's painting cannot be contained either.
+ */
+.vml-has-wraps .cm-content > .vml-live-preview:not(.vml-live-preview--wrap)[contenteditable="false"] {
+  contain: none !important;
+}
+
+.vml-has-wraps .vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout {
+  clear: both;
+}
+
+/* While the source of a layout shows, the media Obsidian draws in it are thumbnails: the note barely moves. */
+.vml-source-line .image-embed img,
+.vml-source-line .internal-embed video {
+  height: auto !important;
+  max-height: 4.5em;
+  max-width: 12em;
+  object-fit: contain;
+  width: auto !important;
+}
+
+/* A spacer in front of an element pushed below a float, so CodeMirror measures the push. */
+.vml-wrap-gap {
+  height: var(--vml-gap-height, 0);
+}
+
+/* Stand-in for a float whose anchor lies above the part of the note the editor has drawn. */
+.vml-wrap-proxy__sandbag {
+  height: var(--vml-proxy-sandbag, 0);
+  width: 0;
+}
+
+.vml-wrap-proxy__sandbag--left {
+  float: left;
+}
+
+.vml-wrap-proxy__sandbag--right {
+  float: right;
+}
+
+.vml-wrap-proxy__float {
+  height: var(--vml-proxy-height, 0);
+  overflow: hidden;
+  position: relative;
+  width: var(--vml-proxy-width, 0);
+  z-index: 1;
+}
+
+.vml-wrap-proxy__float--left {
+  clear: left;
+  float: left;
+  margin-right: var(--vml-proxy-margin, 0);
+}
+
+.vml-wrap-proxy__float--right {
+  clear: right;
+  float: right;
+  margin-left: var(--vml-proxy-margin, 0);
+}
+
+.vml-wrap-proxy__content {
+  margin-top: calc(-1 * var(--vml-proxy-shift, 0px));
+}
+
+/* A stand-in shows the layout itself, or a copy of it, at the float's width. */
+.vml-wrap-proxy__content > .vml-layout {
+  float: none;
+  margin: 0;
+  width: 100%;
 }
 
 /* Image viewer */

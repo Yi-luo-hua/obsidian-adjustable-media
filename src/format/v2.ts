@@ -7,15 +7,22 @@ import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts"
  *   ![[a.png]] ![alt](b.png)
  *   <!-- /vml -->
  *
- * Every non-blank body line is one layout row. Settings live in the opening comment and are
- * matched to rows by position. The embeds themselves are never rewritten, only moved verbatim.
- * See docs/DESIGN.md, section 1.
+ * Every body line made of media embeds only is one layout row. Settings live in the opening comment
+ * and are matched to rows by position. The embeds themselves are never rewritten, only moved verbatim.
+ *
+ * Other lines are text shown beside the media, as ordinary Markdown: the lines before the first row
+ * to its left, the lines after the last row to its right. Text between two rows, or text without
+ * any row, makes the block invalid. See docs/DESIGN.md, section 1.
  */
 
 export type MediaKind = "image" | "video";
 export type EmbedSyntax = "wiki" | "markdown";
 export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
+/** The side a layout floats to, with the note's own text wrapping around it. */
+export type WrapSide = "left" | "right";
+/** How the text beside a layout's media lines up with them vertically. */
+export type TextAlign = "top" | "center" | "bottom";
 export type V2RowMeta = Record<string, unknown>;
 
 export interface V2Meta {
@@ -44,15 +51,30 @@ export interface V2Row {
   embeds: V2Embed[];
 }
 
+/** Text written in a block beside its media. */
+export interface V2Text {
+  /** First and last non-blank line of the text. */
+  from: number;
+  to: number;
+  /** The lines from `from` to `to`, blank ones included, without \r. */
+  lines: string[];
+}
+
+export type TextSide = "left" | "right";
+
 export interface V2Block {
   openLine: number;
   closeLine: number;
   /** Exact lines of the block (without \r), used to find and validate it before writing. */
   lines: string[];
   rows: V2Row[];
+  /** Text before the first row, shown left of the media. */
+  leftText: V2Text | null;
+  /** Text after the last row, shown right of the media. */
+  rightText: V2Text | null;
   meta: V2Meta;
   metaError: string | null;
-  /** First body line that is not made of media embeds only. Invalid blocks are left to Obsidian. */
+  /** First body line out of place: text between two rows, or text without any row. Invalid blocks are left to Obsidian. */
   invalidLine: number | null;
 }
 
@@ -73,6 +95,11 @@ export const MIN_ROW_HEIGHT = 80;
 export const MAX_ROW_HEIGHT = 900;
 export const MAX_EMBEDS_PER_ROW = 4;
 export const MIN_BLOCK_WIDTH = 0.2;
+/** Width of a wrapped layout that sets none: text needs room beside it. */
+export const DEFAULT_WRAP_WIDTH = 0.4;
+/** A wrapped layout leaves at least a fifth of the width to the text. */
+export const MAX_WRAP_WIDTH = 0.8;
+export const MAX_WRAP_SKIP = 40;
 
 const IMAGE_EXTENSIONS = new Set(["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]);
 const VIDEO_EXTENSIONS = new Set(["mkv", "mov", "mp4", "ogv", "webm"]);
@@ -202,6 +229,22 @@ export function readBlockWidth(value: unknown): number | null {
   return width !== null && width >= MIN_BLOCK_WIDTH && width < 1 ? width : null;
 }
 
+/** The side the block floats to with text wrapping around it (top-level `wrap`); null when unset or invalid. */
+export function readBlockWrap(value: unknown): WrapSide | null {
+  return value === "left" || value === "right" ? value : null;
+}
+
+/** How many lines below its place a wrapped block starts (top-level `skip`); null when unset, invalid or 0. */
+export function readBlockSkip(value: unknown): number | null {
+  const skip = finiteNumber(value);
+  return skip !== null && skip >= 1 && skip <= MAX_WRAP_SKIP ? Math.round(skip) : null;
+}
+
+/** How the text beside the media lines up with them (top-level `valign`); null when unset, invalid or the top. */
+export function readBlockValign(value: unknown): TextAlign | null {
+  return value === "center" || value === "bottom" ? value : null;
+}
+
 /** Writes the opening comment. Settings are omitted entirely when there are none, to keep the line short. */
 export function serializeOpener(meta: V2Meta): string {
   const rows = trimTrailingEmptyRows(meta.rows.map(withoutUndefined));
@@ -209,7 +252,8 @@ export function serializeOpener(meta: V2Meta): string {
     return "<!-- vml -->";
   }
 
-  const json = JSON.stringify({ v: 2, ...meta.extra, rows }, roundNumbers)
+  // Without row settings, `rows` is left out too: every version reads a missing `rows` as none.
+  const json = JSON.stringify({ v: 2, ...meta.extra, ...(rows.length > 0 ? { rows } : {}) }, roundNumbers)
     // "--" may only appear inside strings; escaping it keeps the comment from closing early.
     .replace(/--/g, "-\\u002d")
     // An odd number of "%%" would make the whole line read as an Obsidian comment.
@@ -251,6 +295,8 @@ function buildBlock(
   metaText: string | undefined,
 ): V2Block {
   const rows: V2Row[] = [];
+  const left: number[] = [];
+  const right: number[] = [];
   let invalidLine: number | null = null;
 
   for (let line = openLine + 1; line < closeLine; line += 1) {
@@ -260,11 +306,18 @@ function buildBlock(
     }
 
     const embeds = readEmbedRow(text, line);
-    if (embeds) {
-      rows.push({ line, embeds });
+    if (!embeds) {
+      (rows.length === 0 ? left : right).push(line);
+    } else if (right.length > 0) {
+      // The text before this row came after another one: it belongs to neither side.
+      invalidLine ??= right[0] ?? line;
     } else {
-      invalidLine ??= line;
+      rows.push({ line, embeds });
     }
+  }
+  // Text alone is not a layout.
+  if (rows.length === 0 && left.length > 0) {
+    invalidLine ??= left[0] ?? null;
   }
 
   const { meta, error } = parseMeta(metaText);
@@ -273,10 +326,31 @@ function buildBlock(
     closeLine,
     lines: lines.slice(openLine, closeLine + 1).map(stripCarriageReturn),
     rows,
+    leftText: textPart(lines, left),
+    rightText: textPart(lines, right),
     meta,
     metaError: error,
     invalidLine,
   };
+}
+
+function textPart(lines: readonly string[], textLines: readonly number[]): V2Text | null {
+  const from = textLines[0];
+  const to = textLines[textLines.length - 1];
+  if (from === undefined || to === undefined) {
+    return null;
+  }
+  return { from, to, lines: lines.slice(from, to + 1).map(stripCarriageReturn) };
+}
+
+/** Whether a block has text beside its media. */
+export function hasSideText(block: V2Block): boolean {
+  return block.leftText !== null || block.rightText !== null;
+}
+
+/** The side a block floats to. A block with text beside its media does not float. */
+export function blockWrap(block: V2Block): WrapSide | null {
+  return block.metaError === null && !hasSideText(block) ? readBlockWrap(block.meta.extra.wrap) : null;
 }
 
 /** Returns the embeds of a row, or null when the line holds anything but media embeds. */

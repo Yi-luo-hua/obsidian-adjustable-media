@@ -1,3 +1,4 @@
+import type { WrapSide } from "../format/v2.ts";
 import type { MoveTarget } from "./model.ts";
 
 /**
@@ -117,6 +118,29 @@ export function positionOffset(startLeft: number, delta: number, free: number, s
   const left = Math.min(free, Math.max(0, startLeft + delta));
   const snapped = [0, 0.5, 1].find((at) => Math.abs(left - at * free) <= snap);
   return snapped ?? Math.round((left / free) * 1000) / 1000;
+}
+
+/**
+ * The side a layout dragged to `x` floats to: the outer thirds of the text (from `left` to `right`)
+ * float it there, with the text wrapping around it; the middle third lets it stand on its own.
+ */
+export function wrapZone(x: number, left: number, right: number): WrapSide | null {
+  const third = (right - left) / 3;
+  if (x < left + third) {
+    return "left";
+  }
+  return x > right - third ? "right" : null;
+}
+
+/**
+ * How many lines below its place (`anchorTop`) a wrapped layout starts when the pointer, marking its
+ * top edge, is at `y`: whole lines, from 0 up to `max`.
+ */
+export function skipLines(y: number, anchorTop: number, lineHeight: number, max: number): number {
+  if (!(lineHeight > 0)) {
+    return 0;
+  }
+  return Math.min(max, Math.max(0, Math.round((y - anchorTop) / lineHeight)));
 }
 
 function beside(box: ItemBox, x: number): MoveTarget {

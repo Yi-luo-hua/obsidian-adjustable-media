@@ -1,10 +1,13 @@
-import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
+import { Menu, Notice, TFile, setIcon, type App, type Editor } from "obsidian";
 
-import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type V2Block } from "../format/v2.ts";
+import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable, planModelEdit, planMoveOut, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
 import { dropTarget, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
+  effectiveWidth,
+  hasText,
   insertItem,
+  maxBlockWidth,
   moveItem,
   removeItem,
   rowOffset,
@@ -16,7 +19,9 @@ import {
   setPosition,
   setRowHeight,
   setSingleWidth,
+  setValign,
   setWeights,
+  setWrap,
   type ItemPosition,
   type LayoutModel,
   type MoveTarget,
@@ -30,13 +35,14 @@ import { MediaViewer, type ViewerImage } from "./mediaViewer.ts";
 import { t, type MessageKey } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
 
+/** A layout drawn in live preview, as its interactions see it. Reading view only shows layouts. */
 export interface LayoutContext {
   app: App;
   sourcePath: string;
   block: V2Block;
   model: LayoutModel;
-  /** Live preview: the layout gets a frame to resize it by, and its images open in the plugin's viewer. */
-  live: boolean;
+  /** Starts typing the text on one side of the media right in the layout. */
+  editText?: (side: TextSide) => void;
 }
 
 export interface DropState {
@@ -69,17 +75,15 @@ const FRAME_LABELS: Record<FrameEdge, MessageKey> = {
 const DROP_CLASSES = ["vml-drop-before", "vml-drop-after", "vml-drop-row-before", "vml-drop-row-after", "vml-layout--drop-target"];
 
 /**
- * Makes a rendered layout editable: drag to reorder (also into other blocks of the same note in the
- * same pane) or to move a single item sideways, resize rows, columns, single items and, in live
- * preview, the whole layout by its frame, and a context menu. Every change goes through the layout
- * model and the write-back layer; the view never edits the note itself. Blocks that are not editable
- * (docs/DESIGN.md, section 1.3) stay display-only.
+ * Makes a layout drawn in live preview editable: drag to reorder (also into other blocks of the same
+ * note in the same pane) or to move a single item sideways, resize rows, columns, single items and the
+ * whole layout by its frame, and a context menu. Its images open in the plugin's viewer. Every change
+ * goes through the layout model and the write-back layer; the view never edits the note itself.
+ * Blocks that are not editable (docs/DESIGN.md, section 1.3) stay display-only.
  */
 export function attachInteractions(root: HTMLElement, context: LayoutContext): void {
   contexts.set(root, context);
-  if (context.live) {
-    setUpViewer(root, context);
-  }
+  setUpViewer(root, context);
   if (!isEditable(context.block)) {
     return;
   }
@@ -92,9 +96,7 @@ export function attachInteractions(root: HTMLElement, context: LayoutContext): v
       setUpItem(root, itemEl, { row, index: Number(itemEl.dataset.index) }, context);
     }
   }
-  if (context.live) {
-    setUpFrame(root, context);
-  }
+  setUpFrame(root, context);
 }
 
 /** Where an item dragged from `leaf` would land in a layout of the note at (x, y), if anywhere. */
@@ -144,8 +146,8 @@ export function clearDropIndicators(doc: Document): void {
 }
 
 /**
- * The browser still reports a click where a drag ends. Reading view would open Obsidian's image
- * viewer for it and live preview would select the image, so the click right after a drag is dropped.
+ * The browser still reports a click where a drag ends, and live preview would select the image under
+ * the pointer for it, so the click right after a drag is dropped.
  */
 export function swallowNextClick(doc: Document): void {
   const swallow = (event: MouseEvent): void => {
@@ -156,8 +158,8 @@ export function swallowNextClick(doc: Document): void {
   window.setTimeout(() => doc.removeEventListener("click", swallow, { capture: true }), 0);
 }
 
-/** Writes planned edits to the note. Returns whether the note changed. */
-export async function commitEdits(app: App, sourcePath: string, edits: Array<BlockEdit | null>): Promise<boolean> {
+/** Writes planned edits to the note, through `editor` if given (see writeBlockEdits). Returns whether the note changed. */
+export async function commitEdits(app: App, sourcePath: string, edits: Array<BlockEdit | null>, editor?: Editor): Promise<boolean> {
   const planned = edits.filter((edit): edit is BlockEdit => edit !== null);
   if (planned.length === 0) {
     return false;
@@ -169,7 +171,7 @@ export async function commitEdits(app: App, sourcePath: string, edits: Array<Blo
     return false;
   }
 
-  const result = await writeBlockEdits(app, file, planned);
+  const result = await writeBlockEdits(app, file, planned, editor);
   if (!result.ok) {
     new Notice(t(FAILURE_MESSAGES[result.reason]));
   }
@@ -355,7 +357,7 @@ function measureSideways(rowEl: HTMLElement, itemEl: HTMLElement): { left: numbe
 }
 
 async function dropItem(source: LayoutContext, from: ItemPosition, drop: DropState): Promise<void> {
-  // A reading-view block split by blank lines is rendered in several sections of one block.
+  // Within the same layout the item just moves.
   if (drop.context.block.openLine === source.block.openLine) {
     const moved = moveItem(source.model, from, drop.target);
     if (moved !== source.model) {
@@ -526,31 +528,45 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
 /**
  * The frame around a layout in live preview: its right edge sets the layout's width, its bottom
  * edge scales the height of every row, and its corner scales both, keeping the images' proportions.
+ * With text beside the media, the handles sit on the media's column, which the width belongs to.
  */
 function setUpFrame(root: HTMLElement, context: LayoutContext): void {
+  const box = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
+  const { left, right } = context.model.text;
+  // The width handles sit on the edge that moves as the layout grows. A layout floating right, or
+  // media with text on their left only, grow to the left; media between two texts grow both ways.
+  const mirrored = context.model.wrap === "right" || (left !== null && right === null);
+  const direction = (mirrored ? -1 : 1) * (left !== null && right !== null ? 2 : 1);
   for (const edge of ["right", "bottom", "corner"] as const) {
-    const handle = root.createDiv({
+    const handle = box.createDiv({
       cls: `vml-handle vml-frame__handle vml-frame__handle--${edge}`,
       attr: { "aria-label": t(FRAME_LABELS[edge]), role: "separator" },
     });
+    handle.toggleClass("vml-frame__handle--mirrored", mirrored && edge !== "bottom");
     handle.addEventListener("pointerdown", (event) => {
       if (event.button !== 0) {
         return;
       }
       event.preventDefault();
       event.stopPropagation();
-      resizeBlock(root, handle, edge, context, event);
+      resizeBlock(root, box, handle, edge, context, event, direction);
     });
   }
 }
 
-function resizeBlock(root: HTMLElement, handle: HTMLElement, edge: FrameEdge, context: LayoutContext, start: PointerEvent): void {
-  const available = root.parentElement?.getBoundingClientRect().width ?? 0;
-  const rect = root.getBoundingClientRect();
+/**
+ * Resizes the layout by one of its frame's handles. `box` is what the width applies to, and the
+ * pointer moves its edge by `direction` times its own distance: negative for a left edge, two for a
+ * box that grows both ways.
+ */
+function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, edge: FrameEdge, context: LayoutContext, start: PointerEvent, direction: number): void {
+  // The width is a share of the layout's container; with text beside the media, of the layout's own content.
+  const available = box === root ? (root.parentElement?.getBoundingClientRect().width ?? 0) : contentWidth(root);
+  const rect = box.getBoundingClientRect();
   if (available <= 0 || rect.width <= 0) {
     return;
   }
-  const startWidth = context.model.width ?? Math.min(1, rect.width / available);
+  const startWidth = effectiveWidth(context.model) ?? Math.min(1, rect.width / available);
   const rowEls = Array.from(root.querySelectorAll<HTMLElement>(".vml-row"));
   const rowsHeight = rowEls.reduce((sum, rowEl) => sum + rowEl.getBoundingClientRect().height, 0);
   // Single items without a stored width scale from the share of their row they take up now.
@@ -573,7 +589,7 @@ function resizeBlock(root: HTMLElement, handle: HTMLElement, edge: FrameEdge, co
   trackPointer(handle, start, {
     onMove(move) {
       moved = true;
-      const dx = move.clientX - start.clientX;
+      const dx = (move.clientX - start.clientX) * direction;
       const dy = move.clientY - start.clientY;
       if (edge === "right") {
         next = setBlockWidth(context.model, (rect.width + dx) / available);
@@ -582,7 +598,8 @@ function resizeBlock(root: HTMLElement, handle: HTMLElement, edge: FrameEdge, co
         next = scaleRows(context.model, scale, singleWidths);
       } else {
         // The layout's width stays within its limits, so the rows scale by the same factor as it.
-        const scale = clamp((rect.width + dx) / rect.width, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, 1 / startWidth));
+        const widest = maxBlockWidth(context.model) / startWidth;
+        const scale = clamp((rect.width + dx) / rect.width, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, widest));
         next = scaleRows(setBlockWidth(context.model, startWidth * scale), scale, singleWidths, 1);
       }
       applySizing(root, next);
@@ -641,6 +658,52 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     }
   }
 
+  // The whole layout floats to one side with the note's text wrapping around it, or stands alone.
+  // A layout with text beside its media does not float.
+  if (!hasText(context.model)) {
+    const wraps = [[null, "wrapNone", "square"], ["left", "wrapLeft", "panel-left"], ["right", "wrapRight", "panel-right"]] as const;
+    for (const [side, label, icon] of wraps) {
+      menu.addItem((entry) => entry
+        .setTitle(t(label))
+        .setIcon(icon)
+        .setSection("vml-wrap")
+        .setChecked(context.model.wrap === side)
+        .onClick(() => {
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWrap(context.model, side))]);
+        }));
+    }
+  }
+
+  // Text beside the media lines up with them at the top, in the middle or at the bottom.
+  if (hasText(context.model)) {
+    const aligns = [["top", "textTop", "align-vertical-justify-start"], ["center", "textCenter", "align-vertical-justify-center"], ["bottom", "textBottom", "align-vertical-justify-end"]] as const;
+    for (const [valign, label, icon] of aligns) {
+      menu.addItem((entry) => entry
+        .setTitle(t(label))
+        .setIcon(icon)
+        .setSection("vml-valign")
+        .setChecked((context.model.valign ?? "top") === valign)
+        .onClick(() => {
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setValign(context.model, valign))]);
+        }));
+    }
+  }
+
+  // Text beside the media is typed right in the layout.
+  const { editText } = context;
+  if (editText) {
+    const sides = [["left", "addTextLeft", "panel-left-open"], ["right", "addTextRight", "panel-right-open"]] as const;
+    for (const [side, label, icon] of sides) {
+      if ((side === "left" ? context.block.leftText : context.block.rightText) === null) {
+        // Once the menu has closed: a submenu still opening loads its keys (Enter among them) a moment
+        // later, above those of a text box opened right away (docs/DESIGN.md, section 4.2).
+        menu.addItem((entry) => entry.setTitle(t(label)).setIcon(icon).setSection("vml-text").onClick(() => {
+          window.setTimeout(() => editText(side), 0);
+        }));
+      }
+    }
+  }
+
   // Nothing is deleted: the embed goes on its own line right after the block.
   menu.addItem((entry) => entry.setTitle(t("moveOut")).setIcon("log-out").setSection("vml-move").onClick(() => {
     const taken = removeItem(context.model, position);
@@ -661,6 +724,11 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   } else {
     menu.showAtPosition(at);
   }
+}
+
+function contentWidth(el: HTMLElement): number {
+  const style = getComputedStyle(el);
+  return el.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
 }
 
 function clamp(value: number, min: number, max: number): number {

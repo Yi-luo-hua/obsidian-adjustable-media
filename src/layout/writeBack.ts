@@ -1,4 +1,4 @@
-import { MarkdownView, type App, type TFile } from "obsidian";
+import { MarkdownView, type App, type Editor, type TFile } from "obsidian";
 
 import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure } from "./edits.ts";
 
@@ -15,10 +15,16 @@ export type WriteResult = { ok: true } | EditFailure;
  * A view in reading mode still has an editor, but changing it only updates the hidden buffer: the
  * note is neither saved nor re-rendered (docs/DESIGN.md, section 4). Reading mode therefore
  * writes the file, and Obsidian reloads the view from it.
+ *
+ * `editor`, when given, is the editor the change is made in: text typed right in a layout goes into
+ * the editor it is typed in, also when the note is open in several panes.
  */
-export async function writeBlockEdits(app: App, file: TFile, edits: readonly BlockEdit[]): Promise<WriteResult> {
+export async function writeBlockEdits(app: App, file: TFile, edits: readonly BlockEdit[], editor?: Editor): Promise<WriteResult> {
   if (edits.length === 0) {
     return { ok: true };
+  }
+  if (editor) {
+    return applyEditsToEditor(editor, edits);
   }
 
   const view = app.workspace.getLeavesOfType("markdown")

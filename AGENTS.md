@@ -18,7 +18,7 @@
 
 ## 改写笔记的原则（优先级最高）
 
-1. 永远不改写媒体嵌入文本本身，只改注释里的设置，或者把嵌入整段原样搬运。
+1. 永远不改写媒体嵌入文本本身，只改注释里的设置、把嵌入整段原样搬运，或者把用户在文字栏编辑器里输入的文字写回这一栏自己的行（写入前确认块仍能原样读回，见 docs/DESIGN.md 第 3 节第 8 条）。
 2. 只替换目标块自身的行范围，不做任何全文规范化（空行、换行符、缩进都不碰）。
 3. 写入前校验目标内容与预期完全一致；不一致就放弃写入并提示，绝不猜测位置写入。读不懂设置的块（`isEditable` 为 false）只显示、不写入。
 4. 只处理 `scanMarkdownLines` 判定为 `text` 的行；围栏代码、frontmatter、公式、注释里的内容一律不碰。
@@ -49,8 +49,10 @@
 - 测试库在 Obsidian 里打开时，可以用 Obsidian 命令行驱动，不必手动点界面（测试库名为 `vml-test-vault`）：
   - `obsidian vault=vml-test-vault plugin:reload id=adjustable-media`：重新加载插件；
   - `obsidian vault=vml-test-vault dev:errors`：查看加载错误；
-  - `obsidian vault=vml-test-vault eval "code=..."`：在应用里执行 JS（这里不能 `require('obsidian')`，JS 里只用单引号）；
+  - `obsidian vault=vml-test-vault eval "code=..."`：在应用里执行 JS（这里不能 `require('obsidian')`，JS 里只用单引号）。`code=` 里只放一行短代码，多行脚本先存成文件，再用 `code=eval(require('fs').readFileSync('<路径>','utf8'))` 执行：把多行脚本直接当参数传入时，命令行桥接生成的 JSON 无效，Obsidian 主进程抛出未捕获的异常并弹出模态错误框，关掉它之前命令行一直没有响应；
   - `obsidian vault=vml-test-vault dev:screenshot "path=..."`：截图。窗口在后台时截图会落后一帧，连截两次，取第二张。
+- 测试库窗口被其他窗口完全挡住时，页面处于 hidden 状态，`requestAnimationFrame` 不再触发，CodeMirror 也就不测量、不重排，实测数据全都不可信。先执行一次 `obsidian vault=vml-test-vault eval "code=require('@electron/remote').getCurrentWebContents().setBackgroundThrottling(false)"`，重启 Obsidian 前一直有效。
+- 需要真实的点击、按键和输入法组字时（例如测试布局里的输入框），在测试脚本里用 `require('@electron/remote').getCurrentWebContents().debugger` 接上 DevTools 协议：`Emulation.setFocusEmulationEnabled` 让后台窗口也按有焦点处理，`Input.dispatchMouseEvent`、`Input.dispatchKeyEvent`、`Input.insertText`、`Input.imeSetComposition` 发送真实输入，用完关掉仿真。命令行的 `dev:debug on` 用的是同一个 debugger（`dev:console` 靠它捕获控制台）：脚本只在自己 `attach` 的情况下才 `detach`，否则会关掉控制台捕获；关掉了就再执行一次 `dev:debug on`。窗口没有焦点时，脚本里直接调用 `focus()`、`blur()` 或派发键盘事件，都不会引起真实的焦点变化，也不经过 Obsidian 的快捷键处理。点击前先把目标滚到窗口里，窗口外的坐标什么也点不到。要测窗口失去焦点，先关掉焦点仿真，再用 `require('@electron/remote').getCurrentWindow().minimize()`，之后用 `showInactive()` 恢复（不会把窗口提到前面）；`win.blur()` 不起作用，页面仍然有焦点。
 - 会改动测试笔记的实测，先把笔记备份，测完恢复并用哈希值核对。
 
 ## Git
