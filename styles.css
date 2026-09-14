@@ -98,6 +98,11 @@
   padding-top: 0;
 }
 
+/* Away from the cursor, a blank line takes the room of a paragraph break, as in the drawn column. */
+.vml-text-editor .cm-editor .cm-content > .cm-line.vml-blank-line {
+  line-height: var(--p-spacing, 1rem);
+}
+
 .vml-text-editor__note {
   color: var(--text-error);
   display: none;
