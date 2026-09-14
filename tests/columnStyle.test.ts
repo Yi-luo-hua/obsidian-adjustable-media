@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { styleLine, tokenStyle, type Token } from "../src/markdown/columnStyle.ts";
+import { hangingPrefix, styleLine, tokenStyle, type Token } from "../src/markdown/columnStyle.ts";
 
 // Token names as Obsidian 1.13.7's Markdown language gives them (docs/DESIGN.md, section 4.2).
 const tokens = (list: Array<[string, number, number]>): Token[] => list.map(([name, from, to]) => ({ name, from, to }));
@@ -32,6 +32,8 @@ test("heading markers show while a selection touches the line, bold markers whil
     marks: [{ from: 3, to: 7, classes: ["cm-header", "cm-header-2"] }, { from: 9, to: 10, classes: ["cm-header", "cm-header-2", "cm-strong"] }],
     hidden: [{ from: 0, to: 3 }, { from: 7, to: 9 }, { from: 10, to: 12 }],
     task: null,
+    math: [],
+    embeds: [],
   });
   assert.deepEqual(styleLine(heading, text, [{ from: 1, to: 1 }]).hidden, [{ from: 7, to: 9 }, { from: 10, to: 12 }]);
   assert.deepEqual(styleLine(heading, text, [{ from: 12, to: 12 }]).hidden, []);
@@ -39,7 +41,7 @@ test("heading markers show while a selection touches the line, bold markers whil
   assert.deepEqual(styleLine(heading, text, [{ from: -5, to: 20 }]).hidden, []);
 });
 
-test("a link shows as its text alone, underlined, until a selection touches it; embeds keep their source", () => {
+test("a link shows as its text alone, underlined, until a selection touches it; embeds are handed on as they are", () => {
   const text = "[链接文字](https://a.b) 和 [[目标|别名]] 和 [[目标]]";
   const links = tokens([
     ["formatting_formatting-link_link", 0, 1],
@@ -81,8 +83,27 @@ test("a link shows as its text alone, underlined, until a selection touches it; 
     ["hmd-embed_hmd-internal-link", 3, 17],
     ["formatting-link_formatting-link-end", 17, 19],
   ]);
-  assert.deepEqual(styleLine(embed, "![[square-1x1.png]]", []).hidden, []);
+  const drawn = styleLine(embed, "![[square-1x1.png]]", []);
+  assert.deepEqual(drawn.hidden, []);
+  assert.deepEqual(drawn.embeds, [{ from: 0, to: 19, target: "square-1x1.png" }]);
+  assert.deepEqual(styleLine(embed, "![[square-1x1.png]]", [{ from: 19, to: 19 }]).embeds, []);
   assert.deepEqual(styleLine(tokens([["url", 4, 23]]), "裸网址 https://example.com", []).marks, [{ from: 4, to: 23, classes: ["cm-url", "cm-underline"] }]);
+});
+
+test("inline math is drawn rendered while no selection touches it", () => {
+  const text = "式 $x^2$ 和 $y$";
+  const math = tokens([
+    ["formatting_formatting-math_formatting-math-begin_keyword_math", 2, 3],
+    ["math_variable-2", 3, 4],
+    ["math_tag", 4, 5],
+    ["math_number", 5, 6],
+    ["formatting_formatting-math_formatting-math-end_keyword_math_math-", 6, 7],
+    ["formatting_formatting-math_formatting-math-begin_keyword_math", 10, 11],
+    ["math_variable-2", 11, 12],
+    ["formatting_formatting-math_formatting-math-end_keyword_math_math-", 12, 13],
+  ]);
+  assert.deepEqual(styleLine(math, text, []).math, [{ from: 2, to: 7, tex: "x^2" }, { from: 10, to: 13, tex: "y" }]);
+  assert.deepEqual(styleLine(math, text, [{ from: 4, to: 4 }]).math, [{ from: 10, to: 13, tex: "y" }]);
 });
 
 test("bullets and numbers are drawn as such whatever the selection; a task's box stands in for its markers", () => {
@@ -100,6 +121,8 @@ test("bullets and numbers are drawn as such whatever the selection; a task's box
     ],
     hidden: [],
     task: null,
+    math: [],
+    embeds: [],
   };
   assert.deepEqual(styleLine(item, "- 列表项", []), bullet);
   assert.deepEqual(styleLine(item, "- 列表项", [{ from: 3, to: 3 }]), bullet);
@@ -119,6 +142,8 @@ test("bullets and numbers are drawn as such whatever the selection; a task's box
     marks: [{ from: 5, to: 8, classes: ["cm-list-1"] }],
     hidden: [{ from: 0, to: 2 }],
     task: { from: 2, to: 5, checked: false },
+    math: [],
+    embeds: [],
   });
   assert.equal(styleLine(task, "- [x] 完成", []).task?.checked, true);
   // Touched, the task shows its source, without a bullet beside the brackets.
@@ -131,6 +156,8 @@ test("bullets and numbers are drawn as such whatever the selection; a task's box
     ],
     hidden: [],
     task: null,
+    math: [],
+    embeds: [],
   });
 });
 
@@ -148,6 +175,17 @@ test("quote markers turn transparent away from selections, and blank lines away 
   ]);
   assert.equal(styleLine(quote, "> > 嵌套", [{ from: 6, to: 6 }]).marks.length, 3);
 
-  assert.deepEqual(styleLine([], "", []), { line: ["vml-blank-line"], marks: [], hidden: [], task: null });
+  assert.deepEqual(styleLine([], "", []), { line: ["vml-blank-line"], marks: [], hidden: [], task: null, math: [], embeds: [] });
   assert.deepEqual(styleLine([], "", [{ from: 0, to: 0 }]).line, []);
+});
+
+test("a wrapped line hangs under its quote markers, indentation, list marker with one space and task box", () => {
+  const cases: Array<[string, number]> = [
+    ["- 项", 2], ["-   项", 2], ["* 项", 2], ["1) 项", 3], ["10. 项", 4], ["- [ ] 任务", 6], ["\t\t- 项", 4], ["-", 1],
+    ["> 引用", 2], ["> > 引用", 4], ["> - [ ] 任务", 8], [">", 1], ["  续行", 2], ["\t续行", 1],
+    ["普通", 0], ["## 标题", 0], ["1.5 倍", 0], ["**粗**", 0], ["", 0],
+  ];
+  for (const [line, prefix] of cases) {
+    assert.equal(hangingPrefix(line), prefix, JSON.stringify(line));
+  }
 });

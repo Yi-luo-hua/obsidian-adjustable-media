@@ -101,7 +101,7 @@ export const DEFAULT_WRAP_WIDTH = 0.4;
 export const MAX_WRAP_WIDTH = 0.8;
 export const MAX_WRAP_SKIP = 40;
 
-const IMAGE_EXTENSIONS = new Set(["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]);
+export const IMAGE_EXTENSIONS = new Set(["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]);
 const VIDEO_EXTENSIONS = new Set(["mkv", "mov", "mp4", "ogv", "webm"]);
 const OPEN_PATTERN = /^<!-- vml(?:[ \t]+(.*?))?[ \t]*-->[ \t]*$/;
 const CLOSE_PATTERN = /^<!-- \/vml -->[ \t]*$/;

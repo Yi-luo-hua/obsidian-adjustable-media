@@ -4,6 +4,8 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
+The latest published release is **0.2.1**. This README describes the development branch: text wrapping, movable layouts and editable text columns are **unreleased**. See [project status and validation](docs/STATUS.md) for completed work, test coverage and known limitations.
+
 ![Adjustable Media Preview](assets/demo.jpg)
 
 ---
@@ -16,7 +18,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 - **Direct Mouse Resizing**: Drag the gap between two images to adjust column widths, drag a row's bottom edge to change height, or drag the outer frame to scale the entire layout block.
 - **Free Single-Image Placement**: Slide a single image left or right across its row, with smooth magnetic snapping to left, center, and right.
 - **Text Wrap, like LaTeX's `wrapfigure`**: Float a layout to the left or right and let the note's own paragraphs, lists, quotes, headings and code flow around it, then continue at full width below it. The text beside it is ordinary note text: type right next to the image and it reflows as you go.
-- **Text Beside Images, like Side-by-Side Minipages**: Write text in a layout block before its media for a column on their left, after them for a column on their right, or both. It is ordinary Markdown (headings, lists, quotes, links), and the media keep the layout's width in the middle. The text lines up with the media at the top, in the middle or at the bottom. In Live Preview, click the text to edit it right in the layout, where it keeps the look of Live Preview (headings, bold text, bullets, task boxes, links) and the keys work as in the note: <kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, <kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>I</kbd> and <kbd>Ctrl</kbd>+<kbd>K</kbd> format. Or right-click an image and choose **Add text on the left** or **Add text on the right** to start one.
+- **Text Beside Images, like Side-by-Side Minipages**: Write text in a layout block before its media for a column on their left, after them for a column on their right, or both. It is ordinary Markdown (headings, lists, quotes, links), and the media keep the layout's width in the middle. The text lines up with the media at the top, in the middle or at the bottom. In Live Preview, click the text to edit it right in the layout, where it keeps the look of Live Preview (headings, bold text, bullets, task boxes, links, rendered math and images, wrapped list items lined up under their text) and the keys work as in the note: <kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, brackets pair up, typing `[[` suggests links, and Obsidian's formatting, link, list, task and heading commands work on the hotkeys you gave them (<kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>I</kbd>, <kbd>Ctrl</kbd>+<kbd>K</kbd> and <kbd>Ctrl</kbd>+<kbd>L</kbd> by default). Or right-click an image and choose **Add text on the left** or **Add text on the right** to start one.
 - **Move Whole Layouts**: Drag the grip on top of a layout's frame to move the whole block. Drop it in the middle of the text to place it between paragraphs, or in the left or right third to float it there, starting at the line you point at.
 - **Flexible Drag-and-Drop Reordering**: Drag an item to reorder within a row, drop between rows to start a new row, or drag loose images from your note directly into an existing layout block.
 - **Double-Click Image Viewer**: In editing mode, double-click any image in a layout block to inspect it up close; supports mouse wheel zoom, click-and-drag panning, and left/right arrow keys to switch between images in the block.
@@ -55,7 +57,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 | **Position a single item** | Drag the image horizontally; snaps smoothly to left, center, and right |
 | **Reorder or move items** | Drag and drop onto adjacent spots, between rows (to split into a new row), or into another layout block |
 | **Wrap text around a layout** | Right-click an item and choose **Float left, wrap text** or **Float right, wrap text**; **No text wrap** takes it back |
-| **Put text beside the media** | Right-click an item and choose **Add text on the left** or **Add text on the right**, then type right there; later, click the text to edit it in place (<kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, <kbd>Ctrl</kbd>+<kbd>B</kbd>/<kbd>I</kbd>/<kbd>K</kbd> format; <kbd>Esc</kbd> or a click elsewhere finishes). The same menu lines the text up with the media at the top, in the middle or at the bottom |
+| **Put text beside the media** | Right-click an item and choose **Add text on the left** or **Add text on the right**, then type right there; later, click the text to edit it in place (<kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, `[[` suggests links, and your formatting hotkeys such as <kbd>Ctrl</kbd>+<kbd>B</kbd>/<kbd>I</kbd>/<kbd>K</kbd> work; <kbd>Esc</kbd> or a click elsewhere finishes). The same menu lines the text up with the media at the top, in the middle or at the bottom |
 | **Move the whole layout** | Drag the grip on top of the frame: the left or right third of the text floats it there from the line you point at, the middle places it between paragraphs |
 | **Move a video** | Drag the dedicated handle in the top-left corner of the video |
 | **Full-screen image viewer** | Double-click an image in Live Preview (scroll to zoom, drag to pan, arrow keys to switch); single-click in Reading View |
@@ -127,7 +129,7 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 - Layout blocks must start at the beginning of a line (not nested inside quotes, callouts, or lists).
 - Reading View only shows layout blocks; change them in Live Preview.
 - Text inside a layout block goes before its first row of media (left column) or after its last row (right column). Text between two rows, or a block without media, is left untouched and renders as normal Markdown. A layout with text beside its media does not wrap the note's text.
-- Completely offline & private: zero network requests, zero telemetry.
+- No telemetry or analytics. Local media work offline; remote media embedded in a note still load from their source URLs.
 
 ---
 
