@@ -103,6 +103,26 @@
   line-height: var(--p-spacing, 1rem);
 }
 
+/* The rows of a wrapped list item, task or quote after its first go on under its text, as in live preview. */
+.vml-text-editor .cm-editor .cm-content > .cm-line.vml-hanging {
+  padding-inline-start: var(--vml-hanging);
+  text-indent: calc(-1 * var(--vml-hanging));
+}
+
+.vml-text-editor .cm-editor .cm-content > .cm-line.vml-hanging > * {
+  text-indent: 0;
+}
+
+.vml-text-editor .image-embed img {
+  max-width: 100%;
+}
+
+/* Link suggestions for a text column's editor, under its cursor; Obsidian's styles draw the popup. */
+.suggestion-container.vml-link-suggest {
+  left: var(--vml-suggest-left, 0);
+  top: var(--vml-suggest-top, 0);
+}
+
 .vml-text-editor__note {
   color: var(--text-error);
   display: none;
@@ -654,8 +674,15 @@ body.vml-is-dragging * {
   display: none;
 }
 
-.markdown-preview-sizer > .vml-rv-host:not(.vml-rv-anchor ~ .vml-rv-host, .vml-rv-host ~ .vml-rv-host) > .vml-rv-proxy {
+.markdown-preview-sizer > .vml-rv-host:not(.vml-rv-anchor + .vml-rv-host, .vml-rv-host + .vml-rv-host) > .vml-rv-proxy {
   display: contents;
+}
+
+/* A copy of a layout is measured in the page, where it takes no room. */
+.markdown-preview-sizer > .vml-rv-measure {
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 /* Reading view: a layout that does not wrap starts below the floats before it. */

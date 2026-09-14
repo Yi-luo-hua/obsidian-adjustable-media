@@ -6,6 +6,7 @@ import { onlyColumnTextDiffers, planColumnText } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { createColumnEditor } from "./columnEditor.ts";
 import { commitEdits, type LayoutContext } from "./interactions.ts";
+import { closeLinkSuggest } from "./linkSuggest.ts";
 import { t } from "./messages.ts";
 
 /**
@@ -88,7 +89,8 @@ class TextEditSession {
   /** The frame around the column's editor. */
   private readonly box: HTMLElement;
   private readonly editor: EditorView;
-  // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here.
+  // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here. The
+  // column's editor carries out Obsidian's editor commands on their keys itself (columnKeys.ts).
   private readonly scope = new Scope();
   private block: V2Block;
   /** The text going into the note right now; the note holds it once the write is done. */
@@ -110,17 +112,22 @@ class TextEditSession {
     column.createDiv({ cls: "vml-text-editor__note", text: t("textNotSaved") });
     this.editor = createColumnEditor({
       parent: this.box,
+      app: host.app,
+      sourcePath: host.sourcePath,
       note: host.view,
       text: source,
       caret,
       onUpdate: (update) => this.updated(update),
     });
     this.scope.register([], "Escape", (event) => {
-      // Esc during an input method's composition cancels the composition.
+      // Esc during an input method's composition cancels the composition, and with link suggestions
+      // open it closes them.
       if (event.isComposing) {
         return true;
       }
-      this.editor.contentDOM.blur();
+      if (!closeLinkSuggest(this.editor)) {
+        this.editor.contentDOM.blur();
+      }
       return false;
     });
 

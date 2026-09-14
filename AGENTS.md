@@ -54,6 +54,7 @@
 - 测试库窗口被其他窗口完全挡住时，页面处于 hidden 状态，`requestAnimationFrame` 不再触发，CodeMirror 也就不测量、不重排，实测数据全都不可信。先执行一次 `obsidian vault=vml-test-vault eval "code=require('@electron/remote').getCurrentWebContents().setBackgroundThrottling(false)"`，重启 Obsidian 前一直有效。
 - 需要真实的点击、按键和输入法组字时（例如测试布局里的输入框），在测试脚本里用 `require('@electron/remote').getCurrentWebContents().debugger` 接上 DevTools 协议：`Emulation.setFocusEmulationEnabled` 让后台窗口也按有焦点处理，`Input.dispatchMouseEvent`、`Input.dispatchKeyEvent`、`Input.insertText`、`Input.imeSetComposition` 发送真实输入，用完关掉仿真。命令行的 `dev:debug on` 用的是同一个 debugger（`dev:console` 靠它捕获控制台）：脚本只在自己 `attach` 的情况下才 `detach`，否则会关掉控制台捕获；关掉了就再执行一次 `dev:debug on`。窗口没有焦点时，脚本里直接调用 `focus()`、`blur()` 或派发键盘事件，都不会引起真实的焦点变化，也不经过 Obsidian 的快捷键处理。点击前先把目标滚到窗口里，窗口外的坐标什么也点不到。要测窗口失去焦点，先关掉焦点仿真，再用 `require('@electron/remote').getCurrentWindow().minimize()`，之后用 `showInactive()` 恢复（不会把窗口提到前面）；`win.blur()` 不起作用，页面仍然有焦点。
 - 会改动测试笔记的实测，先把笔记备份，测完恢复并用哈希值核对。
+- 测快捷键时，在脚本里用 `app.hotkeyManager.setHotkeys(id, [...])` 临时设置，要在文字栏编辑器打开之前设（它打开时读一次），而且紧挨着打开之前设，设完用 `getHotkeys(id)` 核对一次：实测在打开笔记、开启焦点仿真之前设的值，有时到编辑器打开时已经没了（原因没查清），编辑器就按默认键建。测完用原来的值或 `removeHotkeys(id)` 恢复。这两个方法只改内存，不写 `.obsidian/hotkeys.json`，测完核对这个文件没变。
 
 ## Git
 

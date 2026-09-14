@@ -1,11 +1,11 @@
-import { MarkdownRenderChild, MarkdownView, type Plugin } from "obsidian";
+import { MarkdownRenderChild, MarkdownView, type MarkdownPostProcessorContext, type MarkdownSectionInformation, type Plugin } from "obsidian";
 
 import { findV2Blocks, hasSideText, type V2Block } from "../format/v2.ts";
 import { drawnFrom, isStale, recordDrawn, type Drawn } from "../layout/drawn.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { renderLayout } from "./layoutView.ts";
 import { blockWarning } from "./messages.ts";
-import { keepWrapped } from "./readingWrap.ts";
+import { keepWrapped, keepWrapsBeside } from "./readingWrap.ts";
 
 const RERENDER_ATTEMPTS = 5;
 const RERENDER_RETRY_MS = 100;
@@ -15,7 +15,8 @@ const RERENDER_RETRY_MS = 100;
  * form a section between the two comment sections (docs/DESIGN.md, section 4). A section that lies
  * entirely inside a block body is replaced with the layout of the rows it holds. A layout with text
  * beside its media is drawn whole in the section of its first line, and its other sections are left
- * empty. Transcluded notes have no section info and keep Obsidian's own rendering.
+ * empty. Transcluded notes have no section info and keep Obsidian's own rendering. In a note with a
+ * floating layout, every section also gets its stand-ins for the floats beside it (readingWrap.ts).
  *
  * Layouts are only shown here; they are changed in live preview. A click on one of their images
  * opens Obsidian's image viewer, as for any image in reading view.
@@ -25,24 +26,21 @@ export function registerReadingView(plugin: Plugin): void {
   let lastText: string | null = null;
   let lastBlocks: V2Block[] = [];
   let lastState: Drawn = { comments: "", texts: [] };
+  /** Whether a layout of that note floats. */
+  let lastWrapped = false;
   const parse = (text: string): void => {
     if (text !== lastText) {
       lastText = text;
       lastBlocks = findBlocks(text);
       lastState = drawnFrom(lastBlocks);
+      lastWrapped = lastBlocks.some((block) => block.invalidLine === null && modelFromBlock(block).wrap !== null);
     }
   };
 
   // What the layouts drawn for each note show, by path.
   const drawn = new Map<string, Drawn>();
 
-  plugin.registerMarkdownPostProcessor((el, ctx) => {
-    const info = ctx.getSectionInfo(el);
-    if (!info) {
-      return;
-    }
-    parse(info.text);
-
+  const draw = (el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
     const block = lastBlocks.find((candidate) => info.lineStart > candidate.openLine && info.lineEnd < candidate.closeLine);
     if (!block || block.invalidLine !== null) {
       return;
@@ -79,7 +77,20 @@ export function registerReadingView(plugin: Plugin): void {
       component: child,
     });
     if (model.wrap !== null) {
-      child.register(keepWrapped(el, root, model.wrap));
+      child.register(keepWrapped(plugin.app, el, root, model.wrap));
+    }
+  };
+
+  plugin.registerMarkdownPostProcessor((el, ctx) => {
+    const info = ctx.getSectionInfo(el);
+    if (!info) {
+      return;
+    }
+    parse(info.text);
+    draw(el, info, ctx);
+    // Before Obsidian measures this section, it gets its stand-ins for the floats beside it.
+    if (lastWrapped) {
+      keepWrapsBeside(plugin.app, el);
     }
   });
 

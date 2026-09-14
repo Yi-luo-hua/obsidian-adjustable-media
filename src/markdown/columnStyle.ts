@@ -9,11 +9,13 @@
  * - away from selections, the markers of headings, bold, italic, strikethrough, highlights, inline
  *   code and links are drawn as nothing, so a link shows as its text alone, underlined; quote
  *   markers turn transparent beside the bars drawn for the line; a task's box takes the place of its
- *   list marker and brackets;
+ *   list marker and brackets; inline math is rendered, and embeds show what they embed;
  * - heading and quote markers come back while a selection touches the line, the others while one
  *   touches what they mark up;
- * - bullets and numbers are drawn as such whatever the selection.
- * Embeds keep their source: the column's editor draws no media.
+ * - bullets and numbers are drawn as such whatever the selection;
+ * - a line that wraps goes on under its text: its rows after the first are indented by as much as its
+ *   quote markers, indentation, list marker and task box take up.
+ * The column's editor draws embedded images, and the source of other embeds.
  */
 
 /** How the note's editor draws a token. */
@@ -57,6 +59,10 @@ export interface LineStyle {
   hidden: Piece[];
   /** A task's box, drawn in place of its brackets. */
   task: (Piece & { checked: boolean }) | null;
+  /** Inline math drawn rendered, with its TeX. */
+  math: Array<Piece & { tex: string }>;
+  /** Embeds away from selections, with what is between their brackets: those of images are drawn as the images. */
+  embeds: Array<Piece & { target: string }>;
 }
 
 /** The formatting whose markers show while a selection touches the text they mark up. */
@@ -78,7 +84,7 @@ export function styleLine(tokens: readonly Token[], text: string, selections: re
   const items: Item[] = tokens.map((token) => ({ ...token, parts: new Set(token.name.split("_")), hidden: false, underlined: false }));
   const touched = (from: number, to: number): boolean => selections.some((piece) => piece.from <= to && piece.to >= from);
   const active = selections.length > 0;
-  const style: LineStyle = { line: [], marks: [], hidden: [], task: null };
+  const style: LineStyle = { line: [], marks: [], hidden: [], task: null, math: [], embeds: [] };
 
   for (const item of items) {
     for (const name of tokenStyle(item.name).line) {
@@ -109,7 +115,7 @@ export function styleLine(tokens: readonly Token[], text: string, selections: re
     }
   }
 
-  // Links: their text alone, underlined, while no selection touches them. Embeds keep their source.
+  // Links: their text alone, underlined, while no selection touches them; embeds, what they embed.
   for (let index = 0; index < items.length; index += 1) {
     const item = items[index];
     if (!item) {
@@ -122,10 +128,14 @@ export function styleLine(tokens: readonly Token[], text: string, selections: re
       if (end < 0 || !last) {
         continue;
       }
-      if (!item.parts.has("formatting-embed") && !touched(item.from, last.to)) {
-        for (const inner of items.slice(index, end + 1)) {
-          inner.hidden ||= inner === item || inner === last || inner.parts.has("link-has-alias") || inner.parts.has("link-alias-pipe");
-          inner.underlined = !inner.hidden;
+      if (!touched(item.from, last.to)) {
+        if (item.parts.has("formatting-embed")) {
+          style.embeds.push({ from: item.from, to: last.to, target: text.slice(item.to, last.from) });
+        } else {
+          for (const inner of items.slice(index, end + 1)) {
+            inner.hidden ||= inner === item || inner === last || inner.parts.has("link-has-alias") || inner.parts.has("link-alias-pipe");
+            inner.underlined = !inner.hidden;
+          }
         }
       }
       index = end;
@@ -150,6 +160,23 @@ export function styleLine(tokens: readonly Token[], text: string, selections: re
       // An address on its own.
       item.underlined = true;
     }
+  }
+
+  // Inline math: rendered while no selection touches it.
+  for (let index = 0; index < items.length; index += 1) {
+    const begin = items[index];
+    if (!begin?.parts.has("formatting-math-begin")) {
+      continue;
+    }
+    const end = items.findIndex((other, j) => j > index && other.parts.has("formatting-math-end"));
+    const last = items[end];
+    if (end < 0 || !last) {
+      continue;
+    }
+    if (!touched(begin.from, last.to)) {
+      style.math.push({ from: begin.from, to: last.to, tex: text.slice(begin.to, last.from) });
+    }
+    index = end;
   }
 
   // Tasks: a box in place of the list marker and the brackets while no selection touches them.
@@ -201,4 +228,16 @@ export function styleLine(tokens: readonly Token[], text: string, selections: re
 
   style.hidden = items.filter((item) => item.hidden).map((item) => ({ from: item.from, to: item.to }));
   return style;
+}
+
+/** Quote markers, indentation, a list marker with one space after it and a task's box. */
+const HANGING_PREFIX = /^(?: {0,3}>[ ]?)*[ \t]*(?:(?:[-*+]|\d{1,9}[.)])(?:[ \t]|$)(?:\[[^\]]\](?:[ \t]|$))?)?/;
+
+/**
+ * How many characters at the start of a line of `text` its wrapped rows hang under, as in live
+ * preview: its quote markers, indentation, list marker with one space after it and task box. Zero
+ * for a line without any, whose rows go on under its start.
+ */
+export function hangingPrefix(text: string): number {
+  return HANGING_PREFIX.exec(text)?.[0].length ?? 0;
 }
