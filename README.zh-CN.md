@@ -4,7 +4,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-当前最新发布版为 **0.2.1**。本文介绍开发主线的功能：文字环绕、整块移动和文字栏编辑目前均为**未发布**内容。已完成工作、验证范围和已知限制见[项目进度与验证记录](docs/STATUS.md)。
+**0.3.0** 包含文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，验证范围和已知限制见[项目进度与验证记录](docs/STATUS.md)。
 
 ![Adjustable Media 效果预览](assets/demo.jpg)
 

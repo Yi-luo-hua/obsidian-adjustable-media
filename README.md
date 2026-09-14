@@ -4,7 +4,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-The latest published release is **0.2.1**. This README describes the development branch: text wrapping, movable layouts and editable text columns are **unreleased**. See [project status and validation](docs/STATUS.md) for completed work, test coverage and known limitations.
+Version **0.3.0** includes text wrapping, movable layouts and editable text columns. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See [project status and validation](docs/STATUS.md) for test coverage and known limitations.
 
 ![Adjustable Media Preview](assets/demo.jpg)
 

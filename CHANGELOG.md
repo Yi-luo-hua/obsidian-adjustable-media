@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 - 2026-09-15
 
 - Improve reading-view wrap measurements across virtualized sections and after media loads. Some first-pass scrolling jumps remain; see `docs/STATUS.md` and `docs/DESIGN.md` for the measured limits.
 - Remove a folded layout's float stand-ins, and restore them when its heading is expanded.
