@@ -1,10 +1,10 @@
 import { Notice, setIcon } from "obsidian";
 import { EditorView } from "@codemirror/view";
 
-import { MAX_WRAP_SKIP, findV2Blocks, type V2Block } from "../format/v2.ts";
+import { MAX_WRAP_SKIP } from "../format/v2.ts";
 import { skipLines, wrapZone } from "../layout/geometry.ts";
 import { effectiveWidth, hasText, setWrap } from "../layout/model.ts";
-import { blockGaps, isSamePlace, pickGap, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
+import { blockForMove, blockGaps, isSamePlace, pickGap, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
 import { createDragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, commitEdits, swallowNextClick, type LayoutContext } from "./interactions.ts";
 import { t } from "./messages.ts";
@@ -52,10 +52,11 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
   const text = view.state.doc.toString();
   const lines = text.split("\n");
   // A widget is kept while its block's text stays the same, so the block may have moved since.
-  const matches = findV2Blocks(lines).filter((candidate) => sameText(candidate, context.block));
-  const block = matches.length === 1 ? matches[0] : undefined;
-  if (!block) {
-    new Notice(t(matches.length === 0 ? "writeNotFound" : "writeAmbiguous"));
+  const widget = root.closest<HTMLElement>(".vml-live-preview");
+  const line = widget ? view.state.doc.lineAt(view.posAtDOM(widget)).number - 1 : context.block.openLine;
+  const block = blockForMove(lines, context.block, line);
+  if (typeof block === "string") {
+    new Notice(t(block === "not-found" ? "writeNotFound" : "writeAmbiguous"));
     return;
   }
 
@@ -170,10 +171,6 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
 
 function edgeSpeed(depth: number): number {
   return Math.min(SCROLL_SPEED, (depth / SCROLL_EDGE) * SCROLL_SPEED);
-}
-
-function sameText(a: V2Block, b: V2Block): boolean {
-  return a.lines.length === b.lines.length && a.lines.every((line, index) => line === b.lines[index]);
 }
 
 function createDropIndicator(doc: Document): DropIndicator {

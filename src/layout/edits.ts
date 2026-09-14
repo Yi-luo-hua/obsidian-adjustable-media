@@ -25,6 +25,8 @@ import { metaFromModel, rowEmbeds, type LayoutModel } from "./model.ts";
 export interface BlockEdit {
   anchorLine: number;
   anchorLines: string[];
+  /** The line within the anchor that must be text; preceding lines only validate context. */
+  textOffset?: number;
   /** Replaces anchorLines[start..end] (inclusive). */
   start: number;
   end: number;
@@ -264,7 +266,7 @@ function locateAnchor(
   edit: BlockEdit,
   contextAt: (line: number) => LineContext | undefined,
 ): number | EditFailureReason {
-  const usable = (line: number) => matchesAt(lines, edit.anchorLines, line) && contextAt(line) === "text";
+  const usable = (line: number) => matchesAt(lines, edit.anchorLines, line) && contextAt(line + (edit.textOffset ?? 0)) === "text";
   if (usable(edit.anchorLine)) {
     return edit.anchorLine;
   }

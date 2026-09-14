@@ -22,6 +22,14 @@ export interface GapTop {
   top: number;
 }
 
+/** Resolve the block at its current widget position before falling back to a unique text match. */
+export function blockForMove(lines: readonly string[], expected: V2Block, line: number): V2Block | "not-found" | "ambiguous" {
+  const matches = findV2Blocks(lines).filter((block) => block.lines.length === expected.lines.length
+    && block.lines.every((text, index) => text === expected.lines[index]));
+  return matches.find((block) => block.openLine === line)
+    ?? (matches.length === 1 ? matches[0] : matches.length === 0 ? "not-found" : "ambiguous");
+}
+
 const LIST_ITEM = /^(?:[-*+]|\d{1,9}[.)])[ \t]/;
 const HEADING = /^#{1,6}(?:[ \t]|$)/;
 const CLOSE_LINE = /^<!-- \/vml -->[ \t]*$/;
@@ -134,7 +142,7 @@ function insertion(lines: readonly string[], line: number, moved: readonly strin
   // Anchored to the line above as well: a single line of text is often not unique.
   const previous = stripCarriageReturn(lines[line - 1] ?? "");
   const head = previous.trim() === "" ? [] : [""];
-  return { anchorLine: line - 1, anchorLines: [previous, target], start: 1, end: 1, replacement: [...head, ...moved, ...tail] };
+  return { anchorLine: line - 1, anchorLines: [previous, target], textOffset: 1, start: 1, end: 1, replacement: [...head, ...moved, ...tail] };
 }
 
 function followsBlockEnd(lines: readonly string[], contexts: readonly LineContext[], line: number): boolean {

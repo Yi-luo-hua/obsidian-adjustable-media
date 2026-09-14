@@ -14,7 +14,7 @@ import {
   setWrap,
   type LayoutModel,
 } from "../src/layout/model.ts";
-import { blockGaps, isSamePlace, pickGap, planPlacement } from "../src/layout/placement.ts";
+import { blockForMove, blockGaps, isSamePlace, pickGap, planPlacement } from "../src/layout/placement.ts";
 import { planGaps, planProxy, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
@@ -132,6 +132,47 @@ const note = [
 ];
 const LAYOUT = ["<!-- vml -->", "![[a.png]]", "<!-- /vml -->"];
 const WRAPPED_LEFT = '<!-- vml {"v":2,"width":0.4,"wrap":"left"} -->';
+
+test("moves after closed non-text sections validate the target while preserving the section", () => {
+  for (const section of [["~~~", "code", "~~~"], ["$$", "x", "$$"], ["<!--", "comment", "-->"], ["%%", "comment", "%%"], ["---", "key: value", "---"]]) {
+    const lines = [...section, "target", "", ...LAYOUT, "", "end"];
+    const target = section.length;
+    assert.ok(blockGaps(lines).includes(target));
+    const edits = planPlacement(lines, block(lines), { line: target, wrap: null, skip: 0 });
+    assert.ok(edits);
+    const expected = [...section, "", ...LAYOUT, "", "target", "", "end"];
+    assert.deepEqual(apply(lines, edits), expected);
+    const editor = new MemoryEditor(lines.join("\n"));
+    assert.deepEqual(applyEditsToEditor(editor, edits), { ok: true });
+    assert.equal(editor.transactionCount, 1);
+    assert.equal(editor.getValue(), expected.join("\n"));
+    assert.deepEqual(applyEditsToText(lines.join("\r\n"), edits), { ok: true, text: expected.join("\r\n") });
+    const changed = [...lines];
+    changed[target - 1] += "changed";
+    assert.equal(applyEditsToText(changed.join("\n"), edits).ok, false);
+    // The same two anchor lines inside a new fence must never become a fallback target.
+    assert.equal(applyEditsToText(["````", ...lines.slice(0, target + 1), "````", "", ...LAYOUT].join("\n"), edits).ok, false);
+  }
+});
+
+test("duplicate layouts resolve at the widget position, including after lines are inserted above", () => {
+  const lines = [...LAYOUT, "", ...LAYOUT, "", "end"];
+  const original = block(lines);
+  for (const at of [0, 4]) {
+    const found = blockForMove(lines, original, at);
+    assert.equal(typeof found, "object");
+    if (typeof found !== "string") assert.equal(found.openLine, at);
+  }
+  const shifted = blockForMove(["intro", "", ...lines], original, 6);
+  assert.equal(typeof shifted, "object");
+  if (typeof shifted !== "string") assert.equal(shifted.openLine, 6);
+  assert.equal(blockForMove(lines, original, 3), "ambiguous");
+  assert.equal(blockForMove(["nothing"], original, 0), "not-found");
+  const unique = blockForMove(["intro", "", ...LAYOUT], original, 0);
+  assert.equal(typeof unique, "object");
+  if (typeof unique !== "string") assert.equal(unique.openLine, 2);
+  assert.equal(blockForMove(["~~~", ...LAYOUT, "~~~"], original, 1), "not-found");
+});
 
 test("in front of itself or of the next paragraph, a block stays where it is", () => {
   const layout = block(note);
