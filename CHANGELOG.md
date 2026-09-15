@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.3.1 - 2026-09-15
 
 - Reading view finds the notes with floating layouts without a `:has()` selector, which can slow down style updates in long notes. The stylesheet uses `!important` only where it must override Obsidian's own.
+
+- Synchronize reused reading-view sections when adding the first floating layout or removing the last, independently in each pane.
 
 ## 0.3.0 - 2026-09-15
 
