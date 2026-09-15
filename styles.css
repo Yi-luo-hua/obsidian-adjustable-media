@@ -666,9 +666,9 @@ body.vml-is-dragging * {
 }
 
 /*
- * Reading view: every section beside a wrapped layout holds a hidden stand-in for the float. The
- * stand-in of the first of them shows once nothing before it, the layout's section or another section
- * with a stand-in, is in the page any more. Its box generates nothing itself, so margins still collapse.
+ * Reading view: every section beside a wrapped layout holds a hidden stand-in for the float. A
+ * section's stand-ins show when the section right before it in the page is neither the layout's section
+ * nor another section with a stand-in. Its box generates nothing itself, so margins still collapse.
  */
 .vml-rv-proxy {
   display: none;
@@ -691,10 +691,11 @@ body.vml-is-dragging * {
 }
 
 /*
- * Reading view: lists (so nested ones keep their indent), a quote's bar, a callout's box, a rule and
- * display math sit beside a float as a whole.
+ * Reading view, in a note with a wrapped layout (its sections carry vml-rv-wrapping): lists (so nested
+ * ones keep their indent), a quote's bar, a callout's box, a rule and display math sit beside a float
+ * as a whole.
  */
-.markdown-rendered:has(.vml-layout--wrap) :is(ul, ol, blockquote, .callout, hr, .math-block) {
+.markdown-rendered .vml-rv-wrapping :is(ul, ol, blockquote, .callout, hr, .math-block) {
   display: flow-root;
 }
 
@@ -737,14 +738,18 @@ body.vml-is-dragging * {
   clear: both;
 }
 
-/* While the source of a layout shows, the media Obsidian draws in it are thumbnails: the note barely moves. */
-.vml-source-line .image-embed img,
-.vml-source-line .internal-embed video {
-  height: auto !important;
+/*
+ * While the source of a layout shows, the media Obsidian draws in it are thumbnails: the note barely
+ * moves. The selector outranks Obsidian's own width for editor images
+ * (`.cm-content .image-embed .image-wrapper img:not([width])`).
+ */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-source-line .image-embed img,
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-source-line .internal-embed video {
+  height: auto;
   max-height: 4.5em;
   max-width: 12em;
   object-fit: contain;
-  width: auto !important;
+  width: auto;
 }
 
 /* A spacer in front of an element pushed below a float, so CodeMirror measures the push. */

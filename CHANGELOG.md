@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Reading view finds the notes with floating layouts without a `:has()` selector, which can slow down style updates in long notes. The stylesheet uses `!important` only where it must override Obsidian's own.
+
 ## 0.3.0 - 2026-09-15
 
 - Improve reading-view wrap measurements across virtualized sections and after media loads. Some first-pass scrolling jumps remain; see `docs/STATUS.md` and `docs/DESIGN.md` for the measured limits.

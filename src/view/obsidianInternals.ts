@@ -3,9 +3,9 @@ import { MarkdownView, type App, type Hotkey } from "obsidian";
 /**
  * What the plugin reads of Obsidian through interfaces its API does not document, each with a
  * fallback for when they are missing: the settings of Obsidian's editor and the hotkeys of its
- * commands, which a text column's editor follows (docs/DESIGN.md, section 4.2), and the heights
- * reading view has measured for the sections of a note (section 4.1). These interfaces never write
- * notes or settings; remeasurement only invalidates the renderer's cached heights.
+ * commands, which a text column's editor follows (docs/DESIGN.md, section 4.2), and the sections of
+ * a note's reading view with the heights it has measured for them (section 4.1). These interfaces
+ * never write notes or settings; remeasurement only invalidates the renderer's cached heights.
  */
 
 interface VaultConfig {
