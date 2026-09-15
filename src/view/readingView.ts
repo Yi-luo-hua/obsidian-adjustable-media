@@ -5,10 +5,14 @@ import { drawnFrom, isStale, recordDrawn, type Drawn } from "../layout/drawn.ts"
 import { modelFromBlock } from "../layout/model.ts";
 import { renderLayout } from "./layoutView.ts";
 import { blockWarning } from "./messages.ts";
+import { readingSections } from "./obsidianInternals.ts";
 import { keepWrapped, keepWrapsBeside } from "./readingWrap.ts";
 
 const RERENDER_ATTEMPTS = 5;
 const RERENDER_RETRY_MS = 100;
+
+/** The class of every section of a note with a floating layout (styles.css). */
+const WRAPPING = "vml-rv-wrapping";
 
 /**
  * Reading view. Obsidian renders each paragraph as its own section, and the embed lines of a block
@@ -39,6 +43,31 @@ export function registerReadingView(plugin: Plugin): void {
 
   // What the layouts drawn for each note show, by path.
   const drawn = new Map<string, Drawn>();
+
+  // For each reading view, by its document id, the note it drew last and whether that has a floating layout.
+  const views = new Map<string, { path: string; wrapped: boolean }>();
+
+  // In a note with a floating layout, lists, quotes and the like sit beside a float as a whole
+  // (styles.css). Obsidian keeps the drawn sections of text that did not change, which never reach
+  // here again: when a note gains its first floating layout or loses its last, every section of the
+  // reading view changes class, or where Obsidian's renderer cannot be read, the note is drawn again.
+  const markWrapping = (el: HTMLElement, ctx: MarkdownPostProcessorContext, text: string): void => {
+    el.toggleClass(WRAPPING, lastWrapped);
+    const seen = views.get(ctx.docId);
+    views.set(ctx.docId, { path: ctx.sourcePath, wrapped: lastWrapped });
+    if (seen?.path !== ctx.sourcePath || seen.wrapped === lastWrapped) {
+      return;
+    }
+    const reading = readingSections(plugin.app, el);
+    if (reading) {
+      for (const section of reading.sections) {
+        section.el.toggleClass(WRAPPING, lastWrapped);
+      }
+    } else {
+      // Not while Obsidian draws.
+      window.setTimeout(() => rerenderNote(plugin, ctx.sourcePath, text), 0);
+    }
+  };
 
   const draw = (el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
     const block = lastBlocks.find((candidate) => info.lineStart > candidate.openLine && info.lineEnd < candidate.closeLine);
@@ -88,6 +117,7 @@ export function registerReadingView(plugin: Plugin): void {
     }
     parse(info.text);
     draw(el, info, ctx);
+    markWrapping(el, ctx, info.text);
     // Before Obsidian measures this section, it gets its stand-ins for the floats beside it.
     if (lastWrapped) {
       keepWrapsBeside(plugin.app, el);
@@ -108,12 +138,7 @@ export function registerReadingView(plugin: Plugin): void {
       return;
     }
     drawn.set(file.path, current);
-    for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
-      const view = leaf.view;
-      if (view instanceof MarkdownView && view.file?.path === file.path && view.getMode() === "preview") {
-        rerenderWhenCurrent(view, data, RERENDER_ATTEMPTS);
-      }
-    }
+    rerenderNote(plugin, file.path, data);
   }));
   plugin.registerEvent(plugin.app.vault.on("rename", (file, oldPath) => {
     const state = drawn.get(oldPath);
@@ -122,6 +147,16 @@ export function registerReadingView(plugin: Plugin): void {
       drawn.set(file.path, state);
     }
   }));
+}
+
+/** Re-renders the reading views of the note at `path`, each once it shows `data`. */
+function rerenderNote(plugin: Plugin, path: string, data: string): void {
+  for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
+    const view = leaf.view;
+    if (view instanceof MarkdownView && view.file?.path === path && view.getMode() === "preview") {
+      rerenderWhenCurrent(view, data, RERENDER_ATTEMPTS);
+    }
+  }
 }
 
 /** Re-renders once the view shows `data`; it may still be loading the new content. */
