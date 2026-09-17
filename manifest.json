@@ -1,7 +1,7 @@
 {
   "id": "adjustable-media",
   "name": "Adjustable Media",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "minAppVersion": "1.5.0",
   "description": "Arrange images and videos side by side, then drag to reorder and resize them. Notes keep plain embeds plus an HTML comment, so they stay readable without the plugin.",
   "author": "Yi-luo-hua",

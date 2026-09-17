@@ -1,7 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 - 2026-09-17
 
+- Text boxes: a layout block with text and no media is now a layout of its own, drawn as one column of Markdown at the layout's width. Like media, it can float left or right with the note's text wrapping around it (`wrap`, `skip`), and be moved as a whole. In live preview, click its text to edit it, drag its frame's edge to set its width, and right-click it to choose the wrap or to remove the box and keep its text. Older versions of the plugin show such blocks as plain Markdown and never change them.
+- The wrap command (now **Wrap selection in a layout**) also takes lines with text: they are wrapped as they are, into a text box, or into text columns beside the media selected with them. Code, math and comments go in with the text; a selection that would not read back as one layout is refused.
+- Reading view draws a layout with text in the section of its opening comment. Drawn in the section of its first line, it was wiped when that line was a heading, and, floating, it was narrowed when that line started a table.
+- Text ending in a list gets a blank line above a layout's closing comment, whether written by the wrap command or typed in the layout. Without it, reading view took the comment and the text after the layout into the list.
 - Paper drafts: a text box can flow through 2–4 balanced columns, with its own column gap, text alignment (justified included) and text size, and a narrow layout can sit in the middle or on the right. Choose them under **Text settings…** in the layout's menu. New layout settings `type`, `cols`, `gap`, `textAlign`, `size` and `align`.
 - Code, math and comments may now be written inside a layout block, as part of its text. With `"type":"text"`, media lines inside a text box are figures in its text.
 - Numbered figures, tables and equations, with references, written as pandoc-crossref reads them: `{#fig:name}` and `{#tbl:name}` at the end of a caption, `\label{eq:name}` in an equation, `@fig:name` in the text. Captions in layouts are drawn as Markdown. A new setting picks English or Chinese numbers.
@@ -10,11 +14,6 @@
 - Reading view draws layouts and numbers in sections Obsidian gives without the note's text, and draws open notes again once the plugin is enabled, so it no longer falls back to plain Markdown until the note is edited.
 - In columns, headings stay with the text after them, and figures, tables, equations and their captions are not split between columns.
 - A blank line between two floating layouts no longer pushes the second one a line down in live preview.
-
-- Text boxes: a layout block with text and no media is now a layout of its own, drawn as one column of Markdown at the layout's width. Like media, it can float left or right with the note's text wrapping around it (`wrap`, `skip`), and be moved as a whole. In live preview, click its text to edit it, drag its frame's edge to set its width, and right-click it to choose the wrap or to remove the box and keep its text. Older versions of the plugin show such blocks as plain Markdown and never change them.
-- The wrap command (now **Wrap selection in a layout**) also takes lines with text: they are wrapped as they are, into a text box, or into text columns beside the media selected with them. Code, math, comments and selections that would not read back as one layout are refused.
-- Reading view draws a layout with text in the section of its opening comment. Drawn in the section of its first line, it was wiped when that line was a heading, and, floating, it was narrowed when that line started a table.
-- Text ending in a list gets a blank line above a layout's closing comment, whether written by the wrap command or typed in the layout. Without it, reading view took the comment and the text after the layout into the list.
 
 ## 0.3.1 - 2026-09-15
 

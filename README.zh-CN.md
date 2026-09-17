@@ -4,7 +4,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-**0.3.0** 包含文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，验证范围和已知限制见[项目进度与验证记录](docs/STATUS.md)。
+**0.4.0** 新增文字块、分栏排版，以及图、表、公式的编号与交叉引用；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，验证范围和已知限制见[项目进度与验证记录](docs/STATUS.md)。
 
 ![Adjustable Media 效果预览](assets/demo.jpg)
 
