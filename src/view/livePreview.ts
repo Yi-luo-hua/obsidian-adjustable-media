@@ -2,10 +2,12 @@ import { Component, editorInfoField, editorLivePreviewField, type App } from "ob
 import { Prec, StateField, type EditorState, type Extension, type Range } from "@codemirror/state";
 import { Decoration, EditorView, WidgetType, type DecorationSet } from "@codemirror/view";
 
-import { blockWrap, findV2Blocks, type TextSide, type V2Block } from "../format/v2.ts";
+import { blockWrap, findV2Blocks, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
+import { mayHaveRefs } from "../markdown/crossref.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
+import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { attachInteractions, type LayoutContext } from "./interactions.ts";
 import { renderLayout } from "./layoutView.ts";
 import { blockWarning, t } from "./messages.ts";
@@ -19,6 +21,13 @@ interface LivePreviewState {
   anchors: WrapAnchor[];
   /** Whether any layout of the note wraps text, drawn or showing its source. */
   hasWraps: boolean;
+  /** The note's numbered figures, tables and equations, if it has any labels or references. */
+  refs: RefContext | undefined;
+}
+
+interface Parsed {
+  blocks: V2Block[];
+  refs: RefContext | undefined;
 }
 
 /**
@@ -32,14 +41,14 @@ interface LivePreviewState {
  */
 export function livePreviewExtension(app: App): Extension {
   const field = StateField.define<LivePreviewState>({
-    create: (state) => withDecorations(app, state, parseBlocks(state)),
+    create: (state) => withDecorations(app, state, parse(state)),
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
       if (tr.docChanged || modeChanged) {
-        return withDecorations(app, tr.state, parseBlocks(tr.state));
+        return withDecorations(app, tr.state, parse(tr.state));
       }
       if (tr.selection) {
-        return withDecorations(app, tr.state, value.blocks);
+        return withDecorations(app, tr.state, value);
       }
       return value;
     },
@@ -60,23 +69,26 @@ export function livePreviewExtension(app: App): Extension {
   ];
 }
 
-function parseBlocks(state: EditorState): V2Block[] {
+function parse(state: EditorState): Parsed {
   if (!state.field(editorLivePreviewField, false)) {
-    return [];
+    return { blocks: [], refs: undefined };
   }
   // Runs on every change of every note, and most notes have no layouts.
   const text = state.doc.toString();
-  return text.includes("<!-- vml") ? findV2Blocks(text.split("\n")) : [];
+  if (!text.includes("<!-- vml")) {
+    return { blocks: [], refs: undefined };
+  }
+  return { blocks: findV2Blocks(text.split("\n")), refs: mayHaveRefs(text) ? refContextOf(text) : undefined };
 }
 
-function withDecorations(app: App, state: EditorState, blocks: V2Block[]): LivePreviewState {
+function withDecorations(app: App, state: EditorState, { blocks, refs }: Parsed): LivePreviewState {
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
   let hasWraps = false;
 
   for (const block of blocks) {
-    if (block.invalidLine !== null || block.rows.length === 0) {
+    if (!isDrawable(block)) {
       continue;
     }
     const from = state.doc.line(block.openLine + 1).from;
@@ -86,7 +98,7 @@ function withDecorations(app: App, state: EditorState, blocks: V2Block[]): LiveP
     const key = block.lines.join("\n");
     hasWraps ||= wraps;
     if (!revealed) {
-      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, block, sourcePath) }).range(from, to));
+      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, block, sourcePath, refs) }).range(from, to));
       if (wraps) {
         anchors.push({ from, to, key, block });
       }
@@ -104,24 +116,85 @@ function withDecorations(app: App, state: EditorState, blocks: V2Block[]): LiveP
     }
   }
 
-  return { blocks, decorations: Decoration.set(ranges, true), anchors, hasWraps };
+  // Blank lines between two floating layouts written one after the other would push the later one a
+  // line down: they take no room while the cursor is elsewhere.
+  for (let index = 1; index < blocks.length; index += 1) {
+    const before = blocks[index - 1];
+    const after = blocks[index];
+    if (!before || !after || !isDrawable(before) || !isDrawable(after) || blockWrap(before) === null || blockWrap(after) === null) {
+      continue;
+    }
+    for (let line = before.closeLine + 1; line < after.openLine; line += 1) {
+      const { from, to, text } = state.doc.line(line + 1);
+      if (text.trim() !== "") {
+        break;
+      }
+      if (!state.selection.ranges.some((range) => range.from <= to && range.to >= from)) {
+        ranges.push(Decoration.line({ class: "vml-float-gap" }).range(from));
+      }
+    }
+  }
+
+  return { blocks, decorations: Decoration.set(ranges, true), anchors, hasWraps, refs };
 }
 
 /** What Obsidian draws for the text beside a layout's media lives as long as the widget's element. */
 const components = new WeakMap<HTMLElement, Component>();
 
+/**
+ * The heights layouts were drawn at, by their block's text and by their place in the note, for
+ * CodeMirror to count a layout it has not drawn at the height it will have. Counted by its lines
+ * instead, a tall layout of text is far too short: the note's height is off, the note jumps as it
+ * scrolls, and a change to the layout, typing in it included, puts it out of the editor's view. The
+ * place stands in for a layout whose text has just changed.
+ */
+const drawnHeights = new Map<string, number>();
+const MAX_DRAWN_HEIGHTS = 1000;
+const heightWatchers = new WeakMap<HTMLElement, ResizeObserver>();
+
+/** Records the height of the widget `el` under `keys`, now and whenever it changes. */
+function watchHeight(el: HTMLElement, keys: readonly string[]): void {
+  heightWatchers.get(el)?.disconnect();
+  const watcher = new ResizeObserver(() => rememberHeight(keys, el.offsetHeight));
+  watcher.observe(el);
+  heightWatchers.set(el, watcher);
+}
+
+function rememberHeight(keys: readonly string[], height: number): void {
+  if (height <= 0) {
+    return;
+  }
+  for (const key of keys) {
+    drawnHeights.delete(key);
+    drawnHeights.set(key, height);
+  }
+  // The oldest go first.
+  for (const key of drawnHeights.keys()) {
+    if (drawnHeights.size <= MAX_DRAWN_HEIGHTS) {
+      break;
+    }
+    drawnHeights.delete(key);
+  }
+}
+
 class LayoutWidget extends WidgetType {
   private readonly app: App;
   private readonly block: V2Block;
   private readonly sourcePath: string;
+  private readonly refs: RefContext | undefined;
   private readonly key: string;
+  private readonly placeKey: string;
 
-  constructor(app: App, block: V2Block, sourcePath: string) {
+  constructor(app: App, block: V2Block, sourcePath: string, refs: RefContext | undefined) {
     super();
     this.app = app;
     this.block = block;
     this.sourcePath = sourcePath;
-    this.key = `${sourcePath}\n${block.lines.join("\n")}`;
+    this.refs = refs;
+    // New numbers draw the layout again.
+    const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
+    this.key = `${sourcePath}\n${numbers}\n${block.lines.join("\n")}`;
+    this.placeKey = `${sourcePath}\n@${block.openLine}`;
   }
 
   override eq(other: LayoutWidget): boolean {
@@ -130,21 +203,34 @@ class LayoutWidget extends WidgetType {
 
   // A wrapped layout's widget is a zero-height anchor; the layout floats out of it.
   override get estimatedHeight(): number {
-    return blockWrap(this.block) === null ? -1 : 0;
+    if (blockWrap(this.block) !== null) {
+      return 0;
+    }
+    return drawnHeights.get(this.key) ?? drawnHeights.get(this.placeKey) ?? -1;
   }
 
   toDOM(view: EditorView): HTMLElement {
     const el = createDiv({ cls: "vml-live-preview" });
-    drawWidget(el, view, this.app, this.block, this.sourcePath);
+    drawWidget(el, view, this.app, this.block, this.sourcePath, this.refs);
+    if (blockWrap(this.block) === null) {
+      watchHeight(el, [this.key, this.placeKey]);
+    }
     return el;
   }
 
-  // While one of its text columns is typed in, the layout keeps its element (textEditing.ts).
+  // While one of its text columns is typed in, the layout keeps its element (textEditing.ts), and
+  // its height goes on under the new text.
   override updateDOM(dom: HTMLElement): boolean {
-    return keepWhileEditing(dom, this.block);
+    if (!keepWhileEditing(dom, this.block)) {
+      return false;
+    }
+    watchHeight(dom, [this.key, this.placeKey]);
+    return true;
   }
 
   override destroy(dom: HTMLElement): void {
+    heightWatchers.get(dom)?.disconnect();
+    heightWatchers.delete(dom);
     stopTextEdit(dom);
     components.get(dom)?.unload();
     components.delete(dom);
@@ -159,7 +245,15 @@ class LayoutWidget extends WidgetType {
  * Draws a layout's widget into `el`, in place of what was there. With `side`, that side shows a text
  * column even without text, for its first line to be typed in.
  */
-function drawWidget(el: HTMLElement, view: EditorView, app: App, block: V2Block, sourcePath: string, side?: TextSide): TextEditHost {
+function drawWidget(
+  el: HTMLElement,
+  view: EditorView,
+  app: App,
+  block: V2Block,
+  sourcePath: string,
+  refs: RefContext | undefined,
+  side?: TextSide,
+): TextEditHost {
   components.get(el)?.unload();
   el.empty();
   const model = modelFromBlock(block);
@@ -172,7 +266,7 @@ function drawWidget(el: HTMLElement, view: EditorView, app: App, block: V2Block,
   const component = new Component();
   component.load();
   components.set(el, component);
-  const root = renderLayout(el, { app, sourcePath, model, editable: isEditable(block), warning: blockWarning(block), component });
+  const root = renderLayout(el, { app, sourcePath, model, editable: isEditable(block), warning: blockWarning(block), component, refs });
   const context: LayoutContext = { app, sourcePath, block, model };
   const host: TextEditHost = {
     el,
@@ -182,7 +276,8 @@ function drawWidget(el: HTMLElement, view: EditorView, app: App, block: V2Block,
     context,
     editor: view.state.field(editorInfoField, false)?.editor,
     view,
-    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, editing),
+    // Drawn again from the note as it is now, numbers included.
+    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), editing),
   };
   if (isEditable(block)) {
     context.editText = (editing) => startTextEdit(host, editing, null);
@@ -266,4 +361,9 @@ class RevealedWrapWidget extends WidgetType {
   override ignoreEvent(): boolean {
     return true;
   }
+}
+
+function currentRefs(view: EditorView): RefContext | undefined {
+  const text = view.state.doc.toString();
+  return mayHaveRefs(text) ? refContextOf(text) : undefined;
 }

@@ -1,10 +1,12 @@
 import { MarkdownRenderChild, MarkdownView, type MarkdownPostProcessorContext, type MarkdownSectionInformation, type Plugin } from "obsidian";
 
-import { findV2Blocks, hasSideText, type V2Block } from "../format/v2.ts";
+import { findV2Blocks, hasSideText, isDrawable, type V2Block } from "../format/v2.ts";
 import { drawnFrom, isStale, recordDrawn, type Drawn } from "../layout/drawn.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { renderLayout } from "./layoutView.ts";
+import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { blockWarning } from "./messages.ts";
+import { sectionNoteText } from "./noteText.ts";
 import { readingSections } from "./obsidianInternals.ts";
 import { keepWrapped, keepWrapsBeside } from "./readingWrap.ts";
 
@@ -17,9 +19,9 @@ const WRAPPING = "vml-rv-wrapping";
 /**
  * Reading view. Obsidian renders each paragraph as its own section, and the embed lines of a block
  * form a section between the two comment sections (docs/DESIGN.md, section 4). A section that lies
- * entirely inside a block body is replaced with the layout of the rows it holds. A layout with text
- * beside its media is drawn whole in the section of its first line, and its other sections are left
- * empty. Transcluded notes have no section info and keep Obsidian's own rendering. In a note with a
+ * entirely inside a block body is replaced with the layout of the rows it holds. A layout with text,
+ * beside its media or on its own, is drawn whole in the section of its opening comment, and its body's
+ * sections are left empty. Transcluded notes have no section info and keep Obsidian's own rendering. In a note with a
  * floating layout, every section also gets its stand-ins for the floats beside it (readingWrap.ts).
  *
  * Layouts are only shown here; they are changed in live preview. A click on one of their images
@@ -32,12 +34,14 @@ export function registerReadingView(plugin: Plugin): void {
   let lastState: Drawn = { comments: "", texts: [] };
   /** Whether a layout of that note floats. */
   let lastWrapped = false;
+  let lastRefs: RefContext | undefined;
   const parse = (text: string): void => {
     if (text !== lastText) {
       lastText = text;
       lastBlocks = findBlocks(text);
-      lastState = drawnFrom(lastBlocks);
-      lastWrapped = lastBlocks.some((block) => block.invalidLine === null && modelFromBlock(block).wrap !== null);
+      lastRefs = lastBlocks.length > 0 ? refContextOf(text) : undefined;
+      lastState = drawnFrom(lastBlocks, numbersOf(lastRefs));
+      lastWrapped = lastBlocks.some((block) => isDrawable(block) && modelFromBlock(block).wrap !== null);
     }
   };
 
@@ -70,15 +74,21 @@ export function registerReadingView(plugin: Plugin): void {
   };
 
   const draw = (el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
-    const block = lastBlocks.find((candidate) => info.lineStart > candidate.openLine && info.lineEnd < candidate.closeLine);
-    if (!block || block.invalidLine !== null) {
+    // A layout with text is drawn in the section of its opening comment, which holds nothing else.
+    // The section of its first line would be a heading's, a table's or a list's, which Obsidian
+    // treats in ways of their own: it draws a heading's section again for its fold icon, which
+    // wipes the layout, and scrolls a table's sideways, which keeps a float inside.
+    const opening = lastBlocks.find((candidate) => info.lineStart === candidate.openLine && info.lineEnd === candidate.openLine);
+    const block = opening && hasSideText(opening)
+      ? opening
+      : lastBlocks.find((candidate) => info.lineStart > candidate.openLine && info.lineEnd < candidate.closeLine);
+    if (!block || !isDrawable(block)) {
       return;
     }
 
     let rowIndices: number[] | undefined;
     if (hasSideText(block)) {
-      const first = block.leftText?.from ?? block.rows[0]?.line ?? -1;
-      if (first < info.lineStart || first > info.lineEnd) {
+      if (block !== opening) {
         el.empty();
         return;
       }
@@ -104,6 +114,7 @@ export function registerReadingView(plugin: Plugin): void {
       editable: false,
       warning: blockWarning(block),
       component: child,
+      refs: lastRefs,
     });
     if (model.wrap !== null) {
       child.register(keepWrapped(plugin.app, el, root, model.wrap));
@@ -112,12 +123,14 @@ export function registerReadingView(plugin: Plugin): void {
 
   plugin.registerMarkdownPostProcessor((el, ctx) => {
     const info = ctx.getSectionInfo(el);
-    if (!info) {
+    // Without the note's text, the section tells nothing about its layouts.
+    const text = info ? sectionNoteText(plugin.app, ctx, info) : "";
+    if (!info || text === "") {
       return;
     }
-    parse(info.text);
+    parse(text);
     draw(el, info, ctx);
-    markWrapping(el, ctx, info.text);
+    markWrapping(el, ctx, text);
     // Before Obsidian measures this section, it gets its stand-ins for the floats beside it.
     if (lastWrapped) {
       keepWrapsBeside(plugin.app, el);
@@ -133,13 +146,23 @@ export function registerReadingView(plugin: Plugin): void {
     if (previous === undefined) {
       return;
     }
-    const current = drawnFrom(findBlocks(data));
+    const blocks = findBlocks(data);
+    const current = drawnFrom(blocks, numbersOf(blocks.length > 0 ? refContextOf(data) : undefined));
     if (!isStale(previous, current)) {
       return;
     }
     drawn.set(file.path, current);
     rerenderNote(plugin, file.path, data);
   }));
+  // Reading views already open keep the sections they drew without the plugin, when it was off
+  // (enabled, updated or reloaded while a note was open in reading view): they are drawn again.
+  plugin.app.workspace.onLayoutReady(() => {
+    for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
+      if (leaf.view instanceof MarkdownView && leaf.view.getMode() === "preview") {
+        leaf.view.previewMode.rerender(true);
+      }
+    }
+  });
   plugin.registerEvent(plugin.app.vault.on("rename", (file, oldPath) => {
     const state = drawn.get(oldPath);
     if (state !== undefined) {
@@ -166,6 +189,11 @@ function rerenderWhenCurrent(view: MarkdownView, data: string, attempts: number)
   } else if (attempts > 0) {
     window.setTimeout(() => rerenderWhenCurrent(view, data, attempts - 1), RERENDER_RETRY_MS);
   }
+}
+
+/** What tells the numbers a note's layouts show. */
+function numbersOf(refs: RefContext | undefined): string {
+  return refs ? `${refs.language} ${refs.index.signature}` : "";
 }
 
 function findBlocks(text: string): V2Block[] {

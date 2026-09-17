@@ -7,16 +7,16 @@ import { hasSideText, type V2Block } from "../format/v2.ts";
  * layouts were drawn from with the note's new text tells when the whole view needs drawing again.
  */
 export interface Drawn {
-  /** The layout comment lines of the note. */
+  /** The layout comment lines of the note, and the numbers of its figures, tables and equations. */
   comments: string;
   /** Every line of each layout with text beside its media, in order; null for one not drawn yet. */
   texts: Array<string | null>;
 }
 
-/** What layouts drawn from `blocks` show. */
-export function drawnFrom(blocks: readonly V2Block[]): Drawn {
+/** What layouts drawn from `blocks` show; `numbers` tells the numbers their text and captions show. */
+export function drawnFrom(blocks: readonly V2Block[], numbers = ""): Drawn {
   return {
-    comments: blocks.map((block) => `${block.lines[0] ?? ""}\n${block.lines[block.lines.length - 1] ?? ""}`).join("\n"),
+    comments: [...(numbers === "" ? [] : [numbers]), ...blocks.map((block) => `${block.lines[0] ?? ""}\n${block.lines[block.lines.length - 1] ?? ""}`)].join("\n"),
     texts: blocks.filter(hasSideText).map((block) => block.lines.join("\n")),
   };
 }

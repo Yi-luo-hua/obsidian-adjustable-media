@@ -1,6 +1,7 @@
-import { finishRenderMath, renderMath } from "obsidian";
 import { EditorSelection } from "@codemirror/state";
 import { WidgetType, type EditorView } from "@codemirror/view";
+
+import { drawMath } from "./math.ts";
 
 /**
  * What a text column's editor draws in place of some of its Markdown, as live preview does
@@ -58,8 +59,7 @@ export class MathWidget extends WidgetType {
 
   toDOM(view: EditorView): HTMLElement {
     const el = createSpan({ cls: "math math-inline is-loaded" });
-    el.appendChild(renderMath(this.tex, false));
-    void finishRenderMath();
+    drawMath(el, this.tex, false);
     // A click puts the cursor in the math, which shows its source. MathJax's own handling of the click
     // would take the focus from the editor, and with it end the typing.
     el.addEventListener("mousedown", (event) => {

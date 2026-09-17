@@ -1,12 +1,14 @@
 import { Menu, Notice, TFile, setIcon, type App, type Editor } from "obsidian";
+import type { EditorView } from "@codemirror/view";
 
 import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
-import { isEditable, planModelEdit, planMoveOut, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
+import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
 import { dropTarget, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
   effectiveWidth,
-  hasText,
+  hasTextColumns,
   insertItem,
+  isTextOnly,
   maxBlockWidth,
   moveItem,
   removeItem,
@@ -19,9 +21,11 @@ import {
   setPosition,
   setRowHeight,
   setSingleWidth,
+  setTextLayout,
   setValign,
   setWeights,
   setWrap,
+  textLayoutOf,
   type ItemPosition,
   type LayoutModel,
   type MoveTarget,
@@ -34,6 +38,7 @@ import { resolveMedia } from "./media.ts";
 import { MediaViewer, type ViewerImage } from "./mediaViewer.ts";
 import { t, type MessageKey } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
+import { TextLayoutModal } from "./textLayoutModal.ts";
 
 /** A layout drawn in live preview, as its interactions see it. Reading view only shows layouts. */
 export interface LayoutContext {
@@ -97,6 +102,9 @@ export function attachInteractions(root: HTMLElement, context: LayoutContext): v
     }
   }
   setUpFrame(root, context);
+  if (isTextOnly(context.model)) {
+    setUpTextBlockMenu(root, context);
+  }
 }
 
 /** Where an item dragged from `leaf` would land in a layout of the note at (x, y), if anywhere. */
@@ -158,8 +166,8 @@ export function swallowNextClick(doc: Document): void {
   window.setTimeout(() => doc.removeEventListener("click", swallow, { capture: true }), 0);
 }
 
-/** Writes planned edits to the note, through `editor` if given (see writeBlockEdits). Returns whether the note changed. */
-export async function commitEdits(app: App, sourcePath: string, edits: Array<BlockEdit | null>, editor?: Editor): Promise<boolean> {
+/** Writes planned edits to the note, through `editor` or as typed in `typed` if given (see writeBlockEdits). Returns whether the note changed. */
+export async function commitEdits(app: App, sourcePath: string, edits: Array<BlockEdit | null>, editor?: Editor, typed?: EditorView): Promise<boolean> {
   const planned = edits.filter((edit): edit is BlockEdit => edit !== null);
   if (planned.length === 0) {
     return false;
@@ -171,7 +179,7 @@ export async function commitEdits(app: App, sourcePath: string, edits: Array<Blo
     return false;
   }
 
-  const result = await writeBlockEdits(app, file, planned, editor);
+  const result = await writeBlockEdits(app, file, planned, editor, typed);
   if (!result.ok) {
     new Notice(t(FAILURE_MESSAGES[result.reason]));
   }
@@ -529,15 +537,17 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
  * The frame around a layout in live preview: its right edge sets the layout's width, its bottom
  * edge scales the height of every row, and its corner scales both, keeping the images' proportions.
  * With text beside the media, the handles sit on the media's column, which the width belongs to.
+ * A layout of text alone has only its width to set: its height follows its text.
  */
 function setUpFrame(root: HTMLElement, context: LayoutContext): void {
   const box = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
   const { left, right } = context.model.text;
   // The width handles sit on the edge that moves as the layout grows. A layout floating right, or
   // media with text on their left only, grow to the left; media between two texts grow both ways.
-  const mirrored = context.model.wrap === "right" || (left !== null && right === null);
-  const direction = (mirrored ? -1 : 1) * (left !== null && right !== null ? 2 : 1);
-  for (const edge of ["right", "bottom", "corner"] as const) {
+  const mirrored = context.model.wrap === "right" || (hasTextColumns(context.model) && left !== null && right === null);
+  const direction = (mirrored ? -1 : 1) * (hasTextColumns(context.model) && left !== null && right !== null ? 2 : 1);
+  const edges = isTextOnly(context.model) ? (["right"] as const) : (["right", "bottom", "corner"] as const);
+  for (const edge of edges) {
     const handle = box.createDiv({
       cls: `vml-handle vml-frame__handle vml-frame__handle--${edge}`,
       attr: { "aria-label": t(FRAME_LABELS[edge]), role: "separator" },
@@ -660,22 +670,13 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
 
   // The whole layout floats to one side with the note's text wrapping around it, or stands alone.
   // A layout with text beside its media does not float.
-  if (!hasText(context.model)) {
-    const wraps = [[null, "wrapNone", "square"], ["left", "wrapLeft", "panel-left"], ["right", "wrapRight", "panel-right"]] as const;
-    for (const [side, label, icon] of wraps) {
-      menu.addItem((entry) => entry
-        .setTitle(t(label))
-        .setIcon(icon)
-        .setSection("vml-wrap")
-        .setChecked(context.model.wrap === side)
-        .onClick(() => {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWrap(context.model, side))]);
-        }));
-    }
+  if (!hasTextColumns(context.model)) {
+    addWrapItems(menu, context, "wrapLeft", "wrapRight");
   }
 
   // Text beside the media lines up with them at the top, in the middle or at the bottom.
-  if (hasText(context.model)) {
+  if (hasTextColumns(context.model)) {
+    addTextLayoutItem(menu, context);
     const aligns = [["top", "textTop", "align-vertical-justify-start"], ["center", "textCenter", "align-vertical-justify-center"], ["bottom", "textBottom", "align-vertical-justify-end"]] as const;
     for (const [valign, label, icon] of aligns) {
       menu.addItem((entry) => entry
@@ -685,6 +686,21 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
         .setChecked((context.model.valign ?? "top") === valign)
         .onClick(() => {
           void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setValign(context.model, valign))]);
+        }));
+    }
+  }
+
+  // A narrow layout that stands alone sits on the left, in the middle or on the right.
+  if (placeable(context.model)) {
+    const places = [["left", "placeLeft", "align-start-vertical"], ["center", "placeCenter", "align-center-vertical"], ["right", "placeRight", "align-end-vertical"]] as const;
+    for (const [align, label, icon] of places) {
+      menu.addItem((entry) => entry
+        .setTitle(t(label))
+        .setIcon(icon)
+        .setSection("vml-place")
+        .setChecked((context.model.align ?? "left") === align)
+        .onClick(() => {
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setTextLayout(context.model, { align }))]);
         }));
     }
   }
@@ -724,6 +740,58 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   } else {
     menu.showAtPosition(at);
   }
+}
+
+/** Whether a layout stands alone and is narrower than the note, so its place across the note shows. */
+function placeable(model: LayoutModel): boolean {
+  return model.wrap === null && !hasTextColumns(model) && effectiveWidth(model) !== null;
+}
+
+/** Opens the settings of the layout's text: columns, alignment, size and the layout's place. */
+function addTextLayoutItem(menu: Menu, context: LayoutContext): void {
+  menu.addItem((entry) => entry.setTitle(t("textLayout")).setIcon("type").setSection("vml-text-layout").onClick(() => {
+    const options = { layout: textLayoutOf(context.model), columns: isTextOnly(context.model), placeable: placeable(context.model) };
+    new TextLayoutModal(context.app, options, (layout) => {
+      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setTextLayout(context.model, layout))]);
+    }).open();
+  }));
+}
+
+/** Floats the whole layout to one side with the note's text wrapping around it, or lets it stand alone. */
+function addWrapItems(menu: Menu, context: LayoutContext, left: MessageKey, right: MessageKey): void {
+  const wraps = [[null, "wrapNone", "square"], ["left", left, "panel-left"], ["right", right, "panel-right"]] as const;
+  for (const [side, label, icon] of wraps) {
+    menu.addItem((entry) => entry
+      .setTitle(t(label))
+      .setIcon(icon)
+      .setSection("vml-wrap")
+      .setChecked(context.model.wrap === side)
+      .onClick(() => {
+        void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWrap(context.model, side))]);
+      }));
+  }
+}
+
+/**
+ * The menu of a layout of text alone, on its frame and its text (a click on the text types in it):
+ * text wrapping, and taking the layout away while its text stays.
+ */
+function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
+  root.addEventListener("contextmenu", (event) => {
+    // The column's editor has a menu of its own.
+    if (event.target instanceof Element && event.target.closest(".vml-text-editor")) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    const menu = new Menu();
+    addWrapItems(menu, context, "textWrapLeft", "textWrapRight");
+    addTextLayoutItem(menu, context);
+    menu.addItem((entry) => entry.setTitle(t("unwrapText")).setIcon("log-out").setSection("vml-move").onClick(() => {
+      void commitEdits(context.app, context.sourcePath, [planUnwrap(context.block)]);
+    }));
+    menu.showAtMouseEvent(event);
+  });
 }
 
 function contentWidth(el: HTMLElement): number {

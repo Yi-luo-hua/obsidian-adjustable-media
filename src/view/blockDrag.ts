@@ -3,7 +3,7 @@ import { EditorView } from "@codemirror/view";
 
 import { MAX_WRAP_SKIP } from "../format/v2.ts";
 import { skipLines, wrapZone } from "../layout/geometry.ts";
-import { effectiveWidth, hasText, setWrap } from "../layout/model.ts";
+import { effectiveWidth, hasTextColumns, setWrap } from "../layout/model.ts";
 import { blockForMove, blockGaps, isSamePlace, pickGap, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
 import { createDragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, commitEdits, swallowNextClick, type LayoutContext } from "./interactions.ts";
@@ -78,7 +78,7 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
 
   const place = (): void => {
     const content = view.contentDOM.getBoundingClientRect();
-    const wrap = hasText(context.model) ? null : wrapZone(pointer.x, content.left, content.right);
+    const wrap = hasTextColumns(context.model) ? null : wrapZone(pointer.x, content.left, content.right);
     const tops: GapTop[] = gaps.map((line) => ({ line, top: lineTop(line) }));
     const gap = pickGap(tops, pointer.y, wrap !== null);
     if (!gap) {

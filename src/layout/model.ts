@@ -6,16 +6,27 @@ import {
   MAX_WRAP_SKIP,
   MAX_WRAP_WIDTH,
   MIN_BLOCK_WIDTH,
+  MAX_COLUMN_GAP,
+  MAX_TEXT_COLUMNS,
+  MAX_TEXT_SIZE,
   MIN_ROW_HEIGHT,
-  hasSideText,
+  MIN_TEXT_SIZE,
+  hasTextColumns as blockHasTextColumns,
+  readBlockAlign,
   readBlockSkip,
+  readBlockType,
   readBlockValign,
   readBlockWidth,
   readBlockWrap,
+  readColumnGap,
   readRowMeta,
+  readTextColumns,
+  readTextJustify,
+  readTextSize,
   type Align,
   type CaptionAlign,
   type TextAlign,
+  type TextJustify,
   type V2Block,
   type V2Embed,
   type V2Meta,
@@ -55,7 +66,7 @@ export interface LayoutRow {
 
 /** Text written in the block beside its media, drawn as Markdown. */
 export interface LayoutText {
-  /** The lines before the first row, shown left of the media. */
+  /** The lines before the first row, shown left of the media; in a layout without media, all of its text. */
   left: string | null;
   /** The lines after the last row, shown right of the media. */
   right: string | null;
@@ -64,18 +75,31 @@ export interface LayoutText {
 export interface LayoutModel {
   rows: LayoutRow[];
   /**
-   * The block's share of the container width, taken by its media; null means full width, or
-   * DEFAULT_WRAP_WIDTH with text beside the layout (wrapped, or written in the block).
+   * The block's share of the container width, taken by its media, or by its text in a layout without
+   * media; null means full width, or DEFAULT_WRAP_WIDTH with text beside the layout (wrapped, or
+   * written in the block beside its media).
    */
   width: number | null;
   /** The side the layout floats to, with the note's text wrapping around it; null means no wrapping. */
   wrap: WrapSide | null;
   /** How many lines below its place a wrapped layout starts; null starts it right there. */
   skip: number | null;
-  /** Text beside the media. A layout with text does not float. */
+  /** Text beside the media. A layout with text beside its media does not float; one with text and no media does. */
   text: LayoutText;
   /** How that text lines up with the media; null means at the top. */
   valign: TextAlign | null;
+  /** Whether all of the block is text, media lines included: a layout of text with figures in it. */
+  allText: boolean;
+  /** How the text of a layout without media flows: through this many columns; null means one. */
+  cols: number | null;
+  /** The space between those columns, in em; null means DEFAULT_COLUMN_GAP. */
+  gap: number | null;
+  /** How the lines of the layout's text line up across it; null means left. */
+  textAlign: Exclude<TextJustify, "left"> | null;
+  /** The size of the layout's text relative to the note's; null means the same. */
+  size: number | null;
+  /** Where a layout narrower than its container sits when it does not float; null means left. */
+  align: Exclude<Align, "left"> | null;
   extra: Record<string, unknown>;
 }
 
@@ -92,9 +116,9 @@ export type MoveTarget =
 const ALIGN_OFFSETS: ReadonlyArray<readonly [Align, number]> = [["left", 0], ["center", 0.5], ["right", 1]];
 
 export function modelFromBlock(block: V2Block): LayoutModel {
-  const { width, wrap, skip, valign, ...rest } = block.meta.extra;
+  const { width, wrap, skip, valign, type, cols, gap, textAlign, size, align, ...rest } = block.meta.extra;
   // A layout with text beside its media does not float; its wrap settings are kept as written.
-  const columns = hasSideText(block);
+  const columns = blockHasTextColumns(block);
   const extra = columns ? { ...definedOnly({ wrap, skip }), ...rest } : rest;
   return {
     rows: block.rows.map((row, rowIndex) => {
@@ -118,6 +142,12 @@ export function modelFromBlock(block: V2Block): LayoutModel {
     skip: columns ? null : readBlockSkip(skip),
     text: { left: markdownOf(block.leftText), right: markdownOf(block.rightText) },
     valign: readBlockValign(valign),
+    allText: readBlockType(type) !== null,
+    cols: readTextColumns(cols),
+    gap: readColumnGap(gap),
+    textAlign: readTextJustify(textAlign),
+    size: readTextSize(size),
+    align: readBlockAlign(align),
     extra,
   };
 }
@@ -126,9 +156,19 @@ function markdownOf(text: V2Text | null): string | null {
   return text === null ? null : text.lines.join("\n");
 }
 
-/** Whether the layout has text beside its media. */
+/** Whether the layout has text: beside its media, or on its own. */
 export function hasText(model: LayoutModel): boolean {
   return model.text.left !== null || model.text.right !== null;
+}
+
+/** Whether the layout is text alone, without media: one column that may float like media. */
+export function isTextOnly(model: LayoutModel): boolean {
+  return model.rows.length === 0 && hasText(model);
+}
+
+/** Whether the layout has text in columns beside its media. Such a layout does not float. */
+export function hasTextColumns(model: LayoutModel): boolean {
+  return model.rows.length > 0 && hasText(model);
 }
 
 export function metaFromModel(model: LayoutModel): V2Meta {
@@ -163,7 +203,13 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       ...(model.wrap === null ? {} : { wrap: model.wrap }),
       // Without wrapping, skip means nothing; without text beside the media, neither does valign.
       ...(model.wrap === null || model.skip === null ? {} : { skip: model.skip }),
-      ...(model.valign === null || !hasText(model) ? {} : { valign: model.valign }),
+      ...(model.valign === null || !hasTextColumns(model) ? {} : { valign: model.valign }),
+      ...(model.allText ? { type: "text" } : {}),
+      ...(model.cols === null ? {} : { cols: model.cols }),
+      ...(model.cols === null || model.gap === null ? {} : { gap: model.gap }),
+      ...(model.textAlign === null ? {} : { textAlign: model.textAlign }),
+      ...(model.size === null ? {} : { size: model.size }),
+      ...(model.align === null ? {} : { align: model.align }),
       ...model.extra,
     },
   };
@@ -326,9 +372,9 @@ export function effectiveWidth(model: LayoutModel): number | null {
   return model.width ?? (besideText(model) ? DEFAULT_WRAP_WIDTH : null);
 }
 
-/** Whether text sits beside the layout: the note's text around its float, or its own text. */
+/** Whether text sits beside the layout: the note's text around its float, or its own text beside its media. */
 function besideText(model: LayoutModel): boolean {
-  return model.wrap !== null || hasText(model);
+  return model.wrap !== null || hasTextColumns(model);
 }
 
 /**
@@ -338,7 +384,7 @@ function besideText(model: LayoutModel): boolean {
  * A layout with text beside its media does not float and stays as it is.
  */
 export function setWrap(model: LayoutModel, wrap: WrapSide | null): LayoutModel {
-  if (hasText(model)) {
+  if (hasTextColumns(model)) {
     return model;
   }
   if (wrap === null) {
@@ -361,7 +407,50 @@ export function setSkip(model: LayoutModel, skip: number): LayoutModel {
 /** Lines the text beside the media up with them: at the top (the default), in the middle or at the bottom. */
 export function setValign(model: LayoutModel, valign: TextAlign): LayoutModel {
   const next = valign === "top" ? null : valign;
-  return !hasText(model) || next === model.valign ? model : { ...model, valign: next };
+  return !hasTextColumns(model) || next === model.valign ? model : { ...model, valign: next };
+}
+
+/** The settings of a layout's text, as the text settings of a layout show them. */
+export interface TextLayout {
+  cols: number;
+  gap: number | null;
+  textAlign: TextJustify;
+  size: number;
+  align: Align;
+}
+
+/**
+ * Sets how a layout's text is laid out. Columns are for a layout of text alone; where a layout sits
+ * only matters when it does not float. Values out of range are brought into it; defaults are not stored.
+ */
+export function setTextLayout(model: LayoutModel, layout: Partial<TextLayout>): LayoutModel {
+  const next = { ...model };
+  if (layout.cols !== undefined && Number.isFinite(layout.cols) && isTextOnly(model)) {
+    const cols = Math.min(MAX_TEXT_COLUMNS, Math.max(1, Math.round(layout.cols)));
+    next.cols = cols === 1 ? null : cols;
+  }
+  if (layout.gap !== undefined) {
+    next.gap = layout.gap === null || !Number.isFinite(layout.gap) ? null : round(Math.min(MAX_COLUMN_GAP, Math.max(0, layout.gap)));
+  }
+  if (next.cols === null) {
+    next.gap = null;
+  }
+  if (layout.textAlign !== undefined) {
+    next.textAlign = layout.textAlign === "left" ? null : layout.textAlign;
+  }
+  if (layout.size !== undefined && Number.isFinite(layout.size)) {
+    const size = round(Math.min(MAX_TEXT_SIZE, Math.max(MIN_TEXT_SIZE, layout.size)));
+    next.size = size === 1 ? null : size;
+  }
+  if (layout.align !== undefined) {
+    next.align = layout.align === "left" ? null : layout.align;
+  }
+  return next;
+}
+
+/** The text settings of a layout, defaults filled in. */
+export function textLayoutOf(model: LayoutModel): TextLayout {
+  return { cols: model.cols ?? 1, gap: model.gap, textAlign: model.textAlign ?? "left", size: model.size ?? 1, align: model.align ?? "left" };
 }
 
 /**

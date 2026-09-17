@@ -1,7 +1,8 @@
 import { MarkdownRenderer, type App, type Component } from "obsidian";
 
-import { DEFAULT_ROW_HEIGHT, type TextSide } from "../format/v2.ts";
-import { effectiveWidth, hasText, rowOffset, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
+import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, type TextSide } from "../format/v2.ts";
+import { effectiveWidth, hasTextColumns, isTextOnly, rowOffset, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
+import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { resolveMedia } from "./media.ts";
 import { t } from "./messages.ts";
 
@@ -13,8 +14,10 @@ export interface LayoutViewOptions {
   rowIndices?: number[];
   editable: boolean;
   warning: string | null;
-  /** Owns what Obsidian draws for the text beside the media; without it that text is left out. */
+  /** Owns what Obsidian draws for the text beside the media; without it that text is left out, and captions are plain text. */
   component?: Component;
+  /** The note's numbered figures, tables and equations, for the layout's text and captions. */
+  refs?: RefContext;
 }
 
 interface MediaSize {
@@ -42,7 +45,8 @@ const mediaSizes = new Map<string, MediaSize>();
  * zero-width float that high, which leaves those lines their full width.
  *
  * Text written in the block goes in columns beside the media, drawn by Obsidian like the rest of
- * the note; the media keep the block's width in a column between them.
+ * the note; the media keep the block's width in a column between them. A layout without media is its
+ * text alone, at the block's width, and floats like media.
  */
 export function renderLayout(container: HTMLElement, options: LayoutViewOptions): HTMLElement {
   const { model } = options;
@@ -57,10 +61,22 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
   if (model.wrap !== null) {
     root.addClass("vml-layout--wrap", `vml-layout--wrap-${model.wrap}`);
   }
-  const columns = hasText(model);
+  const columns = hasTextColumns(model);
   root.toggleClass("vml-layout--columns", columns);
+  root.toggleClass("vml-layout--text-only", isTextOnly(model));
   if (columns && model.valign !== null) {
     root.addClass(`vml-layout--valign-${model.valign}`);
+  }
+  if (model.textAlign !== null) {
+    root.addClass(`vml-layout--text-${model.textAlign}`);
+  }
+  if (model.size !== null) {
+    root.addClass("vml-layout--text-sized");
+    root.setCssProps({ "--vml-text-size": String(model.size) });
+  }
+  if (isTextOnly(model) && model.cols !== null) {
+    root.addClass("vml-layout--multicol");
+    root.setCssProps({ "--vml-cols": String(model.cols), "--vml-gap": `${model.gap ?? DEFAULT_COLUMN_GAP}em` });
   }
   if (model.text.left !== null) {
     renderText(root, "left", model.text.left, options);
@@ -85,9 +101,18 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
 
 function renderText(root: HTMLElement, side: TextSide, markdown: string, options: LayoutViewOptions): void {
   const el = root.createDiv({ cls: `vml-layout__text vml-layout__text--${side} markdown-rendered`, attr: { "data-side": side } });
-  if (options.component) {
-    void MarkdownRenderer.render(options.app, markdown, el, options.sourcePath, options.component);
+  renderMarkdown(el, markdown, options);
+}
+
+/** Draws Markdown with its numbers into `el`, captions and figures marked; without a component, nothing. */
+function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOptions): boolean {
+  const { component } = options;
+  if (!component) {
+    return false;
   }
+  void MarkdownRenderer.render(options.app, numbered(markdown, options.refs), el, options.sourcePath, component)
+    .then(() => markCaptions(el, markdown));
+  return true;
 }
 
 /**
@@ -98,6 +123,10 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
   const width = effectiveWidth(model);
   root.toggleClass("vml-layout--sized", width !== null);
   root.setCssProps({ "--vml-block-width": width === null ? "" : `${width * 100}%` });
+  // A narrow layout that does not float sits on the left, in the middle or on the right.
+  for (const align of ["center", "right"] as const) {
+    root.toggleClass(`vml-layout--align-${align}`, width !== null && model.wrap === null && !hasTextColumns(model) && model.align === align);
+  }
 
   for (const rowEl of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) {
     const row = model.rows[Number(rowEl.dataset.row)];
@@ -174,11 +203,13 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
   }
 
   if (item.caption) {
-    itemEl.createDiv({
-      cls: "vml-item__caption",
-      attr: { "data-align": row.captionAlign ?? "left" },
-      text: item.caption,
-    });
+    // A caption is Markdown, drawn as such where the layout can own what Obsidian draws.
+    const captionEl = itemEl.createDiv({ cls: "vml-item__caption", attr: { "data-align": row.captionAlign ?? "left" } });
+    if (renderMarkdown(captionEl, item.caption, options)) {
+      captionEl.addClass("vml-item__caption--markdown");
+    } else {
+      captionEl.setText(item.caption);
+    }
   }
 }
 

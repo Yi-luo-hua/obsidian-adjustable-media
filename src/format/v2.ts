@@ -11,8 +11,9 @@ import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts"
  * and are matched to rows by position. The embeds themselves are never rewritten, only moved verbatim.
  *
  * Other lines are text shown beside the media, as ordinary Markdown: the lines before the first row
- * to its left, the lines after the last row to its right. Text between two rows, or text without
- * any row, makes the block invalid. See docs/DESIGN.md, section 1.
+ * to its left, the lines after the last row to its right. A block with text and no row is a text
+ * block: its text is one column (held as its left text). Text between two rows makes the block
+ * invalid. See docs/DESIGN.md, section 1.
  */
 
 export type MediaKind = "image" | "video";
@@ -23,6 +24,8 @@ export type CaptionAlign = "left" | "center";
 export type WrapSide = "left" | "right";
 /** How the text beside a layout's media lines up with them vertically. */
 export type TextAlign = "top" | "center" | "bottom";
+/** How the lines of a layout's text line up across it; left is the default. */
+export type TextJustify = "left" | "center" | "right" | "justify";
 export type V2RowMeta = Record<string, unknown>;
 
 export interface V2Meta {
@@ -68,13 +71,13 @@ export interface V2Block {
   /** Exact lines of the block (without \r), used to find and validate it before writing. */
   lines: string[];
   rows: V2Row[];
-  /** Text before the first row, shown left of the media. */
+  /** Text before the first row, shown left of the media; in a text block, all of its text. */
   leftText: V2Text | null;
   /** Text after the last row, shown right of the media. */
   rightText: V2Text | null;
   meta: V2Meta;
   metaError: string | null;
-  /** First body line out of place: text between two rows, or text without any row. Invalid blocks are left to Obsidian. */
+  /** First body line out of place: text between two rows. Invalid blocks are left to Obsidian. */
   invalidLine: number | null;
 }
 
@@ -100,6 +103,13 @@ export const DEFAULT_WRAP_WIDTH = 0.4;
 /** A wrapped layout leaves at least a fifth of the width to the text. */
 export const MAX_WRAP_WIDTH = 0.8;
 export const MAX_WRAP_SKIP = 40;
+export const MAX_TEXT_COLUMNS = 4;
+/** Space between text columns, in em. */
+export const DEFAULT_COLUMN_GAP = 2;
+export const MAX_COLUMN_GAP = 6;
+/** The size of a layout's text, relative to the note's. */
+export const MIN_TEXT_SIZE = 0.5;
+export const MAX_TEXT_SIZE = 2;
 
 export const IMAGE_EXTENSIONS = new Set(["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]);
 const VIDEO_EXTENSIONS = new Set(["mkv", "mov", "mp4", "ogv", "webm"]);
@@ -121,8 +131,11 @@ export function findV2Blocks(
   for (let index = 0; index < lines.length; index += 1) {
     const line = stripCarriageReturn(lines[index] ?? "");
     if (contexts[index] !== "text") {
-      // Code, comments or math inside a block make it a different construct; drop it.
-      open = null;
+      // Code, math and comments inside a block are text of the block; the block still ends on a
+      // line of plain text, so one that never leaves them never closes. Frontmatter is no text.
+      if (contexts[index] === "frontmatter") {
+        open = null;
+      }
       continue;
     }
 
@@ -133,7 +146,7 @@ export function findV2Blocks(
     }
 
     if (open && CLOSE_PATTERN.test(line)) {
-      blocks.push(buildBlock(lines, open.line, index, open.metaText));
+      blocks.push(buildBlock(lines, contexts, open.line, index, open.metaText));
       open = null;
     }
   }
@@ -245,6 +258,39 @@ export function readBlockValign(value: unknown): TextAlign | null {
   return value === "center" || value === "bottom" ? value : null;
 }
 
+/** Whether a block is all text, media lines included (top-level `type`). */
+export function readBlockType(value: unknown): "text" | null {
+  return value === "text" ? value : null;
+}
+
+/** How many columns a text block's text flows through (top-level `cols`); null when unset, invalid or 1. */
+export function readTextColumns(value: unknown): number | null {
+  const cols = finiteNumber(value);
+  return cols !== null && Number.isInteger(cols) && cols >= 2 && cols <= MAX_TEXT_COLUMNS ? cols : null;
+}
+
+/** The space between text columns in em (top-level `gap`); null when unset or invalid. */
+export function readColumnGap(value: unknown): number | null {
+  const gap = finiteNumber(value);
+  return gap !== null && gap >= 0 && gap <= MAX_COLUMN_GAP ? gap : null;
+}
+
+/** How a layout's text lines up across it (top-level `textAlign`); null when unset, invalid or left. */
+export function readTextJustify(value: unknown): Exclude<TextJustify, "left"> | null {
+  return value === "center" || value === "right" || value === "justify" ? value : null;
+}
+
+/** The size of a layout's text relative to the note's (top-level `size`); null when unset, invalid or 1. */
+export function readTextSize(value: unknown): number | null {
+  const size = finiteNumber(value);
+  return size !== null && size >= MIN_TEXT_SIZE && size <= MAX_TEXT_SIZE && size !== 1 ? size : null;
+}
+
+/** Where a layout narrower than its container and not floating sits (top-level `align`); null when unset, invalid or left. */
+export function readBlockAlign(value: unknown): Exclude<Align, "left"> | null {
+  return value === "center" || value === "right" ? value : null;
+}
+
 /** Writes the opening comment. Settings are omitted entirely when there are none, to keep the line short. */
 export function serializeOpener(meta: V2Meta): string {
   const rows = trimTrailingEmptyRows(meta.rows.map(withoutUndefined));
@@ -290,10 +336,14 @@ export function isRemoteTarget(target: string): boolean {
 
 function buildBlock(
   lines: readonly string[],
+  contexts: readonly LineContext[],
   openLine: number,
   closeLine: number,
   metaText: string | undefined,
 ): V2Block {
+  const { meta, error } = parseMeta(metaText);
+  // A block of text holds no rows: its media lines are text too.
+  const allText = error === null && readBlockType(meta.extra.type) !== null;
   const rows: V2Row[] = [];
   const left: number[] = [];
   const right: number[] = [];
@@ -305,7 +355,8 @@ function buildBlock(
       continue;
     }
 
-    const embeds = readEmbedRow(text, line);
+    // Code, math and comments are text, whatever they hold.
+    const embeds = contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
     } else if (right.length > 0) {
@@ -315,12 +366,7 @@ function buildBlock(
       rows.push({ line, embeds });
     }
   }
-  // Text alone is not a layout.
-  if (rows.length === 0 && left.length > 0) {
-    invalidLine ??= left[0] ?? null;
-  }
 
-  const { meta, error } = parseMeta(metaText);
   return {
     openLine,
     closeLine,
@@ -348,9 +394,24 @@ export function hasSideText(block: V2Block): boolean {
   return block.leftText !== null || block.rightText !== null;
 }
 
+/** Whether a block holds text and no media: its text is one column, which may float like media. */
+export function isTextBlock(block: V2Block): boolean {
+  return block.rows.length === 0 && block.leftText !== null;
+}
+
+/** Whether a block has text in columns beside its media. */
+export function hasTextColumns(block: V2Block): boolean {
+  return block.rows.length > 0 && hasSideText(block);
+}
+
+/** Whether the plugin draws a block: it is valid and has media or text. */
+export function isDrawable(block: V2Block): boolean {
+  return block.invalidLine === null && (block.rows.length > 0 || isTextBlock(block));
+}
+
 /** The side a block floats to. A block with text beside its media does not float. */
 export function blockWrap(block: V2Block): WrapSide | null {
-  return block.metaError === null && !hasSideText(block) ? readBlockWrap(block.meta.extra.wrap) : null;
+  return block.metaError === null && !hasTextColumns(block) ? readBlockWrap(block.meta.extra.wrap) : null;
 }
 
 /** Returns the embeds of a row, or null when the line holds anything but media embeds. */
