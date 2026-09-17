@@ -2,7 +2,7 @@
 
 ## Do my notes still work if I remove the plugin?
 
-Yes. A layout stores ordinary image and video embeds; its settings live in an HTML comment. Without the plugin the images display as usual. Reading view hides the comments, while live preview shows them as a faint line. To remove the comments too, run "Remove layout comments from all notes" before uninstalling.
+Yes. A layout stores ordinary image and video embeds and any text you put in it; its settings live in an HTML comment. Without the plugin the images display as usual and the text stays the ordinary Markdown it is. Reading view hides the comments, while live preview shows them as a faint line. To remove the comments too, run "Remove layout comments from all notes" before uninstalling.
 
 ## Why an HTML comment instead of a code block?
 
@@ -13,8 +13,8 @@ Obsidian doesn't read the inside of code blocks. Image paths stored there are no
 Yes. Keep in mind:
 
 - The opening `<!-- vml … -->` and closing `<!-- /vml -->` comments each sit on their own line, at the start of the line.
-- Every line between them may only contain image or video embeds, with or without spaces between them. A layout that also contains text is left alone and displays as normal Markdown.
-- Settings are matched to rows by position. If you reorder embeds by hand, column widths and captions may no longer line up; set them again.
+- A line between them that holds only image or video embeds, with or without spaces between them, is a row of media. Any other line is text: text before the first media row shows in a column on its left, text after the last media row in a column on its right, and a block with text and no media is a text box drawn as one column. Code, math and comments count as text too. Text between two media rows makes the block invalid, so it is left alone and displays as normal Markdown.
+- Settings are matched to media rows by position; text lines don't count. If you reorder embeds by hand, column widths and captions may no longer line up; set them again.
 
 ## Can I put a layout inside a callout, a quote or a list?
 
