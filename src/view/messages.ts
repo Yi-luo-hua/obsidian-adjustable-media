@@ -48,6 +48,74 @@ const MESSAGES = {
     zh: "图片靠右，文字环绕",
     en: "Float right, wrap text",
   },
+  textWrapLeft: {
+    zh: "文字块靠左，正文环绕",
+    en: "Float text box left, wrap text",
+  },
+  textWrapRight: {
+    zh: "文字块靠右，正文环绕",
+    en: "Float text box right, wrap text",
+  },
+  textLayout: {
+    zh: "文字设置…",
+    en: "Text settings…",
+  },
+  textLayoutTitle: {
+    zh: "文字设置",
+    en: "Text settings",
+  },
+  textColumns: {
+    zh: "分栏数",
+    en: "Columns",
+  },
+  textColumnGap: {
+    zh: "栏间距（em）",
+    en: "Space between columns (em)",
+  },
+  textJustify: {
+    zh: "文字对齐",
+    en: "Text alignment",
+  },
+  justifyLeft: {
+    zh: "左对齐",
+    en: "Left",
+  },
+  justifyCenter: {
+    zh: "居中",
+    en: "Center",
+  },
+  justifyRight: {
+    zh: "右对齐",
+    en: "Right",
+  },
+  justifyBoth: {
+    zh: "两端对齐",
+    en: "Justify",
+  },
+  textSize: {
+    zh: "字号（相对正文）",
+    en: "Text size (relative to the note)",
+  },
+  blockPlace: {
+    zh: "布局块位置（不环绕时）",
+    en: "Layout position (when not floating)",
+  },
+  placeLeft: {
+    zh: "布局块靠左",
+    en: "Layout on the left",
+  },
+  placeCenter: {
+    zh: "布局块居中",
+    en: "Layout in the middle",
+  },
+  placeRight: {
+    zh: "布局块靠右",
+    en: "Layout on the right",
+  },
+  unwrapText: {
+    zh: "取消文字块，保留文字",
+    en: "Remove text box, keep its text",
+  },
   moveLayout: {
     zh: "拖动以移动布局块",
     en: "Drag to move the layout",
@@ -77,8 +145,8 @@ const MESSAGES = {
     en: "Text at the bottom",
   },
   textNotSaved: {
-    zh: "这样写会改变布局块本身（例如只有图片的一行、代码围栏或布局注释），暂不保存。",
-    en: "This would change the layout block itself (a line of media embeds only, a code fence or a layout comment), so it is not saved.",
+    zh: "这样写会改变布局块本身（例如只有图片的一行、代码围栏、布局注释，或者清空了文字块），暂不保存。",
+    en: "This would change the layout block itself (a line of media embeds only, a code fence, a layout comment, or an emptied text box), so it is not saved.",
   },
   linkSuggestEmpty: {
     zh: "未找到匹配结果",
@@ -184,9 +252,21 @@ const MESSAGES = {
     zh: "开启后，拖入或粘贴图片、视频时，新插入的那几行会自动包成布局块；紧跟在已有布局块后面时并入那个块。只处理新插入的行，不会改动笔记的其他内容。",
     en: "When on, media you drop or paste is wrapped in a layout block, or joins the layout block right above it. Only the newly inserted lines are touched.",
   },
+  settingRefLanguage: {
+    zh: "图表编号的语言",
+    en: "Language of figure and table numbers",
+  },
+  settingRefLanguageDesc: {
+    zh: "图注、表注和引用（@fig:名字、@tbl:名字、@eq:名字）显示成“图 1”还是“Figure 1”。改动后重新打开笔记生效。",
+    en: "Whether captions and references (@fig:name, @tbl:name, @eq:name) read \u201cFigure 1\u201d or \u201c图 1\u201d. Takes effect when a note is opened again.",
+  },
+  refLanguageAuto: {
+    zh: "跟随 Obsidian",
+    en: "Same as Obsidian",
+  },
   cmdWrap: {
-    zh: "把选中的图片、视频包成布局块",
-    en: "Wrap selected media in a layout",
+    zh: "把选中的内容包成布局块",
+    en: "Wrap selection in a layout",
   },
   cmdMerge: {
     zh: "与下一个布局块合并",
@@ -201,8 +281,8 @@ const MESSAGES = {
     en: "Remove layout comments from all notes…",
   },
   wrapNothing: {
-    zh: "选中的内容里只能有图片或视频嵌入，而且不能已经在布局块里。",
-    en: "The selection must contain only image or video embeds that are not already in a layout.",
+    zh: "选中的内容不能包成布局块：它已经在布局块里，含有代码、公式或注释，或者文字夹在两行图片之间。",
+    en: "The selection cannot be wrapped: it is already in a layout, holds code, math or comments, or has text between two rows of media.",
   },
   mergeNothing: {
     zh: "光标所在的布局块后面没有紧挨着的布局块，或者其中一个块不能编辑、带有文字。",

@@ -19,6 +19,9 @@ Version **0.3.0** includes text wrapping, movable layouts and editable text colu
 - **Free Single-Image Placement**: Slide a single image left or right across its row, with smooth magnetic snapping to left, center, and right.
 - **Text Wrap, like LaTeX's `wrapfigure`**: Float a layout to the left or right and let the note's own paragraphs, lists, quotes, headings and code flow around it, then continue at full width below it. The text beside it is ordinary note text: type right next to the image and it reflows as you go.
 - **Text Beside Images, like Side-by-Side Minipages**: Write text in a layout block before its media for a column on their left, after them for a column on their right, or both. It is ordinary Markdown (headings, lists, quotes, links), and the media keep the layout's width in the middle. The text lines up with the media at the top, in the middle or at the bottom. In Live Preview, click the text to edit it right in the layout, where it keeps the look of Live Preview (headings, bold text, bullets, task boxes, links, rendered math and images, wrapped list items lined up under their text) and the keys work as in the note: <kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, brackets pair up, typing `[[` suggests links, and Obsidian's formatting, link, list, task and heading commands work on the hotkeys you gave them (<kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>I</kbd>, <kbd>Ctrl</kbd>+<kbd>K</kbd> and <kbd>Ctrl</kbd>+<kbd>L</kbd> by default). Or right-click an image and choose **Add text on the left** or **Add text on the right** to start one.
+- **Two-Column Text and Paper Drafts**: A text box can flow its text through 2–4 columns that balance themselves, like `multicols`, with its own column gap, alignment (including justified) and text size, and a narrow box can sit in the middle (right-click the box and choose **Text settings…**). Code, math and figures go inside the text, so a whole paper section can be one box.
+- **Numbered Figures, Tables and Equations**: End a caption with `{#fig:name}` or `{#tbl:name}`, put `\label{eq:name}` in an equation, and write `@fig:name`, `@tbl:name` or `@eq:name` in the text. Captions start with "Figure 1.", equations get their number, and references read "Figure 1" and jump to their target when clicked. The syntax is pandoc-crossref's, so the draft converts to LaTeX as it is. Choose English or Chinese numbers in the settings.
+- **Text Boxes**: A layout block can hold text alone, without media. It is drawn as one column of Markdown at the layout's width and can float left or right like an image, with the note's text wrapping around it: a sidebar or margin note. Select some lines and run the wrap command to make one; click the text to edit it, drag the frame's edge to set its width, and right-click it to float it or to remove the box and keep its text.
 - **Move Whole Layouts**: Drag the grip on top of a layout's frame to move the whole block. Drop it in the middle of the text to place it between paragraphs, or in the left or right third to float it there, starting at the line you point at.
 - **Flexible Drag-and-Drop Reordering**: Drag an item to reorder within a row, drop between rows to start a new row, or drag loose images from your note directly into an existing layout block.
 - **Double-Click Image Viewer**: In editing mode, double-click any image in a layout block to inspect it up close; supports mouse wheel zoom, click-and-drag panning, and left/right arrow keys to switch between images in the block.
@@ -44,7 +47,7 @@ Version **0.3.0** includes text wrapping, movable layouts and editable text colu
 ### 1. Create a Layout Block
 
 - **Right-Click Menu**: In Live Preview, right-click any image or video and choose **Wrap in a layout block**.
-- **Command / Hotkey**: Select one or more lines of media embeds and run `Adjustable Media: Wrap selected media in a layout block` (assign a dedicated hotkey in Settings → Hotkeys).
+- **Command / Hotkey**: Select one or more lines and run `Adjustable Media: Wrap selection in a layout` (assign a dedicated hotkey in Settings → Hotkeys). Lines of media embeds are gathered into rows; lines with text are wrapped as they are, making a text box, or text columns beside the media.
 - **Drag & Drop**: When a layout block already exists in your note, drag standalone images from the note directly into it.
 
 ### 2. Common Interactions
@@ -128,7 +131,7 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 
 - Layout blocks must start at the beginning of a line (not nested inside quotes, callouts, or lists).
 - Reading View only shows layout blocks; change them in Live Preview.
-- Text inside a layout block goes before its first row of media (left column) or after its last row (right column). Text between two rows, or a block without media, is left untouched and renders as normal Markdown. A layout with text beside its media does not wrap the note's text.
+- Text inside a layout block goes before its first row of media (left column) or after its last row (right column). A block with text and no media is a text box. Text between two rows is left untouched and renders as normal Markdown. A layout with text beside its media does not wrap the note's text.
 - No telemetry or analytics. Local media work offline; remote media embedded in a note still load from their source URLs.
 
 ---

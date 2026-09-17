@@ -9,6 +9,9 @@ data.json
 
 .DS_Store
 
+# WorkBuddy session data (memory logs and workspace state).
+.workbuddy/
+
 *.log
 npm-debug.log*
 

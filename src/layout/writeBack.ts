@@ -1,6 +1,7 @@
 import { MarkdownView, type App, type Editor, type TFile } from "obsidian";
+import type { EditorView } from "@codemirror/view";
 
-import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure } from "./edits.ts";
+import { applyEditsToEditor, applyEditsToText, planOffsetChanges, type BlockEdit, type EditFailure } from "./edits.ts";
 
 export type WriteResult = { ok: true } | EditFailure;
 
@@ -17,11 +18,26 @@ export type WriteResult = { ok: true } | EditFailure;
  * writes the file, and Obsidian reloads the view from it.
  *
  * `editor`, when given, is the editor the change is made in: text typed right in a layout goes into
- * the editor it is typed in, also when the note is open in several panes.
+ * the editor it is typed in, also when the note is open in several panes. Such text goes in as typing
+ * does, through that editor's CodeMirror view, `typed`: Obsidian's editor transaction would scroll the
+ * note to its own cursor, which may be far from the layout, and the layout would leave the view.
  */
-export async function writeBlockEdits(app: App, file: TFile, edits: readonly BlockEdit[], editor?: Editor): Promise<WriteResult> {
+export async function writeBlockEdits(
+  app: App,
+  file: TFile,
+  edits: readonly BlockEdit[],
+  editor?: Editor,
+  typed?: EditorView,
+): Promise<WriteResult> {
   if (edits.length === 0) {
     return { ok: true };
+  }
+  if (typed) {
+    const planned = planOffsetChanges(typed.state.doc.toString(), edits);
+    if (planned.ok) {
+      typed.dispatch({ changes: planned.changes, userEvent: "input.type" });
+    }
+    return planned.ok ? { ok: true } : planned;
   }
   if (editor) {
     return applyEditsToEditor(editor, edits);

@@ -1,8 +1,9 @@
-import type { EditorChangeLike, EditorLike } from "../editor/editorLike.ts";
+import type { EditorChangeLike, EditorLike, EditorPosition } from "../editor/editorLike.ts";
 import {
   CLOSE_LINE,
   findV2Blocks,
   hasSideText,
+  isTextBlock,
   serializeBlock,
   serializeOpener,
   type TextSide,
@@ -51,7 +52,7 @@ export type ResolveResult = { ok: true; changes: LineChange[] } | EditFailure;
 
 /**
  * Only blocks that were read completely may be rewritten. With unreadable settings (a typo, or a
- * newer format version) or text out of place in the body (between two rows, or without any), a
+ * newer format version) or text out of place in the body (between two rows), a
  * rewrite would silently drop what we could not read, so such blocks are displayed but never
  * written to (docs/DESIGN.md, section 1.3).
  */
@@ -62,7 +63,8 @@ export function isEditable(block: V2Block): boolean {
 /**
  * Plans the edit for a changed model. A settings-only change rewrites just the opening comment and
  * keeps the body as the user wrote it; moving embeds rewrites the rows, and the text beside them
- * stays exactly as written; an empty model removes the block, leaving only its text.
+ * stays exactly as written; a model that lost its last embed removes the block, leaving only its
+ * text. A text block has no embeds to begin with: only its settings change.
  * Returns null when there is nothing to write or the block is not editable.
  */
 export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | null {
@@ -71,7 +73,7 @@ export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | n
   }
   const embeds = rowEmbeds(model);
   const lastLine = block.lines.length - 1;
-  if (embeds.length === 0) {
+  if (embeds.length === 0 && block.rows.length > 0) {
     return anchored(block, 0, lastLine, textLines(block));
   }
 
@@ -105,29 +107,39 @@ export interface ColumnTextPlan {
  * Puts `text`, typed in the layout itself, on one side of the media (docs/DESIGN.md, section 3).
  * Only that side's own lines change: from its first line to its last, or, on a side without text
  * yet, new lines at the top of the body (left) or at its bottom (right). Blank lines around the
- * text are left out, and no text at all takes the side's lines out. The block must read back with
+ * text are left out, and no text at all takes the side's lines out, except in a text block: its one
+ * column, the left one, is never emptied, or the block would be no layout at all. The block must read back with
  * its opening comment, rows and other side as they were and this text on the side: a line of media
  * embeds, a code fence or a layout comment would change what the block is, so such text does not
  * fit and nothing is written.
  */
 export function planColumnText(block: V2Block, side: TextSide, text: string): ColumnTextPlan {
-  if (!isEditable(block) || block.rows.length === 0) {
+  const textBlock = isTextBlock(block);
+  if (!isEditable(block) || (block.rows.length === 0 && !(textBlock && side === "left"))) {
     return { fits: false, edit: null };
   }
   const lines = withoutBlankEdges(text.split("\n"));
   if (sameLines(lines, textOf(block, side))) {
     return { fits: true, edit: null };
   }
+  if (textBlock && lines.length === 0) {
+    return { fits: false, edit: null };
+  }
 
   const part = side === "left" ? block.leftText : block.rightText;
+  const closeLine = block.lines.length - 1;
+  // Text right above the closing comment keeps a list from taking the comment in (keepListOpen).
+  const last = side === "right" || textBlock;
   let edit: BlockEdit;
   if (part) {
-    edit = anchored(block, part.from - block.openLine, part.to - block.openLine, lines);
+    const end = part.to - block.openLine;
+    const written = last && end + 1 === closeLine ? keepListOpen(lines) : lines;
+    edit = anchored(block, part.from - block.openLine, end, written);
   } else {
     // The comment next to the new lines is written back exactly as it was.
-    const edge = side === "left" ? 0 : block.lines.length - 1;
+    const edge = side === "left" ? 0 : closeLine;
     const comment = block.lines[edge] ?? "";
-    edit = anchored(block, edge, edge, side === "left" ? [comment, ...lines] : [...lines, comment]);
+    edit = anchored(block, edge, edge, side === "left" ? [comment, ...lines] : [...keepListOpen(lines), comment]);
   }
 
   const after = [...block.lines];
@@ -160,9 +172,26 @@ export function planUnwrap(block: V2Block): BlockEdit {
   return anchored(block, 0, block.lines.length - 1, block.lines.slice(1, -1));
 }
 
-/** Wraps embed lines in a layout block with no settings. */
-export function wrapLines(lines: readonly string[]): string[] {
-  return [serializeOpener({ rows: [], extra: {} }), ...lines, CLOSE_LINE];
+/** Wraps lines in a layout block, with no settings unless given. */
+export function wrapLines(lines: readonly string[], meta: V2Meta = { rows: [], extra: {} }): string[] {
+  return [serializeOpener(meta), ...keepListOpen(lines), CLOSE_LINE];
+}
+
+const LIST_ITEM = /^[ \t]*(?:[-*+]|\d{1,9}[.)])(?:[ \t]|$)/;
+
+/**
+ * The lines that go right above a closing comment. Obsidian's reading view reads a closing comment
+ * right after a list as part of the list's last item, and the text after the block along with it
+ * (docs/DESIGN.md, section 4.2), so text ending in a list gets a blank line after it; blank lines in
+ * a block are ignored.
+ */
+export function keepListOpen(lines: readonly string[]): string[] {
+  let start = lines.length;
+  while (start > 0 && (lines[start - 1] ?? "").trim() !== "") {
+    start -= 1;
+  }
+  const endsInList = start < lines.length && lines.slice(start).some((line) => LIST_ITEM.test(line));
+  return endsInList ? [...lines, ""] : [...lines];
 }
 
 export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit[]): ResolveResult {
@@ -243,6 +272,34 @@ export function applyEditsToEditor(editor: EditorLike, edits: readonly BlockEdit
 
   editor.transaction({ changes: resolved.changes.map((change) => toEditorChange(lines, change)) });
   return { ok: true };
+}
+
+/** A change to text by character offsets, as CodeMirror takes it. */
+export interface OffsetChange {
+  from: number;
+  to: number;
+  insert: string;
+}
+
+/** Plans edits on `text` as changes by character offsets, all relative to `text`, or fails as a whole. */
+export function planOffsetChanges(text: string, edits: readonly BlockEdit[]): { ok: true; changes: OffsetChange[] } | EditFailure {
+  const lines = text.split("\n");
+  const resolved = resolveEdits(lines, edits);
+  if (!resolved.ok) {
+    return resolved;
+  }
+  const starts: number[] = [];
+  let offset = 0;
+  for (const line of lines) {
+    starts.push(offset);
+    offset += line.length + 1;
+  }
+  const at = (position: EditorPosition): number => (starts[position.line] ?? text.length) + position.ch;
+  const changes = resolved.changes.map((change) => {
+    const editorChange = toEditorChange(lines, change);
+    return { from: at(editorChange.from), to: at(editorChange.to ?? editorChange.from), insert: editorChange.text };
+  });
+  return { ok: true, changes: changes.sort((a, b) => a.from - b.from) };
 }
 
 function toEditorChange(lines: readonly string[], change: LineChange): EditorChangeLike {

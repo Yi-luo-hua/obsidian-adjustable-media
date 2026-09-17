@@ -143,7 +143,7 @@ test("text typed in the layout replaces only its side's lines, and only when the
   const found = block(note);
   const typed = planColumnText(found, "right", "改过的右侧文字\n\n- 列表\n- 新的一项\n");
   assert.equal(typed.fits, true);
-  assert.deepEqual(apply(note, [typed.edit]), [...note.slice(0, 10), "改过的右侧文字", "", "- 列表", "- 新的一项", ...note.slice(13)]);
+  assert.deepEqual(apply(note, [typed.edit]), [...note.slice(0, 10), "改过的右侧文字", "", "- 列表", "- 新的一项", "", ...note.slice(13)]);
   // The same text, blank lines around it aside, writes nothing.
   assert.deepEqual(planColumnText(found, "left", "\n## 左侧标题\n\n左侧第一段，\n第二行。  \n\n"), { fits: true, edit: null });
 

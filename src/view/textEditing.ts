@@ -43,7 +43,7 @@ interface Point {
 }
 
 /** The size of the pieces of drawn text looked up in the source to place the caret, longest first. */
-const CARET_CLUES = [8, 5, 3];
+const CARET_CLUES = [32, 16, 8, 5, 3];
 
 const sessions = new WeakMap<HTMLElement, TextEditSession>();
 
@@ -162,11 +162,14 @@ class TextEditSession {
     this.pushScope();
   }
 
-  /** Whether `block`, the layout's block after a change to the note, holds just the typed text: then the layout stays. */
+  /**
+   * Whether `block`, the layout's block after a change to the note, holds just the typed text: then the
+   * layout stays. CodeMirror also offers the element to the widgets of other blocks, which it may not
+   * take; the typing goes on, and ends only if the element goes away (stopTextEdit).
+   */
   accepts(block: V2Block): boolean {
     const text = this.writing ?? this.editor.state.doc.toString();
     if (this.ended || blockWrap(block) !== blockWrap(this.block) || !onlyColumnTextDiffers(this.block, block, this.side, text.split("\n"))) {
-      this.abort();
       return false;
     }
     this.block = block;
@@ -221,7 +224,7 @@ class TextEditSession {
       return;
     }
     this.writing = text;
-    void commitEdits(this.host.app, this.host.sourcePath, [plan.edit], this.host.editor).then((written) => {
+    void commitEdits(this.host.app, this.host.sourcePath, [plan.edit], this.host.editor, this.host.view).then((written) => {
       // The note changed elsewhere in the meantime: draw what it holds now.
       if (!written && !this.ended) {
         this.finish();
@@ -281,12 +284,28 @@ function caretInSource(column: HTMLElement, point: Point, source: string): numbe
   if (before === "") {
     return 0;
   }
+  // The drawn text has no line breaks and collapses spaces: both sides are compared without whitespace.
+  const { text: compact, offsets } = withoutWhitespace(source);
   for (const size of CARET_CLUES) {
     const clue = before.slice(-size);
-    const at = source.indexOf(clue);
-    if (clue.length === Math.min(size, before.length) && at >= 0 && source.indexOf(clue, at + 1) < 0) {
-      return at + clue.length;
+    const at = compact.indexOf(clue);
+    if (clue.length === Math.min(size, before.length) && at >= 0 && compact.indexOf(clue, at + 1) < 0) {
+      return (offsets[at + clue.length - 1] ?? source.length - 1) + 1;
     }
   }
   return source.length;
+}
+
+/** `source` without whitespace, and where each of its characters is in `source`. */
+function withoutWhitespace(source: string): { text: string; offsets: number[] } {
+  let text = "";
+  const offsets: number[] = [];
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index] ?? "";
+    if (!/\s/.test(char)) {
+      text += char;
+      offsets.push(index);
+    }
+  }
+  return { text, offsets };
 }

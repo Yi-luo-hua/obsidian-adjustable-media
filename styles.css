@@ -35,6 +35,107 @@
   position: relative;
 }
 
+/* A narrow layout that does not float sits in the middle or on the right. */
+.vml-layout.vml-layout--align-center,
+.vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout.vml-layout--align-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.vml-layout.vml-layout--align-right,
+.vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout.vml-layout--align-right {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* The text of a layout without media flows through columns, balanced as far as they go. */
+.vml-layout--multicol > .vml-layout__text {
+  column-count: var(--vml-cols, 2);
+  column-gap: var(--vml-gap, 2em);
+}
+
+/*
+ * As in LaTeX, a heading stays with the text after it, and a figure, table, equation or caption is not
+ * split between two columns, nor a caption parted from what it describes (markCaptions).
+ */
+.vml-layout--multicol > .vml-layout__text :is(h1, h2, h3, h4, h5, h6) {
+  break-after: avoid;
+}
+
+.vml-layout--multicol > .vml-layout__text :is(.vml-figure, .vml-caption, table, .math-block, pre, .callout) {
+  break-inside: avoid;
+}
+
+.vml-layout--multicol > .vml-layout__text .vml-keep-with-next {
+  break-after: avoid;
+}
+
+/* The text's editor is one column: CodeMirror does not measure text laid out in columns. */
+.vml-layout--multicol > .vml-layout__text--editing {
+  column-count: 1;
+}
+
+.vml-layout--text-center > .vml-layout__text {
+  text-align: center;
+}
+
+.vml-layout--text-right > .vml-layout__text {
+  text-align: right;
+}
+
+.vml-layout--text-justify > .vml-layout__text {
+  text-align: justify;
+}
+
+.vml-layout--text-sized > .vml-layout__text {
+  font-size: calc(var(--vml-text-size, 1) * 1em);
+}
+
+/* Numbered captions and references to them (crossrefView.ts). */
+.vml-caption {
+  font-size: 0.9em;
+}
+
+.vml-caption-label {
+  font-weight: var(--font-semibold);
+}
+
+.vml-ref {
+  color: var(--link-color);
+  cursor: pointer;
+}
+
+.vml-ref:hover {
+  text-decoration: underline;
+}
+
+.vml-ref.is-unresolved {
+  color: var(--text-error);
+  cursor: default;
+  text-decoration: none;
+}
+
+/* A caption drawn as Markdown takes no paragraph spacing. */
+.vml-item__caption--markdown {
+  white-space: normal;
+}
+
+.vml-item__caption--markdown > :first-child {
+  margin-top: 0;
+}
+
+.vml-item__caption--markdown > :last-child {
+  margin-bottom: 0;
+}
+
+/* A blank line between two floating layouts takes no room while the cursor is elsewhere. */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-float-gap {
+  height: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
 /* In live preview the editor's pre-wrap would turn the line breaks between Obsidian's elements into blank lines. */
 .vml-layout__text {
   flex: 1 1 0;

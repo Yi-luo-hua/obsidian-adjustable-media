@@ -2,6 +2,7 @@ import { Plugin } from "obsidian";
 
 import { registerCommands } from "./src/commands/register";
 import { autoConvert } from "./src/input/autoConvert";
+import { crossrefExtension, registerCrossrefs, setRefLanguage } from "./src/view/crossrefView";
 import { DEFAULT_SETTINGS, VmlSettingTab, readSettings, type VmlSettings } from "./src/settings";
 import { registerImageMenu } from "./src/view/imageMenu";
 import { livePreviewExtension } from "./src/view/livePreview";
@@ -14,10 +15,13 @@ export default class AdjustableMediaPlugin extends Plugin {
   override async onload(): Promise<void> {
     this.settings = readSettings(await this.loadData());
     this.addSettingTab(new VmlSettingTab(this.app, this));
+    setRefLanguage(() => this.settings.refLanguage);
 
     registerReadingView(this);
+    registerCrossrefs(this);
     this.registerEditorExtension([
       livePreviewExtension(this.app),
+      crossrefExtension(),
       plainImageDrag(this.app),
       autoConvert(this, () => this.settings.autoConvert),
     ]);

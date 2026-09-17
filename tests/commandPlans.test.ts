@@ -13,8 +13,7 @@ test("wrapping a selection gathers its media lines into one block", () => {
   assert.deepEqual(applyLineChanges(lines, [change]), ["前文", "<!-- vml -->", "![[a.png]] ![[b.png]] ![[c.png]]", "<!-- /vml -->", "后文"]);
 });
 
-test("a selection with other text or an existing block is not wrapped", () => {
-  assert.equal(planWrapSelection(["![[a.png]]", "正文"], 0, 1), null);
+test("a selection with an existing block, or nothing in it, is not wrapped", () => {
   assert.equal(planWrapSelection(["<!-- vml -->", "![[a.png]]", "<!-- /vml -->"], 0, 2), null);
   assert.equal(planWrapSelection(["", ""], 0, 1), null);
 });

@@ -43,13 +43,24 @@ function block(lines: string[], index = 0): V2Block {
 test("finds blocks only at column 0 and outside code", () => {
   assert.deepEqual(
     findV2Blocks(doc).map((found) => [found.openLine, found.closeLine, found.invalidLine]),
-    [[0, 3, null], [7, 9, 8], [11, 13, null]],
+    [[0, 3, null], [7, 9, null], [11, 13, null]],
   );
 });
 
-test("a code fence or comment inside a block drops it", () => {
-  assert.deepEqual(findV2Blocks(["<!-- vml -->", "```", "![[a.png]]", "```", "<!-- /vml -->"]), []);
-  assert.deepEqual(findV2Blocks(["<!-- vml -->", "%%", "![[a.png]]", "%%", "<!-- /vml -->"]), []);
+test("code, math and comments inside a block are its text, embeds in them included", () => {
+  const fenced = block(["<!-- vml -->", "```", "![[a.png]]", "```", "<!-- /vml -->"]);
+  assert.deepEqual([fenced.rows.length, fenced.invalidLine, fenced.leftText?.lines], [0, null, ["```", "![[a.png]]", "```"]]);
+
+  const beside = block(["<!-- vml -->", "![[a.png]]", "$$", "x^2", "$$", "%%", "![[b.png]]", "%%", "<!-- /vml -->"]);
+  assert.deepEqual([beside.rows.length, beside.rightText?.from, beside.rightText?.to, beside.invalidLine], [1, 2, 7, null]);
+  assert.equal(block(["<!-- vml -->", "$$ x $$", "<!-- /vml -->"]).leftText?.lines[0], "$$ x $$");
+});
+
+test("a block ends only on a closing comment in plain text", () => {
+  // The closing comment inside an unclosed fence is code: the block never closes.
+  assert.deepEqual(findV2Blocks(["<!-- vml -->", "```", "<!-- /vml -->"]), []);
+  // The next opener starts over.
+  assert.equal(findV2Blocks(["<!-- vml -->", "%%", "<!-- /vml -->", "%%", "<!-- vml -->", "文字", "<!-- /vml -->"]).length, 1);
 });
 
 test("keeps exact embed source and columns, including embeds with no space between them", () => {
@@ -90,9 +101,9 @@ test("parses Markdown destinations: encoding, parentheses, angle brackets and ti
   );
 });
 
-test("text between two rows, or text without any row, makes the block invalid", () => {
-  // A line with anything but media embeds is text, and text alone is not a layout.
-  assert.equal(block(["<!-- vml -->", "![[a.png]] 说明", CLOSE()]).invalidLine, 1);
+test("text between two rows makes the block invalid", () => {
+  // A line with anything but media embeds is text; text alone is a text block.
+  assert.equal(block(["<!-- vml -->", "![[a.png]] 说明", CLOSE()]).invalidLine, null);
   assert.equal(block(["<!-- vml -->", "![[a.png]]", "说明", "![[b.png]]", CLOSE()]).invalidLine, 2);
   assert.equal(block(["<!-- vml -->", "左", "![[a.png]]", "![[笔记]]", "", "![[b.png]]", CLOSE()]).invalidLine, 3);
 });

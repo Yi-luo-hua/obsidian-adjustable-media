@@ -127,7 +127,7 @@ class ProxyWidget extends WidgetType {
     });
     // The layout itself at the float's width, cut off above the line.
     const content = box.createDiv({ cls: "vml-live-preview vml-live-preview--wrap vml-wrap-proxy__content" });
-    const model = { ...modelFromBlock(this.anchor.block), width: null, wrap: null, skip: null };
+    const model = { ...modelFromBlock(this.anchor.block), width: null, wrap: null, skip: null, align: null };
     renderLayout(content, { app: this.app, sourcePath: this.sourcePath, model, editable: isEditable(this.anchor.block), warning: null });
     return el;
   }
