@@ -1,8 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 - 2026-09-21
 
 - In Live Preview and Source mode, a valid text selection now adds **Wrap selection in a layout** to the editor context menu. The same command remains available in the command palette and can be assigned a custom shortcut under **Settings → Hotkeys**; the plugin does not set a default shortcut.
+- Moving, resizing or using the right-click menu on a layout — and undoing or redoing the gesture — no longer scrolls the note to its own cursor, which used to push the layout out of view and close its editor when the cursor was far away. Ordinary typing, undo and redo keep their previous behavior.
+- PDF export now draws layouts: media, text columns and their wrap settings appear as they do on screen, instead of only the plain embeds. Notes without layouts export exactly as before.
+- A layout can no longer be dropped inside a fenced code block, or into an unclosed code fence, equation, comment or frontmatter at the end of the note. A code fence now clears a floating layout beside it, so its background and width are no longer cut by the image.
+- In reading view, a wide table beside a floating layout scrolls horizontally in place instead of being squeezed below the layout.
+- A layout with text beside its media now has the same width in reading view and in live preview, so its text wraps identically in both, and centered or bottom-aligned media no longer shift with the height of the text.
+- Expanding the source of a layout with text beside its media keeps the read-only preview in place, so the images no longer jump from beside the text to below it.
+- Numbered captions and equations: two adjacent single-line equations now each get their own number, and a caption's number no longer leaks into a heading, list, quote or table right after it.
 
 ## 0.4.0 - 2026-09-17
 
