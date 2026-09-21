@@ -21,12 +21,14 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
   rendering.add(el);
   const file = app.vault.getAbstractFileByPath(ctx.sourcePath);
   if (!(file instanceof TFile)) {
+    rendering.delete(el);
     return;
   }
   const text = await app.vault.cachedRead(file);
   const token = crypto.randomUUID();
   const { markdown, blocks } = printPlan(text, token);
   if (blocks.length === 0) {
+    rendering.delete(el);
     return;
   }
   const child = new MarkdownRenderChild(el);

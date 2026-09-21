@@ -128,8 +128,8 @@ export function registerReadingView(plugin: Plugin): void {
       return renderPrintLayouts(plugin.app, el, ctx);
     }
     // Without the note's text, the section tells nothing about its layouts.
-    const text = info ? sectionNoteText(plugin.app, ctx, info) : "";
-    if (!info || text === "") {
+    const text = sectionNoteText(plugin.app, ctx, info);
+    if (text === "") {
       return;
     }
     parse(text);
