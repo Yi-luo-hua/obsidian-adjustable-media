@@ -18,6 +18,8 @@ export interface LayoutViewOptions {
   component?: Component;
   /** The note's numbered figures, tables and equations, for the layout's text and captions. */
   refs?: RefContext;
+  /** Export waits for the Markdown inside the layout before printing. */
+  renderTasks?: Promise<void>[];
 }
 
 interface MediaSize {
@@ -51,7 +53,7 @@ const mediaSizes = new Map<string, MediaSize>();
 export function renderLayout(container: HTMLElement, options: LayoutViewOptions): HTMLElement {
   const { model } = options;
   const rowIndices = options.rowIndices ?? model.rows.map((_row, index) => index);
-  if (model.wrap !== null && model.skip !== null && rowIndices.includes(0)) {
+  if (model.wrap !== null && model.skip !== null && (isTextOnly(model) || rowIndices.includes(0))) {
     const skip = container.createDiv({ cls: `vml-wrap-skip vml-wrap-skip--${model.wrap}` });
     skip.setCssProps({ "--vml-skip": String(model.skip) });
   }
@@ -110,8 +112,9 @@ function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOp
   if (!component) {
     return false;
   }
-  void MarkdownRenderer.render(options.app, numbered(markdown, options.refs), el, options.sourcePath, component)
+  const task = MarkdownRenderer.render(options.app, numbered(markdown, options.refs), el, options.sourcePath, component)
     .then(() => markCaptions(el, markdown));
+  options.renderTasks?.push(task);
   return true;
 }
 

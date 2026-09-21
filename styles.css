@@ -1,5 +1,10 @@
 .vml-layout {
+  /* The editing frame must not change the columns' available width between modes. */
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  box-sizing: border-box;
   margin: 0.75em 0;
+  padding: 2px 10px;
 }
 
 .vml-layout--sized {
@@ -775,6 +780,10 @@ body.vml-is-dragging * {
   display: none;
 }
 
+.vml-rv-table-scroll {
+  overflow-x: auto;
+}
+
 .markdown-preview-sizer > .vml-rv-host:not(.vml-rv-anchor + .vml-rv-host, .vml-rv-host + .vml-rv-host) > .vml-rv-proxy {
   display: contents;
 }
@@ -823,8 +832,33 @@ body.vml-is-dragging * {
  * float lies under the float. Laid out on their own, such lines sit beside the float as a whole and
  * are measured from their own edge; code and rules draw their background beside it too.
  */
-.vml-has-wraps .cm-content > .cm-line:is(.HyperMD-list-line, .HyperMD-quote, .HyperMD-codeblock, .HyperMD-hr, [style*="text-indent"]) {
+.vml-has-wraps .cm-content > .cm-line:is(.HyperMD-list-line, .HyperMD-quote, .HyperMD-hr, [style*="text-indent"]) {
   display: flow-root;
+}
+
+/* A fenced code block is one unit in reading/print view, not independently wrapping lines. */
+.vml-has-wraps .cm-content > .cm-line.HyperMD-codeblock-begin,
+.markdown-rendered .vml-rv-wrapping pre,
+.vml-print-content pre {
+  clear: both;
+}
+
+.vml-has-wraps .cm-content > .cm-line.HyperMD-codeblock {
+  display: block;
+}
+
+.vml-print-content :is(ul, ol, blockquote, .callout, hr, .math-block) {
+  display: flow-root;
+}
+
+.vml-print-content {
+  display: flow-root;
+}
+
+@media print {
+  .vml-layout {
+    break-inside: avoid;
+  }
 }
 
 /*
@@ -1008,4 +1042,9 @@ body.vml-is-dragging * {
   max-height: 320px;
   overflow-y: auto;
   padding-left: 1.2em;
+}
+
+/* Override Obsidian's inline table scroller while a float shares the section. */
+.vml-rv-table-host {
+  overflow-x: visible !important;
 }

@@ -1,7 +1,26 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { dropTarget, resizePair, weightsFromWidths, type ItemBox, type Rect, type RowBox } from "../src/layout/geometry.ts";
+import { dropTarget, frameResizeDirection, resizePair, weightsFromWidths, type ItemBox, type Rect, type RowBox } from "../src/layout/geometry.ts";
+import { findV2Blocks } from "../src/format/v2.ts";
+import { modelFromBlock } from "../src/layout/model.ts";
+
+test("frame resizing follows the moving edge for block alignment, floats and text columns", () => {
+  const block = findV2Blocks(["<!-- vml -->", "Text", "<!-- /vml -->"])[0];
+  assert.ok(block);
+  const model = modelFromBlock(block);
+  assert.equal(frameResizeDirection(model), 1);
+  assert.equal(frameResizeDirection({ ...model, align: "right" }), -1);
+  assert.equal(frameResizeDirection({ ...model, align: "center" }), 2);
+  assert.equal(frameResizeDirection({ ...model, align: "center", wrap: "left" }), 1);
+  assert.equal(frameResizeDirection({ ...model, align: "center", wrap: "right" }), -1);
+  const columns = findV2Blocks(["<!-- vml -->", "Left", "![[a.png]]", "Right", "<!-- /vml -->"])[0];
+  assert.ok(columns);
+  const two = modelFromBlock(columns);
+  assert.equal(frameResizeDirection(two), 2);
+  assert.equal(frameResizeDirection({ ...two, text: { left: "Left", right: null } }), -1);
+  assert.equal(frameResizeDirection({ ...two, text: { left: null, right: "Right" } }), 1);
+});
 
 function rect(left: number, top: number, right: number, bottom: number): Rect {
   return { left, top, right, bottom };

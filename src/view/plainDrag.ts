@@ -119,7 +119,7 @@ async function dropPlain(app: App, view: EditorView, img: HTMLImageElement, sour
   const target = planModelEdit(drop.context.block, insertItem(drop.context.model, { embed: taken.embed, weight: null, caption: null }, drop.target));
   // Both halves or nothing: writing only the removal would lose the embed.
   if (target) {
-    await commitEdits(app, sourcePath, [taken.edit, target]);
+    await commitEdits(app, sourcePath, [taken.edit, target], { view });
   }
 }
 

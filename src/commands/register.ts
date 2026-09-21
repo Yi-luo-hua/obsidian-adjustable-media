@@ -7,6 +7,29 @@ import { t } from "../view/messages.ts";
 import { applyLineChange, blockAt, planMergeWithNext, planWrapSelection } from "./plans.ts";
 
 export function registerCommands(plugin: Plugin): void {
+  plugin.registerEvent(plugin.app.workspace.on("editor-menu", (menu, editor) => {
+    if (!editor.somethingSelected()) {
+      return;
+    }
+    const original = editor.getValue();
+    const from = editor.getCursor("from").line;
+    const to = editor.getCursor("to").line;
+    if (!planWrapSelection(original.split("\n"), from, to)) {
+      return;
+    }
+    menu.addItem((item) => item.setTitle(t("cmdWrap")).setIcon("layout-grid").onClick(() => {
+      // Keep the selection captured when the menu opened; never apply it to changed text.
+      if (editor.getValue() !== original) {
+        new Notice(t("writeNotFound"));
+        return;
+      }
+      const change = planWrapSelection(original.split("\n"), from, to);
+      if (change) {
+        applyLineChange(editor, change);
+      }
+    }));
+  }));
+
   plugin.addCommand({
     id: "wrap-selection-in-layout",
     name: t("cmdWrap"),

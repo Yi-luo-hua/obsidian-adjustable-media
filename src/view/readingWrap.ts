@@ -78,6 +78,8 @@ const asked = new WeakMap<HTMLElement, string>();
  * and how wide the page was then: until Obsidian has measured one, it counts at that height.
  */
 const remeasuring = new WeakMap<HTMLElement, { height: number; width: number }>();
+/** A table's native scroll box must not contain the float that stands beside the table. */
+const tableHosts = new WeakMap<HTMLElement, { box: HTMLElement }>();
 let nextId = 0;
 
 /** Keeps the float of `layout`, drawn in the reading-view section `section`. Returns what stops it. */
@@ -499,6 +501,7 @@ function replan(float: Float): void {
 
 /** Puts `float`'s stand-in in `host`, in the order of the floats, unless the same one is there. */
 function place(host: HTMLElement, float: Float, size: FloatSize, plan: ProxyPlan): void {
+  prepareTableHost(host);
   const key = [size.width, size.layoutHeight, size.margin, size.marginBottom, plan.sandbag, plan.height, plan.shift]
     .map((value) => Math.round(value))
     .join(",");
@@ -518,8 +521,37 @@ function unplace(host: HTMLElement, float: Float): void {
   proxyOf(host, float)?.remove();
   if (!host.querySelector(":scope > .vml-rv-proxy")) {
     host.removeClass("vml-rv-host");
+    restoreTableHost(host);
   }
   float.hosts.delete(host);
+}
+
+function prepareTableHost(host: HTMLElement): void {
+  if (!host.hasClass("el-table") || tableHosts.has(host)) {
+    return;
+  }
+  const table = host.querySelector<HTMLElement>(":scope > table");
+  if (!table) {
+    return;
+  }
+  const box = host.createDiv({ cls: "vml-rv-table-scroll" });
+  box.appendChild(table);
+  tableHosts.set(host, { box });
+  // Obsidian puts overflow-x:auto on the section itself. A float inside that formatting context
+  // pushes a wide table down by the float's height. Keep scrolling on the table's own inner box.
+  host.addClass("vml-rv-table-host");
+}
+
+function restoreTableHost(host: HTMLElement): void {
+  const saved = tableHosts.get(host);
+  if (!saved) {
+    return;
+  }
+  if (saved.box.parentElement === host) {
+    saved.box.replaceWith(...Array.from(saved.box.childNodes));
+  }
+  host.removeClass("vml-rv-table-host");
+  tableHosts.delete(host);
 }
 
 function proxyOf(host: HTMLElement, float: Float): HTMLElement | null {

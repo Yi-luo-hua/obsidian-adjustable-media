@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- In Live Preview and Source mode, a valid text selection now adds **Wrap selection in a layout** to the editor context menu. The same command remains available in the command palette and can be assigned a custom shortcut under **Settings → Hotkeys**; the plugin does not set a default shortcut.
+
 ## 0.4.0 - 2026-09-17
 
 - Text boxes: a layout block with text and no media is now a layout of its own, drawn as one column of Markdown at the layout's width. Like media, it can float left or right with the note's text wrapping around it (`wrap`, `skip`), and be moved as a whole. In live preview, click its text to edit it, drag its frame's edge to set its width, and right-click it to choose the wrap or to remove the box and keep its text. Older versions of the plugin show such blocks as plain Markdown and never change them.

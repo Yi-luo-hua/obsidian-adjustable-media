@@ -1,9 +1,8 @@
-import { Menu, Notice, TFile, setIcon, type App, type Editor } from "obsidian";
-import type { EditorView } from "@codemirror/view";
+import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
 import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
-import { dropTarget, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
+import { dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
   effectiveWidth,
   hasTextColumns,
@@ -30,7 +29,7 @@ import {
   type LayoutModel,
   type MoveTarget,
 } from "../layout/model.ts";
-import { writeBlockEdits } from "../layout/writeBack.ts";
+import { writeBlockEdits, type WriteOptions } from "../layout/writeBack.ts";
 import { CaptionModal } from "./captionModal.ts";
 import { createDragGhost } from "./dragGhost.ts";
 import { applySizing } from "./layoutView.ts";
@@ -41,7 +40,7 @@ import { trackPointer } from "./pointer.ts";
 import { TextLayoutModal } from "./textLayoutModal.ts";
 
 /** A layout drawn in live preview, as its interactions see it. Reading view only shows layouts. */
-export interface LayoutContext {
+export interface LayoutContext extends WriteOptions {
   app: App;
   sourcePath: string;
   block: V2Block;
@@ -166,8 +165,8 @@ export function swallowNextClick(doc: Document): void {
   window.setTimeout(() => doc.removeEventListener("click", swallow, { capture: true }), 0);
 }
 
-/** Writes planned edits to the note, through `editor` or as typed in `typed` if given (see writeBlockEdits). Returns whether the note changed. */
-export async function commitEdits(app: App, sourcePath: string, edits: Array<BlockEdit | null>, editor?: Editor, typed?: EditorView): Promise<boolean> {
+/** Writes planned edits through their originating editor when provided. Returns whether the note changed. */
+export async function commitEdits(app: App, sourcePath: string, edits: Array<BlockEdit | null>, options?: WriteOptions): Promise<boolean> {
   const planned = edits.filter((edit): edit is BlockEdit => edit !== null);
   if (planned.length === 0) {
     return false;
@@ -179,7 +178,7 @@ export async function commitEdits(app: App, sourcePath: string, edits: Array<Blo
     return false;
   }
 
-  const result = await writeBlockEdits(app, file, planned, editor, typed);
+  const result = await writeBlockEdits(app, file, planned, options);
   if (!result.ok) {
     new Notice(t(FAILURE_MESSAGES[result.reason]));
   }
@@ -340,7 +339,7 @@ function startDrag(
         rowEl?.removeClass("vml-row--positioning");
         rowEl?.removeClass("vml-row--snapped");
         // The preview stays until the note re-renders; put it back if nothing was written.
-        void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setPosition(context.model, source.row, placed))])
+        void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setPosition(context.model, source.row, placed))], context)
           .then((changed) => {
             if (!changed) {
               showPosition(null);
@@ -369,7 +368,7 @@ async function dropItem(source: LayoutContext, from: ItemPosition, drop: DropSta
   if (drop.context.block.openLine === source.block.openLine) {
     const moved = moveItem(source.model, from, drop.target);
     if (moved !== source.model) {
-      await commitEdits(source.app, source.sourcePath, [planModelEdit(source.block, moved)]);
+      await commitEdits(source.app, source.sourcePath, [planModelEdit(source.block, moved)], source);
     }
     return;
   }
@@ -382,7 +381,7 @@ async function dropItem(source: LayoutContext, from: ItemPosition, drop: DropSta
   const targetEdit = planModelEdit(drop.context.block, insertItem(drop.context.model, taken.item, drop.target));
   // Both halves or nothing: writing only the removal would lose the embed.
   if (sourceEdit && targetEdit) {
-    await commitEdits(source.app, source.sourcePath, [sourceEdit, targetEdit]);
+    await commitEdits(source.app, source.sourcePath, [sourceEdit, targetEdit], source);
   }
 }
 
@@ -439,7 +438,7 @@ function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, 
         handle.removeClass("is-active");
         // A click without a drag must not write anything.
         if (moved) {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setSingleWidth(context.model, row, round(fraction)))]);
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setSingleWidth(context.model, row, round(fraction)))], context);
         }
       },
       onCancel() {
@@ -476,7 +475,7 @@ function setUpHeightHandle(rowEl: HTMLElement, row: number, startHeight: number,
       onEnd() {
         handle.removeClass("is-active");
         if (moved) {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setRowHeight(context.model, row, height))]);
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setRowHeight(context.model, row, height))], context);
         }
       },
       onCancel() {
@@ -519,7 +518,7 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
         handle.removeClass("is-active");
         // Without a drag, the row would silently switch from shares by aspect ratio to fixed widths.
         if (moved) {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWeights(context.model, row, weightsFromWidths(widths)))]);
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWeights(context.model, row, weightsFromWidths(widths)))], context);
         }
       },
       onCancel() {
@@ -541,11 +540,10 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
  */
 function setUpFrame(root: HTMLElement, context: LayoutContext): void {
   const box = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
-  const { left, right } = context.model.text;
   // The width handles sit on the edge that moves as the layout grows. A layout floating right, or
   // media with text on their left only, grow to the left; media between two texts grow both ways.
-  const mirrored = context.model.wrap === "right" || (hasTextColumns(context.model) && left !== null && right === null);
-  const direction = (mirrored ? -1 : 1) * (hasTextColumns(context.model) && left !== null && right !== null ? 2 : 1);
+  const direction = frameResizeDirection(context.model);
+  const mirrored = direction < 0;
   const edges = isTextOnly(context.model) ? (["right"] as const) : (["right", "bottom", "corner"] as const);
   for (const edge of edges) {
     const handle = box.createDiv({
@@ -619,7 +617,7 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
       if (!moved) {
         return;
       }
-      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, next)]).then((changed) => {
+      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, next)], context).then((changed) => {
         if (!changed) {
           applySizing(root, context.model);
         }
@@ -649,7 +647,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
       if (align !== currentAlign) {
         model = setCaptionAlign(model, position.row, align);
       }
-      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, model)]);
+      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, model)], context);
     }).open();
   }));
 
@@ -663,7 +661,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
         .setSection("vml-align")
         .setChecked(row.offset === null && (row.align ?? "center") === align)
         .onClick(() => {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setAlign(context.model, position.row, align))]);
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setAlign(context.model, position.row, align))], context);
         }));
     }
   }
@@ -685,7 +683,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
         .setSection("vml-valign")
         .setChecked((context.model.valign ?? "top") === valign)
         .onClick(() => {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setValign(context.model, valign))]);
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setValign(context.model, valign))], context);
         }));
     }
   }
@@ -700,7 +698,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
         .setSection("vml-place")
         .setChecked((context.model.align ?? "left") === align)
         .onClick(() => {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setTextLayout(context.model, { align }))]);
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setTextLayout(context.model, { align }))], context);
         }));
     }
   }
@@ -724,7 +722,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   menu.addItem((entry) => entry.setTitle(t("moveOut")).setIcon("log-out").setSection("vml-move").onClick(() => {
     const taken = removeItem(context.model, position);
     if (taken) {
-      void commitEdits(context.app, context.sourcePath, [planMoveOut(context.block, taken.model, taken.item.embed)]);
+      void commitEdits(context.app, context.sourcePath, [planMoveOut(context.block, taken.model, taken.item.embed)], context);
     }
   }));
 
@@ -752,7 +750,7 @@ function addTextLayoutItem(menu: Menu, context: LayoutContext): void {
   menu.addItem((entry) => entry.setTitle(t("textLayout")).setIcon("type").setSection("vml-text-layout").onClick(() => {
     const options = { layout: textLayoutOf(context.model), columns: isTextOnly(context.model), placeable: placeable(context.model) };
     new TextLayoutModal(context.app, options, (layout) => {
-      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setTextLayout(context.model, layout))]);
+      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setTextLayout(context.model, layout))], context);
     }).open();
   }));
 }
@@ -767,7 +765,7 @@ function addWrapItems(menu: Menu, context: LayoutContext, left: MessageKey, righ
       .setSection("vml-wrap")
       .setChecked(context.model.wrap === side)
       .onClick(() => {
-        void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWrap(context.model, side))]);
+        void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWrap(context.model, side))], context);
       }));
   }
 }
@@ -788,7 +786,7 @@ function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
     addWrapItems(menu, context, "textWrapLeft", "textWrapRight");
     addTextLayoutItem(menu, context);
     menu.addItem((entry) => entry.setTitle(t("unwrapText")).setIcon("log-out").setSection("vml-move").onClick(() => {
-      void commitEdits(context.app, context.sourcePath, [planUnwrap(context.block)]);
+      void commitEdits(context.app, context.sourcePath, [planUnwrap(context.block)], context);
     }));
     menu.showAtMouseEvent(event);
   });

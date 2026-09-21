@@ -9,6 +9,7 @@ import { blockWarning } from "./messages.ts";
 import { sectionNoteText } from "./noteText.ts";
 import { readingSections } from "./obsidianInternals.ts";
 import { keepWrapped, keepWrapsBeside } from "./readingWrap.ts";
+import { renderPrintLayouts } from "./printView.ts";
 
 const RERENDER_ATTEMPTS = 5;
 const RERENDER_RETRY_MS = 100;
@@ -123,9 +124,12 @@ export function registerReadingView(plugin: Plugin): void {
 
   plugin.registerMarkdownPostProcessor((el, ctx) => {
     const info = ctx.getSectionInfo(el);
+    if (!info) {
+      return renderPrintLayouts(plugin.app, el, ctx);
+    }
     // Without the note's text, the section tells nothing about its layouts.
-    const text = info ? sectionNoteText(plugin.app, ctx, info) : "";
-    if (!info || text === "") {
+    const text = sectionNoteText(plugin.app, ctx, info);
+    if (text === "") {
       return;
     }
     parse(text);

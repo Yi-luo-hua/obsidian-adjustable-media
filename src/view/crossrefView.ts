@@ -5,6 +5,7 @@ import { Decoration, EditorView, WidgetType, type DecorationSet } from "@codemir
 import {
   EMPTY_REF_INDEX,
   captionText,
+  captionParagraphStart,
   collectRefs,
   equationLabels,
   mayHaveRefs,
@@ -292,13 +293,7 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
   const touched = (from: number, to: number): boolean => state.selection.ranges.some((range) => range.from <= to && range.to >= from);
   const { doc } = state;
   const captions = new Set<number>();
-  const paragraphStart = (line: number): number => {
-    let start = line;
-    while (start > 0 && contexts[start - 1] === "text" && doc.line(start).text.trim() !== "") {
-      start -= 1;
-    }
-    return start;
-  };
+  const lines = doc.toString().split("\n");
 
   for (let at = 0; at < contexts.length; at += 1) {
     const line = doc.line(at + 1);
@@ -340,7 +335,7 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
       const ref = match[3];
       if (label !== undefined) {
         const target = index.targets.get(label);
-        const start = paragraphStart(at);
+        const start = captionParagraphStart(lines, contexts, at);
         if (target && !captions.has(start)) {
           // The label goes; the caption's number starts its paragraph, after any quote or list marker.
           captions.add(start);

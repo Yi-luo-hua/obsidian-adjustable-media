@@ -162,7 +162,7 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
       }
       const edits = planPlacement(lines, block, placement);
       if (edits && edits.length > 0) {
-        void commitEdits(context.app, context.sourcePath, edits);
+        void commitEdits(context.app, context.sourcePath, edits, { ...context, view });
       }
     },
     onCancel: stop,

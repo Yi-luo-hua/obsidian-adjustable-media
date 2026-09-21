@@ -2,6 +2,8 @@
 
 更新日期：2026-09-17。
 
+2026-09-21 补充：0.4.0 后续审查修复与页面跳动实测见 [SCROLL_VALIDATION.md](SCROLL_VALIDATION.md)，尚未发布；其中记录了已修复场景及仍未解决的快速滚动边界。
+
 ## 发布与开发状态
 
 - 本版为 [0.4.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.4.0)，公开状态和下载附件以 Release 页面为准。插件已在 Obsidian 社区目录中。
