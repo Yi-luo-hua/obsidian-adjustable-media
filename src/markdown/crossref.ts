@@ -119,7 +119,9 @@ export function numberMarkdown(markdown: string, index: RefIndex, language: RefL
       if (mathStart < 0) {
         mathStart = at;
       }
-      if (contexts[at + 1] !== "math" || lines[at]?.trimEnd().endsWith("$$") && at > mathStart) {
+      const trimmed = line.trim();
+      const singleLine = trimmed.startsWith("$$") && trimmed.slice(2).includes("$$");
+      if (singleLine || contexts[at + 1] !== "math" || trimmed.endsWith("$$") && at > mathStart) {
         tagEquation(result, mathStart, at, index);
         mathStart = -1;
       }
@@ -136,7 +138,7 @@ export function numberMarkdown(markdown: string, index: RefIndex, language: RefL
           return token;
         }
         // A paragraph is the caption of its first label only.
-        const start = paragraphStart(lines, contexts, at);
+        const start = captionParagraphStart(lines, contexts, at);
         if (!prefixes.has(start)) {
           prefixes.set(start, captionHtml(target, language));
         }
@@ -206,9 +208,32 @@ function tagEquation(lines: string[], from: number, to: number, index: RefIndex)
 }
 
 /** The first line of the paragraph `line` is in. */
-function paragraphStart(lines: readonly string[], contexts: readonly LineContext[], line: number): number {
+export function captionParagraphStart(lines: readonly string[], contexts: readonly LineContext[], line: number): number {
   let start = line;
-  while (start > 0 && contexts[start - 1] === "text" && (lines[start - 1] ?? "").trim() !== "") {
+  const content = (text: string): string => text.replace(/^(?:[ \t]*>[ \t]?)+/, "");
+  const quoteDepth = (text: string): number => /^(?:[ \t]*>[ \t]?)+/.exec(text)?.[0].split(">").length ?? 0;
+  const boundary = (text: string): boolean => /^(?: {0,3}#{1,6}(?:\s|$)|\s*(?:[-*_]\s*){3,}$|\s*(?:=+|-+)\s*$|\s*\||\s*<)/.test(content(text));
+  const item = (text: string): boolean => /^\s*(?:[-*+]|\d{1,9}[.)])\s/.test(content(text));
+  const inTable = (at: number): boolean => {
+    // Tables can omit their outer pipes. Find their delimiter row rather than treating every pipe
+    // in prose as a boundary.
+    for (let row = at; row >= 0 && contexts[row] === "text"; row -= 1) {
+      const text = content(lines[row] ?? "");
+      if (!text.includes("|")) {
+        break;
+      }
+      if (/^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)+\|?\s*$/.test(text)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  while (start > 0 && contexts[start - 1] === "text") {
+    const current = lines[start] ?? "";
+    const previous = lines[start - 1] ?? "";
+    if (content(previous).trim() === "" || boundary(previous) || boundary(current) || inTable(start - 1) || item(current) || quoteDepth(previous) !== quoteDepth(current)) {
+      break;
+    }
     start -= 1;
   }
   return start;

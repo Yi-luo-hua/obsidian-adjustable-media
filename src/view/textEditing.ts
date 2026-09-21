@@ -224,7 +224,7 @@ class TextEditSession {
       return;
     }
     this.writing = text;
-    void commitEdits(this.host.app, this.host.sourcePath, [plan.edit], this.host.editor, this.host.view).then((written) => {
+    void commitEdits(this.host.app, this.host.sourcePath, [plan.edit], { editor: this.host.editor, view: this.host.view, typing: true }).then((written) => {
       // The note changed elsewhere in the meantime: draw what it holds now.
       if (!written && !this.ended) {
         this.finish();

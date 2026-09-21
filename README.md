@@ -48,6 +48,7 @@ Version **0.4.0** adds text boxes, multi-column text and numbered figures, table
 
 - **Right-Click Menu**: In Live Preview, right-click any image or video and choose **Wrap in a layout block**.
 - **Command / Hotkey**: Select one or more lines and run `Adjustable Media: Wrap selection in a layout` (assign a dedicated hotkey in Settings → Hotkeys). Lines of media embeds are gathered into rows; lines with text are wrapped as they are, making a text box, or text columns beside the media.
+- **Selected text menu**: In Live Preview or Source mode, select text, right-click and choose **Wrap selection in a layout**. The command wraps the whole lines touched by the selection. It appears only when the selection can form a layout. To choose your own shortcut, open **Settings → Hotkeys**, search for **Wrap selection in a layout**, and assign a key combination; no shortcut is assigned by default.
 - **Drag & Drop**: When a layout block already exists in your note, drag standalone images from the note directly into it.
 
 ### 2. Common Interactions

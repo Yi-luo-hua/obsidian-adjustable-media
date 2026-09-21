@@ -28,6 +28,20 @@ function model(opener: string): LayoutModel {
   return modelFromBlock(block([opener, "![[a.png]]", "<!-- /vml -->"]));
 }
 
+test("moving a layout cannot split a fenced code block or enter an unclosed fence at EOF", () => {
+  const prefix = ['<!-- vml -->', '![[a.png]]', '<!-- /vml -->', ''];
+  const lines = [...prefix, '```python', 'print(1)', '', 'print(2)', '```', '', 'Tail'];
+  const original = lines.join('\n');
+  for (let line = 4; line <= 8; line += 1) {
+    assert.equal(planPlacement(lines, block(lines), { line, wrap: 'right', skip: 0 }), null);
+  }
+  const unclosed = lines.slice(0, 8);
+  assert.equal(blockGaps(unclosed).includes(unclosed.length), false);
+  assert.equal(planPlacement(unclosed, block(unclosed), { line: unclosed.length, wrap: null, skip: 0 }), null);
+  assert.equal(lines.join('\n'), original);
+  assert.ok(planPlacement(lines, block(lines), { line: 10, wrap: 'right', skip: 0 }));
+});
+
 function apply(lines: readonly string[], edits: readonly BlockEdit[] | null): string[] {
   assert.ok(edits);
   const result = applyEditsToText(lines.join("\n"), edits);

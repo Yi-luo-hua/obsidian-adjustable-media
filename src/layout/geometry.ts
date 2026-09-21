@@ -1,5 +1,16 @@
 import type { WrapSide } from "../format/v2.ts";
-import type { MoveTarget } from "./model.ts";
+import { hasTextColumns, type LayoutModel, type MoveTarget } from "./model.ts";
+
+/** Which edge moves when a block grows, and how far its width changes per pointer pixel. */
+export function frameResizeDirection(model: LayoutModel): number {
+  if (hasTextColumns(model)) {
+    return model.text.left === null ? 1 : model.text.right === null ? -1 : 2;
+  }
+  if (model.wrap !== null) {
+    return model.wrap === "right" ? -1 : 1;
+  }
+  return model.align === "right" ? -1 : model.align === "center" ? 2 : 1;
+}
 
 /**
  * Pure geometry for drag and resize, so it can be tested without a DOM. Rects are in client pixels.

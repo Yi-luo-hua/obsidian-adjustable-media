@@ -1,9 +1,16 @@
-import { MarkdownView, type App, type Editor, type TFile } from "obsidian";
+import { MarkdownView, editorInfoField, type App, type Editor, type TFile } from "obsidian";
 import type { EditorView } from "@codemirror/view";
 
-import { applyEditsToEditor, applyEditsToText, planOffsetChanges, type BlockEdit, type EditFailure } from "./edits.ts";
+import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure } from "./edits.ts";
+import { applyEditsToView } from "./editorTransaction.ts";
 
 export type WriteResult = { ok: true } | EditFailure;
+
+export interface WriteOptions {
+  editor?: Editor;
+  view?: EditorView;
+  typing?: boolean;
+}
 
 /**
  * The only place layout changes are written to a note (docs/DESIGN.md, section 3).
@@ -17,30 +24,38 @@ export type WriteResult = { ok: true } | EditFailure;
  * note is neither saved nor re-rendered (docs/DESIGN.md, section 4). Reading mode therefore
  * writes the file, and Obsidian reloads the view from it.
  *
- * `editor`, when given, is the editor the change is made in: text typed right in a layout goes into
- * the editor it is typed in, also when the note is open in several panes. Such text goes in as typing
- * does, through that editor's CodeMirror view, `typed`: Obsidian's editor transaction would scroll the
- * note to its own cursor, which may be far from the layout, and the layout would leave the view.
+ * The originating view is used when given, including when the note is open in several panes.
+ * Layout gestures and text input use CodeMirror without scrolling to the note's distant cursor.
+ * Text input groups as typing; each layout gesture is its own undo step.
  */
 export async function writeBlockEdits(
   app: App,
   file: TFile,
   edits: readonly BlockEdit[],
-  editor?: Editor,
-  typed?: EditorView,
+  options: WriteOptions = {},
 ): Promise<WriteResult> {
   if (edits.length === 0) {
     return { ok: true };
   }
-  if (typed) {
-    const planned = planOffsetChanges(typed.state.doc.toString(), edits);
-    if (planned.ok) {
-      typed.dispatch({ changes: planned.changes, userEvent: "input.type" });
+  if (options.view) {
+    // A modal may outlive the pane that opened it. Matching text in a different note is not consent
+    // to edit that note, and a hidden reading-mode editor does not save its buffer.
+    const info = options.view.state.field(editorInfoField, false);
+    const origin = app.workspace.getLeavesOfType("markdown").some((leaf) => leaf.view instanceof MarkdownView
+      && leaf.view.file?.path === file.path && leaf.view.getMode() === "source" && leaf.view.editor === info?.editor);
+    if (info?.file?.path !== file.path || !options.view.dom.isConnected || !origin) {
+      return { ok: false, reason: "not-found" };
     }
-    return planned.ok ? { ok: true } : planned;
+    const result = applyEditsToView(options.view, edits, options.typing);
+    if (result.ok && !options.typing) {
+      // A pointer gesture can leave focus on the body. Restore keyboard undo to this pane without
+      // moving its selection; focus() in CodeMirror preserves the scroll position.
+      options.view.focus();
+    }
+    return result;
   }
-  if (editor) {
-    return applyEditsToEditor(editor, edits);
+  if (options.editor) {
+    return applyEditsToEditor(options.editor, edits);
   }
 
   const view = app.workspace.getLeavesOfType("markdown")

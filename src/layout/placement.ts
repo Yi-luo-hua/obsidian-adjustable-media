@@ -61,7 +61,10 @@ export function blockGaps(lines: readonly string[], contexts: readonly LineConte
     }
     gaps.push(line);
   }
-  gaps.push(lines.length);
+  // EOF is not outside an unterminated fence, equation, frontmatter or comment.
+  if (scanMarkdownLines([...lines, "vml insertion boundary"]).at(-1) === "text") {
+    gaps.push(lines.length);
+  }
   return gaps;
 }
 
@@ -103,7 +106,7 @@ export function isSamePlace(lines: readonly string[], block: V2Block, line: numb
  * Returns null when the block cannot be edited, [] when nothing changes.
  */
 export function planPlacement(lines: readonly string[], block: V2Block, placement: Placement): BlockEdit[] | null {
-  if (!isEditable(block)) {
+  if (!isEditable(block) || !blockGaps(lines).includes(placement.line)) {
     return null;
   }
   const current = modelFromBlock(block);

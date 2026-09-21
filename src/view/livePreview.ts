@@ -2,7 +2,7 @@ import { Component, editorInfoField, editorLivePreviewField, type App } from "ob
 import { Prec, StateField, type EditorState, type Extension, type Range } from "@codemirror/state";
 import { Decoration, EditorView, WidgetType, type DecorationSet } from "@codemirror/view";
 
-import { blockWrap, findV2Blocks, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
+import { blockWrap, findV2Blocks, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
@@ -10,6 +10,7 @@ import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { attachInteractions, type LayoutContext } from "./interactions.ts";
 import { renderLayout } from "./layoutView.ts";
+import { layoutHistory } from "./layoutHistory.ts";
 import { blockWarning, t } from "./messages.ts";
 import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
 import { wrapGuard, type WrapAnchor } from "./wrapGuard.ts";
@@ -61,6 +62,7 @@ export function livePreviewExtension(app: App): Extension {
     ],
   });
   return [
+    layoutHistory(),
     Prec.high(field),
     wrapGuard(app, {
       anchors: (state) => state.field(field, false)?.anchors ?? [],
@@ -105,7 +107,12 @@ function withDecorations(app: App, state: EditorState, { blocks, refs }: Parsed)
       continue;
     }
 
-    // The source shows, with the media Obsidian draws in it as thumbnails, so the note barely moves.
+    // Keep a text/media layout at its original position while its source opens below it. Replacing
+    // the columns with normal Markdown would move the image below all of the left column's text.
+    if (hasTextColumns(block)) {
+      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, block, sourcePath, refs, true) }).range(from));
+    }
+    // The source shows, with the media Obsidian draws in it as thumbnails.
     for (let line = block.openLine; line <= block.closeLine; line += 1) {
       ranges.push(Decoration.line({ class: "vml-source-line" }).range(state.doc.line(line + 1).from));
     }
@@ -124,14 +131,12 @@ function withDecorations(app: App, state: EditorState, { blocks, refs }: Parsed)
     if (!before || !after || !isDrawable(before) || !isDrawable(after) || blockWrap(before) === null || blockWrap(after) === null) {
       continue;
     }
+    const gap = state.doc.sliceString(state.doc.line(before.closeLine + 1).to, state.doc.line(after.openLine + 1).from);
+    if (gap.trim() !== "" || state.selection.ranges.some((range) => range.from <= state.doc.line(after.closeLine + 1).to && range.to >= state.doc.line(before.openLine + 1).from)) {
+      continue;
+    }
     for (let line = before.closeLine + 1; line < after.openLine; line += 1) {
-      const { from, to, text } = state.doc.line(line + 1);
-      if (text.trim() !== "") {
-        break;
-      }
-      if (!state.selection.ranges.some((range) => range.from <= to && range.to >= from)) {
-        ranges.push(Decoration.line({ class: "vml-float-gap" }).range(from));
-      }
+      ranges.push(Decoration.line({ class: "vml-float-gap" }).range(state.doc.line(line + 1).from));
     }
   }
 
@@ -184,13 +189,15 @@ class LayoutWidget extends WidgetType {
   private readonly refs: RefContext | undefined;
   private readonly key: string;
   private readonly placeKey: string;
+  private readonly sourcePreview: boolean;
 
-  constructor(app: App, block: V2Block, sourcePath: string, refs: RefContext | undefined) {
+  constructor(app: App, block: V2Block, sourcePath: string, refs: RefContext | undefined, sourcePreview = false) {
     super();
     this.app = app;
     this.block = block;
     this.sourcePath = sourcePath;
     this.refs = refs;
+    this.sourcePreview = sourcePreview;
     // New numbers draw the layout again.
     const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
     this.key = `${sourcePath}\n${numbers}\n${block.lines.join("\n")}`;
@@ -198,7 +205,7 @@ class LayoutWidget extends WidgetType {
   }
 
   override eq(other: LayoutWidget): boolean {
-    return other.key === this.key;
+    return other.key === this.key && other.sourcePreview === this.sourcePreview;
   }
 
   // A wrapped layout's widget is a zero-height anchor; the layout floats out of it.
@@ -211,7 +218,14 @@ class LayoutWidget extends WidgetType {
 
   toDOM(view: EditorView): HTMLElement {
     const el = createDiv({ cls: "vml-live-preview" });
-    drawWidget(el, view, this.app, this.block, this.sourcePath, this.refs);
+    if (this.sourcePreview) {
+      const component = new Component();
+      component.load();
+      components.set(el, component);
+      renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block), editable: false, warning: blockWarning(this.block), component, refs: this.refs });
+    } else {
+      drawWidget(el, view, this.app, this.block, this.sourcePath, this.refs);
+    }
     if (blockWrap(this.block) === null) {
       watchHeight(el, [this.key, this.placeKey]);
     }
@@ -221,7 +235,7 @@ class LayoutWidget extends WidgetType {
   // While one of its text columns is typed in, the layout keeps its element (textEditing.ts), and
   // its height goes on under the new text.
   override updateDOM(dom: HTMLElement): boolean {
-    if (!keepWhileEditing(dom, this.block)) {
+    if (this.sourcePreview || !keepWhileEditing(dom, this.block)) {
       return false;
     }
     watchHeight(dom, [this.key, this.placeKey]);
@@ -267,7 +281,7 @@ function drawWidget(
   component.load();
   components.set(el, component);
   const root = renderLayout(el, { app, sourcePath, model, editable: isEditable(block), warning: blockWarning(block), component, refs });
-  const context: LayoutContext = { app, sourcePath, block, model };
+  const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor };
   const host: TextEditHost = {
     el,
     root,

@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 
 import { findV2Blocks } from "../src/format/v2.ts";
 import { drawnFrom, isStale } from "../src/layout/drawn.ts";
-import { captionText, collectRefs, equationLabels, mayHaveRefs, numberMarkdown, refText } from "../src/markdown/crossref.ts";
+import { captionParagraphStart, captionText, collectRefs, equationLabels, mayHaveRefs, numberMarkdown, refText } from "../src/markdown/crossref.ts";
+import { scanMarkdownLines } from "../src/markdown/lineContext.ts";
 
 const note = [
   '<!-- vml {"v":2,"rows":[{"captions":["Scaling. {#fig:scaling}"]}]} -->', // 0
@@ -82,4 +83,21 @@ test("reading view redraws layouts when the numbers change", () => {
 test("display equations are listed in order with their labels, for references to find them drawn", () => {
   const markdown = [String.raw`$$ a \label{eq:one} $$`, "text", "$$", "b", "$$", "$$", String.raw`c \label{eq:three}`, "$$", "```", String.raw`$$ \label{eq:code} $$`, "```"].join("\n");
   assert.deepEqual(equationLabels(markdown), ["eq:one", null, "eq:three"]);
+});
+
+test("adjacent single-line and multiline equations each receive their own number", () => {
+  const source = [String.raw`$$ a \label{eq:a} $$`, String.raw`$$ b \label{eq:b} $$`, "$$", String.raw`c \label{eq:c}`, "$$"].join("\n");
+  const drawn = numberMarkdown(source, collectRefs(source.split("\n")), "en");
+  assert.equal(drawn, [String.raw`$$ a \tag{1} $$`, String.raw`$$ b \tag{2} $$`, "$$", String.raw`c \tag{3}`, "$$"].join("\n"));
+});
+
+test("caption prefixes stay out of adjacent headings, lists, quotes and tables", () => {
+  for (const before of ["# Heading", "---", "| a | b |\n| --- | --- |\n| 1 | 2 |", "a | b\n--- | ---\n1 | 2", "> Different paragraph."]) {
+    const source = `${before}\nCaption {#fig:a}`;
+    assert.equal(numberMarkdown(source, collectRefs(source.split("\n")), "en"), `${before}\n<span class="vml-caption-label" data-vml-label="fig:a">Figure 1.</span> Caption`);
+  }
+  const lines = ["- First item", "- Caption starts", "  and continues {#fig:a}"];
+  assert.equal(captionParagraphStart(lines, scanMarkdownLines(lines), 2), 1);
+  const quote = ["> Paragraph", ">", "> Caption {#fig:a}"];
+  assert.equal(captionParagraphStart(quote, scanMarkdownLines(quote), 2), 2);
 });
