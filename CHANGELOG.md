@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.6.0 - 2026-09-22
 
-- Add offline Chinese and English feature examples built around a signal-processing notebook, including bundled charts and a short teaching video. Open **Feature examples** from the command palette, or create an editable copy with its media. The guide appears once for new installs and existing users receiving it for the first time; ordinary later updates do not reopen it.
+- Add an offline Chinese and English feature guide that walks through the plugin's core layouts step by step — side-by-side media, text beside media, text wrap and float, multi-column text with academic cross-references, and video — with bundled sample figures and a short teaching video. Open **Feature examples** from the command palette, or create an editable copy with its media. The guide appears once for new installs and existing users receiving it for the first time; ordinary later updates do not reopen it.
+- Add an interface-language setting (Follow Obsidian, Chinese or English) for the plugin's menus, settings and notices.
 - Match separator and equation spacing between Live Preview and Reading View, refresh references in Live Preview callouts, and fix PDF numbering, wide-table clipping and unnecessary page breaks in text layouts.
 
 ## 0.5.0 - 2026-09-21
