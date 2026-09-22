@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { printPlan } from "../src/markdown/print.ts";
+import { collectRefs, numberMarkdown } from "../src/markdown/crossref.ts";
 
 test("export replaces whole drawable layouts and preserves code and surrounding Markdown", () => {
   const code = ['```html', '<!-- vml -->', '![[example.png]]', '<!-- /vml -->', '```'].join('\n');
@@ -20,4 +21,20 @@ test("export replaces whole drawable layouts and preserves code and surrounding 
 test("export leaves ordinary notes and incomplete layouts alone", () => {
   const text = '# Heading\n\n<!-- vml -->\n```python\nprint(1)\n<!-- /vml -->';
   assert.deepEqual(printPlan(text, 'export'), { markdown: text, blocks: [] });
+});
+
+test("export body keeps the whole note's numbering after layouts become placeholders", () => {
+  const text = ['> [!note] References', '> @fig:chart, @eq:outside and @fig:missing.', '',
+    '$$', String.raw`x = 1 \label{eq:outside}`, '$$', '', 'Table caption. {#tbl:outside}', '',
+    '<!-- vml {"v":2,"rows":[{"captions":["Chart. {#fig:chart}"]}]} -->', '![[chart.png]]', '<!-- /vml -->', '',
+    '```tex', String.raw`\label{eq:example}`, '```'].join('\n');
+  const { markdown } = printPlan(text, 'export');
+  const numbered = numberMarkdown(markdown, collectRefs(text.split('\n')), 'en');
+  assert.match(numbered, /data-vml-ref="fig:chart">Figure 1/);
+  assert.match(numbered, /data-vml-ref="eq:outside">Eq\. \(1\)/);
+  assert.match(numbered, /is-unresolved/);
+  assert.ok(numbered.includes(String.raw`x = 1 \tag{1}`));
+  assert.ok(!numbered.includes(String.raw`\label{eq:outside}`));
+  assert.ok(numbered.includes(String.raw`\label{eq:example}`));
+  assert.match(numbered, /data-vml-label="tbl:outside">Table 1\./);
 });

@@ -1,6 +1,6 @@
 import { MarkdownView, editorLivePreviewField, moment, type App, type MarkdownPostProcessorContext, type Plugin } from "obsidian";
 import { Prec, StateField, type EditorState, type Extension, type Range } from "@codemirror/state";
-import { Decoration, EditorView, WidgetType, type DecorationSet } from "@codemirror/view";
+import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
 import {
   EMPTY_REF_INDEX,
@@ -166,6 +166,16 @@ function goTo(view: MarkdownView, id: string, line: number): void {
 
 function numberSection(app: App, el: HTMLElement, ctx: MarkdownPostProcessorContext): void {
   const info = ctx.getSectionInfo(el);
+  // CodeMirror renders callouts through MarkdownRenderer without section offsets.
+  if (!info && el.closest(".cm-callout")) {
+    const view = app.workspace.getLeavesOfType("markdown")
+      .map((leaf) => leaf.view)
+      .find((candidate): candidate is MarkdownView => candidate instanceof MarkdownView && candidate.file?.path === ctx.sourcePath);
+    if (view) {
+      numberCallout(el, refContextOf(view.getViewData()));
+    }
+    return;
+  }
   const text = info ? sectionNoteText(app, ctx, info) : "";
   if (!info || !mayHaveRefs(text) || el.querySelector(".vml-layout")) {
     return;
@@ -250,13 +260,35 @@ interface CrossrefState {
   decorations: DecorationSet;
 }
 
+function numberCallout(el: HTMLElement, refs: RefContext): void {
+  numberTextNodes(el, refs);
+  // An unchanged callout widget can survive edits to labels elsewhere in the note.
+  for (const ref of Array.from(el.querySelectorAll<HTMLElement>(".vml-ref"))) {
+    const target = refs.index.targets.get(ref.dataset.vmlRef ?? "");
+    const text = target ? refText(target, refs.language) : "??";
+    if (ref.textContent !== text) {
+      ref.setText(text);
+    }
+    ref.toggleClass("is-unresolved", !target);
+  }
+  for (const label of Array.from(el.querySelectorAll<HTMLElement>(".vml-caption-label"))) {
+    const target = refs.index.targets.get(label.dataset.vmlLabel ?? "");
+    if (target) {
+      const text = captionText(target, refs.language);
+      if (label.textContent !== text) {
+        label.setText(text);
+      }
+    }
+  }
+}
+
 /**
  * Live preview: references and caption labels in the note's own text show their numbers, and an
  * equation with a label shows its tag, until the selection touches them.
  */
 export function crossrefExtension(): Extension {
   // Above Obsidian's own drawing of equations.
-  return Prec.high(StateField.define<CrossrefState>({
+  const field = StateField.define<CrossrefState>({
     create: (state) => decorate(state, scan(state)),
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
@@ -266,7 +298,29 @@ export function crossrefExtension(): Extension {
       return tr.selection ? decorate(tr.state, value) : value;
     },
     provide: (field) => EditorView.decorations.from(field, (value) => value.decorations),
-  }));
+  });
+  return [Prec.high(field), ViewPlugin.define((view) => {
+    let destroyed = false;
+    let pending = false;
+    const refresh = (): void => {
+      if (pending) {
+        return;
+      }
+      pending = true;
+      queueMicrotask(() => {
+        pending = false;
+        if (destroyed || !view.state.field(editorLivePreviewField, false)) {
+          return;
+        }
+        const refs = { index: view.state.field(field).index, language: refLanguage() };
+        for (const callout of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".cm-callout .callout"))) {
+          numberCallout(callout, refs);
+        }
+      });
+    };
+    refresh();
+    return { update: refresh, destroy: () => { destroyed = true; } };
+  })];
 }
 
 function scan(state: EditorState): Omit<CrossrefState, "decorations"> {

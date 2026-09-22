@@ -2,7 +2,7 @@ import { MarkdownRenderChild, MarkdownRenderer, TFile, type App, type MarkdownPo
 
 import { printPlan } from "../markdown/print.ts";
 import { modelFromBlock } from "../layout/model.ts";
-import { refContextOf } from "./crossrefView.ts";
+import { markCaptions, numbered, refContextOf } from "./crossrefView.ts";
 import { renderLayout } from "./layoutView.ts";
 import { blockWarning } from "./messages.ts";
 
@@ -36,8 +36,11 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
   // Keep Obsidian's optional filename title and export container settings.
   const title = el.querySelector(":scope > h1");
   const content = el.createDiv({ cls: "vml-print-content" });
-  await MarkdownRenderer.render(app, markdown, content, ctx.sourcePath, child);
   const refs = refContextOf(text);
+  // Export has no section offsets, so crossref's normal postprocessor cannot number the body.
+  // Number before rendering, including TeX labels: leaving them to MathJax causes duplicate labels.
+  await MarkdownRenderer.render(app, numbered(markdown, refs), content, ctx.sourcePath, child);
+  markCaptions(content, markdown);
   const tasks: Promise<void>[] = [];
   blocks.forEach((block, index) => {
     const slot = content.querySelector<HTMLElement>(`[data-vml-print="${token}-${index}"]`);

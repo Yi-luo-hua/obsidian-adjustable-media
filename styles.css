@@ -158,6 +158,17 @@
   margin-bottom: 0;
 }
 
+/* Obsidian removes rule margins in the editor, including rules rendered inside footnotes. */
+.vml-layout .vml-layout__text hr {
+  margin: 2rem 0;
+}
+
+/* Use the same collapsing display-math spacing inside rendered text in both modes. */
+.vml-layout .vml-layout__text mjx-container[display="true"] {
+  margin: 1em 0;
+  padding: 0;
+}
+
 /*
  * In live preview the text is typed right in the layout: a click swaps it for an editor of its own,
  * which draws the source in the styles of the note's editor (docs/DESIGN.md, section 4.2).
@@ -805,7 +816,7 @@ body.vml-is-dragging * {
  * ones keep their indent), a quote's bar, a callout's box, a rule and display math sit beside a float
  * as a whole.
  */
-.markdown-rendered .vml-rv-wrapping :is(ul, ol, blockquote, .callout, hr, .math-block) {
+.markdown-rendered .vml-rv-wrapping :is(ul, ol, blockquote, .callout, hr, .math-block):not(.vml-layout *) {
   display: flow-root;
 }
 
@@ -847,7 +858,7 @@ body.vml-is-dragging * {
   display: block;
 }
 
-.vml-print-content :is(ul, ol, blockquote, .callout, hr, .math-block) {
+.vml-print-content :is(ul, ol, blockquote, .callout, hr, .math-block):not(.vml-layout *) {
   display: flow-root;
 }
 
@@ -858,6 +869,37 @@ body.vml-is-dragging * {
 @media print {
   .vml-layout {
     break-inside: avoid;
+  }
+
+  /* Long text layouts must continue on the next page instead of reserving a whole page. */
+  .vml-layout--text-only:not(.vml-layout--wrap) {
+    break-inside: auto;
+  }
+
+  /* Screen tables can scroll horizontally; every column must fit on paper. */
+  .vml-print-content table {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .vml-print-content :is(th, td) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .vml-print-content table:has(tr > :nth-child(9)) {
+    font-size: 0.75em;
+    table-layout: auto;
+  }
+
+  .vml-print-content table:has(tr > :nth-child(9)) :is(th, td) {
+    font-size: inherit;
+    padding: 0.2em;
+  }
+
+  .vml-print-content table:has(tr > :nth-child(9)) :is(th, td):first-child {
+    overflow-wrap: normal;
   }
 }
 
