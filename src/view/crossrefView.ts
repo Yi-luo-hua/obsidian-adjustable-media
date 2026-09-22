@@ -1,4 +1,4 @@
-import { MarkdownView, editorLivePreviewField, moment, type App, type MarkdownPostProcessorContext, type Plugin } from "obsidian";
+import { MarkdownView, editorLivePreviewField, type App, type MarkdownPostProcessorContext, type Plugin } from "obsidian";
 import { Prec, StateField, type EditorState, type Extension, type Range } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
@@ -17,6 +17,7 @@ import {
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
 import { drawMath } from "./math.ts";
 import { sectionNoteText } from "./noteText.ts";
+import { currentLanguage } from "./messages.ts";
 
 /**
  * Numbered figures, tables and equations, and references to them (crossref.ts), as the note shows
@@ -38,7 +39,7 @@ export function refLanguage(): RefLanguage {
   if (setting !== "auto") {
     return setting;
   }
-  return moment.locale().toLowerCase().startsWith("zh") ? "zh" : "en";
+  return currentLanguage();
 }
 
 /** What a layout's text needs to be drawn with its numbers. */
