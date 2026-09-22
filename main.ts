@@ -1,16 +1,16 @@
 import { Plugin } from "obsidian";
 
-import { registerCommands } from "./src/commands/register";
-import { autoConvert } from "./src/input/autoConvert";
-import { crossrefExtension, registerCrossrefs, setRefLanguage } from "./src/view/crossrefView";
-import { DEFAULT_SETTINGS, VmlSettingTab, readSettings, type VmlSettings } from "./src/settings";
-import { registerImageMenu } from "./src/view/imageMenu";
-import { livePreviewExtension } from "./src/view/livePreview";
-import { plainImageDrag } from "./src/view/plainDrag";
-import { registerReadingView } from "./src/view/readingView";
-import { GuideModal } from "./src/guide/guideModal";
-import { GUIDE_REVISION, shouldShowGuide } from "./src/guide/state";
-import { t } from "./src/view/messages";
+import { registerCommands } from "./src/commands/register.ts";
+import { autoConvert } from "./src/input/autoConvert.ts";
+import { crossrefExtension, registerCrossrefs, setRefLanguage } from "./src/view/crossrefView.ts";
+import { DEFAULT_SETTINGS, VmlSettingTab, readSettings, type VmlSettings } from "./src/settings.ts";
+import { registerImageMenu } from "./src/view/imageMenu.ts";
+import { livePreviewExtension } from "./src/view/livePreview.ts";
+import { plainImageDrag } from "./src/view/plainDrag.ts";
+import { registerReadingView } from "./src/view/readingView.ts";
+import { GuideModal } from "./src/guide/guideModal.ts";
+import { GUIDE_REVISION, shouldShowGuide } from "./src/guide/state.ts";
+import { setUiLanguage, t } from "./src/view/messages.ts";
 
 export default class AdjustableMediaPlugin extends Plugin {
   settings: VmlSettings = { ...DEFAULT_SETTINGS };
@@ -19,6 +19,7 @@ export default class AdjustableMediaPlugin extends Plugin {
     this.settings = readSettings(await this.loadData());
     this.addSettingTab(new VmlSettingTab(this.app, this));
     setRefLanguage(() => this.settings.refLanguage);
+    setUiLanguage(() => this.settings.uiLanguage);
 
     registerReadingView(this);
     registerCrossrefs(this);

@@ -1,93 +1,95 @@
-# An experiment notebook with room for its figures
+## 1. Side-by-Side Media
 
-Follow a three-point moving average using the **teaching dataset** `[2, 5, 3, 8, 4, 9, 6, 8, 7]`. Every chart, animation and value below comes from these samples. All example media ship with the plugin and work offline.
-
-**Try this first:** create the example note → switch to Live Preview → drag the gap between the charts. Use Reading View to read and Live Preview to adjust layouts.
-
-## 1 · Compare side by side
-
-Before-and-after experiments, design revisions and screenshot comparisons benefit from sharing a row.
-
-<!-- vml {"v":2,"rows":[{"height":190,"widths":[1,1],"captions":["Original samples. {#fig:raw}","Three-point mean; endpoints omitted. {#fig:mean}"]}]} -->
-![Original samples](./assets/raw.svg) ![Three-point moving average](./assets/mean.svg)
+<!-- vml {"v":2,"rows":[{"height":190,"widths":[1.223,0.777],"captions":["Fine-tuning parameters vs. accuracy {#fig:eval}","GPT-2 scale and zero-shot performance {#fig:gpt2}"]}]} -->
+![LoRA comparison](./assets/lora-eval.png) ![GPT-2 performance](./assets/gpt2-perf.png)
 <!-- /vml -->
 
-**Try it:** drag the gap to change the ratio, or the bottom edge to change row height. Drag images to reorder them or start a new row. Use up to four items per row and multiple rows for a gallery; loose images can join an existing layout. Right-click to edit captions and their alignment.
+- **Adjust image width**: Drag the divider between images to adjust width distribution.
+- **Resize layout block**: Drag the bottom edge of the block to adjust height; drag the bottom-right corner to scale proportionally.
+- **Adjust media arrangement**: Click and drag an image to reorder media within the layout (left/right/up/down); if a row has only one image, drag horizontally to adjust its offset.
+- **Add / edit caption**: Right-click an image and choose "Edit caption…" to edit text and alignment.
+- **Layout block position**: Drag the handle in the center of the block to move it; drag left/right to position it left or right.
+---
 
-## 2 · Keep the interpretation beside the evidence
+## 2. Text Beside Media
 
-<!-- vml {"v":2,"width":0.55,"valign":"center","rows":[{"width":1}]} -->
-![Three-point moving average](./assets/mean.svg)
-### Smoothing has a cost
-The original peak is **9**; its window averages **6.33**. Local variation decreases, but the peak is suppressed too. Keep the original chart when reporting a conclusion.
+<!-- vml {"v":2,"width":0.48,"valign":"center","rows":[{"width":1}]} -->
+![LoRA architecture](./assets/lora-arch.png)
+### Low-Rank Adaptation (LoRA)
+Freeze pre-trained weights $W \in \mathbb{R}^{d \times k}$ and introduce rank decomposition matrices:
+$$h = W x + \frac{\alpha}{r} B A x$$
+where $B \in \mathbb{R}^{d \times r}, A \in \mathbb{R}^{r \times k}$, with rank $r \ll \min(d, k)$.
 <!-- /vml -->
 
-**Try it:** click the text to edit it in place; press Esc to finish. Right-click the image to add a left column or align the text at the top, middle or bottom. Text supports Markdown, lists, tasks, links, math and your formatting shortcuts.
+- **In-place editing**: Click the text on the right to edit directly; press `Esc` to exit.
+- **Vertical alignment**: Right-click the image to switch text alignment to top, center, or bottom.
+- **Add text box**: Right-click text in the layout block to add a text column on the left or right.
 
-## 3 · Wrap a short reminder into its context
+---
 
-<!-- vml {"v":2,"type":"text","wrap":"right","width":0.32,"size":0.9} -->
-**At the boundaries**
+## 3. Text Wrap & Float
 
-Only samples 2–8 have a complete window. Leave the endpoints empty instead of padding with zeros.
+<!-- vml {"v":2,"width":0.3,"wrap":"right","type":"text","size":0.9} -->
+**Hyperparameters**
+- Rank $r = 8$
+- Scaling $\alpha = 16$
+- Optimizer: AdamW
 <!-- /vml -->
-A moving average replaces a sample with the mean of three neighbors. It helps a study note show local variation; it does not establish measurement accuracy or replace checking unusual values. The sidebar explains the missing endpoints while the surrounding text continues at full width below it.
+Right-click the layout block to choose the text wrapping mode.
 
-**Try it:** images can float left or right too, using their context menu. Drag the grip above the frame to move a whole layout: the middle of the text places it between paragraphs; either side makes it float from the chosen position. Drag frame edges to resize, or a corner to scale proportionally. A single image slides horizontally and snaps left, center or right. Esc cancels a drag.
+In large language model fine-tuning, low-rank adaptation drastically reduces trainable parameters. The card on the right floats right, with body text wrapping around it, resuming full-width flow below the card to maintain a compact page layout.
 
-## 4 · Columns, equations and references explain the method
+
+---
+
+## 4. Multi-Column Text & Academic Cross-References
+
+Multi-column paper layout supporting automatic numbering and clickable jump links for figures, tables, and equations.
 
 <!-- vml {"v":2,"type":"text","cols":2,"gap":1.5} -->
-### Method
+### Attention Mechanism
 
-For each interior sample:
+Standard scaled dot-product attention is formulated as:
 
 $$
-y_t=\frac{x_{t-1}+x_t+x_{t+1}}{3}\label{eq:mean}
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V \label{eq:attn}
 $$
 
-Compare @fig:raw with @fig:mean: @eq:mean reduces local fluctuations. This code keeps the seven complete windows:
+As illustrated in @fig:eval and @fig:gpt2, models following @eq:attn demonstrate strong scalability.
 
-```python
-x = [2, 5, 3, 8, 4, 9, 6, 8, 7]
-y = [sum(x[i-1:i+2]) / 3
-     for i in range(1, len(x)-1)]
-```
+### Model Parameters
 
-### Check
-
-| Sample | Original | Mean |
+| Architecture | Hidden Dim | Attention Heads |
 | --- | ---: | ---: |
-| 2 | 5 | 3.33 |
-| 4 | 8 | 5.00 |
-| 6 | 9 | 6.33 |
+| Small (117M) | 768 | 12 |
+| Medium (345M) | 1024 | 16 |
+| Large (762M) | 1280 | 20 |
 
-Three windows checked by hand. {#tbl:check}
+GPT-2 model specifications {#tbl:arch}
 
-Use @tbl:check to check arithmetic, not to equate smoothness with accuracy. Text temporarily uses one column while editing, then returns to its layout.
+See @tbl:arch for details. When editing, text temporarily unfolds into a single column, restoring multi-column flow upon exiting.
 <!-- /vml -->
 
-**Try it:** right-click the text box → **Text settings** for 2–4 columns, column gap, text size, alignment and block position. One column works better on a narrow screen.
+- **Column settings**: Right-click the text layout block and choose "Text settings…" to switch 2–4 columns, adjust column gap, and set alignment.
+- **Auto-numbering**: Append `{#fig:label}` to captions, `{#tbl:label}` to table captions, and `\label{eq:label}` inside equations; reference them in body text with `@fig:label`, `@tbl:label`, and `@eq:label` for click-to-jump navigation.
 
-**Numbering syntax:** end a figure caption with `{#fig:name}`, a table caption with `{#tbl:name}`, or put `\label{eq:name}` inside an equation. Refer to them with `@fig:name`, `@tbl:name` and `@eq:name`; click a reference to jump. Numbering follows the order within this note. Choose English or Chinese in settings.
+---
 
-## 5 · Keep the process as well as the result
+## 5. Video & Media Combination
 
-<!-- vml {"v":2,"rows":[{"height":190,"widths":[1,1],"captions":["A three-point window moving across the samples (teaching animation).","Original samples for checking while paused."]}]} -->
-![Moving window animation](./assets/window.webm) ![Original samples](./assets/raw.svg)
+
+<!-- vml {"v":2,"rows":[{"height":190,"widths":[1,1],"captions":["Sliding window attention animation","Model architecture comparison"]}]} -->
+![Sliding window](./assets/window.webm) ![LoRA architecture](./assets/lora-arch.png)
 <!-- /vml -->
 
-**Try it:** play the animation, then move it using the video's dedicated top-left drag handle. Playback controls remain usable. Double-click an image in Live Preview to inspect it: scroll to zoom, drag to pan and use the arrow keys to switch images.
+- **Video handle**: The drag handle for videos is located at the top-left corner.
+- **Image preview**: Double-click an image to open the full-screen lightbox, supporting mouse-wheel zoom and arrow-key navigation.
 
-## Use it in your own notes
+---
 
-| Goal | Shortest route |
+## Other Common Actions
+
+| Action | Path |
 | --- | --- |
-| Start a layout | Select text or media lines → right-click **Wrap selection in a layout**, or run that command; ordinary images have a context-menu entry too |
-| Organize incoming media | Enable automatic conversion after drop/paste in settings if useful (off by default) |
-| Merge or unwrap | Run **Merge with the next layout**; use the context menu to move one item out, or remove layout comments to retain the content |
-| Inspect or undo | Click **Edit source**; use Obsidian's Undo/Redo for adjustments |
-| Share the result | Switch to Reading View or use Obsidian's **Export to PDF**; paper width changes line breaks and pagination |
-| Return to this guide | Search **Feature examples** in the command palette; assign your own shortcuts in Obsidian settings |
-
-Layouts live in HTML comments; media remain ordinary embeds. With the plugin disabled, content remains in normal Markdown order. Layouts and automatic numbering require the plugin. Replace the example files with your own media whenever you like.
+| **Create layout** | Select content → right-click "Wrap selection in a layout" (or use hotkey). |
+| **Unwrap & restore** | Right-click "Move out of layout", or click "Edit source" to delete comments. |

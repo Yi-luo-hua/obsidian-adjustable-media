@@ -1,11 +1,14 @@
-# Feature examples / 功能示例
+# 示例文档 / Feature Examples
 
-[English](Guide.en.md) · [简体中文](Guide.zh-CN.md)
+[简体中文](Guide.zh-CN.md) · [English](Guide.en.md)
 
-Open **Feature examples / 功能示例** in Obsidian's command palette for the rendered guide. **Create example note / 创建示例笔记** creates a runnable copy and its three media files in a new folder. The source documents here contain the actual layout blocks; GitHub displays ordinary Markdown rather than the plugin's layout.
+本目录包含 Adjustable Media 的排版示例文档与内置媒体素材。示例以学术论文写作（Transformer / LoRA / GPT-2）为场景，直观演示多图并排、图文混排、文字环绕、双栏排版以及公式图表交叉引用。
 
-在 Obsidian 命令面板打开「功能示例」可看到实际排版。点击「创建示例笔记」生成可操作的副本与三个素材文件。仓库中的文档包含真实布局语法；GitHub 只显示普通 Markdown，不显示插件排版。
+This directory contains demonstration notes and bundled media for Adjustable Media, showcasing side-by-side figures, figures with text, text wrapping, two-column typography, and smart academic cross-referencing in research contexts.
 
-The charts and WebM animation are original illustrations under this repository's MIT license. Both use the teaching samples `[2, 5, 3, 8, 4, 9, 6, 8, 7]`; the mean includes three consecutive samples and omits incomplete endpoint windows. They are examples of arithmetic, not experimental measurements or claims of improved accuracy. No network resources or extra release downloads are required.
+---
 
-图表和 WebM 教学动画为本仓库原创素材，使用仓库的 MIT 许可。数据是教学样例，不是真实实验测量，也不代表准确率提高；不依赖网络资源或额外下载。
+### 如何在 Obsidian 中体验
+
+1. **一键创建**：在 Obsidian 命令面板中搜索并运行「Adjustable Media 功能介绍」，点击「在库中创建示例笔记」按钮，插件将在库中生成独立笔记与素材。
+2. **切换实时预览**：打开创建的示例文档并切换到「实时预览」模式，即可用鼠标直接拖拽调整排版。

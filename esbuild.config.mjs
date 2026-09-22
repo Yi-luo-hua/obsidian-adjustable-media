@@ -27,7 +27,7 @@ const context = await esbuild.context({
   entryPoints: ["main.ts"],
   outfile: "main.js",
   bundle: true,
-  loader: { ".md": "text", ".svg": "text", ".webm": "base64" },
+  loader: { ".md": "text", ".svg": "text", ".webm": "base64", ".jpg": "base64", ".jpeg": "base64", ".png": "base64" },
   external,
   format: "cjs",
   platform: "browser",

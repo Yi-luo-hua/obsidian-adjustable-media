@@ -1,6 +1,7 @@
 import { MarkdownView, editorInfoField, type App, type Editor, type TFile } from "obsidian";
 import type { EditorView } from "@codemirror/view";
 
+import { t } from "../view/messages.ts";
 import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure } from "./edits.ts";
 import { applyEditsToView } from "./editorTransaction.ts";
 
@@ -18,8 +19,9 @@ export async function writeExampleNote(
   name: string,
   text: string,
   assets: readonly { name: string; data: Uint8Array<ArrayBuffer> }[],
+  folderName?: string,
 ): Promise<TFile> {
-  const base = "Adjustable Media examples";
+  const base = folderName ?? t("exampleFolderName");
   let folder = base;
   for (let suffix = 2; app.vault.getAbstractFileByPath(folder); suffix++) folder = `${base} ${suffix}`;
   await app.vault.createFolder(folder);

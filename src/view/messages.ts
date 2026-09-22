@@ -4,14 +4,73 @@ import type { V2Block } from "../format/v2.ts";
 
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
-  guideTitle: { zh: "功能示例", en: "Feature examples" },
-  guideLanguage: { zh: "示例语言", en: "Example language" },
-  guideIntro: { zh: "从一份实验笔记开始。可切换语言；创建副本后，在实时预览中动手调整。", en: "Start with an experiment notebook. Switch languages, or create a copy to try the layouts in Live Preview." },
-  guideCreate: { zh: "创建示例笔记", en: "Create example note" },
-  guideCreateDesc: { zh: "在新文件夹中创建当前语言的笔记和离线素材，不覆盖已有文件。", en: "Creates the selected language's note and offline media in a new folder without replacing existing files." },
+  guideTitle: { zh: "Adjustable Media 功能介绍", en: "Adjustable Media overview" },
+  guideSubtitle: {
+    zh: "为 Obsidian 带来无侵入、所见即所得的 Markdown 多媒体与文本自由排版能力。",
+    en: "Non-destructive, what-you-see-is-what-you-get media and text layouts for Obsidian.",
+  },
+  guideLanguage: { zh: "语言", en: "Language" },
+  guideCreate: { zh: "在库中创建示例笔记", en: "Create example note in vault" },
+  guideCreateDesc: {
+    zh: "在库中生成独立的示例笔记与离线素材，方便在实时预览模式下亲自上手体验拖拽调整。",
+    en: "Creates a standalone note and offline media in your vault to try interactive layouts in Live Preview.",
+  },
+  exampleFolderName: { zh: "Adjustable Media 示例", en: "Adjustable Media examples" },
+  settingUiLanguage: { zh: "界面语言", en: "Interface language" },
+  settingUiLanguageDesc: {
+    zh: "设置插件界面与菜单的显示语言；选择「跟随 Obsidian」将自动匹配应用语言。",
+    en: "Display language for plugin menus, settings, and notices; \"Follow Obsidian\" matches your application locale.",
+  },
+  uiLanguageAuto: { zh: "跟随 Obsidian", en: "Follow Obsidian" },
+  settingOpenGuide: { zh: "功能介绍", en: "Feature overview" },
+  settingOpenGuideDesc: { zh: "重新查看插件的核心排版能力与快速上手指南。", en: "Reopen the feature overview and quick start guide." },
+  settingOpenGuideBtn: { zh: "打开指南", en: "Open overview" },
   guideCreating: { zh: "正在创建…", en: "Creating…" },
-  guideFailed: { zh: "示例未能完成，请重试。已创建的文件会保留。", en: "The example could not be completed. Please retry. Any files already created are kept." },
-  guideLoadFailed: { zh: "示例显示失败，请关闭后通过命令重新打开。", en: "The examples could not be displayed. Close this window and reopen them from the command palette." },
+  guideCreated: { zh: "示例笔记已创建并打开。", en: "Example note created and opened." },
+  guideFailed: { zh: "示例笔记创建失败，请重试。", en: "Failed to create example note. Please try again." },
+  guideStart: { zh: "开始使用", en: "Get started" },
+  guideFeaturesTitle: { zh: "核心排版功能", en: "Key features" },
+  guideFeatureSideBySideTitle: { zh: "多图自由并排", en: "Side-by-side media" },
+  guideFeatureSideBySideDesc: {
+    zh: "多张图片或视频同排展示，拖动分割线即时调节比例，拖动底边调整行高，随意拖拽排序。",
+    en: "Place multiple images or videos in one row. Drag the dividers to adjust width ratios, drag the bottom edge for row height, and drag items to reorder.",
+  },
+  guideFeatureTextBesideTitle: { zh: "图文优雅混排", en: "Text beside media" },
+  guideFeatureTextBesideDesc: {
+    zh: "在图片旁并排放置文字分析，实时预览中点击即可就地编辑，支持靠上、居中或靠底对齐。",
+    en: "Place explanatory text directly next to figures. Click to edit in place in Live Preview, with top, middle, or bottom vertical alignment.",
+  },
+  guideFeatureWrapTitle: { zh: "图文环绕与浮动", en: "Float & text wrap" },
+  guideFeatureWrapDesc: {
+    zh: "图片或边栏文字卡片可设为左/右浮动，正文自动环绕流动，支持错开首几行（skip）。",
+    en: "Float images or text boxes to the left or right with surrounding text wrapping naturally around them, supporting line skips.",
+  },
+  guideFeatureColumnsTitle: { zh: "多栏流式排版", en: "Multi-column text" },
+  guideFeatureColumnsDesc: {
+    zh: "纯文本块支持 2~4 栏自动流式分栏排版，自定义栏间距与两端对齐，告别长行视觉疲劳。",
+    en: "Flow text through 2 to 4 responsive columns with customizable gaps and text alignment, avoiding wide-line fatigue.",
+  },
+  guideFeatureCrossrefTitle: { zh: "学术编号与跳转", en: "Smart cross-references" },
+  guideFeatureCrossrefDesc: {
+    zh: "支持图注（{#fig:...}）、表注（{#tbl:...}）与公式（\\label{eq:...}）自动编号，正文一键引用跳转。",
+    en: "Automatic numbering for figures, tables, and equations with clickable cross-references (@fig, @tbl, @eq) compatible with Pandoc.",
+  },
+  guideQuickStartTitle: { zh: "快速上手方式", en: "Quick start" },
+  guideQuickStep1Title: { zh: "创建排版", en: "Create layout" },
+  guideQuickStep1Desc: {
+    zh: "选中文本或图片行，右键选择「把选中的内容包成布局块」，或使用快捷命令即可创建排版。",
+    en: "Select media or text lines, right-click and choose \"Wrap selection in a layout\", or run the command palette action.",
+  },
+  guideQuickStep2Title: { zh: "交互调整", en: "Adjust interactively" },
+  guideQuickStep2Desc: {
+    zh: "在「实时预览」模式下，直接鼠标拖拽间隙改宽度、拖拽底边改高度、拖动手柄移动整块，所见即所得。",
+    en: "In Live Preview mode, adjust layouts directly by dragging gaps, edges, and handles with your mouse—true WYSIWYG.",
+  },
+  guideQuickStep3Title: { zh: "安全纯净", en: "Safe & clean" },
+  guideQuickStep3Desc: {
+    zh: "所有排版配置保存在 HTML 注释中，底层仍为纯标准 Markdown，即使停用插件也绝不破坏笔记内容。",
+    en: "All layout configurations are stored in HTML comments. The underlying content remains 100% standard Markdown with zero data lock-in.",
+  },
   unreadableSettings: {
     zh: "布局块设置无法读取，已按默认值显示；修好之前不能在这里调整布局块。",
     en: "Layout settings could not be read, so defaults are shown. Layout editing is off until they are fixed.",
@@ -328,8 +387,50 @@ const MESSAGES = {
 
 export type MessageKey = keyof typeof MESSAGES;
 
-export function t(key: MessageKey, values: Record<string, string> = {}): string {
-  const language = moment.locale().toLowerCase().startsWith("zh") ? "zh" : "en";
+export type UiLanguageSetting = "auto" | "en" | "zh";
+let uiLanguageSetting: () => UiLanguageSetting = () => "auto";
+
+export function setUiLanguage(provider: () => UiLanguageSetting): void {
+  uiLanguageSetting = provider;
+}
+
+function detectObsidianLanguage(): "zh" | "en" {
+  try {
+    const storageLang = typeof window !== "undefined" ? window.localStorage?.getItem("language") : null;
+    if (storageLang) {
+      return storageLang.toLowerCase().startsWith("zh") ? "zh" : "en";
+    }
+  } catch {
+    // ignore
+  }
+  try {
+    const docLang = typeof document !== "undefined" ? document.documentElement?.lang : "";
+    if (docLang) {
+      return docLang.toLowerCase().startsWith("zh") ? "zh" : "en";
+    }
+  } catch {
+    // ignore
+  }
+  try {
+    const locale = typeof moment !== "undefined" && typeof moment.locale === "function" ? moment.locale() : "";
+    if (locale) {
+      return locale.toLowerCase().startsWith("zh") ? "zh" : "en";
+    }
+  } catch {
+    // ignore
+  }
+  return "en";
+}
+
+export function currentLanguage(explicit?: "zh" | "en"): "zh" | "en" {
+  if (explicit) return explicit;
+  const setting = uiLanguageSetting();
+  if (setting === "zh" || setting === "en") return setting;
+  return detectObsidianLanguage();
+}
+
+export function t(key: MessageKey, values: Record<string, string> = {}, lang?: "zh" | "en"): string {
+  const language = currentLanguage(lang);
   return MESSAGES[key][language].replace(/\{(\w+)\}/g, (_match, name: string) => values[name] ?? "");
 }
 

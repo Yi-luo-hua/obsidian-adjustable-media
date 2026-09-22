@@ -1,122 +1,169 @@
-import { Component, MarkdownRenderer, Modal, Notice, moment, type App, type TFile } from "obsidian";
+import { Modal, Notice, type App, type TFile } from "obsidian";
 
-import { printPlan } from "../markdown/print.ts";
-import { modelFromBlock } from "../layout/model.ts";
 import { writeExampleNote } from "../layout/writeBack.ts";
-import { markCaptions, numbered, refContextOf } from "../view/crossrefView.ts";
-import { renderLayout } from "../view/layoutView.ts";
-import { t } from "../view/messages.ts";
+import { currentLanguage, t } from "../view/messages.ts";
 import { GUIDE_TEXT, guideAssets, type GuideLanguage } from "./content.ts";
 
-/** A read-only, offline preview. Writing a runnable copy requires the explicit create button. */
+/**
+ * Feature overview modal shown on initial install or opened via command.
+ * Strictly explains features and quick-start instructions without embedding interactive examples.
+ */
 export class GuideModal extends Modal {
-  private language: GuideLanguage = moment.locale().toLowerCase().startsWith("zh") ? "zh" : "en";
-  private renderer: Component | null = null;
-  private urls: string[] = [];
-  private generation = 0;
+  private language: GuideLanguage = currentLanguage();
   private creating = false;
-  private body!: HTMLElement;
 
   constructor(app: App) {
     super(app);
   }
 
   override onOpen(): void {
-    this.modalEl.addClass("vml-guide");
-    this.titleEl.setText(t("guideTitle"));
-    this.contentEl.createEl("p", { text: t("guideIntro") });
-    const actions = this.contentEl.createDiv({ cls: "vml-guide__actions" });
-    const select = actions.createEl("select", { attr: { "aria-label": t("guideLanguage") } });
-    select.createEl("option", { text: "中文", value: "zh" });
-    select.createEl("option", { text: "English", value: "en" });
-    select.value = this.language;
-    select.addEventListener("change", () => {
-      this.language = select.value === "zh" ? "zh" : "en";
-      void this.renderGuide();
+    this.modalEl.addClass("vml-guide-modal");
+    this.render();
+  }
+
+  private render(): void {
+    const { contentEl } = this;
+    contentEl.empty();
+
+    // 1. Header: Title, Subtitle & Language Selector
+    const header = contentEl.createDiv({ cls: "vml-guide__header" });
+    const headerLeft = header.createDiv({ cls: "vml-guide__header-text" });
+    headerLeft.createEl("h2", { text: t("guideTitle", {}, this.language), cls: "vml-guide__title" });
+    headerLeft.createEl("p", { text: t("guideSubtitle", {}, this.language), cls: "vml-guide__subtitle" });
+
+    const langSelect = header.createEl("select", {
+      cls: "dropdown vml-guide__lang-select",
+      attr: { "aria-label": t("guideLanguage", {}, this.language) },
     });
-    const create = actions.createEl("button", { cls: "mod-cta", text: t("guideCreate"), attr: { title: t("guideCreateDesc") } });
-    create.addEventListener("click", () => {
+    langSelect.createEl("option", { text: "简体中文", value: "zh" });
+    langSelect.createEl("option", { text: "English", value: "en" });
+    langSelect.value = this.language;
+    langSelect.addEventListener("change", () => {
+      this.language = langSelect.value === "zh" ? "zh" : "en";
+      this.render();
+    });
+
+    // 2. Features Grid: 5 Core Capabilities
+    contentEl.createEl("h3", { text: t("guideFeaturesTitle", {}, this.language), cls: "vml-guide__section-title" });
+    const grid = contentEl.createDiv({ cls: "vml-guide__grid" });
+
+    const features = [
+      {
+        icon: "🖼️",
+        title: t("guideFeatureSideBySideTitle", {}, this.language),
+        desc: t("guideFeatureSideBySideDesc", {}, this.language),
+      },
+      {
+        icon: "📝",
+        title: t("guideFeatureTextBesideTitle", {}, this.language),
+        desc: t("guideFeatureTextBesideDesc", {}, this.language),
+      },
+      {
+        icon: "🔄",
+        title: t("guideFeatureWrapTitle", {}, this.language),
+        desc: t("guideFeatureWrapDesc", {}, this.language),
+      },
+      {
+        icon: "📰",
+        title: t("guideFeatureColumnsTitle", {}, this.language),
+        desc: t("guideFeatureColumnsDesc", {}, this.language),
+      },
+      {
+        icon: "🏷️",
+        title: t("guideFeatureCrossrefTitle", {}, this.language),
+        desc: t("guideFeatureCrossrefDesc", {}, this.language),
+      },
+    ];
+
+    for (const f of features) {
+      const card = grid.createDiv({ cls: "vml-guide__card" });
+      const top = card.createDiv({ cls: "vml-guide__card-header" });
+      top.createSpan({ cls: "vml-guide__card-icon", text: f.icon });
+      top.createEl("h4", { cls: "vml-guide__card-title", text: f.title });
+      card.createEl("p", { cls: "vml-guide__card-desc", text: f.desc });
+    }
+
+    // 3. Quick Start Section
+    contentEl.createEl("h3", { text: t("guideQuickStartTitle", {}, this.language), cls: "vml-guide__section-title" });
+    const stepsContainer = contentEl.createDiv({ cls: "vml-guide__steps" });
+
+    const steps = [
+      {
+        step: "1",
+        title: t("guideQuickStep1Title", {}, this.language),
+        desc: t("guideQuickStep1Desc", {}, this.language),
+      },
+      {
+        step: "2",
+        title: t("guideQuickStep2Title", {}, this.language),
+        desc: t("guideQuickStep2Desc", {}, this.language),
+      },
+      {
+        step: "3",
+        title: t("guideQuickStep3Title", {}, this.language),
+        desc: t("guideQuickStep3Desc", {}, this.language),
+      },
+    ];
+
+    for (const s of steps) {
+      const stepItem = stepsContainer.createDiv({ cls: "vml-guide__step-item" });
+      stepItem.createSpan({ cls: "vml-guide__step-badge", text: s.step });
+      const textWrap = stepItem.createDiv({ cls: "vml-guide__step-content" });
+      textWrap.createEl("strong", { cls: "vml-guide__step-title", text: s.title });
+      textWrap.createSpan({ cls: "vml-guide__step-desc", text: `: ${s.desc}` });
+    }
+
+    // 4. Footer & Action Buttons
+    const footer = contentEl.createDiv({ cls: "vml-guide__footer" });
+
+    const createWrap = footer.createDiv({ cls: "vml-guide__create-box" });
+    const createBtn = createWrap.createEl("button", {
+      cls: "mod-cta vml-guide__create-btn",
+      text: t("guideCreate", {}, this.language),
+    });
+    createWrap.createSpan({
+      cls: "vml-guide__create-desc",
+      text: t("guideCreateDesc", {}, this.language),
+    });
+
+    createBtn.addEventListener("click", () => {
       if (this.creating) return;
       this.creating = true;
-      create.disabled = true;
-      create.setText(t("guideCreating"));
-      void this.createNote().then(() => this.close()).catch((error: unknown) => {
-        console.error("Adjustable Media: example creation failed", error);
-        new Notice(t("guideFailed"));
-      }).finally(() => {
-        this.creating = false;
-        create.disabled = false;
-        create.setText(t("guideCreate"));
-      });
+      createBtn.disabled = true;
+      createBtn.setText(t("guideCreating", {}, this.language));
+      void this.createNote()
+        .then(() => {
+          new Notice(t("guideCreated", {}, this.language));
+          this.close();
+        })
+        .catch((error: unknown) => {
+          console.error("Adjustable Media: example note creation failed", error);
+          new Notice(t("guideFailed", {}, this.language));
+        })
+        .finally(() => {
+          this.creating = false;
+          createBtn.disabled = false;
+          createBtn.setText(t("guideCreate", {}, this.language));
+        });
     });
-    actions.createEl("button", { text: t("close") }).addEventListener("click", () => this.close());
-    this.contentEl.createEl("p", { cls: "setting-item-description", text: t("guideCreateDesc") });
-    this.body = this.contentEl.createDiv({ cls: "vml-guide__body markdown-rendered" });
-    this.body.addEventListener("click", (event) => {
-      const ref = event.target instanceof Element ? event.target.closest<HTMLElement>(".vml-ref") : null;
-      const id = ref?.dataset.vmlRef;
-      if (id) {
-        event.preventDefault();
-        this.body.querySelector<HTMLElement>(`[data-vml-label="${CSS.escape(id)}"]`)?.scrollIntoView({ block: "center" });
-      }
+
+    const closeBtn = footer.createEl("button", {
+      cls: "vml-guide__start-btn",
+      text: t("guideStart", {}, this.language),
     });
-    void this.renderGuide();
-  }
-
-  private releaseRender(): void {
-    this.renderer?.unload();
-    this.renderer = null;
-    for (const url of this.urls) URL.revokeObjectURL(url);
-    this.urls = [];
-  }
-
-  private async renderGuide(): Promise<void> {
-    const generation = ++this.generation;
-    this.releaseRender();
-    const renderer = new Component();
-    this.renderer = renderer;
-    renderer.load();
-    const content = this.body.createDiv();
-    this.body.replaceChildren(content);
-    const mediaSources = new Map(guideAssets().map((asset) => {
-      const url = URL.createObjectURL(new Blob([asset.data], { type: asset.type }));
-      this.urls.push(url);
-      return [`./assets/${asset.name}`, url];
-    }));
-    try {
-      const text = GUIDE_TEXT[this.language];
-      const refs = { ...refContextOf(text), language: this.language };
-      const token = crypto.randomUUID();
-      const { markdown, blocks } = printPlan(text, token);
-      await MarkdownRenderer.render(this.app, numbered(markdown, refs), content, "", renderer);
-      if (generation !== this.generation) return;
-      markCaptions(content, markdown);
-      const tasks: Promise<void>[] = [];
-      blocks.forEach((block, index) => {
-        const slot = content.querySelector<HTMLElement>(`[data-vml-print="${token}-${index}"]`);
-        if (slot) renderLayout(slot, { app: this.app, sourcePath: "", model: modelFromBlock(block), editable: false,
-          warning: null, component: renderer, refs, renderTasks: tasks, mediaSources });
-      });
-      await Promise.all(tasks);
-    } catch (error) {
-      if (generation === this.generation) {
-        content.setText(t("guideLoadFailed"));
-        console.error("Adjustable Media: guide rendering failed", error);
-      }
-    }
+    closeBtn.addEventListener("click", () => this.close());
   }
 
   private async createNote(): Promise<TFile> {
     const text = GUIDE_TEXT[this.language];
-    const name = this.language === "zh" ? "功能示例" : "Feature examples";
-    const file = await writeExampleNote(this.app, name, text, guideAssets());
+    const name = this.language === "zh" ? "Adjustable Media 排版示例" : "Adjustable Media Examples";
+    const folder = t("exampleFolderName", {}, this.language);
+    const file = await writeExampleNote(this.app, name, text, guideAssets(), folder);
     await this.app.workspace.getLeaf("tab").openFile(file, { state: { mode: "source", source: false } });
     return file;
   }
 
   override onClose(): void {
-    this.generation++;
-    this.releaseRender();
     this.contentEl.empty();
   }
 }

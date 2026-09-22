@@ -27,7 +27,7 @@ for (const language of ["zh-CN", "en"]) {
       }
     }
     const refs = collectRefs(text.split("\n"));
-    for (const key of ["fig:raw", "fig:mean", "eq:mean", "tbl:check"]) assert.ok(refs.targets.has(key), key);
+    for (const key of ["fig:eval", "fig:gpt2", "eq:attn", "tbl:arch"]) assert.ok(refs.targets.has(key), key);
     assert.equal(refs.targets.size, 4);
   });
 }
