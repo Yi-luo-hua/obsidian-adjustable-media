@@ -20,6 +20,8 @@ export interface LayoutViewOptions {
   refs?: RefContext;
   /** Export waits for the Markdown inside the layout before printing. */
   renderTasks?: Promise<void>[];
+  /** Offline, bundled examples can supply media without creating vault files. */
+  mediaSources?: ReadonlyMap<string, string>;
 }
 
 interface MediaSize {
@@ -178,7 +180,8 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
     itemEl.setCssProps({ "--vml-grow": String(item.weight) });
   }
 
-  const media = resolveMedia(options.app, item.embed, options.sourcePath);
+  const bundled = options.mediaSources?.get(item.embed.target);
+  const media = bundled ? { url: bundled, file: null } : resolveMedia(options.app, item.embed, options.sourcePath);
   if (!media) {
     itemEl.createDiv({ cls: "vml-item__missing", text: t("missingMedia", { target: item.embed.target }) });
   } else {

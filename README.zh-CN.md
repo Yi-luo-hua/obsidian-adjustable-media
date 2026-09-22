@@ -1,5 +1,7 @@
 # Adjustable Media
 
+[功能示例](docs/examples/Guide.zh-CN.md) · [Feature examples](docs/examples/Guide.en.md)。在 Obsidian 命令面板打开「功能示例」，可离线预览或创建带素材的示例笔记。首次安装，以及现有用户升级到包含示例的版本时，会自动展示一次。
+
 在 Obsidian 中像排版软件一样，自由拖拽、并排、缩放及用「布局块」格式排版图片/视频内容——基于轻量 HTML 注释存储，保持 100% 原生 Markdown，零格式绑架。
 
 [English](README.md) · [简体中文](README.zh-CN.md)

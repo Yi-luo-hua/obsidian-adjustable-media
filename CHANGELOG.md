@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add offline Chinese and English feature examples built around a signal-processing notebook, including bundled charts and a short teaching video. Open **Feature examples** from the command palette, or create an editable copy with its media. The guide appears once for new installs and existing users receiving it for the first time; ordinary later updates do not reopen it.
+- Match separator and equation spacing between Live Preview and Reading View, refresh references in Live Preview callouts, and fix PDF numbering, wide-table clipping and unnecessary page breaks in text layouts.
+
 ## 0.5.0 - 2026-09-21
 
 - In Live Preview and Source mode, a valid text selection now adds **Wrap selection in a layout** to the editor context menu. The same command remains available in the command palette and can be assigned a custom shortcut under **Settings → Hotkeys**; the plugin does not set a default shortcut.

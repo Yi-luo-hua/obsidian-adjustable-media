@@ -12,6 +12,22 @@ export interface WriteOptions {
   typing?: boolean;
 }
 
+/** Explicit onboarding action: create a fresh example folder, never modify an existing note. */
+export async function writeExampleNote(
+  app: App,
+  name: string,
+  text: string,
+  assets: readonly { name: string; data: Uint8Array<ArrayBuffer> }[],
+): Promise<TFile> {
+  const base = "Adjustable Media examples";
+  let folder = base;
+  for (let suffix = 2; app.vault.getAbstractFileByPath(folder); suffix++) folder = `${base} ${suffix}`;
+  await app.vault.createFolder(folder);
+  await app.vault.createFolder(`${folder}/assets`);
+  for (const asset of assets) await app.vault.createBinary(`${folder}/assets/${asset.name}`, asset.data.buffer);
+  return app.vault.create(`${folder}/${name}.md`, text);
+}
+
 /**
  * The only place layout changes are written to a note (docs/DESIGN.md, section 3).
  *

@@ -4,6 +4,14 @@ import type { V2Block } from "../format/v2.ts";
 
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
+  guideTitle: { zh: "功能示例", en: "Feature examples" },
+  guideLanguage: { zh: "示例语言", en: "Example language" },
+  guideIntro: { zh: "从一份实验笔记开始。可切换语言；创建副本后，在实时预览中动手调整。", en: "Start with an experiment notebook. Switch languages, or create a copy to try the layouts in Live Preview." },
+  guideCreate: { zh: "创建示例笔记", en: "Create example note" },
+  guideCreateDesc: { zh: "在新文件夹中创建当前语言的笔记和离线素材，不覆盖已有文件。", en: "Creates the selected language's note and offline media in a new folder without replacing existing files." },
+  guideCreating: { zh: "正在创建…", en: "Creating…" },
+  guideFailed: { zh: "示例未能完成，请重试。已创建的文件会保留。", en: "The example could not be completed. Please retry. Any files already created are kept." },
+  guideLoadFailed: { zh: "示例显示失败，请关闭后通过命令重新打开。", en: "The examples could not be displayed. Close this window and reopen them from the command palette." },
   unreadableSettings: {
     zh: "布局块设置无法读取，已按默认值显示；修好之前不能在这里调整布局块。",
     en: "Layout settings could not be read, so defaults are shown. Layout editing is off until they are fixed.",

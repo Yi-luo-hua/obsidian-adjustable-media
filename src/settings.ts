@@ -2,17 +2,20 @@ import { PluginSettingTab, Setting, type App, type Plugin, type SettingDefinitio
 
 import type { RefLanguageSetting } from "./view/crossrefView.ts";
 import { t } from "./view/messages.ts";
+import { readGuideRevision } from "./guide/state.ts";
 
 export interface VmlSettings {
   /** Wrap dropped or pasted media in a layout. Off by default, since it changes the note. */
   autoConvert: boolean;
   /** The language of the numbers of figures, tables and equations; auto follows Obsidian's. */
   refLanguage: RefLanguageSetting;
+  guideRevision: number;
 }
 
 export const DEFAULT_SETTINGS: VmlSettings = {
   autoConvert: false,
   refLanguage: "auto",
+  guideRevision: 0,
 };
 
 const REF_LANGUAGES: readonly RefLanguageSetting[] = ["auto", "en", "zh"];
@@ -24,6 +27,7 @@ export function readSettings(saved: unknown): VmlSettings {
   return {
     autoConvert: typeof record.autoConvert === "boolean" ? record.autoConvert : DEFAULT_SETTINGS.autoConvert,
     refLanguage: refLanguage ?? DEFAULT_SETTINGS.refLanguage,
+    guideRevision: readGuideRevision(record.guideRevision),
   };
 }
 

@@ -1048,3 +1048,10 @@ body.vml-is-dragging * {
 .vml-rv-table-host {
   overflow-x: visible !important;
 }
+/* Offline examples use the same layout renderer as the note, inside a read-only dialog. */
+.modal.vml-guide { width: min(960px, 94vw); }
+.vml-guide__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.vml-guide__body { margin-top: 20px; }
+.vml-guide__body h2 { clear: both; padding-top: 1em; }
+.vml-guide__body > div { display: flow-root; }
+.vml-guide__body table { width: 100%; }
