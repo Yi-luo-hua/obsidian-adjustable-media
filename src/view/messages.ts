@@ -5,6 +5,7 @@ import type { V2Block } from "../format/v2.ts";
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
   guideTitle: { zh: "Adjustable Media 功能介绍", en: "Adjustable Media overview" },
+  guideCommandName: { zh: "功能示例", en: "Feature examples" },
   guideSubtitle: {
     zh: "为 Obsidian 带来无侵入、所见即所得的 Markdown 多媒体与文本自由排版能力。",
     en: "Non-destructive, what-you-see-is-what-you-get media and text layouts for Obsidian.",
@@ -391,10 +392,12 @@ export function setUiLanguage(provider: () => UiLanguageSetting): void {
 }
 
 function detectObsidianLanguage(): "zh" | "en" {
+  // Obsidian configures moment with the app's locale, available long before getLanguage().
+  // getLanguage() itself cannot be used here: it requires 1.8.7 while minAppVersion is 1.5.0.
   try {
-    const storageLang = typeof window !== "undefined" ? window.localStorage?.getItem("language") : null;
-    if (storageLang) {
-      return storageLang.toLowerCase().startsWith("zh") ? "zh" : "en";
+    const locale = typeof moment !== "undefined" && typeof moment.locale === "function" ? moment.locale() : "";
+    if (locale) {
+      return locale.toLowerCase().startsWith("zh") ? "zh" : "en";
     }
   } catch {
     // ignore
@@ -403,14 +406,6 @@ function detectObsidianLanguage(): "zh" | "en" {
     const docLang = typeof document !== "undefined" ? document.documentElement?.lang : "";
     if (docLang) {
       return docLang.toLowerCase().startsWith("zh") ? "zh" : "en";
-    }
-  } catch {
-    // ignore
-  }
-  try {
-    const locale = typeof moment !== "undefined" && typeof moment.locale === "function" ? moment.locale() : "";
-    if (locale) {
-      return locale.toLowerCase().startsWith("zh") ? "zh" : "en";
     }
   } catch {
     // ignore

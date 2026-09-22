@@ -1,7 +1,6 @@
 import { MarkdownView, editorInfoField, type App, type Editor, type TFile } from "obsidian";
 import type { EditorView } from "@codemirror/view";
 
-import { t } from "../view/messages.ts";
 import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure } from "./edits.ts";
 import { applyEditsToView } from "./editorTransaction.ts";
 
@@ -19,11 +18,10 @@ export async function writeExampleNote(
   name: string,
   text: string,
   assets: readonly { name: string; data: Uint8Array<ArrayBuffer> }[],
-  folderName?: string,
+  folderName: string,
 ): Promise<TFile> {
-  const base = folderName ?? t("exampleFolderName");
-  let folder = base;
-  for (let suffix = 2; app.vault.getAbstractFileByPath(folder); suffix++) folder = `${base} ${suffix}`;
+  let folder = folderName;
+  for (let suffix = 2; app.vault.getAbstractFileByPath(folder); suffix++) folder = `${folderName} ${suffix}`;
   await app.vault.createFolder(folder);
   await app.vault.createFolder(`${folder}/assets`);
   for (const asset of assets) await app.vault.createBinary(`${folder}/assets/${asset.name}`, asset.data.buffer);

@@ -38,7 +38,10 @@ export default class AdjustableMediaPlugin extends Plugin {
       guide = new GuideModal(this.app);
       guide.open();
     };
-    this.addCommand({ id: "show-feature-examples", name: t("guideTitle"), callback: openGuide });
+    // Obsidian freezes command names at registration; switching UI language later does not rename
+    // the entry in the command palette. The name intentionally omits the plugin name because
+    // Obsidian already prefixes it with "Adjustable Media:" in the palette (AGENTS.md).
+    this.addCommand({ id: "show-feature-examples", name: t("guideCommandName"), callback: openGuide });
     this.register(() => { unloaded = true; guide?.close(); });
     this.app.workspace.onLayoutReady(() => {
       if (unloaded || !shouldShowGuide(this.settings.guideRevision)) return;

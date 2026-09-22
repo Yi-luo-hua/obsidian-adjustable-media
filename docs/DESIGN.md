@@ -259,7 +259,7 @@ $$
 
 ### 离线功能示例
 
-`docs/examples/Guide.zh-CN.md` 和 `Guide.en.md` 是弹窗与可操作示例笔记共用的正文。esbuild 将正文、两张 SVG 与 WebM 教学动画打包进 `main.js`，发布仍只有三个文件。弹窗通过共享布局渲染器显示只读示例，素材使用临时 Blob URL，关闭、切换语言和卸载时释放。点击创建后，由 `writeBack.ts` 在新文件夹写入副本；已有示例不会被覆盖。命令「功能示例」可随时重新打开。
+`docs/examples/Guide.zh-CN.md` 和 `Guide.en.md` 是弹窗与可操作示例笔记共用的正文。esbuild 将正文、三张 PNG 与一个 WebM 教学动画以 base64 打包进 `main.js`，发布仍只有三个文件。弹窗（`GuideModal`）以文字卡片形式概述五项核心排版能力与三步快速上手，不渲染布局示例、不使用 Blob URL，因此无需资源释放。点击「在库中创建使用指南」后，由 `writeBack.ts` 的 `writeExampleNote` 在新文件夹写入正文与素材副本；同名文件夹已存在时自动追加序号，已有示例不会被覆盖。命令「功能示例」（英文界面 "Feature examples"）可随时重新打开弹窗；命令名不含插件名，Obsidian 在命令面板中会自动加上「Adjustable Media:」前缀。
 
 `settings.guideRevision` 记录已展示的文档修订号：旧用户没有该字段、新安装没有数据，都会在布局就绪后展示一次；普通重载、后续版本和降级不重复展示。只有示例发生值得重新介绍的重大变化时才增加 `GUIDE_REVISION`。不随每次插件版本发布递增。
 

@@ -15,12 +15,16 @@ function decodeBase64(base64: string): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
-/** Included in main.js: offline media for standalone example note creation. */
+let cachedAssets: { name: string; type: string; data: Uint8Array<ArrayBuffer> }[] | null = null;
+
+/** Included in main.js: offline media for standalone example note creation. Decoded once and cached. */
 export function guideAssets(): { name: string; type: string; data: Uint8Array<ArrayBuffer> }[] {
-  return [
+  if (cachedAssets) return cachedAssets;
+  cachedAssets = [
     { name: "lora-arch.png", type: "image/png", data: decodeBase64(loraArch) },
     { name: "lora-eval.png", type: "image/png", data: decodeBase64(loraEval) },
     { name: "gpt2-perf.png", type: "image/png", data: decodeBase64(gpt2Perf) },
     { name: "window.webm", type: "video/webm", data: decodeBase64(video) },
   ];
+  return cachedAssets;
 }

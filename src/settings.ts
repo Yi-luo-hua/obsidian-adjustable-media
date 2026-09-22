@@ -45,10 +45,18 @@ interface SettingsHost extends Plugin {
 
 export class VmlSettingTab extends PluginSettingTab {
   private readonly host: SettingsHost;
+  private guide: GuideModal | null = null;
 
   constructor(app: App, host: SettingsHost) {
     super(app, host);
     this.host = host;
+  }
+
+  /** Opens the feature overview modal, closing any previous instance to avoid stacking. */
+  private openGuide(): void {
+    this.guide?.close();
+    this.guide = new GuideModal(this.app);
+    this.guide.open();
   }
 
   /**
@@ -78,9 +86,7 @@ export class VmlSettingTab extends PluginSettingTab {
         render: (setting) => {
           setting.addButton((button) => button
             .setButtonText(t("settingOpenGuideBtn"))
-            .onClick(() => {
-              new GuideModal(this.app).open();
-            }));
+            .onClick(() => this.openGuide()));
         },
       },
     ];
@@ -166,8 +172,6 @@ export class VmlSettingTab extends PluginSettingTab {
       .setDesc(t("settingOpenGuideDesc"))
       .addButton((button) => button
         .setButtonText(t("settingOpenGuideBtn"))
-        .onClick(() => {
-          new GuideModal(this.app).open();
-        }));
+        .onClick(() => this.openGuide()));
   }
 }
