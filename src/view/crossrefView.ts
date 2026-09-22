@@ -168,6 +168,8 @@ function numberSection(app: App, el: HTMLElement, ctx: MarkdownPostProcessorCont
   const info = ctx.getSectionInfo(el);
   // CodeMirror renders callouts through MarkdownRenderer without section offsets.
   if (!info && el.closest(".cm-callout")) {
+    // The same file open in several panes shares one buffer, so the first matching view yields the
+    // same numbering as the view that triggered this post-processor.
     const view = app.workspace.getLeavesOfType("markdown")
       .map((leaf) => leaf.view)
       .find((candidate): candidate is MarkdownView => candidate instanceof MarkdownView && candidate.file?.path === ctx.sourcePath);
@@ -319,7 +321,13 @@ export function crossrefExtension(): Extension {
       });
     };
     refresh();
-    return { update: refresh, destroy: () => { destroyed = true; } };
+    return {
+      // Callout numbering only changes when the document does: a callout that scrolls into view is
+      // numbered by the numberSection post-processor, and cursor moves never renumber. Refreshing on
+      // every transaction would walk all callouts on each keystroke and arrow press.
+      update: (update) => { if (update.docChanged) refresh(); },
+      destroy: () => { destroyed = true; },
+    };
   })];
 }
 
