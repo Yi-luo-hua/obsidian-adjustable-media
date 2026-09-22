@@ -1101,7 +1101,7 @@ body.vml-is-dragging * {
 }
 
 .vml-guide__card {
-  padding: 12px 14px;
+  padding: 14px 16px;
   background-color: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
   border-radius: var(--radius-m);
@@ -1115,20 +1115,9 @@ body.vml-is-dragging * {
   border-color: var(--interactive-accent);
 }
 
-.vml-guide__card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.vml-guide__card-icon {
-  font-size: 1.15rem;
-  line-height: 1;
-}
-
 .vml-guide__card-title {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-normal);
 }
@@ -1137,7 +1126,7 @@ body.vml-is-dragging * {
   margin: 0;
   font-size: 0.82rem;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .vml-guide__steps {
@@ -1190,15 +1179,8 @@ body.vml-is-dragging * {
   border-top: 1px solid var(--background-modifier-border);
 }
 
-.vml-guide__create-box {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.vml-guide__create-desc {
-  font-size: 0.78rem;
-  color: var(--text-muted);
+.vml-guide__create-btn {
+  padding: 6px 16px;
 }
 
 .vml-guide__start-btn {

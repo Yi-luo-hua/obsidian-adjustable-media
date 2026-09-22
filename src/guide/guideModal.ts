@@ -49,27 +49,22 @@ export class GuideModal extends Modal {
 
     const features = [
       {
-        icon: "🖼️",
         title: t("guideFeatureSideBySideTitle", {}, this.language),
         desc: t("guideFeatureSideBySideDesc", {}, this.language),
       },
       {
-        icon: "📝",
         title: t("guideFeatureTextBesideTitle", {}, this.language),
         desc: t("guideFeatureTextBesideDesc", {}, this.language),
       },
       {
-        icon: "🔄",
         title: t("guideFeatureWrapTitle", {}, this.language),
         desc: t("guideFeatureWrapDesc", {}, this.language),
       },
       {
-        icon: "📰",
         title: t("guideFeatureColumnsTitle", {}, this.language),
         desc: t("guideFeatureColumnsDesc", {}, this.language),
       },
       {
-        icon: "🏷️",
         title: t("guideFeatureCrossrefTitle", {}, this.language),
         desc: t("guideFeatureCrossrefDesc", {}, this.language),
       },
@@ -77,9 +72,7 @@ export class GuideModal extends Modal {
 
     for (const f of features) {
       const card = grid.createDiv({ cls: "vml-guide__card" });
-      const top = card.createDiv({ cls: "vml-guide__card-header" });
-      top.createSpan({ cls: "vml-guide__card-icon", text: f.icon });
-      top.createEl("h4", { cls: "vml-guide__card-title", text: f.title });
+      card.createEl("h4", { cls: "vml-guide__card-title", text: f.title });
       card.createEl("p", { cls: "vml-guide__card-desc", text: f.desc });
     }
 
@@ -116,14 +109,9 @@ export class GuideModal extends Modal {
     // 4. Footer & Action Buttons
     const footer = contentEl.createDiv({ cls: "vml-guide__footer" });
 
-    const createWrap = footer.createDiv({ cls: "vml-guide__create-box" });
-    const createBtn = createWrap.createEl("button", {
+    const createBtn = footer.createEl("button", {
       cls: "mod-cta vml-guide__create-btn",
       text: t("guideCreate", {}, this.language),
-    });
-    createWrap.createSpan({
-      cls: "vml-guide__create-desc",
-      text: t("guideCreateDesc", {}, this.language),
     });
 
     createBtn.addEventListener("click", () => {
@@ -156,7 +144,7 @@ export class GuideModal extends Modal {
 
   private async createNote(): Promise<TFile> {
     const text = GUIDE_TEXT[this.language];
-    const name = this.language === "zh" ? "Adjustable Media 排版示例" : "Adjustable Media Examples";
+    const name = this.language === "zh" ? "Adjustable Media 使用指南" : "Adjustable Media Guide";
     const folder = t("exampleFolderName", {}, this.language);
     const file = await writeExampleNote(this.app, name, text, guideAssets(), folder);
     await this.app.workspace.getLeaf("tab").openFile(file, { state: { mode: "source", source: false } });
