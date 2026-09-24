@@ -1,6 +1,7 @@
-import { findV2Blocks, serializeOpener, type V2Block, type WrapSide } from "../format/v2.ts";
+import { findV2Blocks, MAX_WRAP_SKIP, serializeOpener, type V2Block, type WrapSide } from "../format/v2.ts";
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
 import { isEditable, planModelEdit, type BlockEdit } from "./edits.ts";
+import { adjacentOppositeFloat, visualWrapSkip } from "./floatOrder.ts";
 import { metaFromModel, modelFromBlock, setSkip, setWrap } from "./model.ts";
 
 /**
@@ -98,6 +99,30 @@ export function isSamePlace(lines: readonly string[], block: V2Block, line: numb
   return line === next;
 }
 
+/** Keep adjacent opposite-side floats in the order of the height they start at. CSS cannot place a
+ * later float above an earlier one, so a moved block crossing its neighbor must cross it in the
+ * note too.
+ */
+export function orderAdjacentFloat(lines: readonly string[], block: V2Block, placement: Placement): Placement {
+  if (placement.wrap === null || !isSamePlace(lines, block, placement.line)) {
+    return placement;
+  }
+  const blocks = findV2Blocks(lines);
+  const index = blocks.findIndex((candidate) => candidate.openLine === block.openLine);
+  if (index < 0) {
+    return placement;
+  }
+  const after = adjacentOppositeFloat(lines, blocks, index, 1);
+  if (after && placement.wrap !== modelFromBlock(after).wrap && placement.skip > visualWrapSkip(lines, blocks, index + 1)) {
+    return { ...placement, line: after.closeLine + 1 };
+  }
+  const before = adjacentOppositeFloat(lines, blocks, index, -1);
+  if (before && placement.wrap !== modelFromBlock(before).wrap && placement.skip < visualWrapSkip(lines, blocks, index - 1)) {
+    return { ...placement, line: before.openLine };
+  }
+  return placement;
+}
+
 /**
  * Plans putting `block` at `placement`. At its own place only the opening comment changes.
  * Elsewhere the block leaves its place, taking one of two surrounding blank lines along, and goes in
@@ -106,14 +131,30 @@ export function isSamePlace(lines: readonly string[], block: V2Block, line: numb
  * Returns null when the block cannot be edited, [] when nothing changes.
  */
 export function planPlacement(lines: readonly string[], block: V2Block, placement: Placement): BlockEdit[] | null {
-  if (!isEditable(block) || !blockGaps(lines).includes(placement.line)) {
+  const ordered = orderAdjacentFloat(lines, block, placement);
+  const afterAdjacent = ordered.line !== placement.line && ordered.line > block.closeLine
+    && (ordered.line === lines.length || lines[ordered.line]?.trim() === "");
+  const gaps = blockGaps(lines);
+  if (!isEditable(block) || !gaps.includes(placement.line) || (!gaps.includes(ordered.line) && !afterAdjacent)) {
     return null;
   }
   const current = modelFromBlock(block);
-  const model = setSkip(setWrap(current, placement.wrap), placement.skip);
-  if (isSamePlace(lines, block, placement.line)) {
+  const blocks = findV2Blocks(lines);
+  const index = blocks.findIndex((candidate) => candidate.openLine === block.openLine);
+  const after = placement.wrap === current.wrap && isSamePlace(lines, block, placement.line) && index >= 0
+    ? adjacentOppositeFloat(lines, blocks, index, 1) : null;
+  const afterVisual = after ? visualWrapSkip(lines, blocks, index + 1) : 0;
+  if (afterVisual > MAX_WRAP_SKIP) {
+    return null;
+  }
+  const afterEdit = after ? planModelEdit(after, setSkip(modelFromBlock(after), afterVisual)) : null;
+  if (after && afterVisual !== (modelFromBlock(after).skip ?? 0) && !afterEdit) {
+    return null;
+  }
+  const model = setSkip(setWrap(current, ordered.wrap), ordered.skip);
+  if (isSamePlace(lines, block, ordered.line)) {
     const edit = planModelEdit(block, model);
-    return edit ? [edit] : [];
+    return [...(edit ? [edit] : []), ...(afterEdit ? [afterEdit] : [])];
   }
 
   // Unchanged settings keep the opening comment exactly as the user wrote it.
@@ -121,7 +162,7 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
   const opener = JSON.stringify(meta) === JSON.stringify(metaFromModel(current)) ? block.lines[0] ?? "" : serializeOpener(meta);
   const moved = [opener, ...block.lines.slice(1)];
   const removal: BlockEdit = { anchorLine: block.openLine, anchorLines: block.lines, start: 0, end: block.lines.length - 1, replacement: [] };
-  return [removal, insertion(lines, placement.line, moved, model.wrap !== null)];
+  return [removal, insertion(lines, ordered.line, moved, model.wrap !== null), ...(afterEdit ? [afterEdit] : [])];
 }
 
 function insertion(lines: readonly string[], line: number, moved: readonly string[], glued: boolean): BlockEdit {

@@ -10,6 +10,8 @@ export interface LayoutViewOptions {
   app: App;
   sourcePath: string;
   model: LayoutModel;
+  /** Spacer height after an adjacent opposite-side float; the stored skip remains absolute. */
+  effectiveSkip?: number | null;
   /** Rows to show; a reading-view section may hold only some of the block's rows. Defaults to all. */
   rowIndices?: number[];
   editable: boolean;
@@ -53,9 +55,10 @@ const mediaSizes = new Map<string, MediaSize>();
 export function renderLayout(container: HTMLElement, options: LayoutViewOptions): HTMLElement {
   const { model } = options;
   const rowIndices = options.rowIndices ?? model.rows.map((_row, index) => index);
-  if (model.wrap !== null && model.skip !== null && (isTextOnly(model) || rowIndices.includes(0))) {
+  const skipLines = options.effectiveSkip === undefined ? model.skip : options.effectiveSkip;
+  if (model.wrap !== null && skipLines !== null && skipLines > 0 && (isTextOnly(model) || rowIndices.includes(0))) {
     const skip = container.createDiv({ cls: `vml-wrap-skip vml-wrap-skip--${model.wrap}` });
-    skip.setCssProps({ "--vml-skip": String(model.skip) });
+    skip.setCssProps({ "--vml-skip": String(skipLines) });
   }
 
   const root = container.createDiv({ cls: "vml-layout" });

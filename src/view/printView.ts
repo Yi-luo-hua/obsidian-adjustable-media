@@ -2,6 +2,7 @@ import { MarkdownRenderChild, MarkdownRenderer, TFile, type App, type MarkdownPo
 
 import { printPlan } from "../markdown/print.ts";
 import { modelFromBlock } from "../layout/model.ts";
+import { effectiveWrapSkip } from "../layout/floatOrder.ts";
 import { markCaptions, numbered, refContextOf } from "./crossrefView.ts";
 import { renderLayout } from "./layoutView.ts";
 import { blockWarning } from "./messages.ts";
@@ -42,10 +43,12 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
   await MarkdownRenderer.render(app, numbered(markdown, refs), content, ctx.sourcePath, child);
   markCaptions(content, markdown);
   const tasks: Promise<void>[] = [];
+  const lines = text.split("\n");
   blocks.forEach((block, index) => {
     const slot = content.querySelector<HTMLElement>(`[data-vml-print="${token}-${index}"]`);
     if (slot) {
-      renderLayout(slot, { app, sourcePath: ctx.sourcePath, model: modelFromBlock(block), editable: false,
+      renderLayout(slot, { app, sourcePath: ctx.sourcePath, model: modelFromBlock(block),
+        effectiveSkip: effectiveWrapSkip(lines, blocks, index), editable: false,
         warning: blockWarning(block), component: child, refs, renderTasks: tasks });
     }
   });

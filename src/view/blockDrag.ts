@@ -1,8 +1,9 @@
 import { Notice, setIcon } from "obsidian";
 import { EditorView } from "@codemirror/view";
 
-import { MAX_WRAP_SKIP } from "../format/v2.ts";
+import { findV2Blocks, MAX_WRAP_SKIP } from "../format/v2.ts";
 import { wrapZone, wrappedDrop } from "../layout/geometry.ts";
+import { visualWrapSkip } from "../layout/floatOrder.ts";
 import { effectiveWidth, hasTextColumns, setWrap } from "../layout/model.ts";
 import { blockForMove, blockGaps, isSamePlace, pickGap, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
 import { createDragGhost } from "./dragGhost.ts";
@@ -61,6 +62,9 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
   }
 
   const gaps = blockGaps(lines);
+  const movingBlocks = findV2Blocks(lines);
+  const movingIndex = movingBlocks.findIndex((candidate) => candidate.openLine === block.openLine);
+  const currentVisualSkip = movingIndex < 0 ? context.model.skip ?? 0 : visualWrapSkip(lines, movingBlocks, movingIndex);
   const layout = root.getBoundingClientRect();
   const ghost = createDragGhost(doc, root.querySelector(".vml-item__media"));
   const indicator = createDropIndicator(doc);
@@ -97,7 +101,7 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
     const samePlace = isSamePlace(lines, block, gap.line);
     const targetTop = samePlace ? lineTop(block.openLine) : gap.top;
     const renderedTop = root.isConnected ? root.getBoundingClientRect().top : layout.top + targetTop - initialAnchorTop;
-    const { skip, top } = wrappedDrop(pointer.y, targetTop, renderedTop, context.model.skip ?? 0,
+    const { skip, top } = wrappedDrop(pointer.y, targetTop, renderedTop, currentVisualSkip,
       lineHeight, MAX_WRAP_SKIP, samePlace && wrap === context.model.wrap);
     placement = { line: gap.line, wrap, skip };
 

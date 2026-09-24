@@ -2,6 +2,7 @@ import { MarkdownRenderChild, MarkdownView, type MarkdownPostProcessorContext, t
 
 import { findV2Blocks, hasSideText, isDrawable, type V2Block } from "../format/v2.ts";
 import { drawnFrom, isStale, recordDrawn, type Drawn } from "../layout/drawn.ts";
+import { effectiveWrapSkip } from "../layout/floatOrder.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { renderLayout } from "./layoutView.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
@@ -31,6 +32,7 @@ const WRAPPING = "vml-rv-wrapping";
 export function registerReadingView(plugin: Plugin): void {
   // Sections of one note arrive one after another with the same text; parse it once.
   let lastText: string | null = null;
+  let lastLines: string[] = [];
   let lastBlocks: V2Block[] = [];
   let lastState: Drawn = { comments: "", texts: [] };
   /** Whether a layout of that note floats. */
@@ -39,6 +41,7 @@ export function registerReadingView(plugin: Plugin): void {
   const parse = (text: string): void => {
     if (text !== lastText) {
       lastText = text;
+      lastLines = text.split("\n");
       lastBlocks = findBlocks(text);
       lastRefs = lastBlocks.length > 0 ? refContextOf(text) : undefined;
       lastState = drawnFrom(lastBlocks, numbersOf(lastRefs));
@@ -111,6 +114,7 @@ export function registerReadingView(plugin: Plugin): void {
       app: plugin.app,
       sourcePath: ctx.sourcePath,
       model,
+      effectiveSkip: effectiveWrapSkip(lastLines, lastBlocks, lastBlocks.indexOf(block)),
       rowIndices,
       editable: false,
       warning: blockWarning(block),

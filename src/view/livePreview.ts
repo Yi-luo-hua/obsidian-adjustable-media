@@ -4,6 +4,7 @@ import { Decoration, EditorView, WidgetType, type DecorationSet } from "@codemir
 
 import { blockWrap, findV2Blocks, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
+import { effectiveWrapSkip } from "../layout/floatOrder.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
@@ -17,6 +18,7 @@ import { wrapGuard, type WrapAnchor } from "./wrapGuard.ts";
 
 interface LivePreviewState {
   blocks: V2Block[];
+  lines: string[];
   decorations: DecorationSet;
   /** Wrapped layouts drawn as widgets. */
   anchors: WrapAnchor[];
@@ -28,6 +30,7 @@ interface LivePreviewState {
 
 interface Parsed {
   blocks: V2Block[];
+  lines: string[];
   refs: RefContext | undefined;
 }
 
@@ -73,23 +76,24 @@ export function livePreviewExtension(app: App): Extension {
 
 function parse(state: EditorState): Parsed {
   if (!state.field(editorLivePreviewField, false)) {
-    return { blocks: [], refs: undefined };
+    return { blocks: [], lines: [], refs: undefined };
   }
   // Runs on every change of every note, and most notes have no layouts.
   const text = state.doc.toString();
   if (!text.includes("<!-- vml")) {
-    return { blocks: [], refs: undefined };
+    return { blocks: [], lines: [], refs: undefined };
   }
-  return { blocks: findV2Blocks(text.split("\n")), refs: mayHaveRefs(text) ? refContextOf(text) : undefined };
+  const lines = text.split("\n");
+  return { blocks: findV2Blocks(lines), lines, refs: mayHaveRefs(text) ? refContextOf(text) : undefined };
 }
 
-function withDecorations(app: App, state: EditorState, { blocks, refs }: Parsed): LivePreviewState {
+function withDecorations(app: App, state: EditorState, { blocks, lines, refs }: Parsed): LivePreviewState {
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
   let hasWraps = false;
 
-  for (const block of blocks) {
+  for (const [index, block] of blocks.entries()) {
     if (!isDrawable(block)) {
       continue;
     }
@@ -97,10 +101,11 @@ function withDecorations(app: App, state: EditorState, { blocks, refs }: Parsed)
     const to = state.doc.line(block.closeLine + 1).to;
     const revealed = state.selection.ranges.some((range) => range.from <= to && range.to >= from);
     const wraps = blockWrap(block) !== null;
+    const effectiveSkip = effectiveWrapSkip(lines, blocks, index);
     const key = block.lines.join("\n");
     hasWraps ||= wraps;
     if (!revealed) {
-      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, block, sourcePath, refs) }).range(from, to));
+      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, block, sourcePath, refs, effectiveSkip) }).range(from, to));
       if (wraps) {
         anchors.push({ from, to, key, block });
       }
@@ -110,7 +115,7 @@ function withDecorations(app: App, state: EditorState, { blocks, refs }: Parsed)
     // Keep a text/media layout at its original position while its source opens below it. Replacing
     // the columns with normal Markdown would move the image below all of the left column's text.
     if (hasTextColumns(block)) {
-      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, block, sourcePath, refs, true) }).range(from));
+      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, block, sourcePath, refs, effectiveSkip, true) }).range(from));
     }
     // The source shows, with the media Obsidian draws in it as thumbnails.
     for (let line = block.openLine; line <= block.closeLine; line += 1) {
@@ -118,7 +123,7 @@ function withDecorations(app: App, state: EditorState, { blocks, refs }: Parsed)
     }
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
-      ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath), side: -1 }).range(from));
+      ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, effectiveSkip), side: -1 }).range(from));
       anchors.push({ from, to: from, key, block });
     }
   }
@@ -140,7 +145,7 @@ function withDecorations(app: App, state: EditorState, { blocks, refs }: Parsed)
     }
   }
 
-  return { blocks, decorations: Decoration.set(ranges, true), anchors, hasWraps, refs };
+  return { blocks, lines, decorations: Decoration.set(ranges, true), anchors, hasWraps, refs };
 }
 
 /** What Obsidian draws for the text beside a layout's media lives as long as the widget's element. */
@@ -187,20 +192,23 @@ class LayoutWidget extends WidgetType {
   private readonly block: V2Block;
   private readonly sourcePath: string;
   private readonly refs: RefContext | undefined;
+  private readonly effectiveSkip: number | null;
   private readonly key: string;
   private readonly placeKey: string;
   private readonly sourcePreview: boolean;
 
-  constructor(app: App, block: V2Block, sourcePath: string, refs: RefContext | undefined, sourcePreview = false) {
+  constructor(app: App, block: V2Block, sourcePath: string, refs: RefContext | undefined,
+    effectiveSkip: number | null, sourcePreview = false) {
     super();
     this.app = app;
     this.block = block;
     this.sourcePath = sourcePath;
     this.refs = refs;
+    this.effectiveSkip = effectiveSkip;
     this.sourcePreview = sourcePreview;
     // New numbers draw the layout again.
     const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
-    this.key = `${sourcePath}\n${numbers}\n${block.lines.join("\n")}`;
+    this.key = `${sourcePath}\n${numbers}\n${effectiveSkip}\n${block.lines.join("\n")}`;
     this.placeKey = `${sourcePath}\n@${block.openLine}`;
   }
 
@@ -222,9 +230,10 @@ class LayoutWidget extends WidgetType {
       const component = new Component();
       component.load();
       components.set(el, component);
-      renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block), editable: false, warning: blockWarning(this.block), component, refs: this.refs });
+      renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block), effectiveSkip: this.effectiveSkip,
+        editable: false, warning: blockWarning(this.block), component, refs: this.refs });
     } else {
-      drawWidget(el, view, this.app, this.block, this.sourcePath, this.refs);
+      drawWidget(el, view, this.app, this.block, this.sourcePath, this.refs, this.effectiveSkip);
     }
     if (blockWrap(this.block) === null) {
       watchHeight(el, [this.key, this.placeKey]);
@@ -266,6 +275,7 @@ function drawWidget(
   block: V2Block,
   sourcePath: string,
   refs: RefContext | undefined,
+  effectiveSkip: number | null,
   side?: TextSide,
 ): TextEditHost {
   components.get(el)?.unload();
@@ -280,7 +290,7 @@ function drawWidget(
   const component = new Component();
   component.load();
   components.set(el, component);
-  const root = renderLayout(el, { app, sourcePath, model, editable: isEditable(block), warning: blockWarning(block), component, refs });
+  const root = renderLayout(el, { app, sourcePath, model, effectiveSkip, editable: isEditable(block), warning: blockWarning(block), component, refs });
   const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor };
   const host: TextEditHost = {
     el,
@@ -291,7 +301,7 @@ function drawWidget(
     editor: view.state.field(editorInfoField, false)?.editor,
     view,
     // Drawn again from the note as it is now, numbers included.
-    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), editing),
+    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), effectiveSkip, editing),
   };
   if (isEditable(block)) {
     context.editText = (editing) => startTextEdit(host, editing, null);
@@ -352,14 +362,16 @@ class RevealedWrapWidget extends WidgetType {
   private readonly app: App;
   private readonly block: V2Block;
   private readonly sourcePath: string;
+  private readonly effectiveSkip: number | null;
   private readonly key: string;
 
-  constructor(app: App, block: V2Block, sourcePath: string) {
+  constructor(app: App, block: V2Block, sourcePath: string, effectiveSkip: number | null) {
     super();
     this.app = app;
     this.block = block;
     this.sourcePath = sourcePath;
-    this.key = `${sourcePath}\n${block.lines.join("\n")}`;
+    this.effectiveSkip = effectiveSkip;
+    this.key = `${sourcePath}\n${effectiveSkip}\n${block.lines.join("\n")}`;
   }
 
   override eq(other: RevealedWrapWidget): boolean {
@@ -368,7 +380,8 @@ class RevealedWrapWidget extends WidgetType {
 
   toDOM(): HTMLElement {
     const el = createSpan({ cls: "vml-wrap-reveal vml-live-preview vml-live-preview--wrap" });
-    renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block), editable: false, warning: null });
+    renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block),
+      effectiveSkip: this.effectiveSkip, editable: false, warning: null });
     return el;
   }
 
