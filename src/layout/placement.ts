@@ -2,7 +2,7 @@ import { findV2Blocks, MAX_WRAP_SKIP, serializeOpener, type V2Block, type WrapSi
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
 import { isEditable, planModelEdit, type BlockEdit } from "./edits.ts";
 import { adjacentOppositeFloat, visualWrapSkip } from "./floatOrder.ts";
-import { metaFromModel, modelFromBlock, setSkip, setWrap } from "./model.ts";
+import { metaFromModel, modelFromBlock, setSkip, setWrap, type LayoutModel } from "./model.ts";
 
 /**
  * Moving a whole layout block to another place in its note (docs/DESIGN.md, section 3), together
@@ -151,6 +151,22 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
   if (after && afterVisual !== (modelFromBlock(after).skip ?? 0) && !afterEdit) {
     return null;
   }
+  // Crossing the float before it makes that float start after this one, so its own height has to be
+  // pinned too; the move rewrites the neighbor's opening line and takes the pinned value along.
+  const crossedBefore = ordered.line !== placement.line && ordered.line < block.openLine;
+  const before = crossedBefore && placement.wrap === current.wrap && index >= 0
+    ? adjacentOppositeFloat(lines, blocks, index, -1) : null;
+  const beforeVisual = before ? visualWrapSkip(lines, blocks, index - 1) : 0;
+  if (beforeVisual > MAX_WRAP_SKIP) {
+    return null;
+  }
+  let beforeModel: LayoutModel | null = null;
+  if (before) {
+    beforeModel = setSkip(modelFromBlock(before), beforeVisual);
+    if (beforeVisual !== (modelFromBlock(before).skip ?? 0) && !planModelEdit(before, beforeModel)) {
+      return null;
+    }
+  }
   const model = setSkip(setWrap(current, ordered.wrap), ordered.skip);
   if (isSamePlace(lines, block, ordered.line)) {
     const edit = planModelEdit(block, model);
@@ -158,14 +174,20 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
   }
 
   // Unchanged settings keep the opening comment exactly as the user wrote it.
-  const meta = metaFromModel(model);
-  const opener = JSON.stringify(meta) === JSON.stringify(metaFromModel(current)) ? block.lines[0] ?? "" : serializeOpener(meta);
-  const moved = [opener, ...block.lines.slice(1)];
+  const moved = [openerFor(block, model), ...block.lines.slice(1)];
   const removal: BlockEdit = { anchorLine: block.openLine, anchorLines: block.lines, start: 0, end: block.lines.length - 1, replacement: [] };
-  return [removal, insertion(lines, ordered.line, moved, model.wrap !== null), ...(afterEdit ? [afterEdit] : [])];
+  // The neighbor crossed upward keeps its height by carrying its pinned opening line as the target.
+  const target = before && beforeModel && ordered.line === before.openLine ? openerFor(before, beforeModel) : undefined;
+  return [removal, insertion(lines, ordered.line, moved, model.wrap !== null, target), ...(afterEdit ? [afterEdit] : [])];
 }
 
-function insertion(lines: readonly string[], line: number, moved: readonly string[], glued: boolean): BlockEdit {
+/** The opening comment `block` gets once its settings read as `model`; unchanged settings keep it verbatim. */
+function openerFor(block: V2Block, model: LayoutModel): string {
+  const meta = metaFromModel(model);
+  return JSON.stringify(meta) === JSON.stringify(metaFromModel(modelFromBlock(block))) ? block.lines[0] ?? "" : serializeOpener(meta);
+}
+
+function insertion(lines: readonly string[], line: number, moved: readonly string[], glued: boolean, overrideTarget?: string): BlockEdit {
   const last = lines.length - 1;
   if (line > last) {
     const end = stripCarriageReturn(lines[last] ?? "");
@@ -178,15 +200,17 @@ function insertion(lines: readonly string[], line: number, moved: readonly strin
     return { anchorLine: last, anchorLines: [end], start: 0, end: 0, replacement: [end, ...(end.trim() === "" ? [] : [""]), ...moved] };
   }
 
-  const target = stripCarriageReturn(lines[line] ?? "");
+  // The anchor validates the target line exactly as written; only the replacement carries an override.
+  const written = stripCarriageReturn(lines[line] ?? "");
+  const target = overrideTarget ?? written;
   const tail = glued ? [target] : ["", target];
   if (line === 0) {
-    return { anchorLine: 0, anchorLines: [target], start: 0, end: 0, replacement: [...moved, ...tail] };
+    return { anchorLine: 0, anchorLines: [written], start: 0, end: 0, replacement: [...moved, ...tail] };
   }
   // Anchored to the line above as well: a single line of text is often not unique.
   const previous = stripCarriageReturn(lines[line - 1] ?? "");
   const head = previous.trim() === "" ? [] : [""];
-  return { anchorLine: line - 1, anchorLines: [previous, target], textOffset: 1, start: 1, end: 1, replacement: [...head, ...moved, ...tail] };
+  return { anchorLine: line - 1, anchorLines: [previous, written], textOffset: 1, start: 1, end: 1, replacement: [...head, ...moved, ...tail] };
 }
 
 function followsBlockEnd(lines: readonly string[], contexts: readonly LineContext[], line: number): boolean {

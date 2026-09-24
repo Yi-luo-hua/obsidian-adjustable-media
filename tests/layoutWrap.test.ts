@@ -403,6 +403,42 @@ test("dragging the later float above its neighbor leaves that neighbor at its ol
   assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 4);
 });
 
+test("dragging a float above one that shares its anchor keeps both neighbors' heights", () => {
+  // Three alternating floats share one anchor: the middle one stores no skip of its own and starts
+  // where the first does. Dragging the last above the middle must not pull the middle down with it.
+  const lines = [
+    '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"left"} -->', '![[b.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"right","skip":6} -->', '![[c.png]]', '<!-- /vml -->', 'body',
+  ];
+  const blocks = findV2Blocks(lines);
+  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(lines, blocks, at)), [5, 5, 6]);
+
+  const dragged = blocks[2];
+  const placement = { line: 8, wrap: 'right' as const, skip: 2 };
+  assert.equal(orderAdjacentFloat(lines, dragged, placement).line, 4);
+  const edits = planPlacement(lines, dragged, placement);
+  assert.ok(edits);
+  const result = apply(lines, edits);
+  assert.deepEqual(result, [
+    '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[c.png]]', '<!-- /vml -->',
+    '<!-- vml {"v":2,"wrap":"left","skip":5} -->', '![[b.png]]', '<!-- /vml -->', '', 'body',
+  ]);
+  // The dragged float lands at 2; the neighbor it crossed stays at its old height of 5.
+  const moved = findV2Blocks(result);
+  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(result, moved, at)), [5, 2, 5]);
+
+  // One transaction; a changed opening line for the crossed neighbor aborts the whole write.
+  const editor = new MemoryEditor(lines.join('\n'));
+  assert.deepEqual(applyEditsToEditor(editor, edits), { ok: true });
+  assert.equal(editor.transactionCount, 1);
+  assert.equal(editor.getValue(), result.join('\n'));
+  const changedNeighbor = [...lines];
+  changedNeighbor[4] = '<!-- vml {"v":2,"wrap":"left","skip":9} -->';
+  assert.equal(applyEditsToText(changedNeighbor.join('\n'), edits).ok, false);
+});
+
 test("block widgets at the same document position do not multiply wrap gaps", () => {
   // A rendered embed and its line can both map to the line's end. This was captured immediately
   // before repeated measurements doubled the second gap and locked up the Obsidian renderer.
