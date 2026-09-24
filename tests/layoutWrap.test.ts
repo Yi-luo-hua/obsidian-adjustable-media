@@ -306,6 +306,33 @@ test("a spacer follows its float: it grows, shrinks and goes", () => {
   assert.deepEqual(planGaps([anchor, beside, spacer]), [{ pos: 20, height: 100 }]);
 });
 
+test("block widgets at the same document position do not multiply wrap gaps", () => {
+  // A rendered embed and its line can both map to the line's end. This was captured immediately
+  // before repeated measurements doubled the second gap and locked up the Obsidian renderer.
+  const float = box(0, 0, 0, 0, { floatBottom: 582 });
+  const before = box(976, 339, 24, 339);
+  const line = box(1012, 761, 24, 339);
+  const embed = box(1012, 785, 37, 339);
+  assert.deepEqual(planGaps([
+    float, before,
+    box(1012, 363, 175, 339, { spacer: true }),
+    box(1012, 538, 223, 339, { spacer: true }),
+    line, embed, box(1013, 822, 24, 822),
+  ]), [{ pos: 1012, height: 219 }]);
+  // Once the two old spacers have become one, the next measurement keeps it unchanged.
+  assert.deepEqual(planGaps([
+    float, before,
+    box(1012, 363, 219, 339, { spacer: true }),
+    box(1012, 582, 24, 339), box(1012, 606, 37, 339),
+    box(1013, 643, 24, 643),
+  ]), [{ pos: 1012, height: 219 }]);
+
+  assert.deepEqual(planGaps([
+    float, before,
+    box(1012, 363, 24, 339), box(1012, 387, 37, 339),
+  ]), [{ pos: 1012, height: 24 }]);
+});
+
 const size: FloatSize = { side: "left", layoutTop: 4, layoutHeight: 400, width: 280, margin: 24, marginBottom: 8 };
 
 test("a stand-in covers the part of a float below the first line drawn", () => {
