@@ -1,8 +1,9 @@
 import { Notice, setIcon } from "obsidian";
 import { EditorView } from "@codemirror/view";
 
-import { MAX_WRAP_SKIP } from "../format/v2.ts";
-import { skipLines, wrapZone } from "../layout/geometry.ts";
+import { findV2Blocks, MAX_WRAP_SKIP } from "../format/v2.ts";
+import { wrapZone, wrappedDrop } from "../layout/geometry.ts";
+import { visualWrapSkip } from "../layout/floatOrder.ts";
 import { effectiveWidth, hasTextColumns, setWrap } from "../layout/model.ts";
 import { blockForMove, blockGaps, isSamePlace, pickGap, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
 import { createDragGhost } from "./dragGhost.ts";
@@ -61,6 +62,9 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
   }
 
   const gaps = blockGaps(lines);
+  const movingBlocks = findV2Blocks(lines);
+  const movingIndex = movingBlocks.findIndex((candidate) => candidate.openLine === block.openLine);
+  const currentVisualSkip = movingIndex < 0 ? context.model.skip ?? 0 : visualWrapSkip(lines, movingBlocks, movingIndex);
   const layout = root.getBoundingClientRect();
   const ghost = createDragGhost(doc, root.querySelector(".vml-item__media"));
   const indicator = createDropIndicator(doc);
@@ -75,6 +79,7 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
     const top = line < state.lines ? view.lineBlockAt(state.line(line + 1).from).top : view.lineBlockAt(state.length).bottom;
     return top + view.documentTop;
   };
+  const initialAnchorTop = lineTop(block.openLine);
 
   const place = (): void => {
     const content = view.contentDOM.getBoundingClientRect();
@@ -93,15 +98,17 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
       indicator.showLine(content.left, gap.top - lineHeight / 2, content.width, t("wrapNone"));
       return;
     }
-    // At its own place the layout starts where its widget is; elsewhere in front of the gap's line.
-    const anchorTop = isSamePlace(lines, block, gap.line) ? lineTop(block.openLine) : gap.top;
-    const skip = skipLines(pointer.y, anchorTop, lineHeight, MAX_WRAP_SKIP);
+    const samePlace = isSamePlace(lines, block, gap.line);
+    const targetTop = samePlace ? lineTop(block.openLine) : gap.top;
+    const renderedTop = root.isConnected ? root.getBoundingClientRect().top : layout.top + targetTop - initialAnchorTop;
+    const { skip, top } = wrappedDrop(pointer.y, targetTop, renderedTop, currentVisualSkip,
+      lineHeight, MAX_WRAP_SKIP, samePlace && wrap === context.model.wrap);
     placement = { line: gap.line, wrap, skip };
 
     const width = (effectiveWidth(setWrap(context.model, wrap)) ?? 1) * content.width;
     const height = Math.min(MAX_PREVIEW_HEIGHT, Math.max(MIN_PREVIEW_HEIGHT, layout.height * (width / Math.max(layout.width, 1))));
     const label = t(wrap === "left" ? "wrapLeft" : "wrapRight") + (skip > 0 ? ` · ${t("dropSkip", { lines: String(skip) })}` : "");
-    indicator.showBox(wrap === "left" ? content.left : content.right - width, anchorTop + skip * lineHeight, width, height, label);
+    indicator.showBox(wrap === "left" ? content.left : content.right - width, top, width, height, label);
   };
 
   const scroll = (): void => {

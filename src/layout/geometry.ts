@@ -154,6 +154,17 @@ export function skipLines(y: number, anchorTop: number, lineHeight: number, max:
   return Math.min(max, Math.max(0, Math.round((y - anchorTop) / lineHeight)));
 }
 
+/** The skip and visible top for a wrapped layout dropped at `y`. At its current place and side,
+ * preceding floats can push the layout below its document anchor. Measure from its rendered top so
+ * that changing its skip moves it by the number of lines the pointer actually moved.
+ */
+export function wrappedDrop(y: number, targetTop: number, renderedTop: number, currentSkip: number,
+  lineHeight: number, max: number, sameFloat: boolean): { skip: number; top: number } {
+  const baseTop = sameFloat ? renderedTop - currentSkip * lineHeight : targetTop;
+  const skip = skipLines(y, baseTop, lineHeight, max);
+  return { skip, top: baseTop + skip * lineHeight };
+}
+
 function beside(box: ItemBox, x: number): MoveTarget {
   const side = x < (box.rect.left + box.rect.right) / 2 ? "before" : "after";
   return { kind: "beside", position: { row: box.row, index: box.index }, side };

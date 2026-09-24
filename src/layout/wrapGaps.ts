@@ -48,14 +48,33 @@ export function planGaps(boxes: readonly FlowBox[]): Gap[] {
   // Height this plan adds that the height map does not have yet.
   let pending = 0;
   let spacer: FlowBox | null = null;
+  let lastContentPos: number | null = null;
 
   for (const box of boxes) {
     if (box.spacer) {
-      spacer = box;
+      if (spacer && spacer.pos === box.pos) {
+        // Several block widgets can share a document position. Treat their old spacers as one
+        // physical gap; otherwise the first one's height is counted again on every measurement.
+        spacer = { pos: spacer.pos, top: spacer.top, height: box.top + box.height - spacer.top,
+          mapTop: spacer.mapTop, spacer: true, floatBottom: null };
+      } else {
+        if (spacer) {
+          gaps.push({ pos: spacer.pos, height: Math.round(spacer.height) });
+        }
+        spacer = box;
+      }
       continue;
     }
 
-    if (spacer) {
+    if (box.pos === lastContentPos) {
+      // CodeMirror maps separate DOM children of a block widget to the same position and gives
+      // each the same mapTop. The later child's offset includes the earlier child's height, so it
+      // cannot be interpreted as a new gap in the document height map.
+      if (spacer) {
+        pending -= spacer.height;
+        spacer = null;
+      }
+    } else if (spacer) {
       const pushed = box.top - (spacer.top + spacer.height);
       let height = spacer.height;
       if (pushed > TOLERANCE) {
@@ -76,6 +95,7 @@ export function planGaps(boxes: readonly FlowBox[]): Gap[] {
         pending += drift;
       }
     }
+    lastContentPos = box.pos;
 
     if (box.floatBottom !== null) {
       floatBottom = Math.max(floatBottom, box.floatBottom);

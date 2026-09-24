@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 
 import { findV2Blocks, readBlockSkip, readBlockWrap, serializeOpener, type V2Block } from "../src/format/v2.ts";
 import { applyEditsToEditor, applyEditsToText, planModelEdit, type BlockEdit } from "../src/layout/edits.ts";
-import { skipLines, wrapZone } from "../src/layout/geometry.ts";
+import { effectiveWrapSkip, visualWrapSkip } from "../src/layout/floatOrder.ts";
+import { skipLines, wrapZone, wrappedDrop } from "../src/layout/geometry.ts";
 import {
   effectiveWidth,
   metaFromModel,
@@ -14,7 +15,7 @@ import {
   setWrap,
   type LayoutModel,
 } from "../src/layout/model.ts";
-import { blockForMove, blockGaps, isSamePlace, pickGap, planPlacement } from "../src/layout/placement.ts";
+import { blockForMove, blockGaps, isSamePlace, orderAdjacentFloat, pickGap, planPlacement } from "../src/layout/placement.ts";
 import { planGaps, planProxy, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
@@ -304,6 +305,165 @@ test("a spacer follows its float: it grows, shrinks and goes", () => {
   assert.deepEqual(planGaps([box(0, 0, 0, 0, { floatBottom: 150 }), beside, spacer, box(20, 300, 80, 200)]), []);
   // One whose element was not measured keeps its height.
   assert.deepEqual(planGaps([anchor, beside, spacer]), [{ pos: 20, height: 100 }]);
+});
+
+test("a second wrapped layout follows the pointer when an earlier float shifts its rendered top", () => {
+  // Captured from two adjacent floats in 笔记.md: both anchors map to 276.55px, but the left
+  // layout's three-line skip pushes the right layout's own three-line skip down to 424.51px.
+  const anchor = 276.554;
+  const rendered = 424.505;
+  const lineHeight = 23.993;
+  assert.equal(skipLines(rendered + 48, anchor, lineHeight, 40), 8);
+  const dropped = wrappedDrop(rendered + 48, anchor, rendered, 3, lineHeight, 40, true);
+  assert.equal(dropped.skip, 5);
+  assert.ok(Math.abs(dropped.top - (rendered + 2 * lineHeight)) < 0.001);
+  assert.equal(wrappedDrop(rendered, anchor, rendered, 3, lineHeight, 40, true).skip, 3);
+  const scrolled = wrappedDrop(rendered + 48 - 100, anchor - 100, rendered - 100, 3, lineHeight, 40, true);
+  assert.equal(scrolled.skip, 5);
+  assert.ok(Math.abs(scrolled.top - (dropped.top - 100)) < 0.001);
+  assert.deepEqual(wrappedDrop(anchor + 48, anchor, rendered, 3, lineHeight, 40, false),
+    { skip: 2, top: anchor + 2 * lineHeight });
+});
+
+test("opposite-side floats sharing an anchor measure their skips from that anchor", () => {
+  const lines = [
+    '<!-- vml {"v":2,"wrap":"left","skip":3} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[b.png]]', '<!-- /vml -->', 'body',
+  ];
+  const blocks = findV2Blocks(lines);
+  assert.equal(effectiveWrapSkip(lines, blocks, 0), 3);
+  assert.equal(effectiveWrapSkip(lines, blocks, 1), 2);
+  const sameHeight = [...lines];
+  sameHeight[4] = '<!-- vml {"v":2,"wrap":"right","skip":3} -->';
+  assert.equal(effectiveWrapSkip(sameHeight, findV2Blocks(sameHeight), 1), 0);
+  const separated = [...lines];
+  separated[3] = 'intervening text';
+  assert.equal(effectiveWrapSkip(separated, findV2Blocks(separated), 1), 5);
+  const sameSide = [...lines];
+  sameSide[4] = '<!-- vml {"v":2,"wrap":"left","skip":5} -->';
+  assert.equal(effectiveWrapSkip(sameSide, findV2Blocks(sameSide), 1), 5);
+});
+
+test("dragging the earlier float below its neighbor preserves the neighbor's screen position", () => {
+  const left = ['<!-- vml {"v":2,"wrap":"left","skip":4} -->', '![[a.png]]', '<!-- /vml -->'];
+  const right = ['<!-- vml {"v":2,"wrap":"right","type":"text"} -->', '右侧旁注', '<!-- /vml -->'];
+  const lines = ['intro', '', ...left, '', ...right, '', 'body'];
+  const dragged = block(lines);
+  const placement = { line: 6, wrap: 'left' as const, skip: 5 };
+  assert.equal(orderAdjacentFloat(lines, dragged, placement).line, 9);
+  const edits = planPlacement(lines, dragged, placement);
+  assert.ok(edits);
+  const result = apply(lines, edits);
+  assert.deepEqual(result, [
+    'intro', '', '<!-- vml {"v":2,"wrap":"right","skip":4,"type":"text"} -->',
+    '右侧旁注', '<!-- /vml -->', '', '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":5} -->',
+    '![[a.png]]', '<!-- /vml -->', '', 'body',
+  ]);
+  assert.equal(effectiveWrapSkip(result, findV2Blocks(result), 1), 1);
+  assert.equal(visualWrapSkip(result, findV2Blocks(result), 0), 4);
+  assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 5);
+  const editor = new MemoryEditor(lines.join('\n'));
+  assert.deepEqual(applyEditsToEditor(editor, edits), { ok: true });
+  assert.equal(editor.transactionCount, 1);
+  assert.equal(editor.getValue(), result.join('\n'));
+  const changedNeighbor = [...lines];
+  changedNeighbor[7] = '右侧旁注已改变';
+  assert.equal(applyEditsToText(changedNeighbor.join('\n'), edits).ok, false);
+});
+
+test("dragging the earlier float upward keeps its later neighbor at the same height", () => {
+  const lines = [
+    '<!-- vml {"v":2,"wrap":"left","skip":4} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"right"} -->', '![[b.png]]', '<!-- /vml -->', 'body',
+  ];
+  const edits = planPlacement(lines, block(lines), { line: 4, wrap: 'left', skip: 3 });
+  assert.ok(edits);
+  const result = apply(lines, edits);
+  assert.deepEqual(result.slice(0, 5), [
+    '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":3} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"right","skip":4} -->',
+  ]);
+  assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 4);
+});
+
+test("dragging the later float above its neighbor leaves that neighbor at its old height", () => {
+  const lines = [
+    '<!-- vml {"v":2,"wrap":"left","skip":4} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"right"} -->', '![[b.png]]', '<!-- /vml -->', 'body',
+  ];
+  const blocks = findV2Blocks(lines);
+  assert.equal(visualWrapSkip(lines, blocks, 1), 4);
+  const edits = planPlacement(lines, blocks[1], { line: 4, wrap: 'right', skip: 2 });
+  assert.ok(edits);
+  const result = apply(lines, edits);
+  assert.deepEqual(result.slice(0, 5), [
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[b.png]]', '<!-- /vml -->',
+    '<!-- vml {"v":2,"wrap":"left","skip":4} -->', '![[a.png]]',
+  ]);
+  assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 4);
+});
+
+test("dragging a float above one that shares its anchor keeps both neighbors' heights", () => {
+  // Three alternating floats share one anchor: the middle one stores no skip of its own and starts
+  // where the first does. Dragging the last above the middle must not pull the middle down with it.
+  const lines = [
+    '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"left"} -->', '![[b.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"right","skip":6} -->', '![[c.png]]', '<!-- /vml -->', 'body',
+  ];
+  const blocks = findV2Blocks(lines);
+  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(lines, blocks, at)), [5, 5, 6]);
+
+  const dragged = blocks[2];
+  const placement = { line: 8, wrap: 'right' as const, skip: 2 };
+  assert.equal(orderAdjacentFloat(lines, dragged, placement).line, 4);
+  const edits = planPlacement(lines, dragged, placement);
+  assert.ok(edits);
+  const result = apply(lines, edits);
+  assert.deepEqual(result, [
+    '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[c.png]]', '<!-- /vml -->',
+    '<!-- vml {"v":2,"wrap":"left","skip":5} -->', '![[b.png]]', '<!-- /vml -->', '', 'body',
+  ]);
+  // The dragged float lands at 2; the neighbor it crossed stays at its old height of 5.
+  const moved = findV2Blocks(result);
+  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(result, moved, at)), [5, 2, 5]);
+
+  // One transaction; a changed opening line for the crossed neighbor aborts the whole write.
+  const editor = new MemoryEditor(lines.join('\n'));
+  assert.deepEqual(applyEditsToEditor(editor, edits), { ok: true });
+  assert.equal(editor.transactionCount, 1);
+  assert.equal(editor.getValue(), result.join('\n'));
+  const changedNeighbor = [...lines];
+  changedNeighbor[4] = '<!-- vml {"v":2,"wrap":"left","skip":9} -->';
+  assert.equal(applyEditsToText(changedNeighbor.join('\n'), edits).ok, false);
+});
+
+test("block widgets at the same document position do not multiply wrap gaps", () => {
+  // A rendered embed and its line can both map to the line's end. This was captured immediately
+  // before repeated measurements doubled the second gap and locked up the Obsidian renderer.
+  const float = box(0, 0, 0, 0, { floatBottom: 582 });
+  const before = box(976, 339, 24, 339);
+  const line = box(1012, 761, 24, 339);
+  const embed = box(1012, 785, 37, 339);
+  assert.deepEqual(planGaps([
+    float, before,
+    box(1012, 363, 175, 339, { spacer: true }),
+    box(1012, 538, 223, 339, { spacer: true }),
+    line, embed, box(1013, 822, 24, 822),
+  ]), [{ pos: 1012, height: 219 }]);
+  // Once the two old spacers have become one, the next measurement keeps it unchanged.
+  assert.deepEqual(planGaps([
+    float, before,
+    box(1012, 363, 219, 339, { spacer: true }),
+    box(1012, 582, 24, 339), box(1012, 606, 37, 339),
+    box(1013, 643, 24, 643),
+  ]), [{ pos: 1012, height: 219 }]);
+
+  assert.deepEqual(planGaps([
+    float, before,
+    box(1012, 363, 24, 339), box(1012, 387, 37, 339),
+  ]), [{ pos: 1012, height: 24 }]);
 });
 
 const size: FloatSize = { side: "left", layoutTop: 4, layoutHeight: 400, width: 280, margin: 24, marginBottom: 8 };

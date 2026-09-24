@@ -200,18 +200,11 @@ export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit
   const contextAt = (line: number): LineContext | undefined => (contexts ??= scanMarkdownLines(normalized))[line];
 
   const changes: LineChange[] = [];
-  const claimed: Array<[number, number]> = [];
   for (const edit of edits) {
     const at = locateAnchor(normalized, edit, contextAt);
     if (typeof at === "string") {
       return { ok: false, reason: at };
     }
-
-    const anchorEnd = at + edit.anchorLines.length - 1;
-    if (claimed.some(([start, end]) => at <= end && anchorEnd >= start)) {
-      return { ok: false, reason: "overlap" };
-    }
-    claimed.push([at, anchorEnd]);
 
     const from = at + edit.start;
     let to = at + edit.end;
@@ -219,6 +212,10 @@ export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit
     // note a leading blank line; take one of them along.
     if (edit.replacement.length === 0 && (from === 0 || isBlank(normalized[from - 1])) && isBlank(normalized[to + 1])) {
       to += 1;
+    }
+    // Several edits may validate the same block, provided their written lines do not overlap.
+    if (changes.some((change) => from <= change.to && to >= change.from)) {
+      return { ok: false, reason: "overlap" };
     }
     changes.push({ from, to, replacement: edit.replacement });
   }
