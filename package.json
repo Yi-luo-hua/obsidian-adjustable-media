@@ -1,6 +1,6 @@
 {
   "name": "adjustable-media",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "An Obsidian plugin for arranging images and videos side by side, stored as plain embeds plus an HTML comment.",
   "main": "main.js",
   "type": "module",
