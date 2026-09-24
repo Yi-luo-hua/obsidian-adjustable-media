@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { findV2Blocks, readBlockSkip, readBlockWrap, serializeOpener, type V2Block } from "../src/format/v2.ts";
 import { applyEditsToEditor, applyEditsToText, planModelEdit, type BlockEdit } from "../src/layout/edits.ts";
-import { skipLines, wrapZone } from "../src/layout/geometry.ts";
+import { skipLines, wrapZone, wrappedDrop } from "../src/layout/geometry.ts";
 import {
   effectiveWidth,
   metaFromModel,
@@ -304,6 +304,24 @@ test("a spacer follows its float: it grows, shrinks and goes", () => {
   assert.deepEqual(planGaps([box(0, 0, 0, 0, { floatBottom: 150 }), beside, spacer, box(20, 300, 80, 200)]), []);
   // One whose element was not measured keeps its height.
   assert.deepEqual(planGaps([anchor, beside, spacer]), [{ pos: 20, height: 100 }]);
+});
+
+test("a second wrapped layout follows the pointer when an earlier float shifts its rendered top", () => {
+  // Captured from two adjacent floats in 笔记.md: both anchors map to 276.55px, but the left
+  // layout's three-line skip pushes the right layout's own three-line skip down to 424.51px.
+  const anchor = 276.554;
+  const rendered = 424.505;
+  const lineHeight = 23.993;
+  assert.equal(skipLines(rendered + 48, anchor, lineHeight, 40), 8);
+  const dropped = wrappedDrop(rendered + 48, anchor, rendered, 3, lineHeight, 40, true);
+  assert.equal(dropped.skip, 5);
+  assert.ok(Math.abs(dropped.top - (rendered + 2 * lineHeight)) < 0.001);
+  assert.equal(wrappedDrop(rendered, anchor, rendered, 3, lineHeight, 40, true).skip, 3);
+  const scrolled = wrappedDrop(rendered + 48 - 100, anchor - 100, rendered - 100, 3, lineHeight, 40, true);
+  assert.equal(scrolled.skip, 5);
+  assert.ok(Math.abs(scrolled.top - (dropped.top - 100)) < 0.001);
+  assert.deepEqual(wrappedDrop(anchor + 48, anchor, rendered, 3, lineHeight, 40, false),
+    { skip: 2, top: anchor + 2 * lineHeight });
 });
 
 test("block widgets at the same document position do not multiply wrap gaps", () => {
