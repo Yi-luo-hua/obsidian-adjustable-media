@@ -179,7 +179,7 @@ function numberSection(app: App, el: HTMLElement, ctx: MarkdownPostProcessorCont
     }
     return;
   }
-  const text = info ? sectionNoteText(app, ctx, info) : "";
+  const text = info ? sectionNoteText(app, ctx, info, el) : "";
   if (!info || !mayHaveRefs(text) || el.querySelector(".vml-layout")) {
     return;
   }

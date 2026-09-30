@@ -137,6 +137,19 @@ export function keepWrapsBeside(app: App, section: HTMLElement): void {
   }
 }
 
+/** Font and theme changes also invalidate measurements of detached floats. */
+export function refreshReadingWrap(app: App, section: HTMLElement): void {
+  const reading = readingSections(app, section);
+  if (!reading) return;
+  for (const item of reading.sections) {
+    const float = floats.get(item.el);
+    if (float) float.size = null;
+    asked.delete(item.el);
+    remeasuring.delete(item.el);
+  }
+  keepWrapsBeside(app, section);
+}
+
 class Keeper {
   private readonly app: App;
   private readonly sizer: HTMLElement;

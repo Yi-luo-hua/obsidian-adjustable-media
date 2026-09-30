@@ -1,7 +1,6 @@
-import type { EditorLike } from "../editor/editorLike.ts";
 import { findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Meta } from "../format/v2.ts";
 import { planWrap } from "../input/insertion.ts";
-import { isEditable, wrapLines, type LineChange } from "../layout/edits.ts";
+import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
 import { scanMarkdownLines } from "../markdown/lineContext.ts";
 
@@ -94,10 +93,8 @@ export function planMergeWithNext(lines: readonly string[], line: number): LineC
   return { from: current.openLine, to: next.closeLine, replacement: serializeBlock(metaFromModel(merged), rowEmbeds(merged)) };
 }
 
-/** Applies a line change planned from the editor's current content, as one undo step. */
-export function applyLineChange(editor: EditorLike, change: LineChange): void {
-  const lastLine = editor.getLine(change.to);
-  editor.transaction({
-    changes: [{ from: { line: change.from, ch: 0 }, to: { line: change.to, ch: lastLine.length }, text: change.replacement.join("\n") }],
-  });
+/** Commands and input conversion use the same source validation and write boundary as gestures. */
+export function lineChangeEdit(lines: readonly string[], change: LineChange): BlockEdit {
+  return { anchorLine: change.from, anchorLines: lines.slice(change.from, change.to + 1).map(stripCarriageReturn),
+    start: 0, end: change.to - change.from, replacement: change.replacement };
 }

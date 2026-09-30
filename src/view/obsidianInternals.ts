@@ -64,6 +64,18 @@ interface Renderer {
   queueRender?: unknown;
 }
 
+/** Uses section ownership, including detached sections being processed by the renderer. */
+export function readingViewOfSection(app: App, el: HTMLElement): MarkdownView | null {
+  for (const leaf of app.workspace.getLeavesOfType("markdown")) {
+    const view = leaf.view;
+    if (!(view instanceof MarkdownView) || view.getMode() !== "preview") continue;
+    if (view.containerEl.contains(el)) return view;
+    const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
+    if (Array.isArray(renderer?.sections) && renderer.sections.some(section => isSection(section) && section.el === el)) return view;
+  }
+  return null;
+}
+
 /**
  * The sections of the reading view that has `el` among its sections, with what Obsidian's renderer
  * knows of them: which are drawn, and how high it measured them. Null when no reading view has it,

@@ -1,22 +1,34 @@
 import { Component, editorInfoField, editorLivePreviewField, type App } from "obsidian";
-import { Prec, StateField, type EditorState, type Extension, type Range } from "@codemirror/state";
-import { Decoration, EditorView, WidgetType, type DecorationSet } from "@codemirror/view";
+import { Prec, StateEffect, StateField, type ChangeDesc, type EditorState, type Extension, type Range } from "@codemirror/state";
+import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
-import { blockWrap, findV2Blocks, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
+import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
+import { documentSnapshot, rememberDocumentSnapshot, snapshotForState, type BlockRef, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { effectiveWrapSkip } from "../layout/floatOrder.ts";
+import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { attachInteractions, type LayoutContext } from "./interactions.ts";
-import { renderLayout } from "./layoutView.ts";
+import { layoutIsRendered, renderLayout } from "./layoutView.ts";
 import { layoutHistory } from "./layoutHistory.ts";
 import { blockWarning, t } from "./messages.ts";
 import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
-import { wrapGuard, type WrapAnchor } from "./wrapGuard.ts";
+import { resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
+import { watchEnvironment } from "./viewEnvironment.ts";
 
-interface LivePreviewState {
+const setEnvironment = StateEffect.define<string>();
+
+interface Measurements {
+  heights: PaneMeasurements<number>;
+  environmentEpoch: number;
+  environmentSpec: string;
+}
+
+interface LivePreviewState extends Measurements {
+  snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
   decorations: DecorationSet;
@@ -28,7 +40,8 @@ interface LivePreviewState {
   refs: RefContext | undefined;
 }
 
-interface Parsed {
+interface Parsed extends Measurements {
+  snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
   refs: RefContext | undefined;
@@ -48,12 +61,22 @@ export function livePreviewExtension(app: App): Extension {
     create: (state) => withDecorations(app, state, parse(state)),
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
-      if (tr.docChanged || modeChanged) {
-        return withDecorations(app, tr.state, parse(tr.state));
+      const file = tr.state.field(editorInfoField, false)?.file;
+      const originChanged = value.snapshot !== null && (value.snapshot.origin.file !== file || value.snapshot.origin.path !== (file?.path ?? ""));
+      const environment = tr.effects.find(effect => effect.is(setEnvironment));
+      let measurements: Measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch, environmentSpec: value.environmentSpec };
+      if (environment) {
+        value.heights.environmentChanged();
+        measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch + 1, environmentSpec: environment.value };
       }
-      if (tr.selection) {
-        return withDecorations(app, tr.state, value);
+      if (originChanged) value.heights.environmentChanged();
+      if (tr.docChanged || modeChanged || originChanged) {
+        return withDecorations(app, tr.state, { ...parse(tr.state, value.snapshot, tr.changes), ...measurements });
       }
+      if (tr.selection || environment) {
+        return withDecorations(app, tr.state, { ...value, ...measurements });
+      }
+      rememberDocumentSnapshot(tr.state, value.snapshot);
       return value;
     },
     provide: (self) => [
@@ -70,24 +93,63 @@ export function livePreviewExtension(app: App): Extension {
     wrapGuard(app, {
       anchors: (state) => state.field(field, false)?.anchors ?? [],
       hasWraps: (state) => state.field(field, false)?.hasWraps ?? false,
+      environmentEpoch: (state) => state.field(field, false)?.environmentEpoch ?? 0,
+    }),
+    ViewPlugin.define(view => {
+      const projection = new ViewProjection();
+      let destroyed = false;
+      let epoch = -1;
+      const measure = (): void => {
+        const value = view.state.field(field);
+        if (!value.snapshot) return;
+        projection.request(value.snapshot);
+        projection.observeHost(view.state.doc.toString());
+        if (epoch !== value.environmentEpoch) { epoch = value.environmentEpoch; projection.environmentChanged(); }
+        projection.viewportChanged([{ from: view.viewport.from, to: view.viewport.to }]);
+        const token = projection.token()!;
+        view.requestMeasure({ key: projection, read: () => {
+          if (destroyed || !projection.accepts(token) || !view.contentDOM.isConnected) return null;
+          const coverage = [{ from: view.viewport.from, to: view.viewport.to }];
+          const media = Array.from(view.contentDOM.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"));
+          const ready = media.every(item => item.instanceOf(HTMLImageElement) ? item.complete : item.readyState > 0)
+            && Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".vml-layout")).every(layoutIsRendered);
+          return { coverage, measured: ready && view.contentDOM.clientWidth > 0 && view.contentDOM.doc.fonts.status === "loaded" };
+        }, write: result => {
+          if (result && projection.installed(token, result.coverage) && result.measured && wrapMeasurementsReady(view)) projection.measured(token, result.coverage);
+        } });
+      };
+      const stop = watchEnvironment(view.contentDOM, spec => {
+        if (destroyed || spec === view.state.field(field).environmentSpec) return;
+        queueMicrotask(() => { if (!destroyed) view.dispatch({ effects: [setEnvironment.of(spec), resetWrapGaps.of(null)] }); });
+      });
+      measure();
+      return { update(update) { if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure(); },
+        destroy() { destroyed = true; stop(); projection.dispose(); } };
     }),
   ];
 }
 
-function parse(state: EditorState): Parsed {
+function parse(state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
+  const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: "pending" };
   if (!state.field(editorLivePreviewField, false)) {
-    return { blocks: [], lines: [], refs: undefined };
+    return { blocks: [], lines: [], refs: undefined, snapshot: null, ...measurements };
   }
   // Runs on every change of every note, and most notes have no layouts.
   const text = state.doc.toString();
   if (!text.includes("<!-- vml")) {
-    return { blocks: [], lines: [], refs: undefined };
+    return { blocks: [], lines: [], refs: undefined, snapshot: null, ...measurements };
   }
-  const lines = text.split("\n");
-  return { blocks: findV2Blocks(lines), lines, refs: mayHaveRefs(text) ? refContextOf(text) : undefined };
+  const info = state.field(editorInfoField, false);
+  const file = info?.file ?? state.doc;
+  const origin = { file, path: info?.file?.path ?? "", branch: previous?.origin.file === file ? previous.origin.branch : {} };
+  const snapshot = documentSnapshot(text, origin, previous ?? undefined, changes);
+  return { snapshot, blocks: snapshot.blocks.map(ref => ref.block), lines: [...snapshot.lines],
+    refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
 }
 
-function withDecorations(app: App, state: EditorState, { blocks, lines, refs }: Parsed): LivePreviewState {
+function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePreviewState {
+  const { blocks, lines, refs, snapshot } = parsed;
+  rememberDocumentSnapshot(state, snapshot);
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
@@ -102,10 +164,11 @@ function withDecorations(app: App, state: EditorState, { blocks, lines, refs }: 
     const revealed = state.selection.ranges.some((range) => range.from <= to && range.to >= from);
     const wraps = blockWrap(block) !== null;
     const effectiveSkip = effectiveWrapSkip(lines, blocks, index);
-    const key = block.lines.join("\n");
+    const ref = snapshot!.blocks[index];
+    const key = `${ref.id}:${ref.contentRevision}`;
     hasWraps ||= wraps;
     if (!revealed) {
-      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, block, sourcePath, refs, effectiveSkip) }).range(from, to));
+      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed) }).range(from, to));
       if (wraps) {
         anchors.push({ from, to, key, block });
       }
@@ -115,7 +178,7 @@ function withDecorations(app: App, state: EditorState, { blocks, lines, refs }: 
     // Keep a text/media layout at its original position while its source opens below it. Replacing
     // the columns with normal Markdown would move the image below all of the left column's text.
     if (hasTextColumns(block)) {
-      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, block, sourcePath, refs, effectiveSkip, true) }).range(from));
+      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed, true) }).range(from));
     }
     // The source shows, with the media Obsidian draws in it as thumbnails.
     for (let line = block.openLine; line <= block.closeLine; line += 1) {
@@ -124,7 +187,7 @@ function withDecorations(app: App, state: EditorState, { blocks, lines, refs }: 
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
       ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, effectiveSkip), side: -1 }).range(from));
-      anchors.push({ from, to: from, key, block });
+      anchors.push({ from, to: from, key: `${key}:source`, block });
     }
   }
 
@@ -145,46 +208,29 @@ function withDecorations(app: App, state: EditorState, { blocks, lines, refs }: 
     }
   }
 
-  return { blocks, lines, decorations: Decoration.set(ranges, true), anchors, hasWraps, refs };
+  return { ...parsed, decorations: Decoration.set(ranges, true), anchors, hasWraps };
 }
 
 /** What Obsidian draws for the text beside a layout's media lives as long as the widget's element. */
 const components = new WeakMap<HTMLElement, Component>();
 
 /**
- * The heights layouts were drawn at, by their block's text and by their place in the note, for
+ * The heights layouts were drawn at, by runtime instance and content revision, for
  * CodeMirror to count a layout it has not drawn at the height it will have. Counted by its lines
  * instead, a tall layout of text is far too short: the note's height is off, the note jumps as it
  * scrolls, and a change to the layout, typing in it included, puts it out of the editor's view. The
- * place stands in for a layout whose text has just changed.
+ * instance stands in for a layout whose text has just changed.
  */
-const drawnHeights = new Map<string, number>();
-const MAX_DRAWN_HEIGHTS = 1000;
 const heightWatchers = new WeakMap<HTMLElement, ResizeObserver>();
 
 /** Records the height of the widget `el` under `keys`, now and whenever it changes. */
-function watchHeight(el: HTMLElement, keys: readonly string[]): void {
+function watchHeight(el: HTMLElement, keys: readonly string[], heights: PaneMeasurements<number>, valid: () => boolean): void {
   heightWatchers.get(el)?.disconnect();
-  const watcher = new ResizeObserver(() => rememberHeight(keys, el.offsetHeight));
+  const watcher = new (el.win as Window & typeof window).ResizeObserver(() => {
+    if (valid() && el.offsetHeight > 0) for (const key of keys) heights.set(key, el.offsetHeight);
+  });
   watcher.observe(el);
   heightWatchers.set(el, watcher);
-}
-
-function rememberHeight(keys: readonly string[], height: number): void {
-  if (height <= 0) {
-    return;
-  }
-  for (const key of keys) {
-    drawnHeights.delete(key);
-    drawnHeights.set(key, height);
-  }
-  // The oldest go first.
-  for (const key of drawnHeights.keys()) {
-    if (drawnHeights.size <= MAX_DRAWN_HEIGHTS) {
-      break;
-    }
-    drawnHeights.delete(key);
-  }
 }
 
 class LayoutWidget extends WidgetType {
@@ -196,24 +242,35 @@ class LayoutWidget extends WidgetType {
   private readonly key: string;
   private readonly placeKey: string;
   private readonly sourcePreview: boolean;
+  private readonly measurements: Measurements;
+  private readonly ref: BlockRef;
+  private readonly heightKey: string;
+  private readonly cacheEpoch: number;
 
-  constructor(app: App, block: V2Block, sourcePath: string, refs: RefContext | undefined,
-    effectiveSkip: number | null, sourcePreview = false) {
+  constructor(app: App, ref: BlockRef, sourcePath: string, refs: RefContext | undefined,
+    effectiveSkip: number | null, measurements: Measurements, sourcePreview = false) {
     super();
+    const block = ref.block;
     this.app = app;
     this.block = block;
     this.sourcePath = sourcePath;
     this.refs = refs;
     this.effectiveSkip = effectiveSkip;
     this.sourcePreview = sourcePreview;
+    this.measurements = measurements;
+    this.cacheEpoch = measurements.heights.environmentEpoch;
+    this.ref = ref;
     // New numbers draw the layout again.
     const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
-    this.key = `${sourcePath}\n${numbers}\n${effectiveSkip}\n${block.lines.join("\n")}`;
-    this.placeKey = `${sourcePath}\n@${block.openLine}`;
+    const spec = `${measurements.environmentSpec}\n${numbers}\n${effectiveSkip}`;
+    const mode = sourcePreview ? "source" : "live";
+    this.heightKey = measurements.heights.key(ref.id, ref.contentRevision, spec, mode);
+    this.placeKey = measurements.heights.key(ref.id, 0, spec, mode);
+    this.key = `${sourcePath}\n${this.heightKey}\n${block.lines.join("\n")}`;
   }
 
   override eq(other: LayoutWidget): boolean {
-    return other.key === this.key && other.sourcePreview === this.sourcePreview;
+    return other.key === this.key && other.block.openLine === this.block.openLine && other.sourcePreview === this.sourcePreview;
   }
 
   // A wrapped layout's widget is a zero-height anchor; the layout floats out of it.
@@ -221,7 +278,7 @@ class LayoutWidget extends WidgetType {
     if (blockWrap(this.block) !== null) {
       return 0;
     }
-    return drawnHeights.get(this.key) ?? drawnHeights.get(this.placeKey) ?? -1;
+    return this.measurements.heights.get(this.heightKey) ?? this.measurements.heights.get(this.placeKey) ?? -1;
   }
 
   toDOM(view: EditorView): HTMLElement {
@@ -236,18 +293,18 @@ class LayoutWidget extends WidgetType {
       drawWidget(el, view, this.app, this.block, this.sourcePath, this.refs, this.effectiveSkip);
     }
     if (blockWrap(this.block) === null) {
-      watchHeight(el, [this.key, this.placeKey]);
+      this.watch(el, view);
     }
     return el;
   }
 
   // While one of its text columns is typed in, the layout keeps its element (textEditing.ts), and
   // its height goes on under the new text.
-  override updateDOM(dom: HTMLElement): boolean {
+  override updateDOM(dom: HTMLElement, view: EditorView): boolean {
     if (this.sourcePreview || !keepWhileEditing(dom, this.block)) {
       return false;
     }
-    watchHeight(dom, [this.key, this.placeKey]);
+    this.watch(dom, view);
     return true;
   }
 
@@ -261,6 +318,13 @@ class LayoutWidget extends WidgetType {
 
   override ignoreEvent(): boolean {
     return true;
+  }
+
+  private watch(el: HTMLElement, view: EditorView): void {
+    watchHeight(el, [this.heightKey, this.placeKey], this.measurements.heights, () => {
+      const current = snapshotForState(view.state)?.blocks.find(ref => ref.id === this.ref.id);
+      return el.isConnected && this.cacheEpoch === this.measurements.heights.environmentEpoch && current?.contentRevision === this.ref.contentRevision;
+    });
   }
 }
 

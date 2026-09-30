@@ -1,4 +1,5 @@
 import { hasSideText, type V2Block } from "../format/v2.ts";
+import { layoutDependencies } from "./documentSnapshot.ts";
 
 /**
  * What the layouts drawn for a note in reading view show beyond the section each is drawn in
@@ -11,13 +12,16 @@ export interface Drawn {
   comments: string;
   /** Every line of each layout with text beside its media, in order; null for one not drawn yet. */
   texts: Array<string | null>;
+  /** Full body dependency while a float's influence has no proven end. */
+  dependencies?: string;
 }
 
 /** What layouts drawn from `blocks` show; `numbers` tells the numbers their text and captions show. */
-export function drawnFrom(blocks: readonly V2Block[], numbers = ""): Drawn {
+export function drawnFrom(blocks: readonly V2Block[], numbers = "", lines: readonly string[] = []): Drawn {
   return {
     comments: [...(numbers === "" ? [] : [numbers]), ...blocks.map((block) => `${block.lines[0] ?? ""}\n${block.lines[block.lines.length - 1] ?? ""}`)].join("\n"),
     texts: blocks.filter(hasSideText).map((block) => block.lines.join("\n")),
+    dependencies: layoutDependencies(lines, blocks),
   };
 }
 
@@ -31,7 +35,7 @@ export function recordDrawn(previous: Drawn | undefined, current: Drawn, textInd
   const texts = textIndex < 0
     ? previous?.texts ?? current.texts.map(() => null)
     : current.texts.map((text, index) => (index === textIndex ? text : previous?.texts[index] ?? null));
-  return { comments: current.comments, texts };
+  return { comments: current.comments, texts, dependencies: current.dependencies };
 }
 
 /**
@@ -40,6 +44,7 @@ export function recordDrawn(previous: Drawn | undefined, current: Drawn, textInd
  */
 export function isStale(drawn: Drawn, current: Drawn): boolean {
   return drawn.comments !== current.comments
+    || drawn.dependencies !== current.dependencies
     || drawn.texts.length !== current.texts.length
     || drawn.texts.some((text, index) => text !== null && text !== current.texts[index]);
 }

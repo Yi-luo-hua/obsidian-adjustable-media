@@ -35,6 +35,10 @@ interface MediaSize {
  * not change shape once it has loaded.
  */
 const mediaSizes = new Map<string, MediaSize>();
+const pendingLayouts = new WeakSet<HTMLElement>();
+
+/** Creating the root does not mean its asynchronous Markdown has finished. */
+export function layoutIsRendered(root: HTMLElement): boolean { return !pendingLayouts.has(root); }
 
 /**
  * Draws a layout model. Shared by reading view and live preview; it never writes to the note.
@@ -53,6 +57,9 @@ const mediaSizes = new Map<string, MediaSize>();
  * text alone, at the block's width, and floats like media.
  */
 export function renderLayout(container: HTMLElement, options: LayoutViewOptions): HTMLElement {
+  const renderTasks = options.renderTasks;
+  const tasks: Promise<void>[] = [];
+  options = { ...options, renderTasks: tasks };
   const { model } = options;
   const rowIndices = options.rowIndices ?? model.rows.map((_row, index) => index);
   const skipLines = options.effectiveSkip === undefined ? model.skip : options.effectiveSkip;
@@ -101,6 +108,13 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
     renderText(root, "right", model.text.right, options);
   }
   applySizing(root, model);
+  renderTasks?.push(...tasks);
+  if (tasks.length > 0) {
+    pendingLayouts.add(root);
+    void Promise.all(tasks).then(() => pendingLayouts.delete(root), (error: unknown) => {
+      console.error("Adjustable Media: layout Markdown could not be rendered", error);
+    });
+  }
   return root;
 }
 

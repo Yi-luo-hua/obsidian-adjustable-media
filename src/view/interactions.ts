@@ -70,6 +70,8 @@ const FAILURE_MESSAGES: Record<EditFailureReason, MessageKey> = {
   "not-found": "writeNotFound",
   ambiguous: "writeAmbiguous",
   overlap: "writeOverlap",
+  "read-only": "unreadableSettings",
+  "stale-dependency": "writeNotFound",
 };
 const FRAME_LABELS: Record<FrameEdge, MessageKey> = {
   right: "resizeBlockWidth",
