@@ -5,7 +5,8 @@ import { EditorView } from "@codemirror/view";
 import { mediaKindOf, readEmbedRow } from "../format/v2.ts";
 import { lineChangeEdit } from "../commands/plans.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
-import { t } from "../view/messages.ts";
+import { reportWriteError, t } from "../view/messages.ts";
+import { fileOfEditor } from "../view/obsidianInternals.ts";
 import { planWrap } from "./insertion.ts";
 
 const WINDOW_MS = 10_000;
@@ -36,6 +37,10 @@ interface Pending {
  */
 export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
   const pending = new Map<string, Pending>();
+  const fileOf = (view: EditorView) => {
+    const info = view.state.field(editorInfoField, false);
+    return info?.file ?? fileOfEditor(plugin.app, info?.editor);
+  };
 
   const forget = (path: string, entry: Pending): void => {
     if (entry.timer !== null) {
@@ -54,7 +59,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
   });
 
   const expect = (view: EditorView, expected: number | null, windowMs: number): void => {
-    const path = view.state.field(editorInfoField, false)?.file?.path;
+    const path = fileOf(view)?.path;
     if (!enabled() || !path) {
       return;
     }
@@ -102,7 +107,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
       return;
     }
 
-    const file = view.state.field(editorInfoField, false)?.file;
+    const file = fileOf(view);
     if (file?.path !== path) return;
     const doc = view.state.doc;
     const lineNumbers = entry.positions
@@ -115,7 +120,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
 
     void writeBlockEdits(plugin.app, file, [lineChangeEdit(doc.toString().split("\n"), change)], { view }).then(result => {
       if (!result.ok) new Notice(t("writeNotFound"));
-    });
+    }).catch(reportWriteError);
   };
 
   const schedule = (path: string, entry: Pending): void => {
@@ -133,7 +138,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
     if (!update.docChanged) {
       return;
     }
-    const path = update.state.field(editorInfoField, false)?.file?.path;
+    const path = fileOf(update.view)?.path;
     const entry = path ? pending.get(path) : undefined;
     if (!path || !entry) {
       return;

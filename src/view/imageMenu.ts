@@ -3,7 +3,8 @@ import { EditorView } from "@codemirror/view";
 
 import { lineChangeEdit, planWrapSelection } from "../commands/plans.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
-import { t } from "./messages.ts";
+import { reportWriteError, t } from "./messages.ts";
+import { fileOfEditor } from "./obsidianInternals.ts";
 
 /**
  * Adds "Wrap in a layout" to Obsidian's own menu for an image in live preview. That menu reports
@@ -32,11 +33,11 @@ export function registerImageMenu(plugin: Plugin): void {
     menu.addItem((item) => item.setTitle(t("wrapInLayout")).setIcon("layout-grid").setSection("image").onClick(() => {
       // Planned again: the note may have changed while the menu was open.
       const change = planWrap(view, editor, embedEl);
-      const file = view.state.field(editorInfoField, false)?.file;
+      const file = view.state.field(editorInfoField, false)?.file ?? fileOfEditor(plugin.app, editor);
       if (change && file) {
         void writeBlockEdits(plugin.app, file, [lineChangeEdit(editor.getValue().split("\n"), change)], { view }).then(result => {
           if (!result.ok) new Notice(t("writeNotFound"));
-        });
+        }).catch(reportWriteError);
       } else {
         new Notice(t("wrapNothing"));
       }

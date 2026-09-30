@@ -4,7 +4,7 @@ import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } fr
 
 import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
-import { documentSnapshot, rememberDocumentSnapshot, snapshotForState, type BlockRef, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
+import { documentSnapshot, editorDocumentOrigin, rememberDocumentSnapshot, snapshotForState, type BlockRef, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { effectiveWrapSkip } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock } from "../layout/model.ts";
@@ -16,8 +16,9 @@ import { layoutIsRendered, renderLayout } from "./layoutView.ts";
 import { layoutHistory } from "./layoutHistory.ts";
 import { blockWarning, t } from "./messages.ts";
 import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
-import { resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
+import { refreshWrapMedia, resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
+import { fileOfEditor } from "./obsidianInternals.ts";
 
 const setEnvironment = StateEffect.define<string>();
 
@@ -58,11 +59,12 @@ interface Parsed extends Measurements {
  */
 export function livePreviewExtension(app: App): Extension {
   const field = StateField.define<LivePreviewState>({
-    create: (state) => withDecorations(app, state, parse(state)),
+    create: (state) => withDecorations(app, state, parse(app, state)),
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
-      const file = tr.state.field(editorInfoField, false)?.file;
-      const originChanged = value.snapshot !== null && (value.snapshot.origin.file !== file || value.snapshot.origin.path !== (file?.path ?? ""));
+      const info = tr.state.field(editorInfoField, false);
+      const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, value.snapshot?.origin);
+      const originChanged = value.snapshot !== null && (value.snapshot.origin.file !== origin.file || value.snapshot.origin.path !== origin.path);
       const environment = tr.effects.find(effect => effect.is(setEnvironment));
       let measurements: Measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch, environmentSpec: value.environmentSpec };
       if (environment) {
@@ -71,7 +73,7 @@ export function livePreviewExtension(app: App): Extension {
       }
       if (originChanged) value.heights.environmentChanged();
       if (tr.docChanged || modeChanged || originChanged) {
-        return withDecorations(app, tr.state, { ...parse(tr.state, value.snapshot, tr.changes), ...measurements });
+        return withDecorations(app, tr.state, { ...parse(app, tr.state, value.snapshot, tr.changes), ...measurements });
       }
       if (tr.selection || environment) {
         return withDecorations(app, tr.state, { ...value, ...measurements });
@@ -121,7 +123,7 @@ export function livePreviewExtension(app: App): Extension {
       const stop = watchEnvironment(view.contentDOM, spec => {
         if (destroyed || spec === view.state.field(field).environmentSpec) return;
         queueMicrotask(() => { if (!destroyed) view.dispatch({ effects: [setEnvironment.of(spec), resetWrapGaps.of(null)] }); });
-      });
+      }, () => { refreshWrapMedia(view); measure(); });
       measure();
       return { update(update) { if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure(); },
         destroy() { destroyed = true; stop(); projection.dispose(); } };
@@ -129,7 +131,7 @@ export function livePreviewExtension(app: App): Extension {
   ];
 }
 
-function parse(state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
+function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
   const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: "pending" };
   if (!state.field(editorLivePreviewField, false)) {
     return { blocks: [], lines: [], refs: undefined, snapshot: null, ...measurements };
@@ -140,8 +142,7 @@ function parse(state: EditorState, previous: DocumentSnapshot | null = null, cha
     return { blocks: [], lines: [], refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
-  const file = info?.file ?? state.doc;
-  const origin = { file, path: info?.file?.path ?? "", branch: previous?.origin.file === file ? previous.origin.branch : {} };
+  const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, previous?.origin);
   const snapshot = documentSnapshot(text, origin, previous ?? undefined, changes);
   return { snapshot, blocks: snapshot.blocks.map(ref => ref.block), lines: [...snapshot.lines],
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
@@ -151,7 +152,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
   const { blocks, lines, refs, snapshot } = parsed;
   rememberDocumentSnapshot(state, snapshot);
   const ranges: Array<Range<Decoration>> = [];
-  const sourcePath = state.field(editorInfoField, false)?.file?.path ?? "";
+  const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
   let hasWraps = false;
 

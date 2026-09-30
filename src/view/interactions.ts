@@ -35,7 +35,7 @@ import { createDragGhost } from "./dragGhost.ts";
 import { applySizing } from "./layoutView.ts";
 import { resolveMedia } from "./media.ts";
 import { MediaViewer, type ViewerImage } from "./mediaViewer.ts";
-import { t, type MessageKey } from "./messages.ts";
+import { reportWriteError, t, type MessageKey } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
 import { TextLayoutModal } from "./textLayoutModal.ts";
 
@@ -180,11 +180,14 @@ export async function commitEdits(app: App, sourcePath: string, edits: Array<Blo
     return false;
   }
 
-  const result = await writeBlockEdits(app, file, planned, options);
-  if (!result.ok) {
-    new Notice(t(FAILURE_MESSAGES[result.reason]));
+  try {
+    const result = await writeBlockEdits(app, file, planned, options);
+    if (!result.ok) new Notice(t(FAILURE_MESSAGES[result.reason]));
+    return result.ok;
+  } catch (error) {
+    reportWriteError(error);
+    return false;
   }
-  return result.ok;
 }
 
 function setUpViewer(root: HTMLElement, context: LayoutContext): void {

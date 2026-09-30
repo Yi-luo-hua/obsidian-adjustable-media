@@ -40,9 +40,10 @@ const CLOSE_LINE = /^<!-- \/vml -->[ \t]*$/;
  * a blank line, a heading or another layout block), plus the end of the note. Code, math, comments,
  * frontmatter, indented lines and the inside of lists and of layout blocks are never split.
  */
-export function blockGaps(lines: readonly string[], contexts: readonly LineContext[] = scanMarkdownLines(lines)): number[] {
+export function blockGaps(lines: readonly string[], contexts: readonly LineContext[] = scanMarkdownLines(lines, true),
+  blocks: readonly V2Block[] = findV2Blocks(lines, contexts)): number[] {
   const inside = new Set<number>();
-  for (const block of findV2Blocks(lines, contexts)) {
+  for (const block of blocks) {
     for (let line = block.openLine + 1; line <= block.closeLine; line += 1) {
       inside.add(line);
     }
@@ -63,7 +64,7 @@ export function blockGaps(lines: readonly string[], contexts: readonly LineConte
     gaps.push(line);
   }
   // EOF is not outside an unterminated fence, equation, frontmatter or comment.
-  if (scanMarkdownLines([...lines, "vml insertion boundary"]).at(-1) === "text") {
+  if ((contexts[lines.length] ?? scanMarkdownLines(lines, true).at(-1)) === "text") {
     gaps.push(lines.length);
   }
   return gaps;

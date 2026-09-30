@@ -10,8 +10,8 @@ import { layoutIsRendered, renderLayout } from "./layoutView.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { blockWarning } from "./messages.ts";
 import { sectionNoteText } from "./noteText.ts";
-import { readingSections, readingViewOfSection } from "./obsidianInternals.ts";
-import { keepWrapped, keepWrapsBeside, refreshReadingWrap } from "./readingWrap.ts";
+import { readingSectionsOfView, readingViewOfSection } from "./obsidianInternals.ts";
+import { keepWrapped, keepWrapsBeside, refreshReadingMedia, refreshReadingWrap } from "./readingWrap.ts";
 import { renderPrintLayouts } from "./printView.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
 
@@ -34,9 +34,11 @@ interface Reader {
   parsed: Parsed;
   requested: string | null;
   needsRender: boolean;
+  markedWrapping: boolean | null;
   timer: number;
   frame: number;
   sections: Map<HTMLElement, { snapshotId: string; range: SourceCoverage }>;
+  pendingSections: Map<HTMLElement, () => boolean>;
   stopEnvironment: () => void;
 }
 
@@ -60,10 +62,19 @@ export function registerReadingView(plugin: Plugin): void {
   const alive = (reader: Reader): boolean => !unloaded && readers.get(reader.view) === reader
     && reader.view.file === reader.file && reader.view.getMode() === "preview" && reader.view.containerEl.isConnected;
 
+  const markWrapping = (reader: Reader, wrapped: boolean): void => {
+    if (reader.markedWrapping === wrapped) return;
+    const reading = readingSectionsOfView(reader.view);
+    if (!reading) return;
+    for (const section of reading.sections) section.el.toggleClass(WRAPPING, wrapped);
+    reader.markedWrapping = wrapped;
+  };
+
   const stop = (reader: Reader): void => {
+    if (reader.markedWrapping) markWrapping(reader, false);
     const win = reader.view.containerEl.win;
     win.clearTimeout(reader.timer); win.cancelAnimationFrame(reader.frame);
-    reader.stopEnvironment(); reader.projection.dispose(); reader.sections.clear();
+    reader.stopEnvironment(); reader.projection.dispose(); reader.sections.clear(); reader.pendingSections.clear();
     readers.delete(reader.view);
   };
 
@@ -75,18 +86,20 @@ export function registerReadingView(plugin: Plugin): void {
       const connected = [...reader.sections].filter(([el]) => el.isConnected && reader.view.containerEl.contains(el));
       reader.projection.viewportChanged(connected.map(([, record]) => record.range));
       const token = reader.projection.token()!;
-      for (const [el, record] of connected) {
-        if (record.snapshotId !== token.snapshotId) continue;
-        reader.projection.installed(token, [record.range]);
-        const reading = readingSections(plugin.app, el);
-        const section = reading?.sections.find(item => item.el === el);
+      const reading = readingSectionsOfView(reader.view);
+      const byElement = new Map(reading?.sections.map(section => [section.el, section]));
+      const installed = connected.filter(([, record]) => record.snapshotId === token.snapshotId);
+      reader.projection.installed(token, installed.map(([, record]) => record.range));
+      const measured: SourceCoverage[] = [];
+      const visible = reader.view.previewMode.containerEl.clientWidth > 0 && reader.view.containerEl.doc.fonts.status === "loaded";
+      for (const [el, record] of installed) {
+        const section = byElement.get(el);
         const media = Array.from(el.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"));
         const ready = media.every(item => item.instanceOf(HTMLImageElement) ? item.complete : item.readyState > 0)
           && Array.from(el.querySelectorAll<HTMLElement>(".vml-layout")).every(layoutIsRendered);
-        if (section?.computed && el.getBoundingClientRect().width > 0 && ready && el.doc.fonts.status === "loaded") {
-          reader.projection.measured(token, [record.range]);
-        }
+        if (visible && section?.computed && section.rendered && section.shown !== false && ready) measured.push(record.range);
       }
+      reader.projection.measured(token, measured);
     });
   };
 
@@ -100,8 +113,11 @@ export function registerReadingView(plugin: Plugin): void {
     }
     if (reader.needsRender && reader.requested !== reader.parsed.snapshot.id) {
       reader.requested = reader.parsed.snapshot.id;
+      reader.needsRender = false;
       reader.view.previewMode.rerender(true);
     }
+    for (const process of [...reader.pendingSections.values()]) process();
+    if (!reader.parsed.snapshot.text.includes("<!-- vml")) { stop(reader); return; }
     confirm(reader);
   };
 
@@ -111,7 +127,7 @@ export function registerReadingView(plugin: Plugin): void {
     if (previous) stop(previous);
     const parsed = parse(view, view.getViewData());
     const reader: Reader = { view, file: view.file!, parsed, projection: new ViewProjection(), requested: null,
-      needsRender: false, timer: 0, frame: 0, sections: new Map(), stopEnvironment: () => {} };
+      needsRender: false, markedWrapping: null, timer: 0, frame: 0, sections: new Map(), pendingSections: new Map(), stopEnvironment: () => {} };
     reader.projection.request(parsed.snapshot);
     reader.projection.observeHost(view.getViewData());
     readers.set(view, reader);
@@ -120,6 +136,9 @@ export function registerReadingView(plugin: Plugin): void {
       reader.projection.environmentChanged();
       const section = [...reader.sections.keys()].find(el => el.isConnected);
       if (section) refreshReadingWrap(plugin.app, section);
+      confirm(reader);
+    }, media => {
+      for (const section of reader.sections.keys()) if (section.contains(media)) { refreshReadingMedia(section, media); break; }
       confirm(reader);
     });
     const scroll = (): void => confirm(reader);
@@ -164,8 +183,7 @@ export function registerReadingView(plugin: Plugin): void {
       }
     }
     el.toggleClass(WRAPPING, wrapped);
-    const reading = readingSections(plugin.app, el);
-    if (reading) for (const section of reading.sections) section.el.toggleClass(WRAPPING, wrapped);
+    markWrapping(reader, wrapped);
     if (wrapped) keepWrapsBeside(plugin.app, el);
     const from = offsets[info.lineStart] ?? snapshot.text.length;
     const to = offsets[info.lineEnd + 1] ?? snapshot.text.length;
@@ -180,21 +198,34 @@ export function registerReadingView(plugin: Plugin): void {
   plugin.registerMarkdownPostProcessor((el, ctx) => {
     const info = ctx.getSectionInfo(el);
     if (!info) return renderPrintLayouts(plugin.app, el, ctx);
+    let waitingReader: Reader | null = null;
+    let unwatch = (): void => {};
+    const finish = (): void => {
+      if (waitingReader?.pendingSections.get(el) === process) waitingReader.pendingSections.delete(el);
+      waitingReader = null;
+      unwatch();
+    };
     const process = (): boolean => {
       const view = readingViewOfSection(plugin.app, el);
       if (!view?.file || view.file.path !== ctx.sourcePath) return false;
       const text = sectionNoteText(plugin.app, ctx, info, el);
-      if (text !== view.getViewData()) return true;
+      if (!text.includes("<!-- vml") && !readers.has(view)) return true;
       const reader = getReader(view);
-      if (text !== reader.parsed.snapshot.text) return true;
+      if (text !== view.getViewData() || text !== reader.parsed.snapshot.text) {
+        if (waitingReader?.pendingSections.get(el) === process) waitingReader.pendingSections.delete(el);
+        waitingReader = reader;
+        reader.pendingSections.set(el, process);
+        return false;
+      }
+      finish();
       draw(reader, el, info, ctx);
       return true;
     };
     if (!process()) {
       const child = new MarkdownRenderChild(el);
       ctx.addChild(child);
-      const unwatch = el.onNodeInserted(() => { if (process()) unwatch(); });
-      child.register(unwatch);
+      unwatch = el.onNodeInserted(process);
+      child.register(finish);
     }
   });
 
@@ -221,10 +252,10 @@ export function registerReadingView(plugin: Plugin): void {
     generations.set(file, generation);
     void plugin.app.vault.cachedRead(file).then(data => {
       if (unloaded || generations.get(file) !== generation) return;
+      if (!data.includes("<!-- vml") && ![...readers.values()].some(reader => reader.file === file)) return;
       const sources = plugin.app.workspace.getLeavesOfType("markdown").map(leaf => leaf.view)
         .filter((view): view is MarkdownView => view instanceof MarkdownView && view.file === file && view.getMode() === "source");
       if (sources.some(view => view.editor.getValue() !== data)) { for (const reader of currentReaders(file)) wake(reader); return; }
-      if (!data.includes("<!-- vml") && ![...readers.values()].some(reader => reader.file === file)) return;
       for (const reader of currentReaders(file)) desire(reader, data);
     }).catch((error: unknown) => {
       if (!unloaded && plugin.app.vault.getAbstractFileByPath(file.path) === file) console.error("Adjustable Media: reading source could not be read", error);
@@ -243,7 +274,9 @@ export function registerReadingView(plugin: Plugin): void {
     if (unloaded) return;
     for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
       if (leaf.view instanceof MarkdownView && leaf.view.file && leaf.view.getMode() === "preview") {
-        const reader = getReader(leaf.view); reader.needsRender = true; wake(reader);
+        if (!leaf.view.getViewData().includes("<!-- vml")) continue;
+        const reader = getReader(leaf.view);
+        if (reader.parsed.blocks.some(isDrawable)) { reader.needsRender = true; wake(reader); }
       }
     }
   });

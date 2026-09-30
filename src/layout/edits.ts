@@ -212,7 +212,7 @@ export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit
   }
   const normalized = lines.map(stripCarriageReturn);
   let contexts: LineContext[] | null = null;
-  const contextAt = (line: number): LineContext | undefined => (contexts ??= scanMarkdownLines(normalized))[line];
+  const contextAt = (line: number): LineContext | undefined => (contexts ??= scanMarkdownLines(normalized, true))[line];
 
   const changes: LineChange[] = [];
   for (const edit of edits) {
@@ -236,7 +236,7 @@ export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit
   }
 
   // Protect every entry point, including commands and future planners that construct raw edits.
-  const readOnly = findV2Blocks(normalized).filter(block => !isEditable(block));
+  const readOnly = findV2Blocks(normalized, contexts ??= scanMarkdownLines(normalized, true)).filter(block => !isEditable(block));
   if (changes.some(change => readOnly.some(block => change.from <= block.closeLine && change.to >= block.openLine))) {
     return { ok: false, reason: "read-only" };
   }

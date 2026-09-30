@@ -63,7 +63,7 @@ export async function writeBlockEdits(
     const info = options.view.state.field(editorInfoField, false);
     const origin = app.workspace.getLeavesOfType("markdown").some((leaf) => leaf.view instanceof MarkdownView
       && leaf.view.file === file && leaf.view.getMode() === "source" && leaf.view.editor === info?.editor);
-    if (info?.file !== file || !options.view.dom.isConnected || !origin) {
+    if ((info?.file && info.file !== file) || !options.view.dom.isConnected || !origin) {
       return { ok: false, reason: "not-found" };
     }
     const result = writeToView(options.view, edits, options);

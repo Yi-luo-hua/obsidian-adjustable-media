@@ -1,4 +1,4 @@
-import { MarkdownView, type App, type Hotkey } from "obsidian";
+import { MarkdownView, type App, type Editor, type Hotkey, type TFile } from "obsidian";
 
 /**
  * What the plugin reads of Obsidian through interfaces its API does not document, each with a
@@ -64,6 +64,16 @@ interface Renderer {
   queueRender?: unknown;
 }
 
+/** File ownership comes from the exact editor pane when editorInfoField omits its file. */
+export function fileOfEditor(app: App, editor: Editor | undefined): TFile | null {
+  if (!editor) return null;
+  for (const leaf of app.workspace.getLeavesOfType("markdown")) {
+    const view = leaf.view;
+    if (view instanceof MarkdownView && view.getMode() === "source" && view.editor === editor) return view.file;
+  }
+  return null;
+}
+
 /** Uses section ownership, including detached sections being processed by the renderer. */
 export function readingViewOfSection(app: App, el: HTMLElement): MarkdownView | null {
   for (const leaf of app.workspace.getLeavesOfType("markdown")) {
@@ -93,6 +103,14 @@ export function readingSections(app: App, el: HTMLElement): ReadingSections | nu
   } catch {
     return null;
   }
+}
+
+/** A coordinator already knows the pane: do not search the section list again for each element. */
+export function readingSectionsOfView(view: MarkdownView): ReadingSections | null {
+  const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
+  const sections = renderer?.sections;
+  return Array.isArray(sections) && sections.every(isSection) && isElement(renderer?.sizerEl)
+    ? { sections, sizer: renderer.sizerEl } : null;
 }
 
 /**

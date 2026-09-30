@@ -4,12 +4,21 @@ import { blockWrap, findV2Blocks, type V2Block } from "../format/v2.ts";
 import { blockGaps } from "./placement.ts";
 import type { SourceAssertion } from "./sourceAssertions.ts";
 import { identifyBlock } from "./blockIdentity.ts";
+import { scanMarkdownLines } from "../markdown/lineContext.ts";
 
 /** File identity and buffer lineage are distinct from the current path or text. */
 export interface DocumentOrigin {
   file: object;
   branch: object;
   path: string;
+}
+
+/** A buffer remains the same when the host temporarily omits its file field. */
+export function editorDocumentOrigin(file: { path: string } | null | undefined, buffer: object | undefined,
+  previous?: DocumentOrigin): DocumentOrigin {
+  const owner = file ?? previous?.file ?? buffer ?? {};
+  return { file: owner, path: file?.path ?? previous?.path ?? "",
+    branch: previous?.file === owner ? previous.branch : buffer ?? {} };
 }
 
 export interface BlockRef {
@@ -77,7 +86,8 @@ export function documentSnapshot(text: string, origin: DocumentOrigin, previous?
   const prior = sameLineage ? previous : undefined;
   const lines = text.split("\n");
   const starts = lineStarts(lines);
-  const parsed = findV2Blocks(lines);
+  const contexts = scanMarkdownLines(lines, true);
+  const parsed = findV2Blocks(lines, contexts);
   const ranges = parsed.map(block => ({
     block,
     from: starts[block.openLine] ?? 0,
@@ -86,24 +96,36 @@ export function documentSnapshot(text: string, origin: DocumentOrigin, previous?
   const matched = new Map<number, BlockRef>();
   const used = new Set<string>();
   if (prior && changes) {
+    const byRange = new Map<string, number[]>();
+    for (const [index, range] of ranges.entries()) {
+      const key = `${range.from}:${range.to}`;
+      const at = byRange.get(key) ?? [];
+      at.push(index); byRange.set(key, at);
+    }
     for (const ref of prior.blocks) {
       const froms = [changes.mapPos(ref.from, 1), changes.mapPos(ref.from, -1)];
       const tos = [changes.mapPos(ref.to, -1), changes.mapPos(ref.to, 1)];
-      const candidates = ranges.flatMap((range, index) => !matched.has(index)
-        && froms.includes(range.from) && tos.includes(range.to) ? [index] : []);
+      const candidates = [...new Set(froms.flatMap(from => tos.flatMap(to => byRange.get(`${from}:${to}`) ?? [])))].filter(index => !matched.has(index));
       if (candidates.length === 1) {
         matched.set(candidates[0], ref);
         used.add(ref.id);
       }
     }
     // Range mapping accounts for the other copies before matching a moved duplicate.
-    for (const ref of prior.blocks.filter(ref => !used.has(ref.id))) {
-      const old = prior.blocks.filter(other => !used.has(other.id) && other.source === ref.source);
-      const candidates = ranges.flatMap((range, index) => !matched.has(index)
-        && text.slice(range.from, range.to) === ref.source ? [index] : []);
+    const oldBySource = new Map<string, BlockRef[]>();
+    const newBySource = new Map<string, number[]>();
+    for (const ref of prior.blocks) if (!used.has(ref.id)) {
+      const at = oldBySource.get(ref.source) ?? []; at.push(ref); oldBySource.set(ref.source, at);
+    }
+    for (const [index, range] of ranges.entries()) if (!matched.has(index)) {
+      const source = text.slice(range.from, range.to);
+      const at = newBySource.get(source) ?? []; at.push(index); newBySource.set(source, at);
+    }
+    for (const [source, old] of oldBySource) {
+      const candidates = newBySource.get(source) ?? [];
       if (old.length === 1 && candidates.length === 1) {
-        matched.set(candidates[0], ref);
-        used.add(ref.id);
+        matched.set(candidates[0], old[0]);
+        used.add(old[0].id);
       }
     }
   }
@@ -125,7 +147,7 @@ export function documentSnapshot(text: string, origin: DocumentOrigin, previous?
       mappedAnchors.set(offset, at);
     }
   }
-  const anchors = blockGaps(lines).map((line): BodyAnchor => {
+  const anchors = blockGaps(lines, contexts, parsed).map((line): BodyAnchor => {
     const offset = starts[line] ?? text.length;
     const candidates = (mappedAnchors.get(offset) ?? []).filter(anchor => !usedAnchors.has(anchor.id));
     const id = candidates.length === 1 ? candidates[0].id : identity("body");
@@ -145,11 +167,20 @@ export function layoutDependencies(lines: readonly string[], blocks: readonly V2
 
 function layoutRelations(lines: readonly string[], blocks: readonly BlockRef[], anchors: readonly BodyAnchor[]): LayoutRelations {
   const floats = blocks.filter(ref => blockWrap(ref.block) !== null);
+  const floatLines = new Set(floats.map(ref => ref.block.openLine));
+  const bodyAnchors = anchors.filter(anchor => anchor.line < lines.length && !floatLines.has(anchor.line));
+  const after = (line: number): string | null => {
+    let low = 0, high = bodyAnchors.length;
+    while (low < high) {
+      const middle = (low + high) >>> 1;
+      if (bodyAnchors[middle].line <= line) low = middle + 1; else high = middle;
+    }
+    return bodyAnchors[low]?.id ?? null;
+  };
   const runs: Array<{ members: string[]; bodyAnchor: string | null }> = [];
   let previous: BlockRef | undefined;
   for (const ref of floats) {
-    const bodyAnchor = anchors.find(anchor => anchor.line > ref.block.closeLine && anchor.line < lines.length
-      && !floats.some(other => anchor.line >= other.block.openLine && anchor.line <= other.block.closeLine))?.id ?? null;
+    const bodyAnchor = after(ref.block.closeLine);
     const adjacent = previous !== undefined && lines.slice(previous.block.closeLine + 1, ref.block.openLine).every(line => line.trim() === "");
     const last = runs.at(-1);
     if (adjacent && last) {
@@ -160,9 +191,10 @@ function layoutRelations(lines: readonly string[], blocks: readonly BlockRef[], 
     }
     previous = ref;
   }
+  const byMember = new Map(runs.flatMap(run => run.members.map(id => [id, run.bodyAnchor] as const)));
   return { floats: floats.map(ref => ref.id), runs,
     flowRegions: floats.map(ref => ({ blockId: ref.id,
-      bodyAnchor: runs.find(run => run.members.includes(ref.id))?.bodyAnchor ?? null, endLine: null })) };
+      bodyAnchor: byMember.get(ref.id) ?? null, endLine: null })) };
 }
 
 function lineStarts(lines: readonly string[]): number[] {

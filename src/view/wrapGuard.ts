@@ -150,6 +150,9 @@ export function wrapMeasurementsReady(view: EditorView): boolean {
   return activeGuards.get(view)?.measurementsReady() ?? true;
 }
 
+/** A loaded visible resource needs a fresh measurement, not a new environment for every block. */
+export function refreshWrapMedia(view: EditorView): void { activeGuards.get(view)?.mediaChanged(); }
+
 class WrapGuard {
   /** Stand-ins for floats whose anchors are above the drawn part of the note. */
   decorations: DecorationSet = Decoration.none;
@@ -208,6 +211,8 @@ class WrapGuard {
     return !this.pendingUpdate && this.source.anchors(this.view.state).every(anchor => anchor.from > this.view.viewport.to
       || (this.sizes.has(anchor.key) && !this.pendingMedia.has(anchor.key)));
   }
+
+  mediaChanged(): void { this.measure(); }
 
   private measure(): void {
     const state = this.view.state;

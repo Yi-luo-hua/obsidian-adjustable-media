@@ -95,6 +95,11 @@ export function planMergeWithNext(lines: readonly string[], line: number): LineC
 
 /** Commands and input conversion use the same source validation and write boundary as gestures. */
 export function lineChangeEdit(lines: readonly string[], change: LineChange): BlockEdit {
+  const contexts = scanMarkdownLines(lines, true);
+  // A complete fence/equation selection is enclosed at its following text boundary; its body
+  // stays verbatim. Partial constructs were already rejected by the planner's round-trip check.
+  let textOffset = 0;
+  while (change.from + textOffset <= change.to && contexts[change.from + textOffset] !== "text") textOffset++;
   return { anchorLine: change.from, anchorLines: lines.slice(change.from, change.to + 1).map(stripCarriageReturn),
-    start: 0, end: change.to - change.from, replacement: change.replacement };
+    textOffset, start: 0, end: change.to - change.from, replacement: change.replacement };
 }

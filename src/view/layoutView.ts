@@ -36,9 +36,14 @@ interface MediaSize {
  */
 const mediaSizes = new Map<string, MediaSize>();
 const pendingLayouts = new WeakSet<HTMLElement>();
+const failedLayouts = new WeakSet<HTMLElement>();
 
 /** Creating the root does not mean its asynchronous Markdown has finished. */
-export function layoutIsRendered(root: HTMLElement): boolean { return !pendingLayouts.has(root); }
+export function layoutRenderState(root: HTMLElement): "pending" | "failed" | "rendered" {
+  return pendingLayouts.has(root) ? "pending" : failedLayouts.has(root) ? "failed" : "rendered";
+}
+
+export function layoutIsRendered(root: HTMLElement): boolean { return layoutRenderState(root) === "rendered"; }
 
 /**
  * Draws a layout model. Shared by reading view and live preview; it never writes to the note.
@@ -112,6 +117,8 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
   if (tasks.length > 0) {
     pendingLayouts.add(root);
     void Promise.all(tasks).then(() => pendingLayouts.delete(root), (error: unknown) => {
+      pendingLayouts.delete(root);
+      failedLayouts.add(root);
       console.error("Adjustable Media: layout Markdown could not be rendered", error);
     });
   }

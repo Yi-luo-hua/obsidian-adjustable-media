@@ -1,4 +1,4 @@
-import { moment } from "obsidian";
+import { Notice, moment } from "obsidian";
 
 import type { V2Block } from "../format/v2.ts";
 
@@ -240,6 +240,7 @@ const MESSAGES = {
     zh: "笔记里有完全相同的布局块，无法确定要改哪一个，这次修改没有写入。",
     en: "The note has identical layout blocks and it is unclear which one to change, so this change was not saved.",
   },
+  writeFailed: { zh: "笔记写入失败，请重试。", en: "The note could not be saved. Please try again." },
   writeOverlap: {
     zh: "同一个布局块被同时修改了两次，这次修改没有写入。",
     en: "The same layout block was changed twice at once, so this change was not saved.",
@@ -427,4 +428,9 @@ export function t(key: MessageKey, values: Record<string, string> = {}, lang?: "
 
 export function blockWarning(block: V2Block): string | null {
   return block.metaError === null ? null : t("unreadableSettings");
+}
+
+export function reportWriteError(error: unknown): void {
+  console.error("Adjustable Media: note write failed", error);
+  new Notice(t("writeFailed"));
 }

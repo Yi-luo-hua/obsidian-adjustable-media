@@ -3,7 +3,7 @@ import { Modal, Notice, type App, type Editor, type Plugin, type TFile } from "o
 import { findV2Blocks, type V2Block } from "../format/v2.ts";
 import { isEditable, planUnwrap, planUnwrapAll, type LineChange } from "../layout/edits.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
-import { t } from "../view/messages.ts";
+import { reportWriteError, t } from "../view/messages.ts";
 import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection } from "./plans.ts";
 
 export function registerCommands(plugin: Plugin): void {
@@ -68,7 +68,7 @@ export function registerCommands(plugin: Plugin): void {
       }
       void writeBlockEdits(plugin.app, view.file, [edit], { editor }).then(result => {
         if (!result.ok) new Notice(t("writeNotFound"));
-      });
+      }).catch(reportWriteError);
     },
   });
 
@@ -76,7 +76,7 @@ export function registerCommands(plugin: Plugin): void {
     id: "remove-all-layout-comments",
     name: t("cmdRemoveAll"),
     callback: () => {
-      void openRemoveAll(plugin.app);
+      void openRemoveAll(plugin.app).catch(reportWriteError);
     },
   });
 }
@@ -86,7 +86,7 @@ function writeCommandChange(plugin: Plugin, editor: Editor, file: TFile | null, 
   const edit = lineChangeEdit(editor.getValue().split("\n"), change);
   void writeBlockEdits(plugin.app, file, [edit], { editor }).then(result => {
     if (!result.ok) new Notice(t("writeNotFound"));
-  });
+  }).catch(reportWriteError);
 }
 
 interface NoteLayouts {
@@ -137,7 +137,7 @@ class RemoveAllModal extends Modal {
     const footer = this.contentEl.createDiv({ cls: "modal-button-container" });
     footer.createEl("button", { cls: "mod-warning", text: t("removeAllConfirm") }).addEventListener("click", () => {
       this.close();
-      void this.removeAll();
+      void this.removeAll().catch(reportWriteError);
     });
     footer.createEl("button", { text: t("cancel") }).addEventListener("click", () => this.close());
   }
