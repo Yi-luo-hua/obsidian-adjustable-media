@@ -1,0 +1,135 @@
+{
+  "vault": "vml-test-vault",
+  "obsidian": "1.13.7",
+  "buildHash": "2f50a378e82636f744d9aae00eb7dc227378be5ab90c3bf67c336bded804f16d",
+  "widths": {
+    "reading": [
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. ",
+          "width": 467.9947509765625,
+          "height": 286.1284484863281
+        }
+      ],
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. ",
+          "width": 258.0468444824219,
+          "height": 526.0590209960938
+        }
+      ]
+    ],
+    "live": [
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. 编辑源码",
+          "width": 467.9947509765625,
+          "height": 286.1284484863281
+        }
+      ],
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. 编辑源码",
+          "width": 258.0468444824219,
+          "height": 526.0590209960938
+        }
+      ]
+    ]
+  },
+  "whileDelayed": {
+    "rerenders": [
+      1,
+      0
+    ],
+    "firstMatches": true,
+    "secondReportsOld": true
+  },
+  "afterDelayed": {
+    "rerenders": [
+      1,
+      1
+    ],
+    "bothMatch": [
+      true,
+      true
+    ],
+    "roots": [
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping.  Latest",
+          "width": 467.9947509765625,
+          "height": 286.1284484863281
+        }
+      ],
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping.  Latest",
+          "width": 258.0468444824219,
+          "height": 550.0520629882812
+        }
+      ]
+    ]
+  },
+  "divergent": {
+    "overwritten": 0,
+    "readersStillLatest": [
+      true,
+      true
+    ]
+  },
+  "undo": {
+    "sourceRestored": true,
+    "readers": [
+      true,
+      true
+    ],
+    "roots": [
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. ",
+          "width": 467.9947509765625,
+          "height": 286.1284484863281
+        }
+      ],
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. ",
+          "width": 258.0468444824219,
+          "height": 526.0590209960938
+        }
+      ]
+    ]
+  },
+  "rename": {
+    "paths": [
+      "Layout redesign P2 renamed transient.md",
+      "Layout redesign P2 renamed transient.md",
+      "Layout redesign P2 renamed transient.md",
+      "Layout redesign P2 renamed transient.md"
+    ],
+    "roots": [
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. ",
+          "width": 467.9947509765625,
+          "height": 286.1284484863281
+        }
+      ],
+      [
+        {
+          "text": "Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. Width sensitive text for the layout with enough words to measure natural wrapping. ",
+          "width": 258.0468444824219,
+          "height": 526.0590209960938
+        }
+      ]
+    ]
+  },
+  "convergence": {
+    "additionalRerenders": [
+      0,
+      0
+    ],
+    "internalEffects": 0
+  },
+  "notesUnchanged": true
+}

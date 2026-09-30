@@ -1,0 +1,32 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs=require('fs'),crypto=require('crypto'),remote=require('@electron/remote');
+  const base=app.vault.adapter.getBasePath();
+  const notes=Object.fromEntries(app.vault.getMarkdownFiles().map(f=>[f.path,crypto.createHash('sha256').update(fs.readFileSync(base+'/'+f.path)).digest('hex')]));
+  const path='Layout redesign P2 surface transient.md';
+  if(app.vault.getAbstractFileByPath(path))throw new Error('Probe note exists');
+  const initial='# Layout verification\n\n<!-- vml {"v":2,"type":"text","width":0.65} -->\nSame source, independent views. '.repeat(1)+'This paragraph tests natural wrapping across reading view and live preview. '.repeat(5)+'\n<!-- /vml -->\n\n<!-- vml {"v":2,"type":"text","wrap":"left","width":0.4,"skip":1} -->\nLeft layout, beside the body\n<!-- /vml -->\n\n<!-- vml {"v":2,"type":"text","wrap":"right","width":0.4,"skip":3} -->\nRight layout, beside the body\n<!-- /vml -->\n\n'+'Body text flows around both layouts, following the same saved source. '.repeat(12)+'\n\nEnd of fixture.';
+  const previous=app.workspace.activeLeaf;
+  const file=await app.vault.create(path,initial);
+  const leaf=app.workspace.getLeaf(true);
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const surfaces=[];
+  try{
+    for(const mode of ['preview','source']){
+      await leaf.setViewState({type:'markdown',state:{file:path,mode}});
+      app.workspace.setActiveLeaf(leaf,{focus:false});
+      if(mode==='source')leaf.view.editor.setCursor({line:0,ch:0});
+      await wait(650);
+      const view=leaf.view;
+      const roots=Array.from(view.containerEl.querySelectorAll('.vml-layout')).filter(el=>el.getBoundingClientRect().width>0).map(el=>({text:el.textContent,top:el.getBoundingClientRect().top,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height}));
+      const filename='E:/TOOLS/obsidian-adjustable-media/docs/plans/layout-redesign/probes/p2-'+mode+'.png';
+      const rect=view.containerEl.getBoundingClientRect();
+      await remote.getCurrentWebContents().capturePage();
+      const capture=await remote.getCurrentWebContents().capturePage({x:Math.max(0,Math.floor(rect.x)),y:Math.max(0,Math.floor(rect.y)),width:Math.floor(rect.width),height:Math.floor(rect.height)});
+      fs.writeFileSync(filename,capture.toPNG());
+      surfaces.push({mode,containerWidth:rect.width,roots,screenshot:filename});
+    }
+    window.__layoutP2Surface={surfaces,buildHash:crypto.createHash('sha256').update(fs.readFileSync(base+'/.obsidian/plugins/adjustable-media/main.js')).digest('hex'),notesUnchanged:Object.entries(notes).every(([p,h])=>crypto.createHash('sha256').update(fs.readFileSync(base+'/'+p)).digest('hex')===h)};
+    console.log(JSON.stringify(window.__layoutP2Surface));
+  }finally{leaf.detach();if(previous)app.workspace.setActiveLeaf(previous,{focus:false});await wait(600);await app.vault.trash(file,false)}
+})().catch(error=>{window.__layoutP2Surface={error:String(error),stack:error.stack};console.error(error)});

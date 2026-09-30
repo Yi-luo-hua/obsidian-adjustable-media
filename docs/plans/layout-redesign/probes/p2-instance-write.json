@@ -1,0 +1,18 @@
+{
+  "vault": "vml-test-vault",
+  "sourceLines": {
+    "oldTarget": 6,
+    "currentFirst": 6,
+    "currentTarget": 10
+  },
+  "targetOnly": true,
+  "changedLines": [
+    10
+  ],
+  "documentTransactions": 1,
+  "undoTransactions": 1,
+  "undo": true,
+  "inputScope": "Programmatic host contextmenu and DOM menu click; not physical pointer drag",
+  "buildHash": "2f50a378e82636f744d9aae00eb7dc227378be5ab90c3bf67c336bded804f16d",
+  "existingNotesUnchanged": true
+}

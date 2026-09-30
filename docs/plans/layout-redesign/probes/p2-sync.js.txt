@@ -1,0 +1,94 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs');
+  const crypto = require('crypto');
+  const base = app.vault.adapter.getBasePath();
+  const hash = value => crypto.createHash('sha256').update(value).digest('hex');
+  const beforeNotes = Object.fromEntries(app.vault.getMarkdownFiles().map(f => [f.path, hash(fs.readFileSync(base + '/' + f.path))]));
+  const path = 'Layout redesign P2 sync transient.md';
+  const renamed = 'Layout redesign P2 renamed transient.md';
+  if (app.vault.getAbstractFileByPath(path) || app.vault.getAbstractFileByPath(renamed)) throw new Error('Probe note exists');
+  const paragraph = 'Width sensitive text for the layout with enough words to measure natural wrapping. '.repeat(7);
+  const initial = '# P2\n\n<!-- vml {"v":2,"type":"text","width":0.65} -->\n' + paragraph + '\n<!-- /vml -->\n\nBody\n';
+  const leaves = [];
+  const restores = [];
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const file = await app.vault.create(path, initial);
+  const style = document.createElement('style');
+  style.textContent = '.layout-p2-wide{width:720px!important;min-width:720px!important;max-width:720px!important}.layout-p2-narrow{width:397px!important;min-width:397px!important;max-width:397px!important}';
+  document.head.appendChild(style);
+  let result;
+  try {
+    for (const mode of ['preview','preview','source','source']) {
+      const leaf = app.workspace.getLeaf('split','vertical'); leaves.push(leaf);
+      await leaf.setViewState({type:'markdown',state:{file:path,mode}});
+    }
+    const readers = leaves.slice(0,2).map(l=>l.view);
+    const source = leaves[2].view;
+    source.editor.setCursor({line:0,ch:0});
+    leaves[3].view.editor.setCursor({line:0,ch:0});
+    readers[0].previewMode.renderer.sizerEl.addClass('layout-p2-wide');
+    readers[1].previewMode.renderer.sizerEl.addClass('layout-p2-narrow');
+    source.editor.cm.contentDOM.addClass('layout-p2-wide');
+    leaves[3].view.editor.cm.contentDOM.addClass('layout-p2-narrow');
+    await wait(700);
+    const rectangles = view => Array.from(view.containerEl.querySelectorAll('.vml-layout--text-only'))
+      .filter(el => el.getBoundingClientRect().width > 0)
+      .map(el => ({text:el.textContent, width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height}));
+    const widths = {reading:readers.map(rectangles),live:leaves.slice(2).map(l=>rectangles(l.view))};
+    const rerenders = [0,0];
+    readers.forEach((view,index)=>{
+      const method=view.previewMode.rerender;
+      view.previewMode.rerender=function(...args){rerenders[index]++;return method.apply(this,args)};
+      restores.push(()=>{view.previewMode.rerender=method});
+    });
+    const getter = readers[1].getViewData;
+    let delay = true;
+    readers[1].getViewData = function(){return delay ? initial : getter.call(this)};
+    restores.push(()=>{readers[1].getViewData=getter});
+    source.editor.replaceRange(' Latest', {line:3,ch:paragraph.length});
+    const latest = source.editor.getValue();
+    await wait(950);
+    const whileDelayed = {rerenders:[...rerenders],firstMatches:readers[0].getViewData()===latest,secondReportsOld:readers[1].getViewData()===initial};
+    delay = false;
+    await wait(450);
+    const afterDelayed = {rerenders:[...rerenders],bothMatch:readers.map(view=>view.getViewData()===latest),roots:readers.map(rectangles)};
+    readers[1].getViewData=getter;
+    // Exercise an explicitly injected divergent source without altering the second buffer.
+    const second = leaves[3].view;
+    const secondGetter=second.editor.getValue;
+    const secondSet=second.setViewData;
+    let overwritten=0;
+    second.editor.getValue=()=>secondGetter.call(second.editor)+' divergence';
+    second.setViewData=function(...args){overwritten++;return secondSet.apply(this,args)};
+    restores.push(()=>{second.editor.getValue=secondGetter;second.setViewData=secondSet});
+    app.metadataCache.trigger('changed',file,initial,{});
+    await wait(300);
+    const divergent = {overwritten,readersStillLatest:readers.map(view=>view.getViewData()===latest)};
+    second.editor.getValue=secondGetter;second.setViewData=secondSet;
+    source.editor.undo();
+    await wait(500);
+    const undo = {sourceRestored:source.editor.getValue()===initial,readers:readers.map(view=>view.getViewData()===initial),roots:readers.map(rectangles)};
+    await app.fileManager.renameFile(file,renamed);
+    await wait(500);
+    const rename={paths:leaves.map(l=>l.view.file?.path),roots:readers.map(rectangles)};
+    const cm=source.editor.cm;
+    const dispatch=cm.dispatch;
+    let internalEffects=0;
+    cm.dispatch=function(...args){const previous=cm.state.doc;const value=dispatch.apply(this,args);if(cm.state.doc===previous)internalEffects++;return value};
+    restores.push(()=>{cm.dispatch=dispatch});
+    await wait(300);
+    internalEffects=0;
+    const steady=[...rerenders];
+    await wait(2100);
+    const convergence={additionalRerenders:rerenders.map((value,index)=>value-steady[index]),internalEffects};
+    const notesUnchanged=Object.entries(beforeNotes).every(([p,h])=>hash(fs.readFileSync(base+'/'+p))===h);
+    result={vault:app.vault.getName(),obsidian:require('@electron/remote').app.getVersion(),
+      buildHash:hash(fs.readFileSync(base+'/.obsidian/plugins/adjustable-media/main.js')),
+      widths,whileDelayed,afterDelayed,divergent,undo,rename,convergence,notesUnchanged};
+  } finally {
+    restores.reverse().forEach(restore=>restore()); style.remove(); leaves.forEach(leaf=>leaf.detach());
+    await wait(600); await app.vault.trash(file,false);
+  }
+  window.__layoutP2Result=result; console.log(JSON.stringify(result));
+})().catch(error=>{window.__layoutP2Result={error:String(error),stack:error.stack};console.error(error)});
