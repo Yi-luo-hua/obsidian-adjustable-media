@@ -4,7 +4,7 @@
 
 ## 当前布局改进进度
 
-当前分支为 `codex/layout-redesign-r1`，P0a 数据契约、P1 快照／身份／写入保护与 P2 协调／缓存基础已实施。完整 P2 生命周期、P0a 候选可实现性和 P3 拖动规划尚待验收，R1／R2 均未完成。提交与 PR 状态、下一工作包和进入／退出条件统一记录在 [09 进度与后续安排](plans/layout-redesign/09-progress-and-next-steps.md)。本分支仍用 V2，不迁移旧笔记。
+当前分支为 `codex/layout-redesign-r1`，已推送并创建草稿 [PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12)。P0a 数据契约、P1 快照／身份／写入保护与 P2 协调／缓存基础已实施。完整 P2 生命周期、P0a 候选可实现性和 P3 拖动规划尚待验收，R1／R2 均未完成。提交记录、下一工作包和进入／退出条件统一记录在 [09 进度与后续安排](plans/layout-redesign/09-progress-and-next-steps.md)。本分支仍用 V2，不迁移旧笔记，未合并或发布。
 
 2026-09-30 文档补充：已归档 [布局冲突研究与证据](research/LAYOUT_CONFLICTS.md)，并整理 [P0–P6 改进实施方案](plans/layout-redesign/README.md)，分为既有 V2 改进和明确并列组两个增量。此段为研究交付记录，后续实施见下文；下方历史发布记录不据此推断当前最新发布状态。
 

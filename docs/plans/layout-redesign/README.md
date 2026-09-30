@@ -1,8 +1,8 @@
 # 布局、拖动与视图同步改进实施方案
 
-状态：已开始分批实施；P0a 数据契约、P1 与 P2 协调／缓存基础已落地，完整 P2 和 P3–P6 尚未完成。更新日期：2026-09-30。最新验证见 [每窗格基础实施记录](08-pane-foundation-record.md)，提交状态与后续顺序见 [09 进度与后续安排](09-progress-and-next-steps.md)。
+状态：已开始分批实施；P0a 数据契约、P1 与 P2 协调／缓存基础已落地并提交草稿 [PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12)，完整 P2 和 P3–P6 尚未完成。更新日期：2026-09-30。最新验证见 [每窗格基础实施记录](08-pane-foundation-record.md)，提交状态与后续顺序见 [09 进度与后续安排](09-progress-and-next-steps.md)。
 
-基线：`main` 的 `34f5896`（0.6.1），另含工作区现有的 `src/layout/placement.ts`、`tests/layoutWrap.test.ts` 未提交补偿。基线研究见 [研究报告](../../research/LAYOUT_CONFLICTS.md)，其纯函数、独立浏览器证据与 Obsidian 实测范围分别记录，不互相替代。
+基线：`main` 的 `34f5896`（0.6.1），另含研究时已有的 `src/layout/placement.ts`、`tests/layoutWrap.test.ts` 未提交补偿；现已原样单独提交，见 09。基线研究见 [研究报告](../../research/LAYOUT_CONFLICTS.md)，其纯函数、独立浏览器证据与 Obsidian 实测范围分别记录，不互相替代。
 
 目标是建立完整的布局关系和可实现位置规则，让拖动预览、写回后的呈现和实时预览／阅读视图一致。现有 Markdown 写入原则、原生正文输入、媒体与文字原文保留、一步撤销都属于必须保留的行为。
 
