@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0 - 2026-10-01
+
+- Keep layout edits tied to the intended block when identical blocks move, and reject edits whose original source or dependencies have changed. Layout commands and automatic media conversion use the same source validation; blocks with unreadable settings keep their comments and cannot be unwrapped.
+- Synchronize reading panes independently, refresh layouts when surrounding wrap text changes, and retain updates while a pane's host is delayed. An empty section source is resolved through its own pane.
+- Unrelated paragraph edits now confirm retained reading sections without redrawing the whole note. When deleting an earlier media row or moving a section into another block changes its row settings, reinstall that section with the correct height and captions.
+- Keep layout dimensions separate for each pane, width and rendering mode; invalidate measurements after font, theme or width changes, and discard stale callbacks. Media loading requests local measurements, and failed Markdown rendering is not counted as complete.
+- Reduce layout snapshot overhead and redundant reading-view work while preserving the existing neighbor-anchor compensation for floating layouts.
+
+The note format remains V2; no migration is needed. Full lifecycle validation, the complete float planner and new group layouts remain future work. Targeted Obsidian 1.13.7 validation and measured limitations are recorded in `docs/STATUS.md` and the layout implementation records.
+
 ## 0.6.1 - 2026-09-24
 
 - Dragging a floating layout could make Obsidian repeatedly unresponsive; layouts that share a document position no longer recompute their wrap gap in a feedback loop.

@@ -4,7 +4,7 @@
 
 ## 1. 当前交付
 
-本批通过 [PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12) 向 `main` 交付 P1 与 P2 基础，合并状态以 PR 页面为准。完整 R1 的 P2 生命周期、P0a 候选可实现性及 P3 门槛未通过，基础交付不等同于 R1 验收，未发布新版本。
+本批通过 [PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12) 向 `main` 交付 P1 与 P2 基础，2026-10-01 已合并，维护发布版本为 [0.7.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.0)，公开状态以 Release 页面为准。完整 R1 的 P2 生命周期、P0a 候选可实现性及 P3 门槛未通过，基础发布不等同于 R1 验收。
 
 提交按审阅范围拆分：`796d5c8` 保留原有邻块锚点补偿，`c685c12` 实施身份／写入／每窗格基础，`28c5fab` 归档研究、证据与后续安排；PR 地址和本进度记录随后补充提交到同一分支。
 

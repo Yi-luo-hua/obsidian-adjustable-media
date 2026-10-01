@@ -1,10 +1,12 @@
 # 项目进度与验证记录
 
-更新日期：2026-09-30。最新已发布版本：0.6.1；下方早期验证保留其原日期与版本，不作为本分支的验收证明。
+更新日期：2026-10-01。当前发布版本：0.7.0，公开状态以 Release 页面为准；下方早期验证保留其原日期与版本，不作为当前版本的完整验收证明。
 
 ## 当前布局改进进度
 
-当前分支为 `codex/layout-redesign-r1`，已推送并创建草稿 [PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12)。P0a 数据契约、P1 快照／身份／写入保护与 P2 协调／缓存基础已实施。完整 P2 生命周期、P0a 候选可实现性和 P3 拖动规划尚待验收，R1／R2 均未完成。提交记录、下一工作包和进入／退出条件统一记录在 [09 进度与后续安排](plans/layout-redesign/09-progress-and-next-steps.md)。本分支仍用 V2，不迁移旧笔记，未合并或发布。
+[PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12) 已于 2026-10-01 合并到 `main`，其 P0a 数据契约、P1 快照／身份／写入保护与 P2 协调／缓存基础纳入 0.7.0。完整 P2 生命周期、P0a 候选可实现性和 P3 拖动规划尚待验收，R1／R2 均未完成。提交记录、下一工作包和进入／退出条件统一记录在 [09 进度与后续安排](plans/layout-redesign/09-progress-and-next-steps.md)。版本仍用 V2，不迁移旧笔记。
+
+2026-10-01 修复与验证：复用阅读段落按当前宿主范围确认新快照，媒体行序号或所属块设置变化时重新安装。类型检查、官方 lint、**247 项测试**和生产构建通过；Obsidian 1.13.7 的重复布局复用、正文编辑、前文插入及媒体行 300px → 100px 重装经过定向验证，测试笔记和原插件文件恢复并核对哈希。详情与冷打开、完整生命周期等边界见 [每窗格记录第 6 节](plans/layout-redesign/08-pane-foundation-record.md#6-pr-12-复用段落确认修复2026-10-01)。
 
 2026-09-30 文档补充：已归档 [布局冲突研究与证据](research/LAYOUT_CONFLICTS.md)，并整理 [P0–P6 改进实施方案](plans/layout-redesign/README.md)，分为既有 V2 改进和明确并列组两个增量。此段为研究交付记录，后续实施见下文；下方历史发布记录不据此推断当前最新发布状态。
 
@@ -16,7 +18,7 @@
 
 ## 发布与开发状态
 
-- 最新发布为 [0.6.1](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.6.1)（2026-09-24 发布；2026-09-30 通过 GitHub API 核对），公开状态和下载附件以 Release 页面为准。插件已在 Obsidian 社区目录中。本次布局基础仍在开发分支。
+- 当前发布版本为 [0.7.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.0)（2026-10-01），公开状态和下载附件以 Release 页面为准。插件已在 Obsidian 社区目录中。本次发布包含已合并的布局基础和审查修复。
 - 0.4.0 新增文字块（可浮动、可分 2–4 栏）、块内代码和公式、栏内的图、文字对齐和字号、窄块居中，以及 pandoc-crossref 写法的图表公式编号与交叉引用。
 - 0.3.0 包含文字环绕、整块移动、文字栏直接编辑及本轮环绕维护和安全修复；0.2.1 不包含这些功能。
 - 发布使用版本标签、GitHub Actions 生产构建、构建来源证明和核验后的 Release 附件。
