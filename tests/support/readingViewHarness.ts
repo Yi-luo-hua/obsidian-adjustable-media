@@ -17,7 +17,7 @@ interface ElementStub {
 
 interface SectionContext {
   sourcePath: string;
-  getSectionInfo(): { text: string; lineStart: number; lineEnd: number };
+  getSectionInfo(): { text: string; lineStart: number; lineEnd: number } | null;
   addChild(child: RenderChild): void;
 }
 
@@ -39,11 +39,17 @@ export async function readingViewHarness(initialText: string, startup = true) {
   let diskText = initialText;
   let rerenders = 0;
   const renders: string[] = [];
+  const renderedRows: Array<Array<number | null>> = [];
   let processor: PostProcessor;
   let onReady: () => void;
   const timers = new Map<number, () => void>();
   const frames = new Map<number, () => void>();
   const elements = new Set<ElementStub>();
+  const infos = new Map<ElementStub, { text: string; lineStart: number; lineEnd: number }>();
+  const trackedProjections: projections.ViewProjection[] = [];
+  class TrackedProjection extends projections.ViewProjection {
+    constructor() { super(); trackedProjections.push(this); }
+  }
   const sections: Array<{ el: ElementStub; computed: boolean; rendered: boolean }> = [];
   const counts = { observers: 0, environments: 0, scrollListeners: 0, sectionLookups: 0, classWrites: 0 };
   let scroll = (): void => {};
@@ -87,9 +93,11 @@ export async function readingViewHarness(initialText: string, startup = true) {
     "../layout/drawn.ts": drawn,
     "../layout/floatOrder.ts": floatOrder,
     "../layout/model.ts": model,
-    "../layout/viewProjection.ts": projections,
-    "./layoutView.ts": { renderLayout(_el: ElementStub, options: { model: model.LayoutModel }) {
-      renders.push(options.model.rows.flatMap(row => row.items.map(item => item.embed.raw)).join(" ")); return {};
+    "../layout/viewProjection.ts": { ...projections, ViewProjection: TrackedProjection },
+    "./layoutView.ts": { renderLayout(_el: ElementStub, options: { model: model.LayoutModel; rowIndices?: number[] }) {
+      const rows = options.rowIndices ?? options.model.rows.map((_row, index) => index);
+      renderedRows.push(rows.map(index => options.model.rows[index].height));
+      renders.push(rows.flatMap(index => options.model.rows[index].items.map(item => item.embed.raw)).join(" ")); return {};
     }, layoutIsRendered: () => true },
     "./crossrefView.ts": { refContextOf: () => undefined },
     "./messages.ts": { blockWarning: () => undefined },
@@ -105,11 +113,13 @@ export async function readingViewHarness(initialText: string, startup = true) {
   if (startup) onReady!();
   return {
     get rerenders() { return rerenders; },
+    get projection() { return trackedProjections.at(-1); },
     renders,
+    renderedRows,
     counts,
     scroll() { scroll(); },
     frame() { const callbacks = [...frames.values()]; frames.clear(); for (const callback of callbacks) callback(); },
-    setHost(text: string) { hostText = text; },
+    setHost(text: string) { hostText = text; for (const info of infos.values()) info.text = text; },
     edit(text: string) {
       diskText = text;
       listeners.get("editor-change")!(sourceView.editor, sourceView);
@@ -125,20 +135,26 @@ export async function readingViewHarness(initialText: string, startup = true) {
     },
     section(text: string, lineStart = 1, lineEnd = lineStart) {
       let wrapping = false;
+      let infoAvailable = true;
       const children: RenderChild[] = [];
       const inserted = new Set<() => void>();
       const el: ElementStub = { isConnected: true, empty() {}, querySelectorAll: () => [],
         toggleClass(_name, enabled) { counts.classWrites++; wrapping = enabled; },
         onNodeInserted(callback) { inserted.add(callback); return () => inserted.delete(callback); } };
       elements.add(el);
+      const info = { text, lineStart, lineEnd };
+      infos.set(el, info);
       sections.push({ el, computed: true, rendered: true });
       const process = (sourceText: string): void => {
-        processor!(el, { sourcePath: file.path, getSectionInfo: () => ({ text: sourceText, lineStart, lineEnd }),
+        info.text = sourceText;
+        processor!(el, { sourcePath: file.path, getSectionInfo: () => infoAvailable ? { ...info } : null,
           addChild(child) { children.push(child); } });
       };
       process(text);
       return { get wrapping() { return wrapping; }, get watchers() { return inserted.size; },
         reprocess: process,
+        move(from: number, to = from) { info.lineStart = from; info.lineEnd = to; },
+        setInfoAvailable(available: boolean) { infoAvailable = available; },
         unloadChild(index: number) { for (const cleanup of children[index].cleanups) cleanup(); },
         insert() { for (const callback of [...inserted]) callback(); },
         dispose() { el.isConnected = false; for (const child of children) for (const cleanup of child.cleanups) cleanup(); } };

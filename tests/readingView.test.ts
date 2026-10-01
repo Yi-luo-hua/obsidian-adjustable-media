@@ -4,6 +4,155 @@ import { readingViewHarness } from "./support/readingViewHarness.ts";
 
 const media = '<!-- vml -->\n![[old.png]]\n<!-- /vml -->\n\nBody';
 
+test("retained media sections settle after unrelated body edits without full rerenders", async () => {
+  const host = await readingViewHarness(media, false);
+  host.section(media);
+  const body = host.section(media, 4);
+  host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  for (const text of [media + " more", media + " more text", media]) {
+    host.setHost(text); host.edit(text); body.reprocess(text); host.frame();
+    assert.equal(host.projection!.phase, "settled");
+    assert.deepEqual(host.projection!.coverage, host.projection!.required);
+    assert.deepEqual(host.projection!.measuredCoverage, host.projection!.required);
+  }
+  assert.equal(host.renders.length, 1);
+  assert.equal(host.rerenders, 0);
+  host.dispose();
+});
+
+test("retained duplicate sections use their host positions after an insertion above them", async () => {
+  const text = media + "\n\n" + media;
+  const host = await readingViewHarness(text, false);
+  const sections = [1, 4, 7, 10].map(line => host.section(text, line));
+  host.frame();
+  const next = "# Intro\n\n" + text;
+  host.setHost(next); host.edit(next);
+  sections.forEach((section, index) => section.move([3, 6, 9, 12][index]));
+  host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  assert.equal(host.projection!.coverage[0].from, next.indexOf("![[old.png]]"));
+  assert.equal(host.projection!.coverage[2].from, next.lastIndexOf("![[old.png]]"));
+  assert.deepEqual(host.projection!.coverage, host.projection!.required);
+  assert.equal(host.renders.length, 2);
+  assert.equal(host.rerenders, 0);
+  host.dispose();
+});
+
+test("retained EOF sections can gain a following paragraph without changing their source", async () => {
+  const host = await readingViewHarness(media, false);
+  host.section(media, 4); host.frame();
+  const next = media + "\n\nNew paragraph";
+  host.setHost(next); host.edit(next); host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  assert.deepEqual(host.projection!.required, [{ from: media.indexOf("Body"), to: media.length + 1 }]);
+  host.dispose();
+});
+
+test("retained sections cannot confirm a desired snapshot before their host adopts it", async () => {
+  const host = await readingViewHarness(media, false);
+  host.section(media); host.frame();
+  const next = media + " more";
+  host.edit(next); host.frame();
+  assert.equal(host.projection!.phase, "waitingForHost");
+  assert.deepEqual(host.projection!.coverage, []);
+  host.setHost(next); host.tick(); host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  assert.equal(host.renders.length, 1);
+  host.dispose();
+});
+
+test("changed media source is not counted until the host section is reprocessed", async () => {
+  const host = await readingViewHarness(media, false);
+  const section = host.section(media); host.frame();
+  const next = media.replace("old.png", "new.png");
+  host.setHost(next); host.edit(next); host.frame();
+  assert.equal(host.projection!.phase, "projecting");
+  assert.deepEqual(host.projection!.coverage, []);
+  section.reprocess(next); host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  assert.deepEqual(host.renders, ["![[old.png]]", "![[new.png]]"]);
+  assert.equal(host.rerenders, 0);
+  host.dispose();
+});
+
+test("unchanged media lines with changed layout settings must be installed again", async () => {
+  const host = await readingViewHarness(media, false);
+  const section = host.section(media); host.frame();
+  const next = media.replace("<!-- vml -->", '<!-- vml {"v":2,"width":0.6} -->');
+  host.setHost(next); host.edit(next); host.frame();
+  assert.equal(host.projection!.phase, "projecting");
+  assert.deepEqual(host.projection!.coverage, []);
+  section.reprocess(next); host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  assert.equal(host.rerenders, 1);
+  host.dispose();
+});
+
+test("wrap body dependencies prevent stale floats from being counted as installed", async () => {
+  const text = media.replace("<!-- vml -->", '<!-- vml {"v":2,"wrap":"right"} -->');
+  const host = await readingViewHarness(text, false);
+  const section = host.section(text); host.frame();
+  const next = text + " more";
+  host.setHost(next); host.edit(next); host.frame();
+  assert.equal(host.projection!.phase, "projecting");
+  assert.deepEqual(host.projection!.coverage, []);
+  section.reprocess(next); host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  assert.equal(host.rerenders, 1);
+  host.dispose();
+});
+
+test("missing host section info stays pending and retagging preserves section cleanup", async () => {
+  const host = await readingViewHarness(media, false);
+  const section = host.section(media); host.frame();
+  section.setInfoAvailable(false);
+  const next = media + " more";
+  host.setHost(next); host.edit(next); host.frame();
+  assert.equal(host.projection!.phase, "projecting");
+  assert.deepEqual(host.projection!.coverage, []);
+  section.setInfoAvailable(true); host.scroll(); host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  section.dispose(); host.scroll(); host.frame();
+  assert.deepEqual(host.projection!.required, []);
+  host.dispose();
+});
+
+test("deleting an earlier media row reinstalls a retained section with its new row settings", async () => {
+  const text = '<!-- vml {"v":2,"rows":[{"height":100},{"height":300}]} -->\n![[first.png]]\n\n![[second.png]]\n<!-- /vml -->\n\nBody';
+  const host = await readingViewHarness(text, false);
+  const section = host.section(text, 3); host.frame();
+  assert.deepEqual(host.renderedRows, [[300]]);
+  const next = text.replace("![[first.png]]\n\n", "");
+  host.setHost(next); host.edit(next); section.move(1); host.frame();
+  assert.equal(host.projection!.phase, "projecting");
+  assert.deepEqual(host.projection!.coverage, []);
+  assert.equal(host.rerenders, 1);
+  host.scroll(); host.frame();
+  assert.equal(host.rerenders, 1);
+  section.reprocess(next); host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  assert.deepEqual(host.renderedRows, [[300], [100]]);
+  host.dispose();
+});
+
+test("moving retained media into a different block reinstalls that block's settings", async () => {
+  const first = '<!-- vml {"v":2,"rows":[{"height":100}]} -->\n![[first.png]]\n<!-- /vml -->';
+  const second = '<!-- vml {"v":2,"rows":[{"height":300}]} -->\n![[second.png]]\n<!-- /vml -->';
+  const text = first + "\n\n" + second;
+  const host = await readingViewHarness(text, false);
+  const section = host.section(text, 5); host.frame();
+  assert.deepEqual(host.renderedRows, [[300]]);
+  const next = text.replace("first.png", "temp.png").replace("second.png", "first.png").replace("temp.png", "second.png");
+  host.setHost(next); host.edit(next); section.move(1); host.frame();
+  assert.equal(host.projection!.phase, "projecting");
+  assert.equal(host.rerenders, 1);
+  section.reprocess(next); host.frame();
+  assert.equal(host.projection!.phase, "settled");
+  assert.deepEqual(host.renderedRows, [[300], [100]]);
+  host.dispose();
+});
+
 test("plain reading notes keep host section rendering at startup and on each edit", async () => {
   const host = await readingViewHarness("Body");
   host.section("Body", 0);

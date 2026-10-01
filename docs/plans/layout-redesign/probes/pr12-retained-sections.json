@@ -1,0 +1,94 @@
+{
+  "vault": "vml-test-vault",
+  "obsidian": "1.13.7",
+  "buildHash": "d278038306ae4ef86c1a6a92d1a812cb06b0f7f89f963708b651b98e6e5e2e3a",
+  "forcedRerenders": 0,
+  "stages": [
+    {
+      "name": "initial",
+      "info": [
+        {
+          "text": "# Retained sections\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nFirst body.\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nLast body.",
+          "lineStart": 3,
+          "lineEnd": 3
+        },
+        {
+          "text": "# Retained sections\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nFirst body.\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nLast body.",
+          "lineStart": 9,
+          "lineEnd": 9
+        }
+      ]
+    },
+    {
+      "name": "body edit",
+      "info": [
+        {
+          "text": "# Retained sections\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nFirst body.\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nLast body. more",
+          "lineStart": 3,
+          "lineEnd": 3
+        },
+        {
+          "text": "# Retained sections\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nFirst body.\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nLast body. more",
+          "lineStart": 9,
+          "lineEnd": 9
+        }
+      ],
+      "sameLayouts": true
+    },
+    {
+      "name": "body edit",
+      "info": [
+        {
+          "text": "# Retained sections\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nFirst body.\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nLast body. more text",
+          "lineStart": 3,
+          "lineEnd": 3
+        },
+        {
+          "text": "# Retained sections\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nFirst body.\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nLast body. more text",
+          "lineStart": 9,
+          "lineEnd": 9
+        }
+      ],
+      "sameLayouts": true
+    },
+    {
+      "name": "prefix insertion",
+      "info": [
+        {
+          "text": "# Prefix\n\n# Retained sections\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nFirst body.\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nLast body. more text",
+          "lineStart": 5,
+          "lineEnd": 5
+        },
+        {
+          "text": "# Prefix\n\n# Retained sections\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nFirst body.\n\n<!-- vml -->\n![[image.png]]\n<!-- /vml -->\n\nLast body. more text",
+          "lineStart": 11,
+          "lineEnd": 11
+        }
+      ],
+      "sameLayouts": true
+    }
+  ],
+  "sourceMatches": true,
+  "hostMatches": true,
+  "currentInfoMatches": true,
+  "shiftedByTwo": true,
+  "sameLayouts": true,
+  "scope": "Production host section reuse and dynamic source ranges; projection phase asserted separately by actual adapter tests",
+  "rowReassignment": {
+    "before": {
+      "index": "1",
+      "styleHeight": "300px",
+      "height": 299.9999694824219
+    },
+    "after": {
+      "index": "0",
+      "styleHeight": "100px",
+      "height": 99.99999237060547
+    },
+    "forcedRerenders": 1,
+    "oldRowReused": false,
+    "sourceMatches": true
+  },
+  "notesUnchanged": true,
+  "pluginRestored": true
+}

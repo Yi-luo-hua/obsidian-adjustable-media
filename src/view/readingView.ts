@@ -37,9 +37,19 @@ interface Reader {
   markedWrapping: boolean | null;
   timer: number;
   frame: number;
-  sections: Map<HTMLElement, { snapshotId: string; range: SourceCoverage }>;
+  sections: Map<HTMLElement, InstalledSection>;
   pendingSections: Map<HTMLElement, () => boolean>;
   stopEnvironment: () => void;
+}
+
+interface InstalledSection {
+  snapshotId: string;
+  range: SourceCoverage;
+  source: string;
+  sourcePath: string;
+  drawn: Drawn;
+  layoutKey: string;
+  context: MarkdownPostProcessorContext;
 }
 
 /** Each reader waits for its own host and confirms only sections actually installed in that pane. */
@@ -84,6 +94,24 @@ export function registerReadingView(plugin: Plugin): void {
       reader.frame = 0;
       if (!alive(reader) || !reader.projection.observeHost(reader.view.getViewData())) return;
       const connected = [...reader.sections].filter(([el]) => el.isConnected && reader.view.containerEl.contains(el));
+      for (const [el, record] of connected) {
+        if (record.snapshotId === reader.parsed.snapshot.id) continue;
+        // The host can retain a section without calling its postprocessors again. Its current
+        // section info supplies the new position, including when identical sections move.
+        const info = record.context.getSectionInfo(el);
+        if (!info || sectionNoteText(plugin.app, record.context, info, el) !== reader.parsed.snapshot.text
+          || record.sourcePath !== reader.parsed.snapshot.origin.path
+          || isStale(record.drawn, reader.parsed.drawn)
+          || record.source !== sectionSource(reader.parsed, info)) continue;
+        if (record.layoutKey !== sectionLayoutKey(reader.parsed, info)) {
+          // A retained image can now be another row, with different height/caption settings.
+          // Ask the host to reinstall it; never confirm the old row's DOM as the new row.
+          if (reader.requested !== reader.parsed.snapshot.id) { reader.needsRender = true; wake(reader); }
+          continue;
+        }
+        record.snapshotId = reader.parsed.snapshot.id;
+        record.range = sectionRange(reader.parsed, info);
+      }
       reader.projection.viewportChanged(connected.map(([, record]) => record.range));
       const token = reader.projection.token()!;
       const reading = readingSectionsOfView(reader.view);
@@ -153,7 +181,8 @@ export function registerReadingView(plugin: Plugin): void {
   const desire = (reader: Reader, text: string): void => {
     if (text === reader.parsed.snapshot.text && reader.file.path === reader.parsed.snapshot.origin.path) { wake(reader); return; }
     const next = parse(reader.view, text, reader.parsed.snapshot);
-    reader.needsRender ||= isStale(reader.parsed.drawn, next.drawn);
+    reader.needsRender ||= isStale(reader.parsed.drawn, next.drawn)
+      || reader.parsed.snapshot.origin.path !== next.snapshot.origin.path;
     reader.parsed = next;
     reader.requested = null;
     reader.projection.request(next.snapshot);
@@ -161,15 +190,14 @@ export function registerReadingView(plugin: Plugin): void {
   };
 
   const draw = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
-    const { blocks, lines, offsets, refs, wrapped, snapshot } = reader.parsed;
-    const opening = blocks.find(block => info.lineStart === block.openLine && info.lineEnd === block.openLine);
-    const block = opening && hasSideText(opening) ? opening
-      : blocks.find(candidate => info.lineStart > candidate.openLine && info.lineEnd < candidate.closeLine);
+    const { blocks, lines, refs, wrapped, snapshot } = reader.parsed;
+    const block = sectionBlock(blocks, info);
+    const opening = block?.openLine === info.lineStart && info.lineStart === info.lineEnd;
     if (block && isDrawable(block)) {
       let rows: number[] | undefined;
-      if (hasSideText(block) && block !== opening) el.empty();
+      if (hasSideText(block) && !opening) el.empty();
       else {
-        rows = hasSideText(block) ? undefined : block.rows.flatMap((row, index) => row.line >= info.lineStart && row.line <= info.lineEnd ? [index] : []);
+        rows = hasSideText(block) ? undefined : sectionRows(block, info);
         if (rows === undefined || rows.length > 0) {
           const child = new MarkdownRenderChild(el);
           ctx.addChild(child);
@@ -185,9 +213,9 @@ export function registerReadingView(plugin: Plugin): void {
     el.toggleClass(WRAPPING, wrapped);
     markWrapping(reader, wrapped);
     if (wrapped) keepWrapsBeside(plugin.app, el);
-    const from = offsets[info.lineStart] ?? snapshot.text.length;
-    const to = offsets[info.lineEnd + 1] ?? snapshot.text.length;
-    const record = { snapshotId: snapshot.id, range: { from, to } };
+    const record: InstalledSection = { snapshotId: snapshot.id, range: sectionRange(reader.parsed, info),
+      source: sectionSource(reader.parsed, info), sourcePath: ctx.sourcePath, drawn: reader.parsed.drawn,
+      layoutKey: sectionLayoutKey(reader.parsed, info), context: ctx };
     reader.sections.set(el, record);
     const lifecycle = new MarkdownRenderChild(el);
     ctx.addChild(lifecycle);
@@ -284,3 +312,29 @@ export function registerReadingView(plugin: Plugin): void {
 }
 
 function numbersOf(refs: RefContext | undefined): string { return refs ? `${refs.language} ${refs.index.signature}` : ""; }
+
+function sectionSource(parsed: Parsed, info: MarkdownSectionInformation): string {
+  return parsed.lines.slice(info.lineStart, info.lineEnd + 1).join("\n");
+}
+
+function sectionRange(parsed: Parsed, info: MarkdownSectionInformation): SourceCoverage {
+  return { from: parsed.offsets[info.lineStart] ?? parsed.snapshot.text.length,
+    to: parsed.offsets[info.lineEnd + 1] ?? parsed.snapshot.text.length };
+}
+
+function sectionBlock(blocks: readonly V2Block[], info: MarkdownSectionInformation): V2Block | undefined {
+  const opening = blocks.find(block => info.lineStart === block.openLine && info.lineEnd === block.openLine);
+  return opening && hasSideText(opening) ? opening
+    : blocks.find(block => info.lineStart > block.openLine && info.lineEnd < block.closeLine);
+}
+
+function sectionRows(block: V2Block, info: MarkdownSectionInformation): number[] {
+  return block.rows.flatMap((row, index) => row.line >= info.lineStart && row.line <= info.lineEnd ? [index] : []);
+}
+
+function sectionLayoutKey(parsed: Parsed, info: MarkdownSectionInformation): string {
+  const block = sectionBlock(parsed.blocks, info);
+  if (!block || !isDrawable(block)) return "";
+  const rows = hasSideText(block) ? info.lineStart === block.openLine ? "columns" : "hidden" : sectionRows(block, info);
+  return JSON.stringify([block.lines[0], rows, effectiveWrapSkip(parsed.lines, parsed.blocks, parsed.blocks.indexOf(block))]);
+}

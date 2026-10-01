@@ -1,0 +1,96 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs');
+  const crypto = require('crypto');
+  const vaultPath = app.vault.adapter.getBasePath();
+  const outputPath = window.__pr12ReuseOutput;
+  if (!outputPath) throw new Error('Set window.__pr12ReuseOutput to a fresh output directory');
+  const hash = value => crypto.createHash('sha256').update(value).digest('hex');
+  const before = Object.fromEntries(app.vault.getMarkdownFiles().map(file => [file.path, hash(fs.readFileSync(vaultPath + '/' + file.path))]));
+  const fixture = 'PR12 retained sections transient ' + Date.now();
+  if (app.vault.getAbstractFileByPath(fixture)) throw new Error('Fixture exists');
+  const leaves = [];
+  const restores = [];
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let result = {};
+  await app.vault.createFolder(fixture);
+  try {
+    const bytes = fs.readFileSync('E:/TOOLS/obsidian-adjustable-media/docs/examples/assets/lora-arch.png');
+    await app.vault.createBinary(fixture + '/image.png', bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+    const block = '<!-- vml -->\n![[image.png]]\n<!-- /vml -->';
+    const initial = '# Retained sections\n\n' + block + '\n\nFirst body.\n\n' + block + '\n\nLast body.';
+    const file = await app.vault.create(fixture + '/note.md', initial);
+    for (const mode of ['preview', 'source']) {
+      const leaf = app.workspace.getLeaf('split', 'vertical'); leaves.push(leaf);
+      await leaf.setViewState({type:'markdown', state:{file:file.path, mode}});
+    }
+    await wait(800);
+    const [reader, source] = leaves.map(leaf => leaf.view);
+    const renderer = reader.previewMode.renderer;
+    const layouts = Array.from(renderer.sizerEl.querySelectorAll('.vml-layout'));
+    if (layouts.length !== 2) throw new Error('Expected two layouts: ' + JSON.stringify({count:layouts.length,
+      source:reader.getViewData(),path:reader.file?.path,sections:renderer.sections.map(section => ({info:renderer.getSectionInfo(section.el),rendered:section.rendered}))}));
+    const sections = layouts.map(root => renderer.getSectionForElement(root));
+    const sectionInfo = () => sections.map(section => renderer.getSectionInfo(section.el));
+    const originalRerender = reader.previewMode.rerender;
+    let forcedRerenders = 0;
+    reader.previewMode.rerender = function(force, ...args) { if (force === true) forcedRerenders++; return originalRerender.call(this, force, ...args); };
+    restores.push(() => { reader.previewMode.rerender = originalRerender; });
+    const stages = [{name:'initial', info:sectionInfo()}];
+    for (const word of [' more', ' text']) {
+      const end = source.editor.lastLine();
+      source.editor.replaceRange(word, {line:end,ch:source.editor.getLine(end).length});
+      await wait(300);
+      stages.push({name:'body edit',info:sectionInfo(),sameLayouts:layouts.every(root => renderer.sizerEl.contains(root))});
+    }
+    source.editor.replaceRange('# Prefix\n\n', {line:0,ch:0});
+    await wait(500);
+    stages.push({name:'prefix insertion',info:sectionInfo(),sameLayouts:layouts.every(root => renderer.sizerEl.contains(root))});
+    const expected = '# Prefix\n\n' + initial + ' more text';
+    const finalInfo = sectionInfo();
+    result = {vault:app.vault.getName(),obsidian:require('@electron/remote').app.getVersion(),
+      buildHash:hash(fs.readFileSync(vaultPath + '/.obsidian/plugins/adjustable-media/main.js')),
+      forcedRerenders,stages,sourceMatches:source.editor.getValue() === expected,hostMatches:reader.getViewData() === expected,
+      currentInfoMatches:finalInfo.every(info => info?.text === expected),
+      shiftedByTwo:finalInfo.every((info,index) => info?.lineStart === stages[0].info[index].lineStart + 2),
+      sameLayouts:layouts.every(root => renderer.sizerEl.contains(root)),
+      scope:'Production host section reuse and dynamic source ranges; projection phase asserted separately by actual adapter tests'};
+    if (forcedRerenders !== 0 || !result.sourceMatches || !result.hostMatches || !result.currentInfoMatches || !result.shiftedByTwo || !result.sameLayouts) throw new Error('Reuse acceptance failed');
+    restores.pop()();
+    const rowsInitial = '<!-- vml {"v":2,"rows":[{"height":100},{"height":300}]} -->\n![first](image.png) ![a](image.png)\n\n![second](image.png) ![b](image.png)\n<!-- /vml -->\n\nBody';
+    const rowsFile = await app.vault.create(fixture + '/rows.md',rowsInitial);
+    for (const [index,mode] of ['preview','source'].entries()) await leaves[index].setViewState({type:'markdown',state:{file:rowsFile.path,mode}});
+    await wait(800);
+    const [rowReader,rowSource] = leaves.map(leaf => leaf.view);
+    const originalRow = rowReader.previewMode.renderer.sizerEl.querySelector('.vml-row[data-row="1"]');
+    if (!originalRow) throw new Error('Expected second media row');
+    const describe = row => ({index:row.getAttribute('data-row'),styleHeight:row.style.getPropertyValue('--vml-row-height'),height:row.getBoundingClientRect().height});
+    const beforeRow = describe(originalRow);
+    const originalRowRerender = rowReader.previewMode.rerender;
+    let rowRerenders = 0;
+    rowReader.previewMode.rerender = function(force,...args) { if (force === true) rowRerenders++; return originalRowRerender.call(this,force,...args); };
+    restores.push(() => { rowReader.previewMode.rerender = originalRowRerender; });
+    rowSource.editor.replaceRange('',{line:1,ch:0},{line:3,ch:0});
+    await wait(600);
+    const currentRow = rowReader.previewMode.renderer.sizerEl.querySelector('.vml-row');
+    if (!currentRow) throw new Error('Expected surviving media row');
+    result.rowReassignment = {before:beforeRow,after:describe(currentRow),forcedRerenders:rowRerenders,
+      oldRowReused:currentRow === originalRow,sourceMatches:rowSource.editor.getValue() === rowReader.getViewData()};
+    if (result.rowReassignment.after.index !== '0' || result.rowReassignment.after.styleHeight !== '100px'
+      || Math.abs(result.rowReassignment.after.height - 100) > 1 || !result.rowReassignment.sourceMatches) throw new Error('Row reassignment acceptance failed');
+    const wc = require('@electron/remote').getCurrentWebContents();
+    await wc.capturePage();
+    const screenshot = await wc.capturePage(); fs.writeFileSync(outputPath + '/surface.png',screenshot.toPNG());
+  } catch (error) { result = {...result,error:String(error),stack:error.stack}; }
+  finally {
+    restores.reverse().forEach(restore => restore());
+    leaves.forEach(leaf => leaf.detach());
+    await wait(500);
+    const folder = app.vault.getAbstractFileByPath(fixture);
+    if (folder) await app.vault.trash(folder,false);
+    result.notesUnchanged = Object.entries(before).every(([path,digest]) => hash(fs.readFileSync(vaultPath + '/' + path)) === digest);
+    fs.writeFileSync(outputPath + '/result.json',JSON.stringify(result,null,2));
+    window.__pr12ReuseResult = result;
+    console.log(JSON.stringify(result));
+  }
+})();
