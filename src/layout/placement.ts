@@ -40,9 +40,10 @@ const CLOSE_LINE = /^<!-- \/vml -->[ \t]*$/;
  * a blank line, a heading or another layout block), plus the end of the note. Code, math, comments,
  * frontmatter, indented lines and the inside of lists and of layout blocks are never split.
  */
-export function blockGaps(lines: readonly string[], contexts: readonly LineContext[] = scanMarkdownLines(lines)): number[] {
+export function blockGaps(lines: readonly string[], contexts: readonly LineContext[] = scanMarkdownLines(lines, true),
+  blocks: readonly V2Block[] = findV2Blocks(lines, contexts)): number[] {
   const inside = new Set<number>();
-  for (const block of findV2Blocks(lines, contexts)) {
+  for (const block of blocks) {
     for (let line = block.openLine + 1; line <= block.closeLine; line += 1) {
       inside.add(line);
     }
@@ -63,7 +64,7 @@ export function blockGaps(lines: readonly string[], contexts: readonly LineConte
     gaps.push(line);
   }
   // EOF is not outside an unterminated fence, equation, frontmatter or comment.
-  if (scanMarkdownLines([...lines, "vml insertion boundary"]).at(-1) === "text") {
+  if ((contexts[lines.length] ?? scanMarkdownLines(lines, true).at(-1)) === "text") {
     gaps.push(lines.length);
   }
   return gaps;
@@ -132,7 +133,8 @@ export function orderAdjacentFloat(lines: readonly string[], block: V2Block, pla
  */
 export function planPlacement(lines: readonly string[], block: V2Block, placement: Placement): BlockEdit[] | null {
   const ordered = orderAdjacentFloat(lines, block, placement);
-  const afterAdjacent = ordered.line !== placement.line && ordered.line > block.closeLine
+  const crossedAfter = ordered.line !== placement.line && ordered.line > block.closeLine;
+  const afterAdjacent = crossedAfter
     && (ordered.line === lines.length || lines[ordered.line]?.trim() === "");
   const gaps = blockGaps(lines);
   if (!isEditable(block) || !gaps.includes(placement.line) || (!gaps.includes(ordered.line) && !afterAdjacent)) {
@@ -143,7 +145,9 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
   const index = blocks.findIndex((candidate) => candidate.openLine === block.openLine);
   const after = placement.wrap === current.wrap && isSamePlace(lines, block, placement.line) && index >= 0
     ? adjacentOppositeFloat(lines, blocks, index, 1) : null;
-  const afterVisual = after ? visualWrapSkip(lines, blocks, index + 1) : 0;
+  // When the neighbor crosses the moved widget, its source anchor ends up one rendered line above
+  // the note text. Add that line so its actual screen position stays fixed after the reorder.
+  const afterVisual = after ? visualWrapSkip(lines, blocks, index + 1) + (crossedAfter ? 1 : 0) : 0;
   if (afterVisual > MAX_WRAP_SKIP) {
     return null;
   }
@@ -156,7 +160,7 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
   const crossedBefore = ordered.line !== placement.line && ordered.line < block.openLine;
   const before = crossedBefore && placement.wrap === current.wrap && index >= 0
     ? adjacentOppositeFloat(lines, blocks, index, -1) : null;
-  const beforeVisual = before ? visualWrapSkip(lines, blocks, index - 1) : 0;
+  const beforeVisual = before ? visualWrapSkip(lines, blocks, index - 1) + 1 : 0;
   if (beforeVisual > MAX_WRAP_SKIP) {
     return null;
   }

@@ -1,0 +1,10 @@
+{
+  "node": "v24.11.1",
+  "cpu": "AMD Ryzen 9 7945HX with Radeon Graphics        ",
+  "lines": 10000,
+  "blocks": 200,
+  "samples": 20,
+  "p50Ms": 9.717999999999961,
+  "p95Ms": 12.172900000000027,
+  "scope": "Snapshot and identity mapping only; not candidate solve or host frame timing"
+}

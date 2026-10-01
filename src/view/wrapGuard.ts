@@ -6,7 +6,7 @@ import type { V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { planGaps, planProxy, type FlowBox, type FloatSize, type Gap, type ProxyPlan } from "../layout/wrapGaps.ts";
-import { renderLayout } from "./layoutView.ts";
+import { layoutIsRendered, renderLayout } from "./layoutView.ts";
 
 /**
  * Live preview around wrapped layouts (docs/DESIGN.md, section 4).
@@ -26,7 +26,7 @@ export interface WrapAnchor {
   /** The widget's range in the document; for a layout beside its source, the start of its first line. */
   from: number;
   to: number;
-  /** The block's exact text: it tells the layout's float apart between measurements. */
+  /** Runtime instance and content revision, distinct for identical source blocks. */
   key: string;
   block: V2Block;
 }
@@ -35,6 +35,7 @@ export interface WrapSource {
   anchors(state: EditorState): readonly WrapAnchor[];
   /** Whether any layout of the note wraps text, drawn or showing its source. */
   hasWraps(state: EditorState): boolean;
+  environmentEpoch(state: EditorState): number;
 }
 
 interface GapUpdate {
@@ -45,6 +46,7 @@ interface GapUpdate {
 }
 
 const setGaps = StateEffect.define<GapUpdate>();
+export const resetWrapGaps = StateEffect.define<null>();
 
 class GapWidget extends WidgetType {
   readonly height: number;
@@ -75,6 +77,7 @@ const gapField = StateField.define<DecorationSet>({
   update(gaps, tr) {
     let next = gaps.map(tr.changes);
     for (const effect of tr.effects) {
+      if (effect.is(resetWrapGaps)) next = Decoration.none;
       if (effect.is(setGaps)) {
         const { from, to } = effect.value;
         next = next.update({
@@ -140,50 +143,99 @@ export function wrapGuard(app: App, source: WrapSource): Extension {
   ];
 }
 
+const activeGuards = new WeakMap<EditorView, WrapGuard>();
+
+/** An unseen upstream float with no current size keeps the viewport pending. */
+export function wrapMeasurementsReady(view: EditorView): boolean {
+  return activeGuards.get(view)?.measurementsReady() ?? true;
+}
+
+/** A loaded visible resource needs a fresh measurement, not a new environment for every block. */
+export function refreshWrapMedia(view: EditorView): void { activeGuards.get(view)?.mediaChanged(); }
+
 class WrapGuard {
   /** Stand-ins for floats whose anchors are above the drawn part of the note. */
   decorations: DecorationSet = Decoration.none;
   private readonly view: EditorView;
   private readonly app: App;
   private readonly source: WrapSource;
-  /** Float sizes by block text, measured whenever the anchor is drawn. */
+  /** Float sizes by instance and content revision, measured when its anchor is drawn. */
   private readonly sizes = new Map<string, FloatSize>();
   private destroyed = false;
+  private serial = 0;
+  private epoch: number;
+  private readonly resize: ResizeObserver;
+  private readonly observed = new Map<HTMLElement, string>();
+  private readonly pendingMedia = new Set<string>();
+  private pendingUpdate = false;
 
   constructor(view: EditorView, app: App, source: WrapSource) {
     this.view = view;
     this.app = app;
     this.source = source;
+    activeGuards.set(view, this);
+    this.epoch = source.environmentEpoch(view.state);
+    this.resize = new (view.dom.win as Window & typeof window).ResizeObserver(entries => {
+      let changed = false;
+      for (const entry of entries) {
+        const el = entry.target as HTMLElement;
+        const size = `${entry.contentRect.width}:${entry.contentRect.height}`;
+        if (this.observed.get(el) !== size) { this.observed.set(el, size); changed = true; }
+      }
+      if (changed && !this.destroyed) this.measure();
+    });
     this.decorations = this.proxies();
     this.measure();
   }
 
   update(update: ViewUpdate): void {
+    const environmentChanged = this.epoch !== this.source.environmentEpoch(update.state);
+    if (environmentChanged) { this.epoch = this.source.environmentEpoch(update.state); this.sizes.clear(); this.pendingMedia.clear(); }
     const anchorsChanged = signature(this.source.anchors(update.state)) !== signature(this.source.anchors(update.startState));
-    if (update.docChanged || update.viewportChanged || anchorsChanged) {
+    if (update.docChanged || update.viewportChanged || anchorsChanged || environmentChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setGaps)))) {
       this.decorations = this.proxies();
     }
-    if (update.docChanged || update.viewportChanged || update.heightChanged || update.geometryChanged || anchorsChanged) {
+    if (update.docChanged || update.viewportChanged || update.heightChanged || update.geometryChanged || anchorsChanged || environmentChanged) {
       this.measure();
     }
   }
 
   destroy(): void {
     this.destroyed = true;
+    this.serial++;
+    this.resize.disconnect(); this.observed.clear(); this.sizes.clear();
+    this.pendingMedia.clear(); activeGuards.delete(this.view);
   }
+
+  measurementsReady(): boolean {
+    return !this.pendingUpdate && this.source.anchors(this.view.state).every(anchor => anchor.from > this.view.viewport.to
+      || (this.sizes.has(anchor.key) && !this.pendingMedia.has(anchor.key)));
+  }
+
+  mediaChanged(): void { this.measure(); }
 
   private measure(): void {
     const state = this.view.state;
     if (!this.source.hasWraps(state) && (state.field(gapField, false)?.size ?? 0) === 0) {
       return;
     }
-    this.view.requestMeasure({ key: this, read: () => this.read(), write: (update) => this.write(update) });
+    const serial = ++this.serial;
+    this.pendingUpdate = true;
+    const doc = state.doc;
+    const epoch = this.epoch;
+    const viewport = this.view.viewport;
+    const current = (): boolean => !this.destroyed && this.serial === serial && this.view.state.doc === doc
+      && this.source.environmentEpoch(this.view.state) === epoch && this.view.viewport.from === viewport.from && this.view.viewport.to === viewport.to;
+    this.view.requestMeasure({ key: this, read: () => current()
+      ? this.source.hasWraps(state) ? this.read() : { from: 0, to: state.doc.length, gaps: [] }
+      : null, write: update => this.write(update, current) });
   }
 
   private read(): GapUpdate | null {
     const view = this.view;
     const docTop = view.documentTop;
     const anchors = this.source.anchors(view.state);
+    const previousSizes = JSON.stringify([...this.sizes]);
     const boxes: FlowBox[] = [];
 
     for (const child of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(":scope > *"))) {
@@ -200,6 +252,8 @@ class WrapGuard {
       const host = child.hasClass("vml-live-preview--wrap") ? child : child.querySelector<HTMLElement>(".vml-wrap-reveal");
       if (host) {
         this.remember(anchors, pos, child, host);
+        const layout = host.querySelector<HTMLElement>(".vml-layout");
+        if (layout && !this.observed.has(layout)) { this.observed.set(layout, ""); this.resize.observe(layout); }
       }
       const rect = child.getBoundingClientRect();
       boxes.push({
@@ -213,6 +267,7 @@ class WrapGuard {
     }
 
     const keys = new Set(anchors.map((anchor) => anchor.key));
+    for (const el of this.observed.keys()) if (!view.contentDOM.contains(el)) { this.resize.unobserve(el); this.observed.delete(el); }
     for (const key of this.sizes.keys()) {
       if (!keys.has(key)) {
         this.sizes.delete(key);
@@ -225,16 +280,19 @@ class WrapGuard {
       return null;
     }
     const gaps = planGaps(boxes);
-    return sameGaps(gaps, currentGaps(view.state, first.pos, last.pos)) ? null : { from: first.pos, to: last.pos, gaps };
+    return sameGaps(gaps, currentGaps(view.state, first.pos, last.pos)) && previousSizes === JSON.stringify([...this.sizes])
+      ? null : { from: first.pos, to: last.pos, gaps };
   }
 
-  private write(update: GapUpdate | null): void {
+  private write(update: GapUpdate | null, current: () => boolean): void {
     if (!update) {
+      if (current()) this.pendingUpdate = false;
       return;
     }
     // A measurement may not dispatch. The spacers change right after it, before the frame is painted.
     queueMicrotask(() => {
-      if (!this.destroyed) {
+      if (current()) {
+        this.pendingUpdate = false;
         this.view.dispatch({ effects: setGaps.of(update) });
       }
     });
@@ -250,6 +308,9 @@ class WrapGuard {
     const anchorRect = anchorEl.getBoundingClientRect();
     const rect = layout.getBoundingClientRect();
     const style = getComputedStyle(layout);
+    const ready = layoutIsRendered(layout) && Array.from(layout.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"))
+      .every(media => media.instanceOf(HTMLImageElement) ? media.complete : media.readyState > 0);
+    if (ready) this.pendingMedia.delete(anchor.key); else this.pendingMedia.add(anchor.key);
     const side = layout.hasClass("vml-layout--wrap-right") ? "right" : "left";
     this.sizes.set(anchor.key, {
       side,
@@ -312,5 +373,5 @@ function sameGaps(a: readonly Gap[], b: readonly Gap[]): boolean {
 }
 
 function signature(anchors: readonly WrapAnchor[]): string {
-  return anchors.map((anchor) => `${anchor.from}:${anchor.to}:${anchor.key.length}`).join(",");
+  return anchors.map((anchor) => `${anchor.from}:${anchor.to}:${anchor.key}`).join(",");
 }

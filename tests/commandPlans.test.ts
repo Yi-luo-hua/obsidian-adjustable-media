@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { applyLineChange, blockAt, planMergeWithNext, planWrapSelection } from "../src/commands/plans.ts";
-import { applyLineChanges } from "../src/layout/edits.ts";
+import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection } from "../src/commands/plans.ts";
+import { applyEditsToEditor, applyEditsToText, applyLineChanges } from "../src/layout/edits.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
 test("wrapping a selection gathers its media lines into one block", () => {
@@ -50,8 +50,49 @@ test("a planned change is applied to the editor in one transaction", () => {
   const change = planWrapSelection(editor.getValue().split("\n"), 1, 1);
   assert.ok(change);
 
-  applyLineChange(editor, change);
+  applyEditsToEditor(editor, [lineChangeEdit(editor.getValue().split("\n"), change)]);
 
   assert.equal(editor.getValue(), "前文\n<!-- vml -->\n![[a.png]]\n<!-- /vml -->\n后文");
   assert.equal(editor.transactionCount, 1);
+});
+
+test("a command's captured source is validated before it writes", () => {
+  const original = ["前文", "![[a.png|240]]", "后文"];
+  const change = planWrapSelection(original, 1, 1);
+  assert.ok(change);
+  const edit = lineChangeEdit(original, change);
+  const editor = new MemoryEditor("前文\n![[renamed.png|240]]\n后文");
+  assert.deepEqual(applyEditsToEditor(editor, [edit]), { ok: false, reason: "not-found" });
+  assert.equal(editor.transactionCount, 0);
+  assert.equal(editor.getValue(), "前文\n![[renamed.png|240]]\n后文");
+});
+
+test("wrapping complete code and equations validates their text boundary and writes one transaction", () => {
+  for (const body of ['```js\nconst a = 1;\n```', '$$\nx = 1\n$$', '%%\nComment\n%%']) {
+    for (const surrounding of [false, true]) {
+      const text = surrounding ? `Intro\n${body}\nTail` : body;
+      const lines = text.split("\n");
+      const from = surrounding ? 1 : 0;
+      const to = from + body.split("\n").length - 1;
+      const change = planWrapSelection(lines, from, to);
+      assert.ok(change);
+      const edit = lineChangeEdit(lines, change);
+      const editor = new MemoryEditor(text);
+      assert.deepEqual(applyEditsToEditor(editor, [edit]), { ok: true });
+      assert.equal(editor.transactionCount, 1);
+      assert.equal(editor.getValue(), applyLineChanges(lines, [change]).join("\n"));
+      assert.ok(editor.getValue().includes(body));
+      const crlf = text.replaceAll("\n", "\r\n");
+      const result = applyEditsToText(crlf, [lineChangeEdit(crlf.split("\n"), change)]);
+      assert.ok(result.ok);
+      assert.ok(result.text.includes(body.replaceAll("\n", "\r\n")));
+    }
+  }
+});
+
+test("wrapping does not turn a partial code or equation selection into a writable plan", () => {
+  for (const lines of [['```', 'code', '```'], ['$$', 'x', '$$']]) {
+    assert.equal(planWrapSelection(lines, 0, 1), null);
+    assert.equal(planWrapSelection(lines, 1, 2), null);
+  }
 });

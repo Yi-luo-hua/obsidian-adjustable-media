@@ -1,8 +1,11 @@
 import { MarkdownView, editorInfoField, type App, type Editor, type TFile } from "obsidian";
-import type { EditorView } from "@codemirror/view";
+import { EditorView } from "@codemirror/view";
 
 import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure } from "./edits.ts";
 import { applyEditsToView } from "./editorTransaction.ts";
+import type { SourceAssertion } from "./sourceAssertions.ts";
+import { bindBlockEdits } from "./blockIdentity.ts";
+import { snapshotForState } from "./documentSnapshot.ts";
 
 export type WriteResult = { ok: true } | EditFailure;
 
@@ -10,6 +13,7 @@ export interface WriteOptions {
   editor?: Editor;
   view?: EditorView;
   typing?: boolean;
+  readSet?: readonly SourceAssertion[];
 }
 
 /** Explicit onboarding action: create a fresh example folder, never modify an existing note. */
@@ -58,11 +62,11 @@ export async function writeBlockEdits(
     // to edit that note, and a hidden reading-mode editor does not save its buffer.
     const info = options.view.state.field(editorInfoField, false);
     const origin = app.workspace.getLeavesOfType("markdown").some((leaf) => leaf.view instanceof MarkdownView
-      && leaf.view.file?.path === file.path && leaf.view.getMode() === "source" && leaf.view.editor === info?.editor);
-    if (info?.file?.path !== file.path || !options.view.dom.isConnected || !origin) {
+      && leaf.view.file === file && leaf.view.getMode() === "source" && leaf.view.editor === info?.editor);
+    if ((info?.file && info.file !== file) || !options.view.dom.isConnected || !origin) {
       return { ok: false, reason: "not-found" };
     }
-    const result = applyEditsToView(options.view, edits, options.typing);
+    const result = writeToView(options.view, edits, options);
     if (result.ok && !options.typing) {
       // A pointer gesture can leave focus on the body. Restore keyboard undo to this pane without
       // moving its selection; focus() in CodeMirror preserves the scroll position.
@@ -71,7 +75,17 @@ export async function writeBlockEdits(
     return result;
   }
   if (options.editor) {
-    return applyEditsToEditor(options.editor, edits);
+    const origin = app.workspace.getLeavesOfType("markdown").map(leaf => leaf.view)
+      .find((view): view is MarkdownView => view instanceof MarkdownView
+        && view.file === file && view.getMode() === "source" && view.editor === options.editor);
+    if (!origin) return { ok: false, reason: "not-found" };
+    const element = origin.containerEl.querySelector<HTMLElement>(".cm-editor");
+    const view = element ? EditorView.findFromDOM(element) : null;
+    if (view?.state.field(editorInfoField, false)?.editor === options.editor) {
+      return writeToView(view, edits, options);
+    }
+    if (edits.some(edit => edit.blockId)) return { ok: false, reason: "not-found" };
+    return applyEditsToEditor(options.editor, edits, options.readSet);
   }
 
   const view = app.workspace.getLeavesOfType("markdown")
@@ -80,14 +94,22 @@ export async function writeBlockEdits(
       && candidate.file?.path === file.path
       && candidate.getMode() === "source");
   if (view) {
-    return applyEditsToEditor(view.editor, edits);
+    return writeBlockEdits(app, file, edits, { ...options, editor: view.editor });
   }
+  // Runtime identities are resolved in their originating live buffer, never by file-text search.
+  if (edits.some(edit => edit.blockId)) return { ok: false, reason: "not-found" };
 
   let result: WriteResult = { ok: true };
   await app.vault.process(file, (data) => {
-    const applied = applyEditsToText(data, edits);
+    const applied = applyEditsToText(data, edits, options.readSet);
     result = applied.ok ? { ok: true } : applied;
     return applied.ok ? applied.text : data;
   });
   return result;
+}
+
+function writeToView(view: EditorView, edits: readonly BlockEdit[], options: WriteOptions): WriteResult {
+  const snapshot = snapshotForState(view.state);
+  const bound = bindBlockEdits(edits, snapshot?.text === view.state.doc.toString() ? snapshot.blocks : []);
+  return bound.ok ? applyEditsToView(view, bound.edits, options.typing, options.readSet) : bound;
 }

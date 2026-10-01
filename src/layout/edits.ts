@@ -14,6 +14,8 @@ import {
 } from "../format/v2.ts";
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
 import { metaFromModel, rowEmbeds, type LayoutModel } from "./model.ts";
+import { sourceAssertionsMatch, type SourceAssertion } from "./sourceAssertions.ts";
+import { blockIdentity } from "./blockIdentity.ts";
 
 /**
  * Turns layout changes into validated line edits (docs/DESIGN.md, section 3).
@@ -24,6 +26,8 @@ import { metaFromModel, rowEmbeds, type LayoutModel } from "./model.ts";
  */
 
 export interface BlockEdit {
+  /** A rendered runtime instance must bind to its current source before raw-text resolution. */
+  blockId?: string;
   anchorLine: number;
   anchorLines: string[];
   /** The line within the anchor that must be text; preceding lines only validate context. */
@@ -41,7 +45,7 @@ export interface LineChange {
   replacement: string[];
 }
 
-export type EditFailureReason = "not-found" | "ambiguous" | "overlap";
+export type EditFailureReason = "not-found" | "ambiguous" | "overlap" | "read-only" | "stale-dependency";
 
 export interface EditFailure {
   ok: false;
@@ -168,8 +172,16 @@ export function onlyColumnTextDiffers(before: V2Block, after: V2Block, side: Tex
 }
 
 /** Removes the two layout comments and leaves the body exactly as written. */
-export function planUnwrap(block: V2Block): BlockEdit {
-  return anchored(block, 0, block.lines.length - 1, block.lines.slice(1, -1));
+export function planUnwrap(block: V2Block): BlockEdit | null {
+  return isEditable(block) ? anchored(block, 0, block.lines.length - 1, block.lines.slice(1, -1)) : null;
+}
+
+/** Batch commands count and remove only layouts whose complete format can be edited. */
+export function planUnwrapAll(blocks: readonly V2Block[]): BlockEdit[] {
+  return blocks.flatMap(block => {
+    const edit = planUnwrap(block);
+    return edit ? [edit] : [];
+  });
 }
 
 /** Wraps lines in a layout block, with no settings unless given. */
@@ -194,10 +206,13 @@ export function keepListOpen(lines: readonly string[]): string[] {
   return endsInList ? [...lines, ""] : [...lines];
 }
 
-export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit[]): ResolveResult {
+export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit[], readSet: readonly SourceAssertion[] = []): ResolveResult {
+  if (!sourceAssertionsMatch(lines, readSet)) {
+    return { ok: false, reason: "stale-dependency" };
+  }
   const normalized = lines.map(stripCarriageReturn);
   let contexts: LineContext[] | null = null;
-  const contextAt = (line: number): LineContext | undefined => (contexts ??= scanMarkdownLines(normalized))[line];
+  const contextAt = (line: number): LineContext | undefined => (contexts ??= scanMarkdownLines(normalized, true))[line];
 
   const changes: LineChange[] = [];
   for (const edit of edits) {
@@ -220,6 +235,11 @@ export function resolveEdits(lines: readonly string[], edits: readonly BlockEdit
     changes.push({ from, to, replacement: edit.replacement });
   }
 
+  // Protect every entry point, including commands and future planners that construct raw edits.
+  const readOnly = findV2Blocks(normalized, contexts ??= scanMarkdownLines(normalized, true)).filter(block => !isEditable(block));
+  if (changes.some(change => readOnly.some(block => change.from <= block.closeLine && change.to >= block.openLine))) {
+    return { ok: false, reason: "read-only" };
+  }
   return { ok: true, changes: changes.sort((a, b) => b.from - a.from) };
 }
 
@@ -232,9 +252,9 @@ export function applyLineChanges(lines: readonly string[], changes: readonly Lin
 }
 
 /** Applies edits to file content, keeping its line endings; untouched lines stay byte-identical. */
-export function applyEditsToText(text: string, edits: readonly BlockEdit[]): { ok: true; text: string } | EditFailure {
+export function applyEditsToText(text: string, edits: readonly BlockEdit[], readSet: readonly SourceAssertion[] = []): { ok: true; text: string } | EditFailure {
   const lines = text.split("\n");
-  const resolved = resolveEdits(lines, edits);
+  const resolved = resolveEdits(lines, edits, readSet);
   if (!resolved.ok) {
     return resolved;
   }
@@ -260,14 +280,16 @@ export function applyEditsToText(text: string, edits: readonly BlockEdit[]): { o
 }
 
 /** Applies edits to an open editor as a single transaction, or changes nothing on failure. */
-export function applyEditsToEditor(editor: EditorLike, edits: readonly BlockEdit[]): { ok: true } | EditFailure {
+export function applyEditsToEditor(editor: EditorLike, edits: readonly BlockEdit[], readSet: readonly SourceAssertion[] = []): { ok: true } | EditFailure {
   const lines = editor.getValue().split("\n");
-  const resolved = resolveEdits(lines, edits);
+  const resolved = resolveEdits(lines, edits, readSet);
   if (!resolved.ok) {
     return resolved;
   }
 
-  editor.transaction({ changes: resolved.changes.map((change) => toEditorChange(lines, change)) });
+  if (resolved.changes.length > 0) {
+    editor.transaction({ changes: resolved.changes.map((change) => toEditorChange(lines, change)) });
+  }
   return { ok: true };
 }
 
@@ -279,9 +301,9 @@ export interface OffsetChange {
 }
 
 /** Plans edits on `text` as changes by character offsets, all relative to `text`, or fails as a whole. */
-export function planOffsetChanges(text: string, edits: readonly BlockEdit[]): { ok: true; changes: OffsetChange[] } | EditFailure {
+export function planOffsetChanges(text: string, edits: readonly BlockEdit[], readSet: readonly SourceAssertion[] = []): { ok: true; changes: OffsetChange[] } | EditFailure {
   const lines = text.split("\n");
-  const resolved = resolveEdits(lines, edits);
+  const resolved = resolveEdits(lines, edits, readSet);
   if (!resolved.ok) {
     return resolved;
   }
@@ -397,7 +419,8 @@ function textLines(block: V2Block): string[] {
 }
 
 function anchored(block: V2Block, start: number, end: number, replacement: string[]): BlockEdit {
-  return { anchorLine: block.openLine, anchorLines: block.lines, start, end, replacement };
+  const blockId = blockIdentity(block);
+  return { ...(blockId ? { blockId } : {}), anchorLine: block.openLine, anchorLines: block.lines, start, end, replacement };
 }
 
 function isBlank(line: string | undefined): boolean {

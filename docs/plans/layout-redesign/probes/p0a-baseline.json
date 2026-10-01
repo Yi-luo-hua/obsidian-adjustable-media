@@ -1,0 +1,253 @@
+{
+  "vault": "vml-test-vault",
+  "obsidian": "1.13.7",
+  "buildHash": "fe583caf3ad1389d07c7370658a6095d1634fa849e58635535e6c59edd2424c9",
+  "topology": {
+    "rerenders": [
+      0,
+      0
+    ],
+    "hostMatches": [
+      true,
+      true
+    ],
+    "before": [
+      {
+        "layouts": 4,
+        "roots": [
+          {
+            "text": "Left note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 315.4687194824219,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Right note",
+            "top": 397.6475524902344,
+            "width": 71.13714599609375
+          }
+        ]
+      },
+      {
+        "layouts": 13,
+        "roots": [
+          {
+            "text": "Left note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 315.4687194824219,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 397.6475524902344,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "layouts": 5,
+        "roots": [
+          {
+            "text": "Left note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 315.4687194824219,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 397.6475524902344,
+            "width": 71.13714599609375
+          }
+        ]
+      },
+      {
+        "layouts": 14,
+        "roots": [
+          {
+            "text": "Left note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 315.4687194824219,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 397.6475524902344,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          }
+        ]
+      }
+    ]
+  },
+  "unknownUnwrap": {
+    "preserved": false,
+    "before": "<!-- vml {\"v\":3,\"id\":\"keep\",\"groupId\":\"g\"} -->\n![[attachments/a.png]]\n<!-- /vml -->",
+    "after": "![[attachments/a.png]]"
+  },
+  "events": [
+    {
+      "ms": 762,
+      "kind": "editor-change",
+      "exact": true
+    },
+    {
+      "ms": 2780,
+      "kind": "vault-modify"
+    },
+    {
+      "ms": 2786,
+      "kind": "metadata-changed",
+      "readerMatches": [
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 4270,
+      "kind": "editor-change",
+      "exact": true
+    },
+    {
+      "ms": 4378,
+      "kind": "editor-change",
+      "exact": true
+    }
+  ]
+}

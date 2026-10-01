@@ -1,0 +1,89 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs');
+  const crypto = require('crypto');
+  const vaultPath = app.vault.adapter.getBasePath();
+  const outputPath = 'E:/Cache/11-temp/adjustable-media-pr12-fixes-20260930-212149/regression-current';
+  const hash = value => crypto.createHash('sha256').update(value).digest('hex');
+  const before = Object.fromEntries(app.vault.getMarkdownFiles().map(file => [file.path, hash(fs.readFileSync(vaultPath + '/' + file.path))]));
+  const fixture = 'PR12 review fixes transient';
+  if (app.vault.getAbstractFileByPath(fixture)) throw new Error('Fixture exists');
+  const leaves = [];
+  const restores = [];
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let result;
+  await app.vault.createFolder(fixture);
+  try {
+    for (const [name, source] of [['old.png', 'lora-arch.png'], ['new.png', 'lora-eval.png']]) {
+      const bytes = fs.readFileSync('E:/TOOLS/obsidian-adjustable-media/docs/examples/assets/' + source);
+      await app.vault.createBinary(fixture + '/' + name, bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+    }
+    const plain = await app.vault.create(fixture + '/plain.md', '# Ordinary note\n\nPlain body.\n');
+    const initial = '<!-- vml {"v":2,"rows":[{"height":140}]} -->\n![one](old.png) ![two](new.png)\n<!-- /vml -->\n\nUnchanged body.\n';
+    const media = await app.vault.create(fixture + '/media.md', initial);
+    for (const [file, mode] of [[plain, 'preview'], [plain, 'source'], [media, 'preview']]) {
+      const leaf = app.workspace.getLeaf('split', 'vertical'); leaves.push(leaf);
+      await leaf.setViewState({type:'markdown', state:{file:file.path, mode}});
+    }
+    await wait(300);
+    const [plainReader, plainSource, mediaReader] = leaves.map(leaf => leaf.view);
+    const Renderer = mediaReader.previewMode.renderer.constructor;
+    const originalRegister = Renderer.registerPostProcessor;
+    const registrations = [];
+    Renderer.registerPostProcessor = function(fn, ...args) { registrations.push(fn); return originalRegister.call(this, fn, ...args); };
+    try {
+      await app.plugins.disablePlugin('adjustable-media');
+      await app.plugins.enablePlugin('adjustable-media');
+    } finally { Renderer.registerPostProcessor = originalRegister; }
+    const layoutProcessor = registrations[0];
+    if (registrations.length !== 2) throw new Error('Unexpected postprocessor count: ' + registrations.length);
+    await wait(500);
+    const originalRerender = plainReader.previewMode.rerender;
+    let forced = 0;
+    plainReader.previewMode.rerender = function(force, ...args) { if (force === true) forced++; return originalRerender.call(this, force, ...args); };
+    restores.push(() => { plainReader.previewMode.rerender = originalRerender; });
+    for (const word of [' first', ' second', ' third']) {
+      const end = plainSource.editor.lastLine();
+      plainSource.editor.replaceRange(word, {line:end, ch:plainSource.editor.getLine(end).length});
+      await wait(300);
+    }
+    const plainResult = {forcedRerenders:forced, source:plainSource.editor.getValue(), host:plainReader.getViewData(), layouts:plainReader.containerEl.querySelectorAll('.vml-layout').length};
+    const changed = initial.replace('![one](old.png)', '![one](new.png)');
+    const originalGet = mediaReader.getViewData;
+    mediaReader.getViewData = () => changed;
+    restores.push(() => { mediaReader.getViewData = originalGet; });
+    const section = mediaReader.previewMode.containerEl.createDiv({cls:'pr12-adapter-probe'});
+    const children = [];
+    const context = {sourcePath:media.path, docId:'pr12-external-probe',
+      getSectionInfo:() => ({text:changed, lineStart:1, lineEnd:1}), addChild:child => {children.push(child); child.load();}};
+    restores.push(() => { children.forEach(child => child.unload()); section.remove(); });
+    layoutProcessor(section, context);
+    const pendingRoots = section.querySelectorAll('.vml-layout').length;
+    await app.vault.process(media, () => changed);
+    await wait(600);
+    mediaReader.getViewData = originalGet;
+    await wait(200);
+    const recoveredRoots = section.querySelectorAll('.vml-layout').length;
+    const sourcePaths = Array.from(section.querySelectorAll('img')).map(image => ({src:image.getAttribute('src'),complete:image.complete,naturalWidth:image.naturalWidth}));
+    const mediaResult = {pendingRoots,recoveredRoots,sourcePaths,host:mediaReader.getViewData(),expected:changed,
+      hostLayouts:mediaReader.previewMode.renderer.sizerEl.querySelectorAll('.vml-layout').length};
+    const webContents = require('@electron/remote').getCurrentWebContents();
+    await webContents.capturePage();
+    const screenshot = await webContents.capturePage();
+    fs.writeFileSync(outputPath + '/surface.png', screenshot.toPNG());
+    result = {vault:app.vault.getName(),obsidian:require('@electron/remote').app.getVersion(),
+      buildHash:hash(fs.readFileSync(vaultPath + '/.obsidian/plugins/adjustable-media/main.js')),plain:plainResult,externalMedia:mediaResult};
+    if (plainResult.forcedRerenders !== 0 || plainResult.source !== plainResult.host || pendingRoots !== 0 || recoveredRoots !== 1 || mediaResult.host !== changed || !sourcePaths.every(image => image.complete && image.naturalWidth > 0 && image.src.includes('new.png'))) throw new Error('Acceptance failed: ' + JSON.stringify(result));
+  } catch (error) { result = {...result,error:String(error),stack:error.stack}; }
+  finally {
+    restores.reverse().forEach(restore => restore());
+    leaves.forEach(leaf => leaf.detach());
+    await wait(500);
+    const folder = app.vault.getAbstractFileByPath(fixture);
+    if (folder) await app.vault.trash(folder, false);
+    result = {...result,notesUnchanged:Object.entries(before).every(([path,digest]) => hash(fs.readFileSync(vaultPath + '/' + path)) === digest)};
+    fs.writeFileSync(outputPath + '/result.json', JSON.stringify(result,null,2));
+    window.__pr12ReviewResult = result;
+    console.log(JSON.stringify(result));
+  }
+})();

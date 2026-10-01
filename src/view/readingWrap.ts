@@ -137,6 +137,25 @@ export function keepWrapsBeside(app: App, section: HTMLElement): void {
   }
 }
 
+/** Font and theme changes also invalidate measurements of detached floats. */
+export function refreshReadingWrap(app: App, section: HTMLElement): void {
+  const reading = readingSections(app, section);
+  if (!reading) return;
+  for (const item of reading.sections) {
+    const float = floats.get(item.el);
+    if (float) float.size = null;
+    asked.delete(item.el);
+    remeasuring.delete(item.el);
+  }
+  keepWrapsBeside(app, section);
+}
+
+/** Resource events invalidate only the float that owns the media and its dependent stand-ins. */
+export function refreshReadingMedia(section: HTMLElement, media: HTMLElement): void {
+  const float = floats.get(section);
+  if (float?.layout.contains(media)) replan(float);
+}
+
 class Keeper {
   private readonly app: App;
   private readonly sizer: HTMLElement;

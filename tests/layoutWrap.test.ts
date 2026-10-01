@@ -355,12 +355,12 @@ test("dragging the earlier float below its neighbor preserves the neighbor's scr
   assert.ok(edits);
   const result = apply(lines, edits);
   assert.deepEqual(result, [
-    'intro', '', '<!-- vml {"v":2,"wrap":"right","skip":4,"type":"text"} -->',
+    'intro', '', '<!-- vml {"v":2,"wrap":"right","skip":5,"type":"text"} -->',
     '右侧旁注', '<!-- /vml -->', '', '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":5} -->',
     '![[a.png]]', '<!-- /vml -->', '', 'body',
   ]);
-  assert.equal(effectiveWrapSkip(result, findV2Blocks(result), 1), 1);
-  assert.equal(visualWrapSkip(result, findV2Blocks(result), 0), 4);
+  assert.equal(effectiveWrapSkip(result, findV2Blocks(result), 1), 0);
+  assert.equal(visualWrapSkip(result, findV2Blocks(result), 0), 5);
   assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 5);
   const editor = new MemoryEditor(lines.join('\n'));
   assert.deepEqual(applyEditsToEditor(editor, edits), { ok: true });
@@ -398,9 +398,24 @@ test("dragging the later float above its neighbor leaves that neighbor at its ol
   const result = apply(lines, edits);
   assert.deepEqual(result.slice(0, 5), [
     '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[b.png]]', '<!-- /vml -->',
-    '<!-- vml {"v":2,"wrap":"left","skip":4} -->', '![[a.png]]',
+    '<!-- vml {"v":2,"wrap":"left","skip":5} -->', '![[a.png]]',
   ]);
-  assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 4);
+  assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 5);
+});
+
+test("moving the left float up across the right text block offsets its shifted anchor", () => {
+  const lines = [
+    '<!-- vml {"v":2,"wrap":"right","skip":19,"type":"text"} -->', '旁注', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":20} -->', '![[a.png]]', '<!-- /vml -->', 'body',
+  ];
+  const blocks = findV2Blocks(lines);
+  const edits = planPlacement(lines, blocks[1], { line: 7, wrap: "left", skip: 18 });
+  assert.ok(edits);
+  const result = apply(lines, edits);
+  assert.deepEqual(result.slice(0, 5), [
+    '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":18} -->', '![[a.png]]', '<!-- /vml -->',
+    '<!-- vml {"v":2,"wrap":"right","skip":20,"type":"text"} -->', '旁注',
+  ]);
 });
 
 test("dragging a float above one that shares its anchor keeps both neighbors' heights", () => {
@@ -423,11 +438,11 @@ test("dragging a float above one that shares its anchor keeps both neighbors' he
   assert.deepEqual(result, [
     '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[a.png]]', '<!-- /vml -->', '',
     '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[c.png]]', '<!-- /vml -->',
-    '<!-- vml {"v":2,"wrap":"left","skip":5} -->', '![[b.png]]', '<!-- /vml -->', '', 'body',
+    '<!-- vml {"v":2,"wrap":"left","skip":6} -->', '![[b.png]]', '<!-- /vml -->', '', 'body',
   ]);
-  // The dragged float lands at 2; the neighbor it crossed stays at its old height of 5.
+  // The dragged float lands at 2; the crossed neighbor's saved skip compensates for its shifted anchor.
   const moved = findV2Blocks(result);
-  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(result, moved, at)), [5, 2, 5]);
+  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(result, moved, at)), [5, 2, 6]);
 
   // One transaction; a changed opening line for the crossed neighbor aborts the whole write.
   const editor = new MemoryEditor(lines.join('\n'));

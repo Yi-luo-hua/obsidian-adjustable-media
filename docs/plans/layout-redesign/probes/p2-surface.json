@@ -1,0 +1,56 @@
+{
+  "surfaces": [
+    {
+      "mode": "preview",
+      "containerWidth": 1014.0624389648438,
+      "roots": [
+        {
+          "text": "Same source, independent views. This paragraph tests natural wrapping across reading view and live preview. This paragraph tests natural wrapping across reading view and live preview. This paragraph tests natural wrapping across reading view and live preview. This paragraph tests natural wrapping across reading view and live preview. This paragraph tests natural wrapping across reading view and live preview. ",
+          "top": 201.37152099609375,
+          "width": 609.95654296875,
+          "height": 166.16317749023438
+        },
+        {
+          "text": "Left layout, beside the body",
+          "top": 407.517333984375,
+          "width": 375.3558654785156,
+          "height": 46.197914123535156
+        },
+        {
+          "text": "Right layout, beside the body",
+          "top": 455.5034484863281,
+          "width": 375.3558654785156,
+          "height": 46.197914123535156
+        }
+      ],
+      "screenshot": "E:/TOOLS/obsidian-adjustable-media/docs/plans/layout-redesign/probes/p2-preview.png"
+    },
+    {
+      "mode": "source",
+      "containerWidth": 1014.0624389648438,
+      "roots": [
+        {
+          "text": "Same source, independent views. This paragraph tests natural wrapping across reading view and live preview. This paragraph tests natural wrapping across reading view and live preview. This paragraph tests natural wrapping across reading view and live preview. This paragraph tests natural wrapping across reading view and live preview. This paragraph tests natural wrapping across reading view and live preview. 编辑源码",
+          "top": 238.37672424316406,
+          "width": 609.95654296875,
+          "height": 166.16317749023438
+        },
+        {
+          "text": "Left layout, beside the body编辑源码",
+          "top": 468.5155944824219,
+          "width": 375.3558654785156,
+          "height": 46.197914123535156
+        },
+        {
+          "text": "Right layout, beside the body编辑源码",
+          "top": 516.501708984375,
+          "width": 375.3558654785156,
+          "height": 46.197914123535156
+        }
+      ],
+      "screenshot": "E:/TOOLS/obsidian-adjustable-media/docs/plans/layout-redesign/probes/p2-source.png"
+    }
+  ],
+  "buildHash": "2f50a378e82636f744d9aae00eb7dc227378be5ab90c3bf67c336bded804f16d",
+  "notesUnchanged": true
+}

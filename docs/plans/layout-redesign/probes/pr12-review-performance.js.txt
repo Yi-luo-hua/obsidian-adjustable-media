@@ -1,0 +1,60 @@
+import { execFileSync } from 'node:child_process';
+import { runInNewContext } from 'node:vm';
+import { performance } from 'node:perf_hooks';
+import fs from 'node:fs';
+import os from 'node:os';
+import { transformSync } from 'esbuild';
+import { ChangeSet } from '@codemirror/state';
+import * as format from './src/format/v2.ts';
+import * as scanner from './src/markdown/lineContext.ts';
+import * as edits from './src/layout/edits.ts';
+import * as floatOrder from './src/layout/floatOrder.ts';
+import * as model from './src/layout/model.ts';
+import * as identity from './src/layout/blockIdentity.ts';
+import { documentSnapshot } from './src/layout/documentSnapshot.ts';
+
+// From the repository root: Get-Content -Raw <this file> | node --input-type=module
+// Fixed baseline keeps this comparison reproducible after the repair is committed.
+const revision = '6568a3ee173fa42282e4fe6a84d8aff9809f0cdc';
+function oldModule(path, modules) {
+  const source = execFileSync('git', ['show', `${revision}:${path}`], {encoding:'utf8'});
+  const {code} = transformSync(source, {loader:'ts',format:'cjs',target:'node24'});
+  const exported = {exports:{}};
+  runInNewContext(code, {module:exported,exports:exported.exports,require(name) {
+    if (!(name in modules)) throw new Error(`Unmapped import ${name}`);
+    return modules[name];
+  }});
+  return exported.exports;
+}
+const placement = oldModule('src/layout/placement.ts', {
+  '../format/v2.ts':format, '../markdown/lineContext.ts':scanner,
+  './edits.ts':edits, './floatOrder.ts':floatOrder, './model.ts':model,
+});
+const old = oldModule('src/layout/documentSnapshot.ts', {
+  '../format/v2.ts':format, './placement.ts':placement,
+  './blockIdentity.ts':identity, '../markdown/lineContext.ts':scanner,
+});
+const lines = Array.from({length:10000}, (_,index)=>index%10===0 ? '' : `Paragraph ${index}`);
+for (let index=0;index<200;index++) lines.splice(index*49+2,3,
+  `<!-- vml {"v":2,"wrap":"${index%2?'left':'right'}"} -->`, '![[a.png]]', '<!-- /vml -->');
+const text = lines.join('\n');
+const origin = {file:{},branch:{},path:'perf.md'};
+const changes = ChangeSet.of({from:0,insert:'Prefix\n'},text.length);
+function sample(callback) {
+  const times=[];
+  for (let index=0;index<110;index++) {
+    const start=performance.now(); callback();
+    if (index>=10) times.push(performance.now()-start);
+  }
+  times.sort((a,b)=>a-b);
+  return {p50Ms:times[49],p95Ms:times[94]};
+}
+const before=old.documentSnapshot(text,origin), after=documentSnapshot(text,origin);
+const result={node:process.version,cpu:os.cpus()[0].model,baselineRevision:revision,
+  lines:lines.length,blocks:after.blocks.length,samples:100,
+  baseline:sample(()=>old.documentSnapshot(`Prefix\n${text}`,origin,before,changes)),
+  fixed:sample(()=>documentSnapshot(`Prefix\n${text}`,origin,after,changes)),
+  parserOnly:sample(()=>format.findV2Blocks(`Prefix\n${text}`.split('\n'))),
+  scope:'Snapshot and identity mapping only. Parser-only is a reference, not main host frame or key timing.'};
+fs.writeFileSync('docs/plans/layout-redesign/probes/pr12-review-performance.json',JSON.stringify(result,null,2)+'\n');
+console.log(JSON.stringify(result));

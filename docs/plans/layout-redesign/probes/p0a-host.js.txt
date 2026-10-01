@@ -1,0 +1,85 @@
+/* Run only with: obsidian vault=vml-test-vault eval code=eval(require('fs').readFileSync(...,'utf8')) */
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs');
+  const crypto = require('crypto');
+  const path = 'Layout redesign P0 transient.md';
+  if (app.vault.getAbstractFileByPath(path)) throw new Error('Probe note already exists');
+  const initial = [
+    '# Layout P0', '',
+    '<!-- vml {"v":2,"wrap":"left","skip":2,"type":"text"} -->',
+    'Left note', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"right","skip":4,"type":"text"} -->',
+    'Right note', '<!-- /vml -->',
+    'Body text repeated to make a visible paragraph. '.repeat(12), '',
+    'Another paragraph. '.repeat(12),
+  ].join('\n');
+  const leaves = [];
+  const refs = [];
+  const restores = [];
+  const events = [];
+  const origin = performance.now();
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const record = (kind, data) => events.push({ ms: Math.round(performance.now() - origin), kind, ...data });
+  const file = await app.vault.create(path, initial);
+  let output;
+  try {
+    for (const mode of ['preview', 'preview', 'source']) {
+      const leaf = app.workspace.getLeaf('split', 'vertical');
+      leaves.push(leaf);
+      await leaf.setViewState({ type: 'markdown', state: { file: path, mode } });
+    }
+    const readers = leaves.slice(0, 2).map(leaf => leaf.view);
+    const source = leaves[2].view;
+    await wait(600);
+    const before = readers.map(view => ({ layouts: view.containerEl.querySelectorAll('.vml-layout').length,
+      roots: Array.from(view.containerEl.querySelectorAll('.vml-layout')).map(el => ({
+        text: el.textContent, top: el.getBoundingClientRect().top, width: el.getBoundingClientRect().width,
+      })) }));
+    const rerenders = [0, 0];
+    readers.forEach((view, index) => {
+      const previous = view.previewMode.rerender;
+      view.previewMode.rerender = function (...args) {
+        rerenders[index]++;
+        record('rerender', { pane: index, matches: view.getViewData() === source.editor.getValue() });
+        return previous.apply(this, args);
+      };
+      restores.push(() => { view.previewMode.rerender = previous; });
+    });
+    refs.push([app.workspace, app.workspace.on('editor-change', (editor, view) => {
+      if (view.file?.path === path) record('editor-change', { exact: editor.getValue() === source.editor.getValue() });
+    })]);
+    refs.push([app.vault, app.vault.on('modify', changed => {
+      if (changed.path === path) record('vault-modify', {});
+    })]);
+    refs.push([app.metadataCache, app.metadataCache.on('changed', (changed, data) => {
+      if (changed.path === path) record('metadata-changed', { readerMatches: readers.map(view => view.getViewData() === data) });
+    })]);
+    source.editor.replaceRange('New body anchor', { line: 5, ch: 0 });
+    const changed = source.editor.getValue();
+    await wait(3500);
+    const topology = { rerenders: [...rerenders], hostMatches: readers.map(view => view.getViewData() === changed), before,
+      after: readers.map(view => ({ layouts: view.containerEl.querySelectorAll('.vml-layout').length,
+        roots: Array.from(view.containerEl.querySelectorAll('.vml-layout')).map(el => ({
+          text: el.textContent, top: el.getBoundingClientRect().top, width: el.getBoundingClientRect().width,
+        })) })) };
+    const unknown = '<!-- vml {"v":3,"id":"keep","groupId":"g"} -->\n![[attachments/a.png]]\n<!-- /vml -->';
+    source.editor.setValue(unknown);
+    source.editor.setCursor({ line: 1, ch: 0 });
+    app.workspace.setActiveLeaf(leaves[2], { focus: false });
+    await wait(100);
+    const command = app.commands.commands['adjustable-media:remove-layout-comments-here'];
+    command.editorCallback(source.editor, source);
+    output = { vault: app.vault.getName(), obsidian: require('@electron/remote').app.getVersion(),
+      buildHash: crypto.createHash('sha256').update(fs.readFileSync(app.vault.adapter.getBasePath() + '/.obsidian/plugins/adjustable-media/main.js')).digest('hex'),
+      topology, unknownUnwrap: { preserved: source.editor.getValue() === unknown, before: unknown, after: source.editor.getValue() }, events };
+  } finally {
+    restores.reverse().forEach(restore => restore());
+    refs.forEach(([emitter, ref]) => emitter.offref(ref));
+    leaves.forEach(leaf => leaf.detach());
+    await wait(600);
+    await app.vault.trash(file, false);
+  }
+  window.__layoutP0Result = output;
+  console.log(JSON.stringify(output));
+})().catch(error => { window.__layoutP0Result = { error: String(error), stack: error.stack }; console.error(error); });

@@ -51,3 +51,20 @@ test("a stale layout edit dispatches nothing", () => {
   assert.equal(view.transactions.length, 0);
   assert.equal(view.state.doc.toString(), original);
 });
+
+test("a changed dependency cancels a CodeMirror gesture before dispatch or history changes", () => {
+  const view = editor();
+  const block = findV2Blocks(original.split("\n"))[0];
+  const moved = moveItem(modelFromBlock(block), { row: 0, index: 0 }, { kind: "beside", position: { row: 0, index: 1 }, side: "after" });
+  const edit = planModelEdit(block, moved);
+  assert.ok(edit);
+  assert.deepEqual(applyEditsToView(view, [edit], false, [{ fromLine: 6, lines: ["Changed tail"] }]),
+    { ok: false, reason: "stale-dependency" });
+  assert.equal(view.transactions.length, 0);
+  assert.deepEqual(applyEditsToView(view, [edit], false, [{ fromLine: 6, lines: ["Tail"] }]), { ok: true });
+  assert.equal(view.transactions.length, 1);
+  assert.equal(undo({ state: view.state, dispatch: tr => { view.state = tr.state; } }), true);
+  assert.equal(view.state.doc.toString(), original);
+  assert.deepEqual(applyEditsToView(view, []), { ok: true });
+  assert.equal(view.transactions.length, 1);
+});

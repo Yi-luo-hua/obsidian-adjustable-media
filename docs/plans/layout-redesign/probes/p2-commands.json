@@ -1,0 +1,33 @@
+{
+  "vault": "vml-test-vault",
+  "identity": {
+    "afterInsertion": true,
+    "afterUndo": true,
+    "newUndoRevision": true
+  },
+  "readonly": {
+    "preserved": true,
+    "documentTransactions": 0
+  },
+  "knownRemoval": {
+    "correct": true,
+    "documentTransactions": 1,
+    "unknownPreserved": true
+  },
+  "wrap": {
+    "correct": true,
+    "documentTransactions": 1,
+    "undo": true
+  },
+  "undo": true,
+  "batchPreview": "移除布局块注释将移除 1 篇笔记中 1 个布局块的注释，图片和视频嵌入保持不变。Layout redesign P1 commands transient.md · 1移除取消",
+  "batchCountExcludesUnknown": true,
+  "batch": {
+    "correct": true,
+    "documentTransactions": 1,
+    "unknownPreserved": true,
+    "undo": true
+  },
+  "buildHash": "2f50a378e82636f744d9aae00eb7dc227378be5ab90c3bf67c336bded804f16d",
+  "existingNotesUnchanged": true
+}

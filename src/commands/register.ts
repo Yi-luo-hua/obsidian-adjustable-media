@@ -1,13 +1,13 @@
-import { Modal, Notice, type App, type Plugin, type TFile } from "obsidian";
+import { Modal, Notice, type App, type Editor, type Plugin, type TFile } from "obsidian";
 
 import { findV2Blocks, type V2Block } from "../format/v2.ts";
-import { applyEditsToEditor, planUnwrap } from "../layout/edits.ts";
+import { isEditable, planUnwrap, planUnwrapAll, type LineChange } from "../layout/edits.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
-import { t } from "../view/messages.ts";
-import { applyLineChange, blockAt, planMergeWithNext, planWrapSelection } from "./plans.ts";
+import { reportWriteError, t } from "../view/messages.ts";
+import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection } from "./plans.ts";
 
 export function registerCommands(plugin: Plugin): void {
-  plugin.registerEvent(plugin.app.workspace.on("editor-menu", (menu, editor) => {
+  plugin.registerEvent(plugin.app.workspace.on("editor-menu", (menu, editor, view) => {
     if (!editor.somethingSelected()) {
       return;
     }
@@ -25,7 +25,7 @@ export function registerCommands(plugin: Plugin): void {
       }
       const change = planWrapSelection(original.split("\n"), from, to);
       if (change) {
-        applyLineChange(editor, change);
+        writeCommandChange(plugin, editor, view.file, change);
       }
     }));
   }));
@@ -33,10 +33,10 @@ export function registerCommands(plugin: Plugin): void {
   plugin.addCommand({
     id: "wrap-selection-in-layout",
     name: t("cmdWrap"),
-    editorCallback: (editor) => {
+    editorCallback: (editor, view) => {
       const change = planWrapSelection(editor.getValue().split("\n"), editor.getCursor("from").line, editor.getCursor("to").line);
       if (change) {
-        applyLineChange(editor, change);
+        writeCommandChange(plugin, editor, view.file, change);
       } else {
         new Notice(t("wrapNothing"));
       }
@@ -46,10 +46,10 @@ export function registerCommands(plugin: Plugin): void {
   plugin.addCommand({
     id: "merge-with-next-layout",
     name: t("cmdMerge"),
-    editorCallback: (editor) => {
+    editorCallback: (editor, view) => {
       const change = planMergeWithNext(editor.getValue().split("\n"), editor.getCursor().line);
       if (change) {
-        applyLineChange(editor, change);
+        writeCommandChange(plugin, editor, view.file, change);
       } else {
         new Notice(t("mergeNothing"));
       }
@@ -59,16 +59,16 @@ export function registerCommands(plugin: Plugin): void {
   plugin.addCommand({
     id: "remove-layout-comments-here",
     name: t("cmdUnwrap"),
-    editorCallback: (editor) => {
+    editorCallback: (editor, view) => {
       const block = blockAt(editor.getValue().split("\n"), editor.getCursor().line);
-      if (!block) {
-        new Notice(t("unwrapNothing"));
+      const edit = block ? planUnwrap(block) : null;
+      if (!edit || !view.file) {
+        new Notice(t(block ? "unreadableSettings" : "unwrapNothing"));
         return;
       }
-      const result = applyEditsToEditor(editor, [planUnwrap(block)]);
-      if (!result.ok) {
-        new Notice(t("writeNotFound"));
-      }
+      void writeBlockEdits(plugin.app, view.file, [edit], { editor }).then(result => {
+        if (!result.ok) new Notice(t("writeNotFound"));
+      }).catch(reportWriteError);
     },
   });
 
@@ -76,9 +76,17 @@ export function registerCommands(plugin: Plugin): void {
     id: "remove-all-layout-comments",
     name: t("cmdRemoveAll"),
     callback: () => {
-      void openRemoveAll(plugin.app);
+      void openRemoveAll(plugin.app).catch(reportWriteError);
     },
   });
+}
+
+function writeCommandChange(plugin: Plugin, editor: Editor, file: TFile | null, change: LineChange): void {
+  if (!file) return;
+  const edit = lineChangeEdit(editor.getValue().split("\n"), change);
+  void writeBlockEdits(plugin.app, file, [edit], { editor }).then(result => {
+    if (!result.ok) new Notice(t("writeNotFound"));
+  }).catch(reportWriteError);
 }
 
 interface NoteLayouts {
@@ -93,7 +101,7 @@ async function openRemoveAll(app: App): Promise<void> {
     if (!text.includes("<!-- vml")) {
       continue;
     }
-    const blocks = findV2Blocks(text.split("\n"));
+    const blocks = findV2Blocks(text.split("\n")).filter(isEditable);
     if (blocks.length > 0) {
       found.push({ file, blocks });
     }
@@ -129,7 +137,7 @@ class RemoveAllModal extends Modal {
     const footer = this.contentEl.createDiv({ cls: "modal-button-container" });
     footer.createEl("button", { cls: "mod-warning", text: t("removeAllConfirm") }).addEventListener("click", () => {
       this.close();
-      void this.removeAll();
+      void this.removeAll().catch(reportWriteError);
     });
     footer.createEl("button", { text: t("cancel") }).addEventListener("click", () => this.close());
   }
@@ -144,7 +152,7 @@ class RemoveAllModal extends Modal {
     let failed = 0;
     for (const note of this.notes) {
       // Each block is re-validated against the note's current content before anything is written.
-      const result = await writeBlockEdits(this.app, note.file, note.blocks.map(planUnwrap));
+      const result = await writeBlockEdits(this.app, note.file, planUnwrapAll(note.blocks));
       if (result.ok) {
         files += 1;
         blocks += note.blocks.length;

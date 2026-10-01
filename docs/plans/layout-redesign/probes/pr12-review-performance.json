@@ -1,0 +1,21 @@
+{
+  "node": "v24.11.1",
+  "cpu": "AMD Ryzen 9 7945HX with Radeon Graphics        ",
+  "baselineRevision": "6568a3ee173fa42282e4fe6a84d8aff9809f0cdc",
+  "lines": 10000,
+  "blocks": 200,
+  "samples": 100,
+  "baseline": {
+    "p50Ms": 11.785699999999906,
+    "p95Ms": 14.094400000000064
+  },
+  "fixed": {
+    "p50Ms": 3.5785000000000764,
+    "p95Ms": 4.736699999999928
+  },
+  "parserOnly": {
+    "p50Ms": 2.2436000000002423,
+    "p95Ms": 2.7876000000001113
+  },
+  "scope": "Snapshot and identity mapping only. Parser-only is a reference, not main host frame or key timing."
+}

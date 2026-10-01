@@ -1,0 +1,76 @@
+{
+  "reading": {
+    "vault": "vml-test-vault",
+    "obsidian": "1.13.7",
+    "buildHash": "7a38984734c83c2c2cb7d9e89410770f1b9ce566c4b53e2be220bf4b7f737542",
+    "plain": {
+      "forcedRerenders": 0,
+      "source": "# Ordinary note\n\nPlain body.\n first second third",
+      "host": "# Ordinary note\n\nPlain body.\n first second third",
+      "layouts": 0
+    },
+    "externalMedia": {
+      "pendingRoots": 0,
+      "recoveredRoots": 1,
+      "sourcePaths": [
+        {
+          "src": "app://094c23dca549ccde8a579ba55302d427ec05/E:/TOOLS/vml-test-vault/PR12%20review%20fixes%20transient/new.png?1790778841819",
+          "complete": true,
+          "naturalWidth": 1644
+        },
+        {
+          "src": "app://094c23dca549ccde8a579ba55302d427ec05/E:/TOOLS/vml-test-vault/PR12%20review%20fixes%20transient/new.png?1790778841819",
+          "complete": true,
+          "naturalWidth": 1644
+        }
+      ],
+      "host": "<!-- vml {\"v\":2,\"rows\":[{\"height\":140}]} -->\n![one](new.png) ![two](new.png)\n<!-- /vml -->\n\nUnchanged body.\n",
+      "expected": "<!-- vml {\"v\":2,\"rows\":[{\"height\":140}]} -->\n![one](new.png) ![two](new.png)\n<!-- /vml -->\n\nUnchanged body.\n",
+      "hostLayouts": 1
+    },
+    "notesUnchanged": true
+  },
+  "major": {
+    "plain": {
+      "subtreeObservers": 0,
+      "captureScroll": 0
+    },
+    "missingFile": {
+      "idStable": true,
+      "owner": "PR12 remaining review transient/source.md",
+      "epochBefore": 1,
+      "epochAfter": 1,
+      "heightRetained": true,
+      "fieldOmitted": true,
+      "gestureWrites": 1,
+      "gestureSaved": true
+    },
+    "commands": [
+      {
+        "name": "fence-inside",
+        "writes": 1,
+        "exact": true,
+        "undo": true,
+        "actual": "Intro\n<!-- vml {\"v\":2,\"type\":\"text\"} -->\n```js\nconst x = 1;\n```\n<!-- /vml -->\nTail"
+      },
+      {
+        "name": "fence-only",
+        "writes": 1,
+        "exact": true,
+        "undo": true,
+        "actual": "<!-- vml {\"v\":2,\"type\":\"text\"} -->\n```js\nconst x = 1;\n```\n<!-- /vml -->"
+      },
+      {
+        "name": "math-inside",
+        "writes": 1,
+        "exact": true,
+        "undo": true,
+        "actual": "Intro\n<!-- vml {\"v\":2,\"type\":\"text\"} -->\n$$\nx = 1\n$$\n<!-- /vml -->\nTail"
+      }
+    ],
+    "buildHash": "7a38984734c83c2c2cb7d9e89410770f1b9ce566c4b53e2be220bf4b7f737542",
+    "inputScope": "Actual host commands and programmatic contextmenu plus DOM click; omitted file field injected in actual editor state",
+    "notesUnchanged": true
+  },
+  "pluginRestored": true
+}

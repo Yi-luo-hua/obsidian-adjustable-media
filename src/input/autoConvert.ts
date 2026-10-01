@@ -1,15 +1,18 @@
-import { editorInfoField, type Plugin } from "obsidian";
+import { Notice, editorInfoField, type Plugin } from "obsidian";
 import { Prec, Transaction, type Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 
 import { mediaKindOf, readEmbedRow } from "../format/v2.ts";
+import { lineChangeEdit } from "../commands/plans.ts";
+import { writeBlockEdits } from "../layout/writeBack.ts";
+import { reportWriteError, t } from "../view/messages.ts";
+import { fileOfEditor } from "../view/obsidianInternals.ts";
 import { planWrap } from "./insertion.ts";
 
 const WINDOW_MS = 10_000;
 /** Files dragged from Obsidian's own file list are inserted right away. */
 const INTERNAL_WINDOW_MS = 2_000;
 const SETTLE_MS = 300;
-const OWN_EVENT = "vml.autoconvert";
 
 interface Pending {
   /** Embeds to wait for; null when the drop doesn't say, as with files from Obsidian's file list. */
@@ -34,6 +37,10 @@ interface Pending {
  */
 export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
   const pending = new Map<string, Pending>();
+  const fileOf = (view: EditorView) => {
+    const info = view.state.field(editorInfoField, false);
+    return info?.file ?? fileOfEditor(plugin.app, info?.editor);
+  };
 
   const forget = (path: string, entry: Pending): void => {
     if (entry.timer !== null) {
@@ -52,7 +59,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
   });
 
   const expect = (view: EditorView, expected: number | null, windowMs: number): void => {
-    const path = view.state.field(editorInfoField, false)?.file?.path;
+    const path = fileOf(view)?.path;
     if (!enabled() || !path) {
       return;
     }
@@ -100,6 +107,8 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
       return;
     }
 
+    const file = fileOf(view);
+    if (file?.path !== path) return;
     const doc = view.state.doc;
     const lineNumbers = entry.positions
       .filter((position) => position <= doc.length)
@@ -109,15 +118,9 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
       return;
     }
 
-    try {
-      view.dispatch({
-        changes: { from: doc.line(change.from + 1).from, to: doc.line(change.to + 1).to, insert: change.replacement.join("\n") },
-        annotations: Transaction.userEvent.of(OWN_EVENT),
-      });
-    } catch (error) {
-      // The note was closed in the meantime; nothing to convert any more.
-      console.warn("Adjustable Media: automatic conversion skipped", error);
-    }
+    void writeBlockEdits(plugin.app, file, [lineChangeEdit(doc.toString().split("\n"), change)], { view }).then(result => {
+      if (!result.ok) new Notice(t("writeNotFound"));
+    }).catch(reportWriteError);
   };
 
   const schedule = (path: string, entry: Pending): void => {
@@ -135,7 +138,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
     if (!update.docChanged) {
       return;
     }
-    const path = update.state.field(editorInfoField, false)?.file?.path;
+    const path = fileOf(update.view)?.path;
     const entry = path ? pending.get(path) : undefined;
     if (!path || !entry) {
       return;

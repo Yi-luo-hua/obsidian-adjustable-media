@@ -32,7 +32,7 @@ const TEXT: ScanState = { kind: "text" };
 const FENCE_PATTERN = /^((?:[ \t]*>)*)([ \t]*(?:(?:[-*+]|\d{1,9}[.)])[ \t]+)?)(`{3,}|~{3,})(.*)$/;
 const INLINE_CODE_PATTERN = /(`+)[\s\S]*?\1/g;
 
-export function scanMarkdownLines(lines: readonly string[]): LineContext[] {
+export function scanMarkdownLines(lines: readonly string[], includeEnd = false): LineContext[] {
   const contexts: LineContext[] = [];
   let state: ScanState = hasFrontmatter(lines) ? { kind: "frontmatter" } : TEXT;
 
@@ -42,6 +42,7 @@ export function scanMarkdownLines(lines: readonly string[]): LineContext[] {
     state = nextState;
   });
 
+  if (includeEnd) contexts.push(classifyLine("vml insertion boundary", lines.length, state)[0]);
   return contexts;
 }
 

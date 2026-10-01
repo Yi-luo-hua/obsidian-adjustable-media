@@ -1,0 +1,22 @@
+{
+  "date":"2026-09-30",
+  "head":"34f5896",
+  "workingTreeIncluded":["src/layout/placement.ts","tests/layoutWrap.test.ts"],
+  "baseline":{"node":"24.11.1","check":"passed","tests":206},
+  "pureProbes":{
+    "moveThirdAboveFirstTwo":{"before":"A:left:2 B:right:4 C:left:6","after":"A:left:2 C:left:1 B:right:5"},
+    "moveFirstBelowLastTwo":{"before":"A:left:2 B:right:4 C:left:6","after":"B:right:5 A:left:8 C:left:6"},
+    "removeFirstFromSharedAnchor":{"beforeNeighborVisualSkip":4,"afterNeighborVisualSkip":0},
+    "crossMaximumSkip":{"neighborSkip":40,"requestedSkip":2,"planPlacement":null},
+    "interveningBodyChangesRelation":{"beforeEffectiveSkip":2,"afterEffectiveSkip":4,"isStale":false}
+  },
+  "isolatedBrowserLab":{
+    "environment":{"lineHeight":24,"boxHeight":120,"containerWidth":999},
+    "before":[{"name":"A","predicted":52,"actual":51.54},{"name":"B","predicted":100,"actual":99.54},{"name":"C","predicted":148,"actual":183.53}],
+    "up":[{"name":"A","predicted":52,"actual":51.54},{"name":"C","predicted":28,"actual":183.53},{"name":"B","predicted":124,"actual":279.53}],
+    "down":[{"name":"B","predicted":124,"actual":123.55},{"name":"A","predicted":196,"actual":195.55},{"name":"C","predicted":148,"actual":339.54}],
+    "wide":[{"name":"A","predicted":4,"actual":3.55},{"name":"B","predicted":4,"actual":135.54}]
+  },
+  "obsidianAcceptance":"not run; no Obsidian process was running",
+  "sourceModified":false
+}

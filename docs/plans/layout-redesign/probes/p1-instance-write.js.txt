@@ -1,0 +1,71 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs');
+  const crypto = require('crypto');
+  const path = 'Layout redesign P1 instance transient.md';
+  if (app.vault.getAbstractFileByPath(path)) throw new Error('Probe note already exists');
+  if (document.querySelector('.menu')) throw new Error('Close existing test menus first');
+  const hash = text => crypto.createHash('sha256').update(text).digest('hex');
+  const base = app.vault.adapter.getBasePath();
+  const beforeNotes = Object.fromEntries(app.vault.getMarkdownFiles().map(file => [file.path, hash(fs.readFileSync(base + '/' + file.path))]));
+  const opener = '<!-- vml {"v":2,"type":"text"} -->';
+  const block = opener + '\nSame note\n<!-- /vml -->';
+  const initial = 'Intro\n\n' + block + '\n\n' + block + '\n\nTail';
+  const prefix = 'One\nTwo\nThree\nFour\n';
+  const file = await app.vault.create(path, initial);
+  const leaf = app.workspace.getLeaf('split', 'vertical');
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let result;
+  let restoreDispatch;
+  try {
+    await leaf.setViewState({ type: 'markdown', state: { file: path, mode: 'source' } });
+    app.workspace.setActiveLeaf(leaf, { focus: false });
+    const view = leaf.view;
+    const editor = view.editor;
+    editor.setCursor({ line: 0, ch: 0 });
+    await wait(300);
+    const roots = view.containerEl.querySelectorAll('.cm-content .vml-layout--interactive');
+    if (roots.length !== 2) throw new Error('Two interactive instances required');
+    const win = view.containerEl.ownerDocument.defaultView;
+    roots[1].dispatchEvent(new win.MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2, clientX: 10, clientY: 10 }));
+    await wait(60);
+    const item = Array.from(view.containerEl.ownerDocument.querySelectorAll('.menu-item-title'))
+      .find(el => ['文字块靠右，正文环绕', 'Float text box right, wrap text'].includes(el.textContent));
+    if (!item) throw new Error('Text wrap menu was not installed');
+    // Leave the opened menu bound to the second old instance, then occupy its old line with the first.
+    editor.replaceRange(prefix, { line: 0, ch: 0 });
+    await wait(60);
+    const cm = editor.cm;
+    const originalDispatch = cm.dispatch;
+    let documentTransactions = 0;
+    cm.dispatch = function (...args) {
+      const before = cm.state.doc;
+      const value = originalDispatch.apply(this, args);
+      if (cm.state.doc !== before) documentTransactions++;
+      return value;
+    };
+    restoreDispatch = () => { cm.dispatch = originalDispatch; };
+    item.closest('.menu-item').click();
+    await wait(100);
+    const before = (prefix + initial).split('\n');
+    const after = editor.getValue().split('\n');
+    const changedLines = after.flatMap((line, index) => line !== before[index] ? [index] : []);
+    const targetOnly = JSON.stringify(changedLines) === '[10]' && after[6] === opener && after[10].includes('"wrap":"right"');
+    const writes = documentTransactions;
+    editor.undo();
+    result = { vault: app.vault.getName(), sourceLines: { oldTarget: 6, currentFirst: 6, currentTarget: 10 },
+      targetOnly, changedLines, documentTransactions: writes, undoTransactions: documentTransactions - writes,
+      undo: editor.getValue() === prefix + initial,
+      inputScope: 'Programmatic host contextmenu and DOM menu click; not physical pointer drag',
+      buildHash: hash(fs.readFileSync(base + '/.obsidian/plugins/adjustable-media/main.js')) };
+  } finally {
+    restoreDispatch?.();
+    document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    leaf.detach();
+    await wait(600);
+    await app.vault.trash(file, false);
+  }
+  result.existingNotesUnchanged = Object.entries(beforeNotes).every(([path, digest]) => hash(fs.readFileSync(base + '/' + path)) === digest);
+  window.__layoutP1Instance = result;
+  console.log(JSON.stringify(result));
+})().catch(error => { window.__layoutP1Instance = { error: String(error), stack: error.stack }; console.error(error); });

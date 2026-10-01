@@ -1,0 +1,205 @@
+{
+  "vault": "vml-test-vault",
+  "obsidian": "1.13.7",
+  "buildHash": "2f50a378e82636f744d9aae00eb7dc227378be5ab90c3bf67c336bded804f16d",
+  "topology": {
+    "rerenders": [
+      1,
+      1
+    ],
+    "hostMatches": [
+      true,
+      true
+    ],
+    "before": [
+      {
+        "layouts": 4,
+        "roots": [
+          {
+            "text": "Left note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 315.4687194824219,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Right note",
+            "top": 397.6475524902344,
+            "width": 71.13714599609375
+          }
+        ]
+      },
+      {
+        "layouts": 13,
+        "roots": [
+          {
+            "text": "Left note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 315.4687194824219,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 397.6475524902344,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note",
+            "top": 0,
+            "width": 0
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "layouts": 4,
+        "roots": [
+          {
+            "text": "Left note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 315.4687194824219,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Right note",
+            "top": 411.4409484863281,
+            "width": 71.13714599609375
+          }
+        ]
+      },
+      {
+        "layouts": 4,
+        "roots": [
+          {
+            "text": "Left note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Right note编辑源码",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "text": "Left note",
+            "top": 315.4687194824219,
+            "width": 71.13714599609375
+          },
+          {
+            "text": "Right note",
+            "top": 411.4409484863281,
+            "width": 71.13714599609375
+          }
+        ]
+      }
+    ]
+  },
+  "unknownUnwrap": {
+    "preserved": true,
+    "before": "<!-- vml {\"v\":3,\"id\":\"keep\",\"groupId\":\"g\"} -->\n![[attachments/a.png]]\n<!-- /vml -->",
+    "after": "<!-- vml {\"v\":3,\"id\":\"keep\",\"groupId\":\"g\"} -->\n![[attachments/a.png]]\n<!-- /vml -->"
+  },
+  "events": [
+    {
+      "ms": 761,
+      "kind": "editor-change",
+      "exact": true
+    },
+    {
+      "ms": 915,
+      "kind": "rerender",
+      "pane": 0,
+      "matches": true
+    },
+    {
+      "ms": 925,
+      "kind": "rerender",
+      "pane": 1,
+      "matches": true
+    },
+    {
+      "ms": 2767,
+      "kind": "vault-modify"
+    },
+    {
+      "ms": 2770,
+      "kind": "metadata-changed",
+      "readerMatches": [
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 4264,
+      "kind": "editor-change",
+      "exact": true
+    }
+  ]
+}
