@@ -201,7 +201,10 @@ class TextEditSession {
    * take; the typing goes on, and ends only if the element goes away (stopTextEdit).
    */
   accepts(block: V2Block): boolean {
-    const text = this.writing ?? this.editor.state.doc.toString();
+    // What the note holds of this side: the text being written, the typed text once it is written, or,
+    // while the editor holds text that cannot be written, the side as it last was. The block may still
+    // move (a line added above it) without the unsaved text going away with its element.
+    const text = this.writing ?? (this.invalid ? textOf(this.block, this.side) : this.editor.state.doc.toString());
     if (this.ended || blockWrap(block) !== blockWrap(this.block) || !onlyColumnTextDiffers(this.block, block, this.side, text.split("\n"))) {
       return false;
     }

@@ -12,6 +12,8 @@ interface Harness {
   leave(): void;
   enter(): void;
   key(key: string, modifiers?: string[]): boolean | void;
+  /** Whether the layout's element stays for the block after a change to the note (its widget's updateDOM). */
+  keeps(lines: string[]): boolean;
   notices: string[];
   written: string[][];
   executed: string[];
@@ -51,7 +53,7 @@ async function session(): Promise<Harness> {
     createDiv: () => element(),
   });
 
-  const module = await mockedModule<{ startTextEdit(host: unknown, side: string, point: null): void }>(new URL("../src/view/textEditing.ts", import.meta.url), {
+  const module = await mockedModule<{ startTextEdit(host: unknown, side: string, point: null): void; keepWhileEditing(el: unknown, block: unknown): boolean }>(new URL("../src/view/textEditing.ts", import.meta.url), {
     obsidian: { Notice, Scope }, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/model.ts": model,
     "./columnEditor.ts": { createColumnEditor: (options: { text: string; onUpdate: typeof onUpdate }) => { text = options.text; onUpdate = options.onUpdate; return editor; } },
     "./interactions.ts": { commitEdits: (_app: unknown, _path: string, planned: edits.BlockEdit[]) => { written.push(planned[0]?.replacement ?? []); return Promise.resolve(true); } },
@@ -75,6 +77,7 @@ async function session(): Promise<Harness> {
     leave() { content.doc.activeElement = null; listeners.get("focusout")?.(); },
     enter() { content.doc.activeElement = content; listeners.get("focusin")?.(); },
     key, notices, written, executed, scopes,
+    keeps(lines) { return module.keepWhileEditing(host.el, format.findV2Blocks(lines)[0]); },
     get redraws() { return redraws; },
     destroyed: () => destroyed,
   };
@@ -134,4 +137,23 @@ test("the command palette, quick switcher and settings still open while a column
   assert.deepEqual(editor.executed, ["command-palette:open", "switcher:open", "app:open-settings"]);
   // Editor commands still do not reach the note's editor: the scope has nothing else.
   assert.equal(editor.key("B", ["Mod"]), undefined);
+});
+
+test("unsaved text survives the layout moving, but not the layout changing", async () => {
+  const editor = await session();
+  editor.type("```js");
+  editor.leave();
+  // A line added above the block moves it: its element, and the unsaved text in it, stay.
+  assert.equal(editor.keeps(["A line added above", "<!-- vml -->", "Left text", "![[a.png]]", "<!-- /vml -->"]), true);
+  assert.equal(editor.destroyed(), false);
+  // Changed elsewhere, the block is drawn anew from the note.
+  assert.equal(editor.keeps(["<!-- vml -->", "Left text", "![[b.png]]", "<!-- /vml -->"]), false);
+  assert.equal(editor.keeps(["<!-- vml -->", "Other left text", "![[a.png]]", "<!-- /vml -->"]), false);
+});
+
+test("while typing text that is saved, the element stays for the block holding exactly that text", async () => {
+  const editor = await session();
+  editor.type("Typed text");
+  assert.equal(editor.keeps(["<!-- vml -->", "Typed text", "![[a.png]]", "<!-- /vml -->"]), true);
+  assert.equal(editor.keeps(["<!-- vml -->", "Left text", "![[a.png]]", "<!-- /vml -->"]), false);
 });
