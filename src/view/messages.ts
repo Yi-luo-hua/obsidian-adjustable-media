@@ -346,8 +346,8 @@ const MESSAGES = {
     en: "Remove layout comments from all notes…",
   },
   wrapNothing: {
-    zh: "选中的内容不能包成布局块：它已经在布局块里，含有代码、公式或注释，或者文字夹在两行图片之间。",
-    en: "The selection cannot be wrapped: it is already in a layout, holds code, math or comments, or has text between two rows of media.",
+    zh: "选中的内容不能包成布局块：它已经在布局块里，含有代码、公式或注释，文字夹在两行图片之间，或者图片行有缩进（属于列表或缩进代码）。",
+    en: "The selection cannot be wrapped: it is already in a layout, holds code, math or comments, has text between two rows of media, or its media lines are indented (part of a list or indented code).",
   },
   mergeNothing: {
     zh: "光标所在的布局块后面没有紧挨着的布局块，或者其中一个块不能编辑、带有文字，或者后一个块的整体设置（宽度、环绕等）和这个块不同。",

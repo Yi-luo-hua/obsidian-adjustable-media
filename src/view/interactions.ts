@@ -39,6 +39,7 @@ import { MediaViewer, type ViewerImage } from "./mediaViewer.ts";
 import { reportWriteError, t, type MessageKey } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
 import { TextLayoutModal } from "./textLayoutModal.ts";
+import { eventElement } from "./windows.ts";
 
 /** A layout drawn in live preview, as its interactions see it. Reading view only shows layouts. */
 export interface LayoutContext extends WriteOptions {
@@ -198,7 +199,7 @@ function setUpViewer(root: HTMLElement, context: LayoutContext): void {
       continue;
     }
     itemEl.addEventListener("dblclick", (event) => {
-      if (event.target instanceof HTMLElement && event.target.closest(".vml-handle")) {
+      if (eventElement(event)?.closest(".vml-handle")) {
         return;
       }
       event.preventDefault();
@@ -256,9 +257,10 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
     setIcon(dragFrom, "grip-vertical");
   }
   dragFrom.addEventListener("pointerdown", (event) => {
-    const onOtherHandle = event.target instanceof HTMLElement
-      && event.target.closest(".vml-handle") !== null
-      && event.target.closest(".vml-item__grip") === null;
+    const target = eventElement(event);
+    const onOtherHandle = target !== null
+      && target.closest(".vml-handle") !== null
+      && target.closest(".vml-item__grip") === null;
     if (event.button !== 0 || onOtherHandle) {
       return;
     }
@@ -740,7 +742,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     context.app.workspace.trigger("file-menu", menu, media.file, "link-context-menu");
   }
 
-  if (at instanceof MouseEvent) {
+  if ("clientX" in at) {
     menu.showAtMouseEvent(at);
   } else {
     menu.showAtPosition(at);
@@ -801,7 +803,7 @@ function addWrapItems(menu: Menu, context: LayoutContext, left: MessageKey, righ
 function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
   root.addEventListener("contextmenu", (event) => {
     // The column's editor has a menu of its own.
-    if (event.target instanceof Element && event.target.closest(".vml-text-editor")) {
+    if (eventElement(event)?.closest(".vml-text-editor")) {
       return;
     }
     event.preventDefault();

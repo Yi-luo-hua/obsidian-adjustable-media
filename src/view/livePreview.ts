@@ -5,7 +5,7 @@ import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } fr
 import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
 import { documentSnapshot, editorDocumentOrigin, rememberDocumentSnapshot, snapshotForState, type BlockRef, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
-import { effectiveWrapSkip } from "../layout/floatOrder.ts";
+import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
@@ -19,6 +19,7 @@ import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type Text
 import { refreshWrapMedia, resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
 import { fileOfEditor } from "./obsidianInternals.ts";
+import { eventElement } from "./windows.ts";
 
 const setEnvironment = StateEffect.define<string>();
 
@@ -32,6 +33,8 @@ interface LivePreviewState extends Measurements {
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
+  /** Each block's spacer skip, found once per parse: cursor moves redraw decorations, not these. */
+  skips: Array<number | null>;
   decorations: DecorationSet;
   /** Wrapped layouts drawn as widgets. */
   anchors: WrapAnchor[];
@@ -45,6 +48,7 @@ interface Parsed extends Measurements {
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
+  skips: Array<number | null>;
   refs: RefContext | undefined;
 }
 
@@ -134,22 +138,24 @@ export function livePreviewExtension(app: App): Extension {
 function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
   const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: "pending" };
   if (!state.field(editorLivePreviewField, false)) {
-    return { blocks: [], lines: [], refs: undefined, snapshot: null, ...measurements };
+    return { blocks: [], lines: [], skips: [], refs: undefined, snapshot: null, ...measurements };
   }
   // Runs on every change of every note, and most notes have no layouts.
   const text = state.doc.toString();
   if (!text.includes("<!-- vml")) {
-    return { blocks: [], lines: [], refs: undefined, snapshot: null, ...measurements };
+    return { blocks: [], lines: [], skips: [], refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
   const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, previous?.origin);
   const snapshot = documentSnapshot(text, origin, previous ?? undefined, changes);
-  return { snapshot, blocks: snapshot.blocks.map(ref => ref.block), lines: [...snapshot.lines],
+  const blocks = snapshot.blocks.map(ref => ref.block);
+  const lines = [...snapshot.lines];
+  return { snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks),
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
 }
 
 function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePreviewState {
-  const { blocks, lines, refs, snapshot } = parsed;
+  const { blocks, refs, snapshot, skips } = parsed;
   rememberDocumentSnapshot(state, snapshot);
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
@@ -164,7 +170,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     const to = state.doc.line(block.closeLine + 1).to;
     const revealed = state.selection.ranges.some((range) => range.from <= to && range.to >= from);
     const wraps = blockWrap(block) !== null;
-    const effectiveSkip = effectiveWrapSkip(lines, blocks, index);
+    const effectiveSkip = skips[index] ?? null;
     const ref = snapshot!.blocks[index];
     const key = `${ref.id}:${ref.contentRevision}`;
     hasWraps ||= wraps;
@@ -187,7 +193,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     }
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
-      ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, effectiveSkip), side: -1 }).range(from));
+      ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, refs, effectiveSkip), side: -1 }).range(from));
       anchors.push({ from, to: from, key: `${key}:source`, block });
     }
   }
@@ -399,7 +405,7 @@ function setUpText(view: EditorView, host: TextEditHost): void {
   for (const textEl of Array.from(host.root.querySelectorAll<HTMLElement>(":scope > .vml-layout__text"))) {
     const side: TextSide = textEl.dataset.side === "left" ? "left" : "right";
     textEl.addEventListener("click", (event) => {
-      if (isEditingText(host.el) || (event.target instanceof Element && event.target.closest("a"))) {
+      if (isEditingText(host.el) || eventElement(event)?.closest("a")) {
         return;
       }
       if (!(host.el.doc.getSelection()?.isCollapsed ?? true)) {
@@ -422,21 +428,29 @@ function setUpText(view: EditorView, host: TextEditHost): void {
   }
 }
 
-/** While a wrapped layout's source shows, the layout floats beside it, for display only. */
+/**
+ * While a wrapped layout's source shows, the layout floats beside it, for display only. Its text and
+ * captions are drawn too: a box of text drawn empty would leave the note's text nothing to wrap
+ * around, and the note would jump each time the cursor went in and out of the box.
+ */
 class RevealedWrapWidget extends WidgetType {
   private readonly app: App;
   private readonly block: V2Block;
   private readonly sourcePath: string;
+  private readonly refs: RefContext | undefined;
   private readonly effectiveSkip: number | null;
   private readonly key: string;
 
-  constructor(app: App, block: V2Block, sourcePath: string, effectiveSkip: number | null) {
+  constructor(app: App, block: V2Block, sourcePath: string, refs: RefContext | undefined, effectiveSkip: number | null) {
     super();
     this.app = app;
     this.block = block;
     this.sourcePath = sourcePath;
+    this.refs = refs;
     this.effectiveSkip = effectiveSkip;
-    this.key = `${sourcePath}\n${effectiveSkip}\n${block.lines.join("\n")}`;
+    // New numbers draw the layout again.
+    const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
+    this.key = `${sourcePath}\n${effectiveSkip}\n${numbers}\n${block.lines.join("\n")}`;
   }
 
   override eq(other: RevealedWrapWidget): boolean {
@@ -445,9 +459,17 @@ class RevealedWrapWidget extends WidgetType {
 
   toDOM(): HTMLElement {
     const el = createSpan({ cls: "vml-wrap-reveal vml-live-preview vml-live-preview--wrap" });
+    const component = new Component();
+    component.load();
+    components.set(el, component);
     renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block),
-      effectiveSkip: this.effectiveSkip, editable: false, warning: null });
+      effectiveSkip: this.effectiveSkip, editable: false, warning: null, component, refs: this.refs });
     return el;
+  }
+
+  override destroy(dom: HTMLElement): void {
+    components.get(dom)?.unload();
+    components.delete(dom);
   }
 
   override ignoreEvent(): boolean {

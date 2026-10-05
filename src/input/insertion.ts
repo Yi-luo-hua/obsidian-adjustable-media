@@ -13,7 +13,7 @@ export interface WrapOptions {
  * of at most four and wrapped in a new block, or appended to the block right above. The lines may
  * be separated by blank lines (a multi-file drop inserts them that way), which are dropped.
  *
- * Returns null, touching nothing, when a line holds anything but media embeds, is not plain text,
+ * Returns null, touching nothing, when a line holds anything but media embeds, is indented, is not plain text,
  * already belongs to a block, or when other content sits between the lines.
  */
 export function planWrap(lines: readonly string[], lineNumbers: readonly number[], options: WrapOptions): LineChange | null {
@@ -40,7 +40,10 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
       continue;
     }
 
-    const row = contexts[line] === "text" ? readEmbedRow(text, line) : null;
+    // An indented line belongs to a list item, or is an indented code block, which the line scan does
+    // not tell apart from text: a block written there would take it out of the list, or turn code
+    // into a layout, and its rows would lose the indentation.
+    const row = contexts[line] === "text" && !/^[ \t]/.test(text) ? readEmbedRow(text, line) : null;
     if (!row) {
       return null;
     }

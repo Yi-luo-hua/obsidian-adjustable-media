@@ -18,6 +18,7 @@ import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts"
 import { drawMath } from "./math.ts";
 import { sectionNoteText } from "./noteText.ts";
 import { currentLanguage } from "./messages.ts";
+import { eventElement, onEveryDocument } from "./windows.ts";
 
 /**
  * Numbered figures, tables and equations, and references to them (crossref.ts), as the note shows
@@ -123,8 +124,9 @@ const EQUATION_LABEL = /\\label\{(eq:[\w.:-]+)\}/;
 export function registerCrossrefs(plugin: Plugin): void {
   plugin.registerMarkdownPostProcessor((el, ctx) => numberSection(plugin.app, el, ctx));
 
-  plugin.registerDomEvent(activeDocument, "click", (event) => {
-    const ref = event.target instanceof Element ? event.target.closest<HTMLElement>(".vml-ref") : null;
+  // In every window: the main document's listener never hears a click in a pop-out window.
+  onEveryDocument(plugin, (doc) => plugin.registerDomEvent(doc, "click", (event) => {
+    const ref = eventElement(event)?.closest<HTMLElement>(".vml-ref") ?? null;
     const id = ref?.dataset.vmlRef;
     if (!ref || !id || ref.hasClass("is-unresolved")) {
       return;
@@ -139,7 +141,7 @@ export function registerCrossrefs(plugin: Plugin): void {
     event.preventDefault();
     event.stopPropagation();
     goTo(view, target.id, target.line);
-  }, { capture: true });
+  }, { capture: true }));
 }
 
 /**
@@ -162,7 +164,7 @@ function goTo(view: MarkdownView, id: string, line: number): void {
     view.setEphemeralState({ line });
   }
   // Drawn now, the target itself goes to the middle.
-  window.setTimeout(() => find()?.scrollIntoView({ block: "center" }), 150);
+  view.containerEl.win.setTimeout(() => find()?.scrollIntoView({ block: "center" }), 150);
 }
 
 function numberSection(app: App, el: HTMLElement, ctx: MarkdownPostProcessorContext): void {

@@ -7,6 +7,10 @@
 - Dragging a layout, an image or a file no longer redraws every layout and discards their measured heights; the moved layout keeps its dimmed look while it is dragged.
 - **Merge with the next layout** refuses to merge when the next layout has block settings (width, wrapping, alignment or settings from a newer version) that the first one does not share, instead of silently dropping them.
 - **Wrap selection in a layout** no longer takes in the line after a selection of whole lines that ends at the start of that line.
+- References to figures, tables and equations can be clicked in pop-out windows too. Links, handles and menus inside layouts in pop-out windows are recognized there as well.
+- While the source of a floating text box is shown, the float beside it shows the box's text and numbered captions instead of an empty frame, so the note keeps wrapping around it.
+- Wrapping, the image menu and automatic conversion leave indented media lines alone: they belong to a list item or an indented code block, and wrapping them took the image out of the list or turned code into a layout.
+- Notes with many floating layouts no longer recompute every layout's offset on each cursor move.
 
 ## 0.7.0 - 2026-10-01
 

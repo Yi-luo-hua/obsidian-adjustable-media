@@ -68,6 +68,11 @@ test("a selection ending at the start of a line does not take that line", () => 
   assert.deepEqual(planWrapSelection(lines, from, to)?.replacement, ['<!-- vml {"v":2,"type":"text"} -->', "para one", "para two", "<!-- /vml -->"]);
 });
 
+test("indented media lines are not wrapped by the command", () => {
+  assert.equal(planWrapSelection(["- item", "", "    ![[a.png]]", "", "- next"], 2, 2), null);
+  assert.equal(planWrapSelection(["Text", "", "    ![[a.png]]", "    ![[b.png]]"], 2, 3), null);
+});
+
 test("finds the block around a line", () => {
   const lines = ["正文", "<!-- vml -->", "![[a.png]]", "<!-- /vml -->"];
 

@@ -5,6 +5,7 @@ import { lineChangeEdit, planWrapSelection } from "../commands/plans.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
 import { reportWriteError, t } from "./messages.ts";
 import { fileOfEditor } from "./obsidianInternals.ts";
+import { eventElement, onEveryDocument } from "./windows.ts";
 
 /**
  * Adds "Wrap in a layout" to Obsidian's own menu for an image in live preview. That menu reports
@@ -13,13 +14,9 @@ import { fileOfEditor } from "./obsidianInternals.ts";
  */
 export function registerImageMenu(plugin: Plugin): void {
   let clicked: Element | null = null;
-  const watch = (doc: Document): void => {
-    plugin.registerDomEvent(doc, "contextmenu", (event) => {
-      clicked = event.target instanceof Element ? event.target : null;
-    }, { capture: true });
-  };
-  watch(document);
-  plugin.registerEvent(plugin.app.workspace.on("window-open", (win) => watch(win.doc)));
+  onEveryDocument(plugin, (doc) => plugin.registerDomEvent(doc, "contextmenu", (event) => {
+    clicked = eventElement(event);
+  }, { capture: true }));
 
   plugin.registerEvent(plugin.app.workspace.on("file-menu", (menu, _file, source) => {
     const embedEl = source === "link-context-menu" ? clicked?.closest<HTMLElement>(".cm-content .image-embed") : null;

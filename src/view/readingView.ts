@@ -3,7 +3,7 @@ import { MarkdownRenderChild, MarkdownView, TFile, type MarkdownPostProcessorCon
 import { hasSideText, isDrawable, type V2Block } from "../format/v2.ts";
 import { documentSnapshot, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { drawnFrom, isStale, type Drawn } from "../layout/drawn.ts";
-import { effectiveWrapSkip } from "../layout/floatOrder.ts";
+import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { ViewProjection, type SourceCoverage } from "../layout/viewProjection.ts";
 import { layoutIsRendered, renderLayout } from "./layoutView.ts";
@@ -22,6 +22,8 @@ interface Parsed {
   lines: string[];
   offsets: number[];
   blocks: V2Block[];
+  /** Each block's spacer skip, found once per parse instead of once per section. */
+  skips: Array<number | null>;
   drawn: Drawn;
   wrapped: boolean;
   refs: RefContext | undefined;
@@ -65,7 +67,7 @@ export function registerReadingView(plugin: Plugin): void {
     const offsets = lines.map(line => { const start = offset; offset += line.length + 1; return start; });
     const blocks = snapshot.blocks.map(ref => ref.block);
     const refs = blocks.length > 0 ? refContextOf(text) : undefined;
-    return { snapshot, lines, offsets, blocks, refs, drawn: drawnFrom(blocks, numbersOf(refs), lines),
+    return { snapshot, lines, offsets, blocks, skips: effectiveWrapSkips(lines, blocks), refs, drawn: drawnFrom(blocks, numbersOf(refs), lines),
       wrapped: blocks.some(block => isDrawable(block) && modelFromBlock(block).wrap !== null) };
   };
 
@@ -190,7 +192,7 @@ export function registerReadingView(plugin: Plugin): void {
   };
 
   const draw = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
-    const { blocks, lines, refs, wrapped, snapshot } = reader.parsed;
+    const { blocks, skips, refs, wrapped, snapshot } = reader.parsed;
     const block = sectionBlock(blocks, info);
     const opening = block?.openLine === info.lineStart && info.lineStart === info.lineEnd;
     if (block && isDrawable(block)) {
@@ -204,7 +206,7 @@ export function registerReadingView(plugin: Plugin): void {
           el.empty();
           const model = modelFromBlock(block);
           const root = renderLayout(el, { app: plugin.app, sourcePath: ctx.sourcePath, model,
-            effectiveSkip: effectiveWrapSkip(lines, blocks, blocks.indexOf(block)), rowIndices: rows,
+            effectiveSkip: skips[blocks.indexOf(block)] ?? null, rowIndices: rows,
             editable: false, warning: blockWarning(block), component: child, refs });
           if (model.wrap !== null) child.register(keepWrapped(plugin.app, el, root, model.wrap));
         }
@@ -336,5 +338,5 @@ function sectionLayoutKey(parsed: Parsed, info: MarkdownSectionInformation): str
   const block = sectionBlock(parsed.blocks, info);
   if (!block || !isDrawable(block)) return "";
   const rows = hasSideText(block) ? info.lineStart === block.openLine ? "columns" : "hidden" : sectionRows(block, info);
-  return JSON.stringify([block.lines[0], rows, effectiveWrapSkip(parsed.lines, parsed.blocks, parsed.blocks.indexOf(block))]);
+  return JSON.stringify([block.lines[0], rows, parsed.skips[parsed.blocks.indexOf(block)] ?? null]);
 }
