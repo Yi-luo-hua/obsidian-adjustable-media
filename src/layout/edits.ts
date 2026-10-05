@@ -89,14 +89,30 @@ export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | n
   return anchored(block, 0, lastLine, blockLines(block, meta, embeds));
 }
 
-/** Rewrites the block without the embed and puts the embed on its own line right after it. */
-export function planMoveOut(block: V2Block, model: LayoutModel, embed: V2Embed): BlockEdit | null {
+/** The lines right above and below a block in the note, as far as they are known. */
+export interface LinesAround {
+  before?: string;
+  after?: string;
+}
+
+/**
+ * Rewrites the block without the embed and puts the embed on its own line right after it. The embed
+ * line is kept a paragraph of its own: a wrapped block sits right on top of the text it wraps, and an
+ * embed glued to that text would join its paragraph and take over the float's anchor.
+ */
+export function planMoveOut(block: V2Block, model: LayoutModel, embed: V2Embed, around: LinesAround = {}): BlockEdit | null {
   if (!isEditable(block)) {
     return null;
   }
   const embeds = rowEmbeds(model);
   const rest = embeds.length === 0 ? textLines(block) : blockLines(block, metaFromModel(model), embeds);
-  return anchored(block, 0, block.lines.length - 1, rest.length === 0 ? [embed.raw] : [...rest, "", embed.raw]);
+  const head = rest.length > 0 ? [...rest, ""] : isBlankOrEdge(around.before) ? [] : [""];
+  const tail = isBlankOrEdge(around.after) ? [] : [""];
+  return anchored(block, 0, block.lines.length - 1, [...head, embed.raw, ...tail]);
+}
+
+function isBlankOrEdge(line: string | undefined): boolean {
+  return line === undefined || line.trim() === "";
 }
 
 /** What planColumnText makes of the text typed on one side of a layout's media. */

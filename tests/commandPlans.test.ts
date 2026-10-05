@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection } from "../src/commands/plans.ts";
+import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection, selectedLines } from "../src/commands/plans.ts";
 import { applyEditsToEditor, applyEditsToText, applyLineChanges } from "../src/layout/edits.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
@@ -36,6 +36,36 @@ test("merging joins the next block when only blank lines separate them", () => {
 test("blocks separated by text, or that cannot be edited, are not merged", () => {
   assert.equal(planMergeWithNext(["<!-- vml -->", "![[a.png]]", "<!-- /vml -->", "正文", "<!-- vml -->", "![[b.png]]", "<!-- /vml -->"], 0), null);
   assert.equal(planMergeWithNext(["<!-- vml -->", "![[a.png]]", "<!-- /vml -->", '<!-- vml {"v":3} -->', "![[b.png]]", "<!-- /vml -->"], 0), null);
+});
+
+test("merging never drops a setting of the next block", () => {
+  const block = (opener: string, embed: string) => [opener, embed, "<!-- /vml -->"];
+  const merge = (first: string, next: string) => planMergeWithNext([...block(first, "![[a.png]]"), "", ...block(next, "![[b.png]]")], 0);
+
+  // Settings the next block alone has, or has otherwise, would be lost: no merge.
+  assert.equal(merge("<!-- vml -->", '<!-- vml {"v":2,"width":0.5} -->'), null);
+  assert.equal(merge('<!-- vml {"v":2,"wrap":"left"} -->', '<!-- vml {"v":2,"wrap":"right"} -->'), null);
+  assert.equal(merge("<!-- vml -->", '<!-- vml {"v":2,"future":1} -->'), null);
+  // The same settings, or none in the next block, merge into the first block's.
+  assert.deepEqual(merge('<!-- vml {"v":2,"width":0.5,"align":"center"} -->', '<!-- vml {"v":2,"width":0.5} -->')?.replacement,
+    ['<!-- vml {"v":2,"width":0.5,"align":"center"} -->', "![[a.png]]", "![[b.png]]", "<!-- /vml -->"]);
+  assert.deepEqual(merge('<!-- vml {"v":2,"width":0.5} -->', "<!-- vml -->")?.replacement,
+    ['<!-- vml {"v":2,"width":0.5} -->', "![[a.png]]", "![[b.png]]", "<!-- /vml -->"]);
+  // Row settings travel with their rows.
+  assert.deepEqual(merge("<!-- vml -->", '<!-- vml {"v":2,"rows":[{"height":300}]} -->')?.replacement,
+    ['<!-- vml {"v":2,"rows":[{},{"height":300}]} -->', "![[a.png]]", "![[b.png]]", "<!-- /vml -->"]);
+});
+
+test("a selection ending at the start of a line does not take that line", () => {
+  assert.deepEqual(selectedLines({ line: 1, ch: 0 }, { line: 3, ch: 0 }), { from: 1, to: 2 });
+  assert.deepEqual(selectedLines({ line: 1, ch: 2 }, { line: 3, ch: 1 }), { from: 1, to: 3 });
+  // Backwards, or within one line, it is the same.
+  assert.deepEqual(selectedLines({ line: 3, ch: 0 }, { line: 1, ch: 0 }), { from: 1, to: 2 });
+  assert.deepEqual(selectedLines({ line: 2, ch: 0 }, { line: 2, ch: 0 }), { from: 2, to: 2 });
+
+  const lines = ["para one", "para two", "# Heading"];
+  const { from, to } = selectedLines({ line: 0, ch: 0 }, { line: 2, ch: 0 });
+  assert.deepEqual(planWrapSelection(lines, from, to)?.replacement, ['<!-- vml {"v":2,"type":"text"} -->', "para one", "para two", "<!-- /vml -->"]);
 });
 
 test("finds the block around a line", () => {

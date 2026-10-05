@@ -61,6 +61,20 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
 
 const TEXT_META: V2Meta = { rows: [], extra: { type: "text" } };
 
+interface Position {
+  line: number;
+  ch: number;
+}
+
+/**
+ * The lines a selection covers. Whole lines selected with Shift+Down or by dragging end at the start
+ * of the line after them, which the selection does not take any of.
+ */
+export function selectedLines(from: Position, to: Position): { from: number; to: number } {
+  const [start, end] = from.line < to.line || (from.line === to.line && from.ch <= to.ch) ? [from, to] : [to, from];
+  return { from: start.line, to: end.ch === 0 && end.line > start.line ? end.line - 1 : end.line };
+}
+
 function stripCarriageReturn(line: string): string {
   return line.endsWith("\r") ? line.slice(0, -1) : line;
 }
@@ -72,6 +86,8 @@ export function blockAt(lines: readonly string[], line: number): V2Block | null 
 /**
  * Merges the block around `line` with the next one, when only blank lines separate them. Blocks with
  * text beside their media are not merged: the text of one would end up between rows of the other.
+ * The merged block keeps the first block's settings, so the next block may only set what the first
+ * sets the same way, unknown keys included: nothing it says is dropped.
  */
 export function planMergeWithNext(lines: readonly string[], line: number): LineChange | null {
   const blocks = findV2Blocks(lines);
@@ -79,7 +95,7 @@ export function planMergeWithNext(lines: readonly string[], line: number): LineC
   const current = blocks[index];
   const next = blocks[index + 1];
   const mergeable = (block: V2Block | undefined): block is V2Block => block !== undefined && isEditable(block) && !hasSideText(block);
-  if (index < 0 || !mergeable(current) || !mergeable(next)) {
+  if (index < 0 || !mergeable(current) || !mergeable(next) || !settingsKept(current, next)) {
     return null;
   }
   for (let between = current.closeLine + 1; between < next.openLine; between += 1) {
@@ -91,6 +107,11 @@ export function planMergeWithNext(lines: readonly string[], line: number): LineC
   const first = modelFromBlock(current);
   const merged = { ...first, rows: [...first.rows, ...modelFromBlock(next).rows] };
   return { from: current.openLine, to: next.closeLine, replacement: serializeBlock(metaFromModel(merged), rowEmbeds(merged)) };
+}
+
+/** Whether every block setting of `next` is set the same way in `first`, which the merged block keeps. */
+function settingsKept(first: V2Block, next: V2Block): boolean {
+  return Object.entries(next.meta.extra).every(([key, value]) => JSON.stringify(first.meta.extra[key]) === JSON.stringify(value));
 }
 
 /** Commands and input conversion use the same source validation and write boundary as gestures. */

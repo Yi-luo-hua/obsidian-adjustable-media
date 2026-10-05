@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Add text on the left/right** is no longer offered for a floating layout. Text beside media stops a layout from floating, so the editor used to close after the first letter typed and the layout jumped; choose **No text wrap** first.
+- **Move out of layout** keeps the moved embed a paragraph of its own. Moved out of a floating layout, it used to join the paragraph the layout wraps and take over the float's position.
+- Dragging a layout, an image or a file no longer redraws every layout and discards their measured heights; the moved layout keeps its dimmed look while it is dragged.
+- **Merge with the next layout** refuses to merge when the next layout has block settings (width, wrapping, alignment or settings from a newer version) that the first one does not share, instead of silently dropping them.
+- **Wrap selection in a layout** no longer takes in the line after a selection of whole lines that ends at the start of that line.
+
 ## 0.7.0 - 2026-10-01
 
 - Keep layout edits tied to the intended block when identical blocks move, and reject edits whose original source or dependencies have changed. Layout commands and automatic media conversion use the same source validation; blocks with unreadable settings keep their comments and cannot be unwrapped.

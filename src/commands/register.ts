@@ -4,7 +4,7 @@ import { findV2Blocks, type V2Block } from "../format/v2.ts";
 import { isEditable, planUnwrap, planUnwrapAll, type LineChange } from "../layout/edits.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
 import { reportWriteError, t } from "../view/messages.ts";
-import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection } from "./plans.ts";
+import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection, selectedLines } from "./plans.ts";
 
 export function registerCommands(plugin: Plugin): void {
   plugin.registerEvent(plugin.app.workspace.on("editor-menu", (menu, editor, view) => {
@@ -12,8 +12,7 @@ export function registerCommands(plugin: Plugin): void {
       return;
     }
     const original = editor.getValue();
-    const from = editor.getCursor("from").line;
-    const to = editor.getCursor("to").line;
+    const { from, to } = selectedLines(editor.getCursor("from"), editor.getCursor("to"));
     if (!planWrapSelection(original.split("\n"), from, to)) {
       return;
     }
@@ -34,7 +33,8 @@ export function registerCommands(plugin: Plugin): void {
     id: "wrap-selection-in-layout",
     name: t("cmdWrap"),
     editorCallback: (editor, view) => {
-      const change = planWrapSelection(editor.getValue().split("\n"), editor.getCursor("from").line, editor.getCursor("to").line);
+      const { from, to } = selectedLines(editor.getCursor("from"), editor.getCursor("to"));
+      const change = planWrapSelection(editor.getValue().split("\n"), from, to);
       if (change) {
         writeCommandChange(plugin, editor, view.file, change);
       } else {

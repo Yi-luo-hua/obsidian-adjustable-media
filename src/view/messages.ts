@@ -350,8 +350,8 @@ const MESSAGES = {
     en: "The selection cannot be wrapped: it is already in a layout, holds code, math or comments, or has text between two rows of media.",
   },
   mergeNothing: {
-    zh: "光标所在的布局块后面没有紧挨着的布局块，或者其中一个块不能编辑、带有文字。",
-    en: "There is no layout block right after this one, or one of the two cannot be edited or has text beside its media.",
+    zh: "光标所在的布局块后面没有紧挨着的布局块，或者其中一个块不能编辑、带有文字，或者后一个块的整体设置（宽度、环绕等）和这个块不同。",
+    en: "There is no layout block right after this one, one of the two cannot be edited or has text beside its media, or the next block's own settings (width, wrapping and so on) differ from this one's.",
   },
   unwrapNothing: {
     zh: "光标不在布局块里。",

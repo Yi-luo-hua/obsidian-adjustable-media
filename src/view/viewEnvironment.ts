@@ -1,3 +1,16 @@
+/**
+ * Classes that only mark a passing interaction: the plugin's own (`vml-is-dragging` while a layout or
+ * image is dragged), Obsidian's `is-grabbing` during any drag, and window focus. They change no layout,
+ * and counting them would redraw every layout and drop every measured height at the start and end of
+ * each drag, the moved layout's own drag styling included.
+ */
+const TRANSIENT_CLASS = /^(?:vml-.*|is-grabbing|is-dragging|is-focused)$/;
+
+/** The classes of `className` that can change how layouts are laid out, in a stable order. */
+export function layoutClasses(className: string): string {
+  return className.split(/\s+/).filter((name) => name !== "" && !TRANSIENT_CLASS.test(name)).sort().join(" ");
+}
+
 /** The pane's own document includes a pop-out window. Height alone is not an environment change. */
 export function watchEnvironment(el: HTMLElement, changed: (signature: string) => void,
   mediaChanged: (media: HTMLImageElement | HTMLVideoElement) => void = () => {}): () => void {
@@ -14,7 +27,7 @@ export function watchEnvironment(el: HTMLElement, changed: (signature: string) =
     const style = win.getComputedStyle(el);
     const next = JSON.stringify([el.clientWidth, style.fontFamily, style.fontSize, style.lineHeight,
       style.fontWeight, style.letterSpacing, style.direction, win.devicePixelRatio,
-      doc.body.className, doc.documentElement.className, fontsRevision]);
+      layoutClasses(doc.body.className), layoutClasses(doc.documentElement.className), fontsRevision]);
     if (signature !== next) { signature = next; changed(next); }
   };
   const schedule = (): void => { if (!stopped && !frame) frame = win.requestAnimationFrame(read); };

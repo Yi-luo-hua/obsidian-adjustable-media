@@ -1,9 +1,10 @@
 import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
 import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
-import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
+import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason, type LinesAround } from "../layout/edits.ts";
 import { dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
+  canAddText,
   effectiveWidth,
   hasTextColumns,
   insertItem,
@@ -708,9 +709,10 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     }
   }
 
-  // Text beside the media is typed right in the layout.
+  // Text beside the media is typed right in the layout. A wrapped layout has to stop wrapping first:
+  // text beside its media would stop it floating as the first letter is typed.
   const { editText } = context;
-  if (editText) {
+  if (editText && canAddText(context.model)) {
     const sides = [["left", "addTextLeft", "panel-left-open"], ["right", "addTextRight", "panel-right-open"]] as const;
     for (const [side, label, icon] of sides) {
       if ((side === "left" ? context.block.leftText : context.block.rightText) === null) {
@@ -727,7 +729,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   menu.addItem((entry) => entry.setTitle(t("moveOut")).setIcon("log-out").setSection("vml-move").onClick(() => {
     const taken = removeItem(context.model, position);
     if (taken) {
-      void commitEdits(context.app, context.sourcePath, [planMoveOut(context.block, taken.model, taken.item.embed)], context);
+      void commitEdits(context.app, context.sourcePath, [planMoveOut(context.block, taken.model, taken.item.embed, linesAround(context))], context);
     }
   }));
 
@@ -743,6 +745,23 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   } else {
     menu.showAtPosition(at);
   }
+}
+
+/**
+ * The lines around the block in the note as the editor holds it now. A widget is only kept while its
+ * block stays on the same lines, so the block's own line numbers still apply. Only shapes the blank
+ * lines written around a moved embed; the write itself is validated against the block's source.
+ */
+function linesAround(context: LayoutContext): LinesAround {
+  const doc = context.view?.state.doc;
+  const { openLine, closeLine } = context.block;
+  if (!doc || closeLine + 1 > doc.lines) {
+    return {};
+  }
+  return {
+    before: openLine > 0 ? doc.line(openLine).text : undefined,
+    after: closeLine + 2 <= doc.lines ? doc.line(closeLine + 2).text : undefined,
+  };
 }
 
 /** Whether a layout stands alone and is narrower than the note, so its place across the note shows. */
