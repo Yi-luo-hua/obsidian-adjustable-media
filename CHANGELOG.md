@@ -9,7 +9,7 @@
 - **Wrap selection in a layout** no longer takes in the line after a selection of whole lines that ends at the start of that line.
 - References to figures, tables and equations can be clicked in pop-out windows too. Links, handles and menus inside layouts in pop-out windows are recognized there as well.
 - While the source of a floating text box is shown, the float beside it shows the box's text and numbered captions instead of an empty frame, so the note keeps wrapping around it.
-- Wrapping, the image menu and automatic conversion leave indented media lines alone: they belong to a list item or an indented code block, and wrapping them took the image out of the list or turned code into a layout.
+- Wrapping, the image menu and automatic conversion leave indented media lines alone: they belong to a list item or an indented code block, and wrapping them took the image out of the list or turned code into a layout. Selected together with text, they now stay text in a text box, verbatim, and a selection that starts on an indented line is not wrapped.
 - Notes with many floating layouts no longer recompute every layout's offset on each cursor move.
 - A layout whose `rows` setting is not a list of objects is now shown read-only with a warning, like other unreadable settings. It used to be editable, and the next edit silently dropped those row settings.
 - Reading view and live preview take for a cross-reference label exactly what numbering counts as one: `{#fig:a.}`, whose dot ends the sentence, is left as written.

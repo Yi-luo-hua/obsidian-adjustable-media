@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import { findV2Blocks } from "../src/format/v2.ts";
 import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection, selectedLines } from "../src/commands/plans.ts";
 import { applyEditsToEditor, applyEditsToText, applyLineChanges } from "../src/layout/edits.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
@@ -71,6 +72,33 @@ test("a selection ending at the start of a line does not take that line", () => 
 test("indented media lines are not wrapped by the command", () => {
   assert.equal(planWrapSelection(["- item", "", "    ![[a.png]]", "", "- next"], 2, 2), null);
   assert.equal(planWrapSelection(["Text", "", "    ![[a.png]]", "    ![[b.png]]"], 2, 3), null);
+  // Starting on an indented line, text or media, would take it out of the list item above.
+  assert.equal(planWrapSelection(["- item", "", "    ![[a.png]]", "    more of the item"], 2, 3), null);
+  assert.equal(planWrapSelection(["- item", "  continued", "Text"], 1, 2), null);
+});
+
+test("with text selected too, indented media lines stay text, verbatim", () => {
+  const wrapped = (lines: string[], from: number, to: number) => {
+    const change = planWrapSelection(lines, from, to);
+    assert.ok(change, lines.join(" / "));
+    const after = applyLineChanges(lines, [change]);
+    const [block] = findV2Blocks(after);
+    assert.ok(block);
+    return { after, block };
+  };
+
+  // An indented code block after a paragraph: still code inside a block of text, never a row.
+  const code = wrapped(["Text", "", "    ![[a.png]]"], 0, 2);
+  assert.deepEqual(code.after, ['<!-- vml {"v":2,"type":"text"} -->', "Text", "", "    ![[a.png]]", "<!-- /vml -->"]);
+  assert.equal(code.block.rows.length, 0);
+  // An image inside a list item stays in the item, indentation and all.
+  const list = wrapped(["- item", "    ![[a.png]]", "- next"], 0, 2);
+  assert.deepEqual(list.after.slice(1, 4), ["- item", "    ![[a.png]]", "- next"]);
+  assert.equal(list.block.rows.length, 0);
+  // Without indentation, text beside media still makes text columns.
+  const columns = wrapped(["Text", "![[a.png]]"], 0, 1);
+  assert.equal(columns.block.rows.length, 1);
+  assert.equal(columns.block.meta.extra.type, undefined);
 });
 
 test("finds the block around a line", () => {
