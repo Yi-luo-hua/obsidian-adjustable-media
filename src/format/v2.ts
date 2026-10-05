@@ -176,9 +176,15 @@ export function parseMeta(text: string | undefined): { meta: V2Meta; error: stri
     return { meta: empty, error: `Unsupported layout format version: ${JSON.stringify(version)}` };
   }
 
+  // Rows that are not a list of objects cannot be written back as they were: a rewrite would drop
+  // them, row heights and captions with them, so the block is not editable.
+  if (rows !== undefined && !(Array.isArray(rows) && rows.every(isRecord))) {
+    return { meta: empty, error: "Layout rows must be a JSON array of objects" };
+  }
+
   return {
     meta: {
-      rows: Array.isArray(rows) ? rows.map((row) => (isRecord(row) ? { ...row } : {})) : [],
+      rows: Array.isArray(rows) ? rows.map((row) => ({ ...row })) : [],
       extra,
     },
     error: null,

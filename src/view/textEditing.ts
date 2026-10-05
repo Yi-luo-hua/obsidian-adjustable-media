@@ -1,13 +1,17 @@
-import { Scope, type App, type Editor } from "obsidian";
+import { Notice, Scope, type App, type Editor, type Hotkey } from "obsidian";
 import type { EditorView, ViewUpdate } from "@codemirror/view";
 
-import { blockWrap, type TextSide, type V2Block } from "../format/v2.ts";
+import { blockWrap, findV2Blocks, type TextSide, type V2Block } from "../format/v2.ts";
+import { blockIdentity } from "../layout/blockIdentity.ts";
+import { latestSnapshotOf, snapshotForState } from "../layout/documentSnapshot.ts";
 import { onlyColumnTextDiffers, planColumnText } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
+import { setBounded } from "../layout/viewProjection.ts";
 import { createColumnEditor } from "./columnEditor.ts";
 import { commitEdits, type LayoutContext } from "./interactions.ts";
 import { closeLinkSuggest } from "./linkSuggest.ts";
 import { t } from "./messages.ts";
+import { commandHotkeys, executeCommand } from "./obsidianInternals.ts";
 
 /**
  * Typing the text beside a layout's media right in the layout, in live preview (docs/DESIGN.md,
@@ -47,21 +51,66 @@ const CARET_CLUES = [32, 16, 8, 5, 3];
 
 const sessions = new WeakMap<HTMLElement, TextEditSession>();
 
+/**
+ * Obsidian commands that still work while a column is typed in, on their keys in Obsidian: they act on
+ * no editor, and each takes the focus away, which ends the typing as any other click elsewhere does.
+ * Every other hotkey stays away from the column's editor (see `scope`).
+ */
+const GLOBAL_COMMANDS: ReadonlyArray<{ id: string; keys: Hotkey[] }> = [
+  { id: "command-palette:open", keys: [{ modifiers: ["Mod"], key: "P" }] },
+  { id: "switcher:open", keys: [{ modifiers: ["Mod"], key: "O" }] },
+  { id: "app:open-settings", keys: [{ modifiers: ["Mod"], key: "," }] },
+];
+
+/**
+ * Text typed in a column that could not go into the note when its editor went away with the layout's
+ * element (reading view, another note, the block changed elsewhere), by the block and side it was
+ * typed for. Kept in memory for this session of Obsidian only, the latest few.
+ */
+const drafts = new Map<string, string>();
+const MAX_DRAFTS = 20;
+
+/**
+ * What a draft was typed for: the note, the side, and the block's opening comment, rows and text on
+ * that side as they were. A draft comes back only to exactly that: once the side has changed
+ * elsewhere, writing the draft would undo that change, and a same-looking block elsewhere is not it.
+ */
+function draftKey(sourcePath: string, block: V2Block, side: TextSide): string {
+  return JSON.stringify([sourcePath, side, block.lines[0], block.rows.map((row) => row.embeds.map((embed) => embed.raw)), textOf(block, side)]);
+}
+
+/** How many blocks of the note in `view` a draft for `key` could belong to. */
+function draftTargets(view: EditorView, sourcePath: string, side: TextSide, key: string): number {
+  return findV2Blocks(view.state.doc.toString().split("\n")).filter((block) => draftKey(sourcePath, block, side) === key).length;
+}
+
 /** Starts typing the text on `side` right in the layout, with the caret where `point` is on the drawn text, or at its end. */
 export function startTextEdit(host: TextEditHost, side: TextSide, point: Point | null): void {
   if (sessions.has(host.el)) {
     return;
   }
   const source = textOf(host.context.block, side);
+  const key = draftKey(host.sourcePath, host.context.block, side);
+  let draft = drafts.get(key);
+  // With identical blocks in the note, nothing tells which one the draft was typed in: it stays kept,
+  // and comes back once that block is the only one like it.
+  if (draft !== undefined && draftTargets(host.view, host.sourcePath, side, key) > 1) {
+    new Notice(t("textDraftAmbiguous"));
+    draft = undefined;
+  }
   let current = host;
   let column = columnOf(current, side);
-  const caret = point && column ? caretInSource(column, point, source) : source.length;
+  const caret = draft !== undefined ? draft.length : point && column ? caretInSource(column, point, source) : source.length;
   if (!column) {
     current = current.redraw(current.context.block, side);
     column = columnOf(current, side);
   }
   if (column) {
-    sessions.set(current.el, new TextEditSession(current, side, column, source, caret));
+    sessions.set(current.el, new TextEditSession(current, side, column, draft ?? source, caret, draft !== undefined));
+    if (draft !== undefined) {
+      drafts.delete(key);
+      new Notice(t("textDraftRestored"));
+    }
   }
 }
 
@@ -86,11 +135,14 @@ export function stopTextEdit(el: HTMLElement): void {
 class TextEditSession {
   private readonly host: TextEditHost;
   private readonly side: TextSide;
+  /** The lineage of the note's buffer when the typing started: drafts are judged against that note. */
+  private readonly lineage: string | undefined;
   /** The frame around the column's editor. */
   private readonly box: HTMLElement;
   private readonly editor: EditorView;
-  // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here. The
-  // column's editor carries out Obsidian's editor commands on their keys itself (columnKeys.ts).
+  // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here, but
+  // for the few that act on no editor (GLOBAL_COMMANDS). The column's editor carries out Obsidian's
+  // editor commands on their keys itself (columnKeys.ts).
   private readonly scope = new Scope();
   private block: V2Block;
   /** The text going into the note right now; the note holds it once the write is done. */
@@ -99,11 +151,17 @@ class TextEditSession {
   private pending = false;
   private pushed = false;
   private ended = false;
+  /** Whether the editor holds text that cannot go into the note as it is (its frame shows red). */
+  private invalid = false;
+  /** Whether Esc was pressed once on such text: a second press, with nothing typed between, gives it up. */
+  private warned = false;
 
-  constructor(host: TextEditHost, side: TextSide, column: HTMLElement, source: string, caret: number) {
+  /** `text` is the column's source, or, `restored`, a draft of it typed before that could not be saved. */
+  constructor(host: TextEditHost, side: TextSide, column: HTMLElement, text: string, caret: number, restored = false) {
     this.host = host;
     this.side = side;
     this.block = host.context.block;
+    this.lineage = snapshotForState(host.view.state)?.lineageId;
     column.empty();
     // The source is drawn as the note's editor draws its text, not as rendered Markdown.
     column.removeClass("markdown-rendered");
@@ -115,35 +173,51 @@ class TextEditSession {
       app: host.app,
       sourcePath: host.sourcePath,
       note: host.view,
-      text: source,
+      text,
       caret,
       onUpdate: (update) => this.updated(update),
     });
     this.scope.register([], "Escape", (event) => {
       // Esc during an input method's composition cancels the composition, and with link suggestions
       // open it closes them.
-      if (event.isComposing) {
-        return true;
+      if (event.isComposing || closeLinkSuggest(this.editor)) {
+        return event.isComposing;
       }
-      if (!closeLinkSuggest(this.editor)) {
+      // Text that cannot be saved is never given up without asking: Esc once warns, twice discards it.
+      if (this.invalid && !this.warned) {
+        this.warned = true;
+        new Notice(t("textUnsavedEsc"));
+      } else if (this.invalid) {
+        this.discard();
+      } else {
         this.editor.contentDOM.blur();
       }
       return false;
     });
+    for (const command of GLOBAL_COMMANDS) {
+      for (const hotkey of commandHotkeys(host.app, command.id, command.keys)) {
+        this.scope.register(hotkey.modifiers, hotkey.key, () => {
+          executeCommand(host.app, command.id);
+          return false;
+        });
+      }
+    }
 
     const content = this.editor.contentDOM;
     // Focus leaving the editor ends the typing, once it has settled elsewhere. Another window taking
     // the focus leaves the editor focused in this one, and the typing goes on on return.
     content.addEventListener("focusout", () => {
-      window.setTimeout(() => {
+      content.win.setTimeout(() => {
         if (content.doc.activeElement !== content) {
           this.end();
         }
       }, 0);
     });
+    // Back in an editor that was left open on unsaved text, Obsidian's hotkeys stay away again.
+    content.addEventListener("focusin", () => this.pushScope());
     // Composed text goes in with the editor's next update; this covers an editor that reports none.
     content.addEventListener("compositionend", () => {
-      window.setTimeout(() => {
+      content.win.setTimeout(() => {
         if (this.pending) {
           this.write();
         }
@@ -160,6 +234,10 @@ class TextEditSession {
 
     this.editor.focus();
     this.pushScope();
+    // A restored draft is checked as typed text is: its frame shows whether it can be saved now.
+    if (restored) {
+      this.write();
+    }
   }
 
   /**
@@ -168,7 +246,16 @@ class TextEditSession {
    * take; the typing goes on, and ends only if the element goes away (stopTextEdit).
    */
   accepts(block: V2Block): boolean {
-    const text = this.writing ?? this.editor.state.doc.toString();
+    // CodeMirror offers the element to the widgets of other blocks too: an identical block elsewhere,
+    // left when this one is deleted, is another block and does not take this editor or its draft.
+    const mine = blockIdentity(this.block);
+    if (mine !== undefined && blockIdentity(block) !== mine) {
+      return false;
+    }
+    // What the note holds of this side: the text being written, the typed text once it is written, or,
+    // while the editor holds text that cannot be written, the side as it last was. The block may still
+    // move (a line added above it) without the unsaved text going away with its element.
+    const text = this.writing ?? (this.invalid ? textOf(this.block, this.side) : this.editor.state.doc.toString());
     if (this.ended || blockWrap(block) !== blockWrap(this.block) || !onlyColumnTextDiffers(this.block, block, this.side, text.split("\n"))) {
       return false;
     }
@@ -178,14 +265,30 @@ class TextEditSession {
     return true;
   }
 
-  /** Stops without drawing anything: the layout is drawn anew anyway. */
+  /**
+   * Stops without drawing anything: the layout is drawn anew anyway. Text that could not be saved is
+   * kept as a draft, for the column of the same block to bring back when it is typed in again.
+   */
   abort(): void {
-    if (!this.ended) {
-      this.finish();
+    if (this.ended) {
+      return;
     }
+    if (this.invalid) {
+      const key = draftKey(this.host.sourcePath, this.block, this.side);
+      if (this.draftBelongs(key)) {
+        setBounded(drafts, key, this.editor.state.doc.toString(), MAX_DRAFTS);
+        new Notice(t("textDraftSaved"));
+      } else {
+        new Notice(t("textDraftNotKept"));
+      }
+    }
+    this.finish();
   }
 
-  /** Leaves the editor: what is left is written, and the layout is drawn again from the note. */
+  /**
+   * Leaves the editor: what is left is written, and the layout is drawn again from the note. Text that
+   * cannot be written keeps the editor open, its frame red, for the text to be fixed or given up with Esc.
+   */
   private end(): void {
     if (this.ended) {
       return;
@@ -194,6 +297,32 @@ class TextEditSession {
     if (this.ended) {
       return;
     }
+    if (this.invalid) {
+      this.popScope();
+      new Notice(t("textKeptOpen"));
+      return;
+    }
+    this.finish();
+    this.host.redraw(this.block);
+  }
+
+  /**
+   * Whether a draft kept under `key` can only come back to this block: no other block of the note
+   * (another runtime identity) reads the way this one did when the draft was typed for it. This block
+   * itself may be there as it was, changed elsewhere or deleted: an undo back to it brings the draft
+   * back. The note is the one the typing started in, as it last stood with layouts in it, not whatever
+   * the editor shows now: going to another note or closing this one empties or replaces the editor's
+   * text before its widgets go. Unknown, the draft is not kept.
+   */
+  private draftBelongs(key: string): boolean {
+    const mine = blockIdentity(this.block);
+    const snapshot = this.lineage === undefined ? null : latestSnapshotOf(this.lineage);
+    return mine !== undefined && snapshot !== null
+      && !snapshot.blocks.some((ref) => ref.id !== mine && draftKey(this.host.sourcePath, ref.block, this.side) === key);
+  }
+
+  /** Gives up the text that cannot be written, and draws the layout again from the note. */
+  private discard(): void {
     this.finish();
     this.host.redraw(this.block);
   }
@@ -202,6 +331,7 @@ class TextEditSession {
   private updated(update: ViewUpdate): void {
     if (update.docChanged) {
       this.pending = true;
+      this.warned = false;
     }
     if (this.pending) {
       this.write();
@@ -219,7 +349,8 @@ class TextEditSession {
     this.pending = false;
     const text = this.editor.state.doc.toString();
     const plan = planColumnText(this.block, this.side, text);
-    this.box.toggleClass("is-invalid", !plan.fits);
+    this.invalid = !plan.fits;
+    this.box.toggleClass("is-invalid", this.invalid);
     if (!plan.edit) {
       return;
     }

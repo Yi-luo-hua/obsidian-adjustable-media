@@ -38,7 +38,18 @@ export function visualWrapSkip(lines: readonly string[], blocks: readonly V2Bloc
   return skipsAt(lines, blocks, index).visual;
 }
 
+/** The spacer skip of every block, in one pass: what effectiveWrapSkip gives for each index. */
+export function effectiveWrapSkips(lines: readonly string[], blocks: readonly V2Block[]): Array<number | null> {
+  return skipsThrough(lines, blocks, blocks.length - 1).map((skips) => skips.effective);
+}
+
 function skipsAt(lines: readonly string[], blocks: readonly V2Block[], index: number): { effective: number | null; visual: number } {
+  return skipsThrough(lines, blocks, index)[index] ?? { effective: null, visual: 0 };
+}
+
+/** The skips of blocks 0..index. Each float counts from the one before it, so they are found in order. */
+function skipsThrough(lines: readonly string[], blocks: readonly V2Block[], index: number): Array<{ effective: number | null; visual: number }> {
+  const result: Array<{ effective: number | null; visual: number }> = [];
   let effective: number | null = null;
   let visual = 0;
   for (let at = 0; at <= index; at += 1) {
@@ -54,6 +65,7 @@ function skipsAt(lines: readonly string[], blocks: readonly V2Block[], index: nu
       effective = current === null ? null : visual <= current ? current - visual : current;
       visual += effective ?? 0;
     }
+    result.push({ effective, visual });
   }
-  return { effective, visual };
+  return result;
 }

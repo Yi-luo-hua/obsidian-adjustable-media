@@ -3,6 +3,7 @@ import { MarkdownRenderer, type App, type Component } from "obsidian";
 import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, type TextSide } from "../format/v2.ts";
 import { effectiveWidth, hasTextColumns, isTextOnly, rowOffset, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
 import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
+import { setBounded } from "../layout/viewProjection.ts";
 import { resolveMedia } from "./media.ts";
 import { t } from "./messages.ts";
 
@@ -35,6 +36,8 @@ interface MediaSize {
  * not change shape once it has loaded.
  */
 const mediaSizes = new Map<string, MediaSize>();
+/** Enough for every image of a long session's notes; the oldest go first. */
+const MAX_MEDIA_SIZES = 500;
 const pendingLayouts = new WeakSet<HTMLElement>();
 const failedLayouts = new WeakSet<HTMLElement>();
 
@@ -242,7 +245,7 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
 
 function remember(itemEl: HTMLElement, url: string, width: number, height: number, shareByRatio: boolean): void {
   if (width > 0 && height > 0) {
-    mediaSizes.set(url, { width, height });
+    setBounded(mediaSizes, url, { width, height }, MAX_MEDIA_SIZES);
     if (shareByRatio) {
       itemEl.setCssProps({ "--vml-grow": String(width / height) });
     }

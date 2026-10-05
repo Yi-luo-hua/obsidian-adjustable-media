@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { findV2Blocks } from "../src/format/v2.ts";
 import { drawnFrom, isStale } from "../src/layout/drawn.ts";
-import { captionParagraphStart, captionText, collectRefs, equationLabels, mayHaveRefs, numberMarkdown, refText } from "../src/markdown/crossref.ts";
+import { DRAWN_TOKEN, captionParagraphStart, captionText, collectRefs, equationLabel, equationLabels, mayHaveRefs, numberMarkdown, refText } from "../src/markdown/crossref.ts";
 import { scanMarkdownLines } from "../src/markdown/lineContext.ts";
 
 const note = [
@@ -100,4 +100,20 @@ test("caption prefixes stay out of adjacent headings, lists, quotes and tables",
   assert.equal(captionParagraphStart(lines, scanMarkdownLines(lines), 2), 1);
   const quote = ["> Paragraph", ">", "> Caption {#fig:a}"];
   assert.equal(captionParagraphStart(quote, scanMarkdownLines(quote), 2), 2);
+});
+
+test("drawn text takes for a label exactly what numbering counts as one", () => {
+  const labelsIn = (text: string) => Array.from(text.matchAll(DRAWN_TOKEN), (match) => match[1] ?? match[3]);
+  // A label may not end in "." or ":": in "{#fig:a.}" the dot ends the sentence, and nothing is numbered.
+  for (const text of ["Caption {#fig:a.}", "Caption {#tbl:x:}", "Caption {#fig:ok}", "See @fig:ok.", "See @eq:ok:"]) {
+    const counted = Array.from(collectRefs([text]).targets.keys());
+    const drawn = labelsIn(text).filter((label) => !label?.startsWith("eq:") && text.includes(`{#${label}}`));
+    assert.deepEqual(drawn, counted, text);
+  }
+  assert.deepEqual(labelsIn("See @fig:ok. and @eq:ok:"), ["fig:ok", "eq:ok"]);
+  assert.deepEqual(labelsIn("mail a@fig:b"), []);
+
+  assert.equal(equationLabel(String.raw`x \label{eq:loss}`), "eq:loss");
+  assert.equal(equationLabel(String.raw`x \label{eq:loss.}`), undefined);
+  assert.equal(collectRefs(["$$", String.raw`x \label{eq:loss.}`, "$$"]).targets.size, 0);
 });

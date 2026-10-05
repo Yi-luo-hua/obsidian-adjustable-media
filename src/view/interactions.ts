@@ -1,9 +1,10 @@
 import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
 import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
-import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason } from "../layout/edits.ts";
+import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason, type LinesAround } from "../layout/edits.ts";
 import { dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
+  canAddText,
   effectiveWidth,
   hasTextColumns,
   insertItem,
@@ -38,6 +39,7 @@ import { MediaViewer, type ViewerImage } from "./mediaViewer.ts";
 import { reportWriteError, t, type MessageKey } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
 import { TextLayoutModal } from "./textLayoutModal.ts";
+import { eventElement } from "./windows.ts";
 
 /** A layout drawn in live preview, as its interactions see it. Reading view only shows layouts. */
 export interface LayoutContext extends WriteOptions {
@@ -197,7 +199,7 @@ function setUpViewer(root: HTMLElement, context: LayoutContext): void {
       continue;
     }
     itemEl.addEventListener("dblclick", (event) => {
-      if (event.target instanceof HTMLElement && event.target.closest(".vml-handle")) {
+      if (eventElement(event)?.closest(".vml-handle")) {
         return;
       }
       event.preventDefault();
@@ -255,9 +257,10 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
     setIcon(dragFrom, "grip-vertical");
   }
   dragFrom.addEventListener("pointerdown", (event) => {
-    const onOtherHandle = event.target instanceof HTMLElement
-      && event.target.closest(".vml-handle") !== null
-      && event.target.closest(".vml-item__grip") === null;
+    const target = eventElement(event);
+    const onOtherHandle = target !== null
+      && target.closest(".vml-handle") !== null
+      && target.closest(".vml-item__grip") === null;
     if (event.button !== 0 || onOtherHandle) {
       return;
     }
@@ -708,9 +711,10 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     }
   }
 
-  // Text beside the media is typed right in the layout.
+  // Text beside the media is typed right in the layout. A wrapped layout has to stop wrapping first:
+  // text beside its media would stop it floating as the first letter is typed.
   const { editText } = context;
-  if (editText) {
+  if (editText && canAddText(context.model)) {
     const sides = [["left", "addTextLeft", "panel-left-open"], ["right", "addTextRight", "panel-right-open"]] as const;
     for (const [side, label, icon] of sides) {
       if ((side === "left" ? context.block.leftText : context.block.rightText) === null) {
@@ -727,7 +731,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   menu.addItem((entry) => entry.setTitle(t("moveOut")).setIcon("log-out").setSection("vml-move").onClick(() => {
     const taken = removeItem(context.model, position);
     if (taken) {
-      void commitEdits(context.app, context.sourcePath, [planMoveOut(context.block, taken.model, taken.item.embed)], context);
+      void commitEdits(context.app, context.sourcePath, [planMoveOut(context.block, taken.model, taken.item.embed, linesAround(context))], context);
     }
   }));
 
@@ -738,11 +742,28 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
     context.app.workspace.trigger("file-menu", menu, media.file, "link-context-menu");
   }
 
-  if (at instanceof MouseEvent) {
+  if ("clientX" in at) {
     menu.showAtMouseEvent(at);
   } else {
     menu.showAtPosition(at);
   }
+}
+
+/**
+ * The lines around the block in the note as the editor holds it now. A widget is only kept while its
+ * block stays on the same lines, so the block's own line numbers still apply. Only shapes the blank
+ * lines written around a moved embed; the write itself is validated against the block's source.
+ */
+function linesAround(context: LayoutContext): LinesAround {
+  const doc = context.view?.state.doc;
+  const { openLine, closeLine } = context.block;
+  if (!doc || closeLine + 1 > doc.lines) {
+    return {};
+  }
+  return {
+    before: openLine > 0 ? doc.line(openLine).text : undefined,
+    after: closeLine + 2 <= doc.lines ? doc.line(closeLine + 2).text : undefined,
+  };
 }
 
 /** Whether a layout stands alone and is narrower than the note, so its place across the note shows. */
@@ -782,7 +803,7 @@ function addWrapItems(menu: Menu, context: LayoutContext, left: MessageKey, righ
 function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
   root.addEventListener("contextmenu", (event) => {
     // The column's editor has a menu of its own.
-    if (event.target instanceof Element && event.target.closest(".vml-text-editor")) {
+    if (eventElement(event)?.closest(".vml-text-editor")) {
       return;
     }
     event.preventDefault();

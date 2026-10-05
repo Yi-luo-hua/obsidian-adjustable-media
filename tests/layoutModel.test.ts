@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import { findV2Blocks, serializeBlock, type V2Block } from "../src/format/v2.ts";
 import {
+  canAddText,
   insertItem,
   metaFromModel,
   modelFromBlock,
@@ -157,4 +158,10 @@ test("serializing a changed model re-parses to the same model with embeds untouc
   assert.deepEqual(names(reparsed), names(moved));
   assert.deepEqual(metaFromModel(reparsed), metaFromModel(moved));
   assert.deepEqual(rowEmbeds(reparsed).flat().map((embed) => embed.raw), ["![[c.png]]", "![[a.png]]", "![[b.png]]"]);
+});
+
+test("text can be added beside media only while the layout does not wrap", () => {
+  assert.equal(canAddText(modelFromBlock(parse(["<!-- vml -->", "![[a.png]]", "<!-- /vml -->"]))), true);
+  assert.equal(canAddText(modelFromBlock(parse(['<!-- vml {"v":2,"wrap":"right"} -->', "![[a.png]]", "<!-- /vml -->"]))), false);
+  assert.equal(canAddText(modelFromBlock(parse(['<!-- vml {"v":2,"type":"text"} -->', "Text", "<!-- /vml -->"]))), false);
 });

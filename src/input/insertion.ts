@@ -1,4 +1,4 @@
-import { MAX_EMBEDS_PER_ROW, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Embed } from "../format/v2.ts";
+import { MAX_EMBEDS_PER_ROW, blockWrap, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Embed } from "../format/v2.ts";
 import { isEditable, wrapLines, type LineChange } from "../layout/edits.ts";
 import { insertItem, metaFromModel, modelFromBlock, rowEmbeds, type LayoutModel } from "../layout/model.ts";
 import { scanMarkdownLines } from "../markdown/lineContext.ts";
@@ -13,7 +13,7 @@ export interface WrapOptions {
  * of at most four and wrapped in a new block, or appended to the block right above. The lines may
  * be separated by blank lines (a multi-file drop inserts them that way), which are dropped.
  *
- * Returns null, touching nothing, when a line holds anything but media embeds, is not plain text,
+ * Returns null, touching nothing, when a line holds anything but media embeds, is indented, is not plain text,
  * already belongs to a block, or when other content sits between the lines.
  */
 export function planWrap(lines: readonly string[], lineNumbers: readonly number[], options: WrapOptions): LineChange | null {
@@ -40,7 +40,10 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
       continue;
     }
 
-    const row = contexts[line] === "text" ? readEmbedRow(text, line) : null;
+    // An indented line belongs to a list item, or is an indented code block, which the line scan does
+    // not tell apart from text: a block written there would take it out of the list, or turn code
+    // into a layout, and its rows would lose the indentation.
+    const row = contexts[line] === "text" && !/^[ \t]/.test(text) ? readEmbedRow(text, line) : null;
     if (!row) {
       return null;
     }
@@ -62,8 +65,10 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
 
 function editableBlockRightAbove(blocks: readonly V2Block[], lines: readonly string[], first: number): V2Block | null {
   const block = [...blocks].reverse().find((candidate) => candidate.closeLine < first);
-  // New media do not join a block with text beside its media: they get a block of their own.
-  if (!block || !isEditable(block) || hasSideText(block)) {
+  // New media do not join a block with text beside its media: they get a block of their own. Nor do
+  // they join a floating block: it would grow down beside the text, while media dropped below a float
+  // go into the note's flow.
+  if (!block || !isEditable(block) || hasSideText(block) || blockWrap(block) !== null) {
     return null;
   }
   for (let line = block.closeLine + 1; line < first; line += 1) {

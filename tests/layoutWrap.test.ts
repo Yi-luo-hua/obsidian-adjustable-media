@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { findV2Blocks, readBlockSkip, readBlockWrap, serializeOpener, type V2Block } from "../src/format/v2.ts";
 import { applyEditsToEditor, applyEditsToText, planModelEdit, type BlockEdit } from "../src/layout/edits.ts";
-import { effectiveWrapSkip, visualWrapSkip } from "../src/layout/floatOrder.ts";
+import { effectiveWrapSkip, effectiveWrapSkips, visualWrapSkip } from "../src/layout/floatOrder.ts";
 import { skipLines, wrapZone, wrappedDrop } from "../src/layout/geometry.ts";
 import {
   effectiveWidth,
@@ -416,6 +416,20 @@ test("moving the left float up across the right text block offsets its shifted a
     '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":18} -->', '![[a.png]]', '<!-- /vml -->',
     '<!-- vml {"v":2,"wrap":"right","skip":20,"type":"text"} -->', '旁注',
   ]);
+});
+
+test("the skips of all blocks found in one pass match those found block by block", () => {
+  const lines = [
+    '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[a.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"left"} -->', '![[b.png]]', '<!-- /vml -->', '',
+    '<!-- vml {"v":2,"wrap":"right","skip":6} -->', '![[c.png]]', '<!-- /vml -->', 'body',
+    '<!-- vml {"v":2,"wrap":"left","skip":2} -->', '![[d.png]]', '<!-- /vml -->', '',
+    '<!-- vml -->', '![[e.png]]', '<!-- /vml -->',
+  ];
+  const blocks = findV2Blocks(lines);
+  assert.deepEqual(effectiveWrapSkips(lines, blocks), blocks.map((_block, at) => effectiveWrapSkip(lines, blocks, at)));
+  assert.deepEqual(effectiveWrapSkips(lines, blocks), [5, null, 1, 2, null]);
+  assert.deepEqual(effectiveWrapSkips([], []), []);
 });
 
 test("dragging a float above one that shares its anchor keeps both neighbors' heights", () => {

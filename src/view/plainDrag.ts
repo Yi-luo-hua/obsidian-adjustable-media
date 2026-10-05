@@ -9,6 +9,7 @@ import { createDragGhost, type DragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, clearDropIndicators, commitEdits, findDrop, showDropIndicator, swallowNextClick, type DropState } from "./interactions.ts";
 import { t } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
+import { eventElement } from "./windows.ts";
 
 /** Images Obsidian itself draws in live preview, for wiki and Markdown embeds alike. */
 const PLAIN_IMAGE = ".image-embed > .image-wrapper > img";
@@ -29,9 +30,9 @@ export function plainImageDrag(app: App): Extension {
     const hasLayouts = (): boolean => view.dom.querySelector(".vml-layout--interactive") !== null;
 
     const onPointerDown = (event: PointerEvent): void => {
-      const img = event.target;
+      const img = eventElement(event);
       const modified = event.ctrlKey || event.metaKey || event.shiftKey || event.altKey;
-      if (event.button !== 0 || modified || !(img instanceof HTMLImageElement) || !img.matches(PLAIN_IMAGE) || !hasLayouts()) {
+      if (event.button !== 0 || modified || !img?.instanceOf(HTMLImageElement) || !img.matches(PLAIN_IMAGE) || !hasLayouts()) {
         return;
       }
       const sourcePath = view.state.field(editorInfoField, false)?.file?.path;

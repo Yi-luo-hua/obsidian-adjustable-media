@@ -3,10 +3,12 @@ import { Prec, StateField, type EditorState, type Extension, type Range } from "
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
 import {
+  DRAWN_TOKEN,
   EMPTY_REF_INDEX,
   captionText,
   captionParagraphStart,
   collectRefs,
+  equationLabel,
   equationLabels,
   mayHaveRefs,
   numberMarkdown,
@@ -15,9 +17,11 @@ import {
   type RefLanguage,
 } from "../markdown/crossref.ts";
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
+import { changesMayAdd } from "../layout/changeScan.ts";
 import { drawMath } from "./math.ts";
 import { sectionNoteText } from "./noteText.ts";
 import { currentLanguage } from "./messages.ts";
+import { eventElement, onEveryDocument } from "./windows.ts";
 
 /**
  * Numbered figures, tables and equations, and references to them (crossref.ts), as the note shows
@@ -113,9 +117,6 @@ function isFloatBody(el: Element): boolean {
   return el.hasClass("vml-figure") || el.hasClass("math-block") || el.tagName === "TABLE" || el.querySelector(":scope > table, :scope > .math-block") !== null;
 }
 
-const TOKEN = /\{#((?:fig|tbl):[\w.:-]+)\}|(^|[^\w@\\/])@((?:fig|tbl|eq):(?:[A-Za-z0-9_][\w.:-]*[\w-]|[A-Za-z0-9_]))/g;
-const EQUATION_LABEL = /\\label\{(eq:[\w.:-]+)\}/;
-
 /**
  * Reading view, and follow-ups to references anywhere. The sections of the note's own text get their
  * numbers here; a layout's text is numbered before it is drawn (layoutView.ts).
@@ -123,8 +124,9 @@ const EQUATION_LABEL = /\\label\{(eq:[\w.:-]+)\}/;
 export function registerCrossrefs(plugin: Plugin): void {
   plugin.registerMarkdownPostProcessor((el, ctx) => numberSection(plugin.app, el, ctx));
 
-  plugin.registerDomEvent(activeDocument, "click", (event) => {
-    const ref = event.target instanceof Element ? event.target.closest<HTMLElement>(".vml-ref") : null;
+  // In every window: the main document's listener never hears a click in a pop-out window.
+  onEveryDocument(plugin, (doc) => plugin.registerDomEvent(doc, "click", (event) => {
+    const ref = eventElement(event)?.closest<HTMLElement>(".vml-ref") ?? null;
     const id = ref?.dataset.vmlRef;
     if (!ref || !id || ref.hasClass("is-unresolved")) {
       return;
@@ -139,7 +141,7 @@ export function registerCrossrefs(plugin: Plugin): void {
     event.preventDefault();
     event.stopPropagation();
     goTo(view, target.id, target.line);
-  }, { capture: true });
+  }, { capture: true }));
 }
 
 /**
@@ -162,7 +164,7 @@ function goTo(view: MarkdownView, id: string, line: number): void {
     view.setEphemeralState({ line });
   }
   // Drawn now, the target itself goes to the middle.
-  window.setTimeout(() => find()?.scrollIntoView({ block: "center" }), 150);
+  view.containerEl.win.setTimeout(() => find()?.scrollIntoView({ block: "center" }), 150);
 }
 
 function numberSection(app: App, el: HTMLElement, ctx: MarkdownPostProcessorContext): void {
@@ -191,7 +193,7 @@ function numberSection(app: App, el: HTMLElement, ctx: MarkdownPostProcessorCont
   const refs = refContextOf(text);
   const math = el.querySelector<HTMLElement>(".math-block");
   const source = mathSource(own);
-  const label = source === null ? undefined : EQUATION_LABEL.exec(source)?.[1];
+  const label = source === null ? undefined : equationLabel(source);
   if (math && source !== null && label !== undefined) {
     const tagged = numbered(`$$\n${source}\n$$`, refs).split("\n").slice(1, -1).join("\n");
     math.setAttr("data-vml-label", label);
@@ -215,13 +217,13 @@ function numberTextNodes(el: HTMLElement, refs: RefContext): void {
   const nodes: Text[] = [];
   for (let node = walker.nextNode() as Text | null; node; node = walker.nextNode() as Text | null) {
     const parent = node.parentElement;
-    if (parent && !parent.closest("code, pre, .math, .vml-ref, .vml-caption-label") && TOKEN.test(node.data)) {
+    if (parent && !parent.closest("code, pre, .math, .vml-ref, .vml-caption-label") && DRAWN_TOKEN.test(node.data)) {
       nodes.push(node);
     }
-    TOKEN.lastIndex = 0;
+    DRAWN_TOKEN.lastIndex = 0;
   }
   for (const node of nodes) {
-    const parts = node.data.split(TOKEN);
+    const parts = node.data.split(DRAWN_TOKEN);
     const fragment = createFragment();
     let caption: string | null = null;
     // split() gives the text, then each match's three groups, in turn.
@@ -260,8 +262,13 @@ function numberTextNodes(el: HTMLElement, refs: RefContext): void {
 interface CrossrefState {
   index: RefIndex;
   contexts: LineContext[];
+  /** The note's lines when it has labels or references, kept for cursor moves to redraw from. */
+  lines: string[];
   decorations: DecorationSet;
 }
+
+/** The longest text mayHaveRefs looks for: `\label{eq:`. */
+const LONGEST_REF_MARK = 10;
 
 function numberCallout(el: HTMLElement, refs: RefContext): void {
   numberTextNodes(el, refs);
@@ -295,6 +302,12 @@ export function crossrefExtension(): Extension {
     create: (state) => decorate(state, scan(state)),
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
+      // A note without labels or references stays without them unless the change wrote one.
+      const stillWithout = tr.docChanged && !modeChanged && value.index === EMPTY_REF_INDEX
+        && !changesMayAdd(tr.state.doc, tr.changes, mayHaveRefs, LONGEST_REF_MARK);
+      if (stillWithout) {
+        return value;
+      }
       if (tr.docChanged || modeChanged) {
         return decorate(tr.state, scan(tr.state));
       }
@@ -335,19 +348,19 @@ export function crossrefExtension(): Extension {
 function scan(state: EditorState): Omit<CrossrefState, "decorations"> {
   // Source mode shows the labels as written.
   if (!state.field(editorLivePreviewField, false)) {
-    return { index: EMPTY_REF_INDEX, contexts: [] };
+    return { index: EMPTY_REF_INDEX, contexts: [], lines: [] };
   }
   const text = state.doc.toString();
   if (!mayHaveRefs(text)) {
-    return { index: EMPTY_REF_INDEX, contexts: [] };
+    return { index: EMPTY_REF_INDEX, contexts: [], lines: [] };
   }
   const lines = text.split("\n");
   const contexts = scanMarkdownLines(lines);
-  return { index: collectRefs(lines, contexts), contexts };
+  return { index: collectRefs(lines, contexts), contexts, lines };
 }
 
 function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations">): CrossrefState {
-  const { index, contexts } = scanned;
+  const { index, contexts, lines } = scanned;
   if (contexts.length === 0) {
     return { ...scanned, decorations: Decoration.none };
   }
@@ -356,7 +369,6 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
   const touched = (from: number, to: number): boolean => state.selection.ranges.some((range) => range.from <= to && range.to >= from);
   const { doc } = state;
   const captions = new Set<number>();
-  const lines = doc.toString().split("\n");
 
   for (let at = 0; at < contexts.length; at += 1) {
     const line = doc.line(at + 1);
@@ -373,7 +385,7 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
       }
       const last = doc.line(end + 1);
       const source = mathSource(doc.sliceString(line.from, last.to));
-      const label = source === null ? undefined : EQUATION_LABEL.exec(source)?.[1];
+      const label = source === null ? undefined : equationLabel(source);
       if (source !== null && label !== undefined && !touched(line.from, last.to)) {
         const tagged = numberMarkdown(`$$\n${source}\n$$`, index, language).split("\n").slice(1, -1).join("\n");
         if (tagged !== source) {
@@ -387,7 +399,7 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
       continue;
     }
     const code = codeSpans(line.text);
-    for (const match of line.text.matchAll(TOKEN)) {
+    for (const match of line.text.matchAll(DRAWN_TOKEN)) {
       const start = (match.index ?? 0) + (match[2]?.length ?? 0);
       const from = line.from + start;
       const to = line.from + (match.index ?? 0) + match[0].length;
@@ -413,7 +425,7 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
       }
     }
   }
-  return { index, contexts, decorations: Decoration.set(ranges, true) };
+  return { index, contexts, lines, decorations: Decoration.set(ranges, true) };
 }
 
 function codeSpans(text: string): Array<[number, number]> {

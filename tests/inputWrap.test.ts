@@ -61,3 +61,22 @@ test("nothing is planned for other text, code, existing blocks or non-media embe
   assert.equal(run(["![[笔记]]"], [0]), null);
   assert.equal(run(["![[a.png]]"], []), null);
 });
+
+test("indented media lines, in a list item or an indented code block, are left alone", () => {
+  // Content of a list item: wrapping it would end the list and take the image out of it.
+  assert.equal(run(["- item one", "", "    ![[a.png]]", "", "- item two"], [2], false), null);
+  assert.equal(run(["- item", "  ![[a.png]]"], [1], false), null);
+  // An indented code block: the line is code, not an image.
+  assert.equal(run(["Text", "", "    ![[a.png]]", "", "More"], [2], false), null);
+  assert.equal(run(["Text", "", "\t![[a.png]]"], [2], false), null);
+  // Any indented line among several spoils the whole wrap.
+  assert.equal(run(["![[a.png]]", "  ![[b.png]]"], [0, 1], false), null);
+});
+
+test("media dropped below a floating layout get a block of their own", () => {
+  const floating = ['<!-- vml {"v":2,"wrap":"left"} -->', "![[a.png]]", "<!-- /vml -->", "", "![[b.png]]"];
+  assert.deepEqual(run(floating, [4]), [...floating.slice(0, 4), "<!-- vml -->", "![[b.png]]", "<!-- /vml -->"]);
+  // A block that does not float still takes them in.
+  const plain = ["<!-- vml -->", "![[a.png]]", "<!-- /vml -->", "", "![[b.png]]"];
+  assert.deepEqual(run(plain, [4]), ["<!-- vml -->", "![[a.png]] ![[b.png]]", "<!-- /vml -->"]);
+});

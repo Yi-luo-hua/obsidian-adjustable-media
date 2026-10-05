@@ -127,10 +127,23 @@ test("metadata: missing, broken, wrong version and unknown keys", () => {
   assert.notEqual(parseMeta('{"rows":[{"height":').error, null);
   assert.notEqual(parseMeta("[1,2]").error, null);
   assert.match(parseMeta('{"v":3}').error ?? "", /version/);
-  assert.deepEqual(parseMeta('{"v":2,"theme":"dark","rows":[{"height":300,"future":true},5]}').meta, {
+  assert.deepEqual(parseMeta('{"v":2,"theme":"dark","rows":[{"height":300,"future":true},{}]}').meta, {
     rows: [{ height: 300, future: true }, {}],
     extra: { theme: "dark" },
   });
+});
+
+test("rows that are not a list of objects make the settings unreadable, not silently dropped", () => {
+  for (const rows of ['{"0":{"height":300}}', '[{"height":300},5]', '[null]', '"tall"']) {
+    const parsed = parseMeta(`{"v":2,"width":0.5,"rows":${rows}}`);
+    assert.match(parsed.error ?? "", /rows/, rows);
+    assert.deepEqual(parsed.meta, { rows: [], extra: {} });
+  }
+  // Such a block is shown but never rewritten, so its rows survive.
+  const found = block(['<!-- vml {"v":2,"rows":{"0":{"height":300}}} -->', "![[a.png]]", CLOSE()]);
+  assert.equal(found.rows.length, 1);
+  assert.notEqual(found.metaError, null);
+  assert.deepEqual(parseMeta('{"v":2,"rows":[]}'), { meta: { rows: [], extra: {} }, error: null });
 });
 
 test("broken metadata keeps the rows and reports the error", () => {

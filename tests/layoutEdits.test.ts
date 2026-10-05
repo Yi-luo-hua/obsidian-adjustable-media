@@ -138,6 +138,38 @@ test("moving an embed out of the layout puts it on its own line after the block"
   assert.deepEqual(apply(single.lines, [planMoveOut(single, alone.model, alone.item.embed)]), ["![[x.png]]"]);
 });
 
+test("an embed moved out of a wrapped block does not join the text it wraps", () => {
+  const lines = ['<!-- vml {"v":2,"wrap":"left"} -->', "![[a.png]] ![[b.png]]", "<!-- /vml -->", "Wrapped paragraph.", "More text."];
+  const block = nth(lines, 0);
+  const taken = removeItem(modelFromBlock(block), { row: 0, index: 1 });
+  assert.ok(taken);
+
+  assert.deepEqual(apply(lines, [planMoveOut(block, taken.model, taken.item.embed, { after: "Wrapped paragraph." })]), [
+    '<!-- vml {"v":2,"wrap":"left"} -->', "![[a.png]]", "<!-- /vml -->", "", "![[b.png]]", "", "Wrapped paragraph.", "More text.",
+  ]);
+  // A blank line already there is not doubled.
+  const spaced = [...lines.slice(0, 3), "", ...lines.slice(3)];
+  const again = nth(spaced, 0);
+  const moved = removeItem(modelFromBlock(again), { row: 0, index: 1 });
+  assert.ok(moved);
+  assert.deepEqual(apply(spaced, [planMoveOut(again, moved.model, moved.item.embed, { after: "" })]).slice(3, 7), ["", "![[b.png]]", "", "Wrapped paragraph."]);
+});
+
+test("the last embed moved out stays a paragraph of its own between text", () => {
+  const lines = ["Before.", "<!-- vml -->", "![[x.png]]", "<!-- /vml -->", "After."];
+  const block = nth(lines, 0);
+  const taken = removeItem(modelFromBlock(block), { row: 0, index: 0 });
+  assert.ok(taken);
+
+  assert.deepEqual(apply(lines, [planMoveOut(block, taken.model, taken.item.embed, { before: "Before.", after: "After." })]),
+    ["Before.", "", "![[x.png]]", "", "After."]);
+  // At the very top and bottom of the note, nothing is added.
+  const alone = nth(lines.slice(1, 4), 0);
+  const only = removeItem(modelFromBlock(alone), { row: 0, index: 0 });
+  assert.ok(only);
+  assert.deepEqual(apply(lines.slice(1, 4), [planMoveOut(alone, only.model, only.item.embed, {})]), ["![[x.png]]"]);
+});
+
 test("wrapping lines in a block and removing the comments again restores them byte for byte", () => {
   const body = ["![[a.png]]![[b.png|300]]", "", '![横图](attachments/with%20space.png "t")'];
   const doc = ["前文", "", ...wrapLines(body), "", "后文"];

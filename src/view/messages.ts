@@ -208,6 +208,30 @@ const MESSAGES = {
     zh: "文字底端对齐",
     en: "Text at the bottom",
   },
+  textUnsavedEsc: {
+    zh: "这段文字还不能写回笔记（框是红的）。改好它，或者再按一次 Esc 放弃这些修改。",
+    en: "This text cannot go into the note yet (the frame is red). Fix it, or press Esc again to give up these changes.",
+  },
+  textKeptOpen: {
+    zh: "文字栏有不能写回的修改，编辑框保持打开：回到框里改好它，或者在框里按两次 Esc 放弃。",
+    en: "The text column has changes that cannot be saved, so its editor stays open: go back to fix them, or press Esc twice in it to give them up.",
+  },
+  textDraftSaved: {
+    zh: "文字栏有不能写回的草稿，已暂存：只要这一栏在别处没被改动，下次点开它时会恢复（重启 Obsidian 后不保留）。",
+    en: "The text column's draft could not be saved, so it was kept: it comes back the next time you edit that column, unless the column was changed elsewhere (not kept after Obsidian restarts).",
+  },
+  textDraftNotKept: {
+    zh: "文字栏有不能写回的草稿，但无法确定它属于哪个块（例如笔记里有内容完全相同的块），所以没有暂存。",
+    en: "The text column's draft could not be saved, and there is no telling which block it belongs to (the note may have identical blocks), so it was not kept.",
+  },
+  textDraftAmbiguous: {
+    zh: "有一份未保存的草稿可能属于这一栏，但笔记里有内容完全相同的块，不自动恢复；只剩一个这样的块时再点开它就会恢复。",
+    en: "An unsaved draft may belong to this column, but the note has identical blocks, so it is not restored; it comes back once only one such block is left.",
+  },
+  textDraftRestored: {
+    zh: "已恢复这一栏之前未保存的草稿。",
+    en: "Restored this column's unsaved draft.",
+  },
   textNotSaved: {
     zh: "这样写会改变布局块本身（例如只有图片的一行、代码围栏、布局注释，或者清空了文字块），暂不保存。",
     en: "This would change the layout block itself (a line of media embeds only, a code fence, a layout comment, or an emptied text box), so it is not saved.",
@@ -346,12 +370,12 @@ const MESSAGES = {
     en: "Remove layout comments from all notes…",
   },
   wrapNothing: {
-    zh: "选中的内容不能包成布局块：它已经在布局块里，含有代码、公式或注释，或者文字夹在两行图片之间。",
-    en: "The selection cannot be wrapped: it is already in a layout, holds code, math or comments, or has text between two rows of media.",
+    zh: "选中的内容不能包成布局块：它已经在布局块里，含有代码、公式或注释，文字夹在两行图片之间，或者从缩进的行开始、只有缩进的图片行（它们属于列表或缩进代码）。",
+    en: "The selection cannot be wrapped: it is already in a layout, holds code, math or comments, has text between two rows of media, or starts on an indented line or holds only indented media lines (part of a list or indented code).",
   },
   mergeNothing: {
-    zh: "光标所在的布局块后面没有紧挨着的布局块，或者其中一个块不能编辑、带有文字。",
-    en: "There is no layout block right after this one, or one of the two cannot be edited or has text beside its media.",
+    zh: "光标所在的布局块后面没有紧挨着的布局块，或者其中一个块不能编辑、带有文字，或者后一个块的整体设置（宽度、环绕等）和这个块不同。",
+    en: "There is no layout block right after this one, one of the two cannot be edited or has text beside its media, or the next block's own settings (width, wrapping and so on) differ from this one's.",
   },
   unwrapNothing: {
     zh: "光标不在布局块里。",

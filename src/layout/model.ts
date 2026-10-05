@@ -171,6 +171,15 @@ export function hasTextColumns(model: LayoutModel): boolean {
   return model.rows.length > 0 && hasText(model);
 }
 
+/**
+ * Whether text can be added beside the layout's media. Text beside media stops a layout from
+ * floating, so a wrapped layout would change shape under the first letter typed, and its text editor
+ * with it; it has to stop wrapping first.
+ */
+export function canAddText(model: LayoutModel): boolean {
+  return model.rows.length > 0 && model.wrap === null;
+}
+
 export function metaFromModel(model: LayoutModel): V2Meta {
   return {
     rows: model.rows.map((row) => {

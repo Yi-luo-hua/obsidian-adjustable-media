@@ -5,7 +5,8 @@ import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } fr
 import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
 import { documentSnapshot, editorDocumentOrigin, rememberDocumentSnapshot, snapshotForState, type BlockRef, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
-import { effectiveWrapSkip } from "../layout/floatOrder.ts";
+import { changesMayAdd } from "../layout/changeScan.ts";
+import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
@@ -19,8 +20,14 @@ import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type Text
 import { refreshWrapMedia, resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
 import { fileOfEditor } from "./obsidianInternals.ts";
+import { eventElement } from "./windows.ts";
 
-const setEnvironment = StateEffect.define<string>();
+/** The pane's environment as viewEnvironment.ts reads it: width, fonts and page classes that change layout. */
+export const setEnvironment = StateEffect.define<string>();
+/** The environment of a pane before its first reading (viewEnvironment.ts). */
+const PENDING_ENVIRONMENT = "pending";
+/** How every layout block opens; a note without it has no layouts. */
+const OPENING = "<!-- vml";
 
 interface Measurements {
   heights: PaneMeasurements<number>;
@@ -32,6 +39,8 @@ interface LivePreviewState extends Measurements {
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
+  /** Each block's spacer skip, found once per parse: cursor moves redraw decorations, not these. */
+  skips: Array<number | null>;
   decorations: DecorationSet;
   /** Wrapped layouts drawn as widgets. */
   anchors: WrapAnchor[];
@@ -45,6 +54,7 @@ interface Parsed extends Measurements {
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
+  skips: Array<number | null>;
   refs: RefContext | undefined;
 }
 
@@ -68,10 +78,21 @@ export function livePreviewExtension(app: App): Extension {
       const environment = tr.effects.find(effect => effect.is(setEnvironment));
       let measurements: Measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch, environmentSpec: value.environmentSpec };
       if (environment) {
-        value.heights.environmentChanged();
-        measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch + 1, environmentSpec: environment.value };
+        // The pane's first reading only names the environment its layouts were drawn and measured in:
+        // starting a new one would draw every layout again as soon as the note opens.
+        const first = value.environmentSpec === PENDING_ENVIRONMENT;
+        if (!first) value.heights.environmentChanged();
+        measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch + (first ? 0 : 1), environmentSpec: environment.value };
       }
       if (originChanged) value.heights.environmentChanged();
+      // A note without layouts stays without them unless the change wrote an opening comment: reading
+      // the whole note on each keystroke of every note is left for notes that have some.
+      const stillWithout = tr.docChanged && !modeChanged && !originChanged && !environment && value.snapshot === null
+        && !changesMayAdd(tr.state.doc, tr.changes, (text) => text.includes(OPENING), OPENING.length);
+      if (stillWithout) {
+        rememberDocumentSnapshot(tr.state, null);
+        return value;
+      }
       if (tr.docChanged || modeChanged || originChanged) {
         return withDecorations(app, tr.state, { ...parse(app, tr.state, value.snapshot, tr.changes), ...measurements });
       }
@@ -121,8 +142,11 @@ export function livePreviewExtension(app: App): Extension {
         } });
       };
       const stop = watchEnvironment(view.contentDOM, spec => {
-        if (destroyed || spec === view.state.field(field).environmentSpec) return;
-        queueMicrotask(() => { if (!destroyed) view.dispatch({ effects: [setEnvironment.of(spec), resetWrapGaps.of(null)] }); });
+        const current = view.state.field(field).environmentSpec;
+        if (destroyed || spec === current) return;
+        // Wrap gaps measured before the first reading belong to this same environment.
+        const effects = current === PENDING_ENVIRONMENT ? [setEnvironment.of(spec)] : [setEnvironment.of(spec), resetWrapGaps.of(null)];
+        queueMicrotask(() => { if (!destroyed) view.dispatch({ effects }); });
       }, () => { refreshWrapMedia(view); measure(); });
       measure();
       return { update(update) { if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure(); },
@@ -132,24 +156,27 @@ export function livePreviewExtension(app: App): Extension {
 }
 
 function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
-  const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: "pending" };
+  const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: PENDING_ENVIRONMENT };
   if (!state.field(editorLivePreviewField, false)) {
-    return { blocks: [], lines: [], refs: undefined, snapshot: null, ...measurements };
+    return { blocks: [], lines: [], skips: [], refs: undefined, snapshot: null, ...measurements };
   }
-  // Runs on every change of every note, and most notes have no layouts.
+  // Runs on every change of a note with layouts; one without them is only read in full when a change
+  // may have written an opening comment (the field's update).
   const text = state.doc.toString();
-  if (!text.includes("<!-- vml")) {
-    return { blocks: [], lines: [], refs: undefined, snapshot: null, ...measurements };
+  if (!text.includes(OPENING)) {
+    return { blocks: [], lines: [], skips: [], refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
   const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, previous?.origin);
   const snapshot = documentSnapshot(text, origin, previous ?? undefined, changes);
-  return { snapshot, blocks: snapshot.blocks.map(ref => ref.block), lines: [...snapshot.lines],
+  const blocks = snapshot.blocks.map(ref => ref.block);
+  const lines = [...snapshot.lines];
+  return { snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks),
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
 }
 
 function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePreviewState {
-  const { blocks, lines, refs, snapshot } = parsed;
+  const { blocks, refs, snapshot, skips } = parsed;
   rememberDocumentSnapshot(state, snapshot);
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
@@ -164,7 +191,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     const to = state.doc.line(block.closeLine + 1).to;
     const revealed = state.selection.ranges.some((range) => range.from <= to && range.to >= from);
     const wraps = blockWrap(block) !== null;
-    const effectiveSkip = effectiveWrapSkip(lines, blocks, index);
+    const effectiveSkip = skips[index] ?? null;
     const ref = snapshot!.blocks[index];
     const key = `${ref.id}:${ref.contentRevision}`;
     hasWraps ||= wraps;
@@ -187,7 +214,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     }
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
-      ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, effectiveSkip), side: -1 }).range(from));
+      ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, refs, effectiveSkip), side: -1 }).range(from));
       anchors.push({ from, to: from, key: `${key}:source`, block });
     }
   }
@@ -263,7 +290,8 @@ class LayoutWidget extends WidgetType {
     this.ref = ref;
     // New numbers draw the layout again.
     const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
-    const spec = `${measurements.environmentSpec}\n${numbers}\n${effectiveSkip}`;
+    // A change of environment draws the layout again through the epoch, which the keys hold.
+    const spec = `${numbers}\n${effectiveSkip}`;
     const mode = sourcePreview ? "source" : "live";
     this.heightKey = measurements.heights.key(ref.id, ref.contentRevision, spec, mode);
     this.placeKey = measurements.heights.key(ref.id, 0, spec, mode);
@@ -399,7 +427,7 @@ function setUpText(view: EditorView, host: TextEditHost): void {
   for (const textEl of Array.from(host.root.querySelectorAll<HTMLElement>(":scope > .vml-layout__text"))) {
     const side: TextSide = textEl.dataset.side === "left" ? "left" : "right";
     textEl.addEventListener("click", (event) => {
-      if (isEditingText(host.el) || (event.target instanceof Element && event.target.closest("a"))) {
+      if (isEditingText(host.el) || eventElement(event)?.closest("a")) {
         return;
       }
       if (!(host.el.doc.getSelection()?.isCollapsed ?? true)) {
@@ -422,21 +450,29 @@ function setUpText(view: EditorView, host: TextEditHost): void {
   }
 }
 
-/** While a wrapped layout's source shows, the layout floats beside it, for display only. */
+/**
+ * While a wrapped layout's source shows, the layout floats beside it, for display only. Its text and
+ * captions are drawn too: a box of text drawn empty would leave the note's text nothing to wrap
+ * around, and the note would jump each time the cursor went in and out of the box.
+ */
 class RevealedWrapWidget extends WidgetType {
   private readonly app: App;
   private readonly block: V2Block;
   private readonly sourcePath: string;
+  private readonly refs: RefContext | undefined;
   private readonly effectiveSkip: number | null;
   private readonly key: string;
 
-  constructor(app: App, block: V2Block, sourcePath: string, effectiveSkip: number | null) {
+  constructor(app: App, block: V2Block, sourcePath: string, refs: RefContext | undefined, effectiveSkip: number | null) {
     super();
     this.app = app;
     this.block = block;
     this.sourcePath = sourcePath;
+    this.refs = refs;
     this.effectiveSkip = effectiveSkip;
-    this.key = `${sourcePath}\n${effectiveSkip}\n${block.lines.join("\n")}`;
+    // New numbers draw the layout again.
+    const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
+    this.key = `${sourcePath}\n${effectiveSkip}\n${numbers}\n${block.lines.join("\n")}`;
   }
 
   override eq(other: RevealedWrapWidget): boolean {
@@ -445,9 +481,17 @@ class RevealedWrapWidget extends WidgetType {
 
   toDOM(): HTMLElement {
     const el = createSpan({ cls: "vml-wrap-reveal vml-live-preview vml-live-preview--wrap" });
+    const component = new Component();
+    component.load();
+    components.set(el, component);
     renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block),
-      effectiveSkip: this.effectiveSkip, editable: false, warning: null });
+      effectiveSkip: this.effectiveSkip, editable: false, warning: null, component, refs: this.refs });
     return el;
+  }
+
+  override destroy(dom: HTMLElement): void {
+    components.get(dom)?.unload();
+    components.delete(dom);
   }
 
   override ignoreEvent(): boolean {
