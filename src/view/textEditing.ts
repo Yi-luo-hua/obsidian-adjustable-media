@@ -3,7 +3,7 @@ import type { EditorView, ViewUpdate } from "@codemirror/view";
 
 import { blockWrap, findV2Blocks, type TextSide, type V2Block } from "../format/v2.ts";
 import { blockIdentity } from "../layout/blockIdentity.ts";
-import { snapshotForState } from "../layout/documentSnapshot.ts";
+import { latestSnapshotOf, snapshotForState } from "../layout/documentSnapshot.ts";
 import { onlyColumnTextDiffers, planColumnText } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { setBounded } from "../layout/viewProjection.ts";
@@ -135,6 +135,8 @@ export function stopTextEdit(el: HTMLElement): void {
 class TextEditSession {
   private readonly host: TextEditHost;
   private readonly side: TextSide;
+  /** The lineage of the note's buffer when the typing started: drafts are judged against that note. */
+  private readonly lineage: string | undefined;
   /** The frame around the column's editor. */
   private readonly box: HTMLElement;
   private readonly editor: EditorView;
@@ -159,6 +161,7 @@ class TextEditSession {
     this.host = host;
     this.side = side;
     this.block = host.context.block;
+    this.lineage = snapshotForState(host.view.state)?.lineageId;
     column.empty();
     // The source is drawn as the note's editor draws its text, not as rendered Markdown.
     column.removeClass("markdown-rendered");
@@ -304,16 +307,18 @@ class TextEditSession {
   }
 
   /**
-   * Whether a draft kept under `key` can only come back to this block: it is still in the note and the
-   * only block like it, or it is gone (deleted, or changed elsewhere) with no block like it left, so
-   * that only an undo bringing it back matches. An identical block elsewhere would take the draft.
+   * Whether a draft kept under `key` can only come back to this block: no other block of the note
+   * (another runtime identity) reads the way this one did when the draft was typed for it. This block
+   * itself may be there as it was, changed elsewhere or deleted: an undo back to it brings the draft
+   * back. The note is the one the typing started in, as it last stood with layouts in it, not whatever
+   * the editor shows now: going to another note or closing this one empties or replaces the editor's
+   * text before its widgets go. Unknown, the draft is not kept.
    */
   private draftBelongs(key: string): boolean {
     const mine = blockIdentity(this.block);
-    const snapshot = snapshotForState(this.host.view.state);
-    const present = mine === undefined || snapshot === null || snapshot.blocks.some((ref) => ref.id === mine);
-    const targets = draftTargets(this.host.view, this.host.sourcePath, this.side, key);
-    return present ? targets === 1 : targets === 0;
+    const snapshot = this.lineage === undefined ? null : latestSnapshotOf(this.lineage);
+    return mine !== undefined && snapshot !== null
+      && !snapshot.blocks.some((ref) => ref.id !== mine && draftKey(this.host.sourcePath, ref.block, this.side) === key);
   }
 
   /** Gives up the text that cannot be written, and draws the layout again from the note. */

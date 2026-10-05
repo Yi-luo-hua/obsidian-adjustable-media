@@ -5,6 +5,7 @@ import { blockGaps } from "./placement.ts";
 import type { SourceAssertion } from "./sourceAssertions.ts";
 import { identifyBlock } from "./blockIdentity.ts";
 import { scanMarkdownLines } from "../markdown/lineContext.ts";
+import { setBounded } from "./viewProjection.ts";
 
 /** File identity and buffer lineage are distinct from the current path or text. */
 export interface DocumentOrigin {
@@ -65,9 +66,22 @@ export interface DocumentSnapshot {
 let nextIdentity = 0;
 const identity = (kind: string): string => `${kind}:${++nextIdentity}`;
 const stateSnapshots = new WeakMap<EditorState, DocumentSnapshot | null>();
+/** The newest snapshot of each buffer lineage, the latest few: see latestSnapshotOf. */
+const latestByLineage = new Map<string, DocumentSnapshot>();
+const MAX_LINEAGES = 10;
 
 export function rememberDocumentSnapshot(state: EditorState, snapshot: DocumentSnapshot | null): void {
   stateSnapshots.set(state, snapshot);
+  if (snapshot) setBounded(latestByLineage, snapshot.lineageId, snapshot, MAX_LINEAGES);
+}
+
+/**
+ * What a note last held while it had layouts, by the lineage of its buffer: still there once its editor
+ * shows another note, or was emptied as the note closed, or the note's last layout went. Null when no
+ * such snapshot is known any more.
+ */
+export function latestSnapshotOf(lineageId: string): DocumentSnapshot | null {
+  return latestByLineage.get(lineageId) ?? null;
 }
 
 export function snapshotForState(state: EditorState): DocumentSnapshot | null {

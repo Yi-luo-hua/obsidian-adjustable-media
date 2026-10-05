@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { documentSnapshot } from "../src/layout/documentSnapshot.ts";
+import { documentSnapshot, latestSnapshotOf, rememberDocumentSnapshot } from "../src/layout/documentSnapshot.ts";
 import { PaneMeasurements, ViewProjection, setBounded } from "../src/layout/viewProjection.ts";
 
 const origin = { file: {}, branch: {}, path: "note.md" };
@@ -90,4 +90,22 @@ test("a bounded cache keeps its newest entries and drops the oldest", () => {
   assert.equal(measurements.get("4"), undefined);
   assert.equal(measurements.get("5"), 5);
   assert.equal(measurements.get("1004"), 1004);
+});
+
+test("a buffer's latest snapshot with layouts outlives the states that have none", () => {
+  const first = documentSnapshot("<!-- vml -->\n![[a.png]]\n<!-- /vml -->", origin);
+  rememberDocumentSnapshot({} as never, first);
+  assert.equal(latestSnapshotOf(first.lineageId), first);
+  // The note emptied as it closes, or its last layout deleted: no snapshot for that state.
+  rememberDocumentSnapshot({} as never, null);
+  assert.equal(latestSnapshotOf(first.lineageId), first);
+  // A later snapshot of the same buffer takes over; another buffer keeps its own.
+  const next = documentSnapshot("Text\n<!-- vml -->\n![[a.png]]\n<!-- /vml -->", origin, first);
+  assert.equal(next.lineageId, first.lineageId);
+  rememberDocumentSnapshot({} as never, next);
+  assert.equal(latestSnapshotOf(first.lineageId), next);
+  const other = documentSnapshot("<!-- vml -->\n![[b.png]]\n<!-- /vml -->", { file: {}, branch: {}, path: "other.md" });
+  rememberDocumentSnapshot({} as never, other);
+  assert.equal(latestSnapshotOf(first.lineageId), next);
+  assert.equal(latestSnapshotOf("unknown"), null);
 });
