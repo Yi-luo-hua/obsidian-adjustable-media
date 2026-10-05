@@ -216,6 +216,14 @@ const MESSAGES = {
     zh: "文字栏有不能写回的修改，编辑框保持打开：回到框里改好它，或者在框里按两次 Esc 放弃。",
     en: "The text column has changes that cannot be saved, so its editor stays open: go back to fix them, or press Esc twice in it to give them up.",
   },
+  textDraftSaved: {
+    zh: "文字栏有不能写回的草稿，已暂存：只要这一栏在别处没被改动，下次点开它时会恢复（重启 Obsidian 后不保留）。",
+    en: "The text column's draft could not be saved, so it was kept: it comes back the next time you edit that column, unless the column was changed elsewhere (not kept after Obsidian restarts).",
+  },
+  textDraftRestored: {
+    zh: "已恢复这一栏之前未保存的草稿。",
+    en: "Restored this column's unsaved draft.",
+  },
   textNotSaved: {
     zh: "这样写会改变布局块本身（例如只有图片的一行、代码围栏、布局注释，或者清空了文字块），暂不保存。",
     en: "This would change the layout block itself (a line of media embeds only, a code fence, a layout comment, or an emptied text box), so it is not saved.",

@@ -4,6 +4,7 @@ import type { EditorView, ViewUpdate } from "@codemirror/view";
 import { blockWrap, type TextSide, type V2Block } from "../format/v2.ts";
 import { onlyColumnTextDiffers, planColumnText } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
+import { setBounded } from "../layout/viewProjection.ts";
 import { createColumnEditor } from "./columnEditor.ts";
 import { commitEdits, type LayoutContext } from "./interactions.ts";
 import { closeLinkSuggest } from "./linkSuggest.ts";
@@ -59,21 +60,44 @@ const GLOBAL_COMMANDS: ReadonlyArray<{ id: string; keys: Hotkey[] }> = [
   { id: "app:open-settings", keys: [{ modifiers: ["Mod"], key: "," }] },
 ];
 
+/**
+ * Text typed in a column that could not go into the note when its editor went away with the layout's
+ * element (reading view, another note, the block changed elsewhere), by the block and side it was
+ * typed for. Kept in memory for this session of Obsidian only, the latest few.
+ */
+const drafts = new Map<string, string>();
+const MAX_DRAFTS = 20;
+
+/**
+ * What a draft was typed for: the note, the side, and the block's opening comment, rows and text on
+ * that side as they were. A draft comes back only to exactly that: once the side has changed
+ * elsewhere, writing the draft would undo that change, and a same-looking block elsewhere is not it.
+ */
+function draftKey(sourcePath: string, block: V2Block, side: TextSide): string {
+  return JSON.stringify([sourcePath, side, block.lines[0], block.rows.map((row) => row.embeds.map((embed) => embed.raw)), textOf(block, side)]);
+}
+
 /** Starts typing the text on `side` right in the layout, with the caret where `point` is on the drawn text, or at its end. */
 export function startTextEdit(host: TextEditHost, side: TextSide, point: Point | null): void {
   if (sessions.has(host.el)) {
     return;
   }
   const source = textOf(host.context.block, side);
+  const key = draftKey(host.sourcePath, host.context.block, side);
+  const draft = drafts.get(key);
   let current = host;
   let column = columnOf(current, side);
-  const caret = point && column ? caretInSource(column, point, source) : source.length;
+  const caret = draft !== undefined ? draft.length : point && column ? caretInSource(column, point, source) : source.length;
   if (!column) {
     current = current.redraw(current.context.block, side);
     column = columnOf(current, side);
   }
   if (column) {
-    sessions.set(current.el, new TextEditSession(current, side, column, source, caret));
+    drafts.delete(key);
+    sessions.set(current.el, new TextEditSession(current, side, column, draft ?? source, caret, draft !== undefined));
+    if (draft !== undefined) {
+      new Notice(t("textDraftRestored"));
+    }
   }
 }
 
@@ -117,7 +141,8 @@ class TextEditSession {
   /** Whether Esc was pressed once on such text: a second press, with nothing typed between, gives it up. */
   private warned = false;
 
-  constructor(host: TextEditHost, side: TextSide, column: HTMLElement, source: string, caret: number) {
+  /** `text` is the column's source, or, `restored`, a draft of it typed before that could not be saved. */
+  constructor(host: TextEditHost, side: TextSide, column: HTMLElement, text: string, caret: number, restored = false) {
     this.host = host;
     this.side = side;
     this.block = host.context.block;
@@ -132,7 +157,7 @@ class TextEditSession {
       app: host.app,
       sourcePath: host.sourcePath,
       note: host.view,
-      text: source,
+      text,
       caret,
       onUpdate: (update) => this.updated(update),
     });
@@ -193,6 +218,10 @@ class TextEditSession {
 
     this.editor.focus();
     this.pushScope();
+    // A restored draft is checked as typed text is: its frame shows whether it can be saved now.
+    if (restored) {
+      this.write();
+    }
   }
 
   /**
@@ -214,11 +243,19 @@ class TextEditSession {
     return true;
   }
 
-  /** Stops without drawing anything: the layout is drawn anew anyway. */
+  /**
+   * Stops without drawing anything: the layout is drawn anew anyway. Text that could not be saved is
+   * kept as a draft, for the column of the same block to bring back when it is typed in again.
+   */
   abort(): void {
-    if (!this.ended) {
-      this.finish();
+    if (this.ended) {
+      return;
     }
+    if (this.invalid) {
+      setBounded(drafts, draftKey(this.host.sourcePath, this.block, this.side), this.editor.state.doc.toString(), MAX_DRAFTS);
+      new Notice(t("textDraftSaved"));
+    }
+    this.finish();
   }
 
   /**
