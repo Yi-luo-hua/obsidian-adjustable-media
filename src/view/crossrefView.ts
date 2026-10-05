@@ -3,10 +3,12 @@ import { Prec, StateField, type EditorState, type Extension, type Range } from "
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
 import {
+  DRAWN_TOKEN,
   EMPTY_REF_INDEX,
   captionText,
   captionParagraphStart,
   collectRefs,
+  equationLabel,
   equationLabels,
   mayHaveRefs,
   numberMarkdown,
@@ -114,9 +116,6 @@ function isFloatBody(el: Element): boolean {
   return el.hasClass("vml-figure") || el.hasClass("math-block") || el.tagName === "TABLE" || el.querySelector(":scope > table, :scope > .math-block") !== null;
 }
 
-const TOKEN = /\{#((?:fig|tbl):[\w.:-]+)\}|(^|[^\w@\\/])@((?:fig|tbl|eq):(?:[A-Za-z0-9_][\w.:-]*[\w-]|[A-Za-z0-9_]))/g;
-const EQUATION_LABEL = /\\label\{(eq:[\w.:-]+)\}/;
-
 /**
  * Reading view, and follow-ups to references anywhere. The sections of the note's own text get their
  * numbers here; a layout's text is numbered before it is drawn (layoutView.ts).
@@ -193,7 +192,7 @@ function numberSection(app: App, el: HTMLElement, ctx: MarkdownPostProcessorCont
   const refs = refContextOf(text);
   const math = el.querySelector<HTMLElement>(".math-block");
   const source = mathSource(own);
-  const label = source === null ? undefined : EQUATION_LABEL.exec(source)?.[1];
+  const label = source === null ? undefined : equationLabel(source);
   if (math && source !== null && label !== undefined) {
     const tagged = numbered(`$$\n${source}\n$$`, refs).split("\n").slice(1, -1).join("\n");
     math.setAttr("data-vml-label", label);
@@ -217,13 +216,13 @@ function numberTextNodes(el: HTMLElement, refs: RefContext): void {
   const nodes: Text[] = [];
   for (let node = walker.nextNode() as Text | null; node; node = walker.nextNode() as Text | null) {
     const parent = node.parentElement;
-    if (parent && !parent.closest("code, pre, .math, .vml-ref, .vml-caption-label") && TOKEN.test(node.data)) {
+    if (parent && !parent.closest("code, pre, .math, .vml-ref, .vml-caption-label") && DRAWN_TOKEN.test(node.data)) {
       nodes.push(node);
     }
-    TOKEN.lastIndex = 0;
+    DRAWN_TOKEN.lastIndex = 0;
   }
   for (const node of nodes) {
-    const parts = node.data.split(TOKEN);
+    const parts = node.data.split(DRAWN_TOKEN);
     const fragment = createFragment();
     let caption: string | null = null;
     // split() gives the text, then each match's three groups, in turn.
@@ -375,7 +374,7 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
       }
       const last = doc.line(end + 1);
       const source = mathSource(doc.sliceString(line.from, last.to));
-      const label = source === null ? undefined : EQUATION_LABEL.exec(source)?.[1];
+      const label = source === null ? undefined : equationLabel(source);
       if (source !== null && label !== undefined && !touched(line.from, last.to)) {
         const tagged = numberMarkdown(`$$\n${source}\n$$`, index, language).split("\n").slice(1, -1).join("\n");
         if (tagged !== source) {
@@ -389,7 +388,7 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
       continue;
     }
     const code = codeSpans(line.text);
-    for (const match of line.text.matchAll(TOKEN)) {
+    for (const match of line.text.matchAll(DRAWN_TOKEN)) {
       const start = (match.index ?? 0) + (match[2]?.length ?? 0);
       const from = line.from + start;
       const to = line.from + (match.index ?? 0) + match[0].length;

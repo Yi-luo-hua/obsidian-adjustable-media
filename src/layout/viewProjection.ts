@@ -123,8 +123,16 @@ export class PaneMeasurements<T> {
   get(key: string): T | undefined { return this.values.get(key); }
 
   set(key: string, value: T): void {
-    this.values.delete(key);
-    this.values.set(key, value);
-    if (this.values.size > 1000) this.values.delete(this.values.keys().next().value!);
+    setBounded(this.values, key, value, 1000);
+  }
+}
+
+/** Sets `key` as the newest entry of `map`, dropping the oldest ones beyond `limit`. */
+export function setBounded<K, V>(map: Map<K, V>, key: K, value: V, limit: number): void {
+  map.delete(key);
+  map.set(key, value);
+  for (const oldest of map.keys()) {
+    if (map.size <= limit) break;
+    map.delete(oldest);
   }
 }

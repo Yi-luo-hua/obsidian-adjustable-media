@@ -29,11 +29,17 @@ export interface RefIndex {
   signature: string;
 }
 
+/** What may follow the kind in a label: no trailing "." or ":", which end the sentence instead. */
 const ID = String.raw`[A-Za-z0-9_][\w.:-]*[\w-]|[A-Za-z0-9_]`;
 const CAPTION_LABEL = new RegExp(String.raw`[ \t]*\{#((?:fig|tbl):(?:${ID}))\}`, "g");
 const EQUATION_LABEL = new RegExp(String.raw`\\label\{(eq:(?:${ID}))\}`, "g");
 const REFERENCE = new RegExp(String.raw`(^|[^\w@\\/])@((?:fig|tbl|eq):(?:${ID}))`, "g");
 const INLINE_CODE = /(`+)[\s\S]*?\1/g;
+/**
+ * A caption label (groups: label) or a reference (groups: the character before it, the label) in drawn
+ * text, read as collectRefs reads them: a label it does not number is not taken for one when drawing.
+ */
+export const DRAWN_TOKEN = new RegExp(String.raw`\{#((?:fig|tbl):(?:${ID}))\}|(^|[^\w@\\/])@((?:fig|tbl|eq):(?:${ID}))`, "g");
 const QUICK_CHECK = /\{#(?:fig|tbl):|\\label\{eq:|@(?:fig|tbl|eq):/;
 
 const NAMES: Record<RefLanguage, Record<RefKind, string>> = {
@@ -155,6 +161,11 @@ export function numberMarkdown(markdown: string, index: RefIndex, language: RefL
     result[at] = marker + prefix + line.slice(marker.length);
   }
   return result.join("\n");
+}
+
+/** The first equation label in `tex`, as collectRefs reads labels. */
+export function equationLabel(tex: string): string | undefined {
+  return new RegExp(EQUATION_LABEL.source).exec(tex)?.[1];
 }
 
 /**
