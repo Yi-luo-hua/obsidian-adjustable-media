@@ -40,6 +40,16 @@ export function commandHotkeys(app: App, id: string, fallback: readonly Hotkey[]
   }
 }
 
+/** Runs Obsidian's command `id`, as its hotkey would; false when it cannot be run. */
+export function executeCommand(app: App, id: string): boolean {
+  try {
+    const commands = (app as unknown as { commands?: { executeCommandById?(id: string): boolean } }).commands;
+    return commands?.executeCommandById?.(id) ?? false;
+  } catch {
+    return false;
+  }
+}
+
 /** A section of a note's reading view, as Obsidian's renderer keeps it. */
 export interface ReadingSection {
   el: HTMLElement;

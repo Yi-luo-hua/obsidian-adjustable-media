@@ -271,6 +271,10 @@ export function registerReadingView(plugin: Plugin): void {
   plugin.registerEvent(plugin.app.workspace.on("editor-change", (editor, view) => {
     if (!(view instanceof MarkdownView) || !view.file) return;
     generations.set(view.file, (generations.get(view.file) ?? 0) + 1);
+    // Fired on each keystroke in every note: read the note only when a reading view shows it too.
+    const file = view.file;
+    if (!plugin.app.workspace.getLeavesOfType("markdown").some(leaf => leaf.view instanceof MarkdownView
+      && leaf.view.file === file && leaf.view.getMode() === "preview")) return;
     const text = editor.getValue();
     if (!text.includes("<!-- vml") && ![...readers.values()].some(reader => reader.file === view.file)) return;
     for (const reader of currentReaders(view.file)) desire(reader, text);

@@ -1,4 +1,4 @@
-import { Scope, type App, type Editor } from "obsidian";
+import { Notice, Scope, type App, type Editor, type Hotkey } from "obsidian";
 import type { EditorView, ViewUpdate } from "@codemirror/view";
 
 import { blockWrap, type TextSide, type V2Block } from "../format/v2.ts";
@@ -8,6 +8,7 @@ import { createColumnEditor } from "./columnEditor.ts";
 import { commitEdits, type LayoutContext } from "./interactions.ts";
 import { closeLinkSuggest } from "./linkSuggest.ts";
 import { t } from "./messages.ts";
+import { commandHotkeys, executeCommand } from "./obsidianInternals.ts";
 
 /**
  * Typing the text beside a layout's media right in the layout, in live preview (docs/DESIGN.md,
@@ -46,6 +47,17 @@ interface Point {
 const CARET_CLUES = [32, 16, 8, 5, 3];
 
 const sessions = new WeakMap<HTMLElement, TextEditSession>();
+
+/**
+ * Obsidian commands that still work while a column is typed in, on their keys in Obsidian: they act on
+ * no editor, and each takes the focus away, which ends the typing as any other click elsewhere does.
+ * Every other hotkey stays away from the column's editor (see `scope`).
+ */
+const GLOBAL_COMMANDS: ReadonlyArray<{ id: string; keys: Hotkey[] }> = [
+  { id: "command-palette:open", keys: [{ modifiers: ["Mod"], key: "P" }] },
+  { id: "switcher:open", keys: [{ modifiers: ["Mod"], key: "O" }] },
+  { id: "app:open-settings", keys: [{ modifiers: ["Mod"], key: "," }] },
+];
 
 /** Starts typing the text on `side` right in the layout, with the caret where `point` is on the drawn text, or at its end. */
 export function startTextEdit(host: TextEditHost, side: TextSide, point: Point | null): void {
@@ -89,8 +101,9 @@ class TextEditSession {
   /** The frame around the column's editor. */
   private readonly box: HTMLElement;
   private readonly editor: EditorView;
-  // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here. The
-  // column's editor carries out Obsidian's editor commands on their keys itself (columnKeys.ts).
+  // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here, but
+  // for the few that act on no editor (GLOBAL_COMMANDS). The column's editor carries out Obsidian's
+  // editor commands on their keys itself (columnKeys.ts).
   private readonly scope = new Scope();
   private block: V2Block;
   /** The text going into the note right now; the note holds it once the write is done. */
@@ -99,6 +112,10 @@ class TextEditSession {
   private pending = false;
   private pushed = false;
   private ended = false;
+  /** Whether the editor holds text that cannot go into the note as it is (its frame shows red). */
+  private invalid = false;
+  /** Whether Esc was pressed once on such text: a second press, with nothing typed between, gives it up. */
+  private warned = false;
 
   constructor(host: TextEditHost, side: TextSide, column: HTMLElement, source: string, caret: number) {
     this.host = host;
@@ -122,28 +139,44 @@ class TextEditSession {
     this.scope.register([], "Escape", (event) => {
       // Esc during an input method's composition cancels the composition, and with link suggestions
       // open it closes them.
-      if (event.isComposing) {
-        return true;
+      if (event.isComposing || closeLinkSuggest(this.editor)) {
+        return event.isComposing;
       }
-      if (!closeLinkSuggest(this.editor)) {
+      // Text that cannot be saved is never given up without asking: Esc once warns, twice discards it.
+      if (this.invalid && !this.warned) {
+        this.warned = true;
+        new Notice(t("textUnsavedEsc"));
+      } else if (this.invalid) {
+        this.discard();
+      } else {
         this.editor.contentDOM.blur();
       }
       return false;
     });
+    for (const command of GLOBAL_COMMANDS) {
+      for (const hotkey of commandHotkeys(host.app, command.id, command.keys)) {
+        this.scope.register(hotkey.modifiers, hotkey.key, () => {
+          executeCommand(host.app, command.id);
+          return false;
+        });
+      }
+    }
 
     const content = this.editor.contentDOM;
     // Focus leaving the editor ends the typing, once it has settled elsewhere. Another window taking
     // the focus leaves the editor focused in this one, and the typing goes on on return.
     content.addEventListener("focusout", () => {
-      window.setTimeout(() => {
+      content.win.setTimeout(() => {
         if (content.doc.activeElement !== content) {
           this.end();
         }
       }, 0);
     });
+    // Back in an editor that was left open on unsaved text, Obsidian's hotkeys stay away again.
+    content.addEventListener("focusin", () => this.pushScope());
     // Composed text goes in with the editor's next update; this covers an editor that reports none.
     content.addEventListener("compositionend", () => {
-      window.setTimeout(() => {
+      content.win.setTimeout(() => {
         if (this.pending) {
           this.write();
         }
@@ -185,7 +218,10 @@ class TextEditSession {
     }
   }
 
-  /** Leaves the editor: what is left is written, and the layout is drawn again from the note. */
+  /**
+   * Leaves the editor: what is left is written, and the layout is drawn again from the note. Text that
+   * cannot be written keeps the editor open, its frame red, for the text to be fixed or given up with Esc.
+   */
   private end(): void {
     if (this.ended) {
       return;
@@ -194,6 +230,17 @@ class TextEditSession {
     if (this.ended) {
       return;
     }
+    if (this.invalid) {
+      this.popScope();
+      new Notice(t("textKeptOpen"));
+      return;
+    }
+    this.finish();
+    this.host.redraw(this.block);
+  }
+
+  /** Gives up the text that cannot be written, and draws the layout again from the note. */
+  private discard(): void {
     this.finish();
     this.host.redraw(this.block);
   }
@@ -202,6 +249,7 @@ class TextEditSession {
   private updated(update: ViewUpdate): void {
     if (update.docChanged) {
       this.pending = true;
+      this.warned = false;
     }
     if (this.pending) {
       this.write();
@@ -219,7 +267,8 @@ class TextEditSession {
     this.pending = false;
     const text = this.editor.state.doc.toString();
     const plan = planColumnText(this.block, this.side, text);
-    this.box.toggleClass("is-invalid", !plan.fits);
+    this.invalid = !plan.fits;
+    this.box.toggleClass("is-invalid", this.invalid);
     if (!plan.edit) {
       return;
     }

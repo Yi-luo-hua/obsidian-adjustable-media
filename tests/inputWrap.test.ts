@@ -72,3 +72,11 @@ test("indented media lines, in a list item or an indented code block, are left a
   // Any indented line among several spoils the whole wrap.
   assert.equal(run(["![[a.png]]", "  ![[b.png]]"], [0, 1], false), null);
 });
+
+test("media dropped below a floating layout get a block of their own", () => {
+  const floating = ['<!-- vml {"v":2,"wrap":"left"} -->', "![[a.png]]", "<!-- /vml -->", "", "![[b.png]]"];
+  assert.deepEqual(run(floating, [4]), [...floating.slice(0, 4), "<!-- vml -->", "![[b.png]]", "<!-- /vml -->"]);
+  // A block that does not float still takes them in.
+  const plain = ["<!-- vml -->", "![[a.png]]", "<!-- /vml -->", "", "![[b.png]]"];
+  assert.deepEqual(run(plain, [4]), ["<!-- vml -->", "![[a.png]] ![[b.png]]", "<!-- /vml -->"]);
+});

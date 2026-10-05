@@ -208,6 +208,14 @@ const MESSAGES = {
     zh: "文字底端对齐",
     en: "Text at the bottom",
   },
+  textUnsavedEsc: {
+    zh: "这段文字还不能写回笔记（框是红的）。改好它，或者再按一次 Esc 放弃这些修改。",
+    en: "This text cannot go into the note yet (the frame is red). Fix it, or press Esc again to give up these changes.",
+  },
+  textKeptOpen: {
+    zh: "文字栏有不能写回的修改，编辑框保持打开：回到框里改好它，或者在框里按两次 Esc 放弃。",
+    en: "The text column has changes that cannot be saved, so its editor stays open: go back to fix them, or press Esc twice in it to give them up.",
+  },
   textNotSaved: {
     zh: "这样写会改变布局块本身（例如只有图片的一行、代码围栏、布局注释，或者清空了文字块），暂不保存。",
     en: "This would change the layout block itself (a line of media embeds only, a code fence, a layout comment, or an emptied text box), so it is not saved.",

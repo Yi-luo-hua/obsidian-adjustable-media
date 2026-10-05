@@ -17,6 +17,7 @@ import {
   type RefLanguage,
 } from "../markdown/crossref.ts";
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
+import { changesMayAdd } from "../layout/changeScan.ts";
 import { drawMath } from "./math.ts";
 import { sectionNoteText } from "./noteText.ts";
 import { currentLanguage } from "./messages.ts";
@@ -261,8 +262,13 @@ function numberTextNodes(el: HTMLElement, refs: RefContext): void {
 interface CrossrefState {
   index: RefIndex;
   contexts: LineContext[];
+  /** The note's lines when it has labels or references, kept for cursor moves to redraw from. */
+  lines: string[];
   decorations: DecorationSet;
 }
+
+/** The longest text mayHaveRefs looks for: `\label{eq:`. */
+const LONGEST_REF_MARK = 10;
 
 function numberCallout(el: HTMLElement, refs: RefContext): void {
   numberTextNodes(el, refs);
@@ -296,6 +302,12 @@ export function crossrefExtension(): Extension {
     create: (state) => decorate(state, scan(state)),
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
+      // A note without labels or references stays without them unless the change wrote one.
+      const stillWithout = tr.docChanged && !modeChanged && value.index === EMPTY_REF_INDEX
+        && !changesMayAdd(tr.state.doc, tr.changes, mayHaveRefs, LONGEST_REF_MARK);
+      if (stillWithout) {
+        return value;
+      }
       if (tr.docChanged || modeChanged) {
         return decorate(tr.state, scan(tr.state));
       }
@@ -336,19 +348,19 @@ export function crossrefExtension(): Extension {
 function scan(state: EditorState): Omit<CrossrefState, "decorations"> {
   // Source mode shows the labels as written.
   if (!state.field(editorLivePreviewField, false)) {
-    return { index: EMPTY_REF_INDEX, contexts: [] };
+    return { index: EMPTY_REF_INDEX, contexts: [], lines: [] };
   }
   const text = state.doc.toString();
   if (!mayHaveRefs(text)) {
-    return { index: EMPTY_REF_INDEX, contexts: [] };
+    return { index: EMPTY_REF_INDEX, contexts: [], lines: [] };
   }
   const lines = text.split("\n");
   const contexts = scanMarkdownLines(lines);
-  return { index: collectRefs(lines, contexts), contexts };
+  return { index: collectRefs(lines, contexts), contexts, lines };
 }
 
 function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations">): CrossrefState {
-  const { index, contexts } = scanned;
+  const { index, contexts, lines } = scanned;
   if (contexts.length === 0) {
     return { ...scanned, decorations: Decoration.none };
   }
@@ -357,7 +369,6 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
   const touched = (from: number, to: number): boolean => state.selection.ranges.some((range) => range.from <= to && range.to >= from);
   const { doc } = state;
   const captions = new Set<number>();
-  const lines = doc.toString().split("\n");
 
   for (let at = 0; at < contexts.length; at += 1) {
     const line = doc.line(at + 1);
@@ -414,7 +425,7 @@ function decorate(state: EditorState, scanned: Omit<CrossrefState, "decorations"
       }
     }
   }
-  return { index, contexts, decorations: Decoration.set(ranges, true) };
+  return { index, contexts, lines, decorations: Decoration.set(ranges, true) };
 }
 
 function codeSpans(text: string): Array<[number, number]> {

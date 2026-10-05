@@ -1,4 +1,4 @@
-import { MAX_EMBEDS_PER_ROW, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Embed } from "../format/v2.ts";
+import { MAX_EMBEDS_PER_ROW, blockWrap, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Embed } from "../format/v2.ts";
 import { isEditable, wrapLines, type LineChange } from "../layout/edits.ts";
 import { insertItem, metaFromModel, modelFromBlock, rowEmbeds, type LayoutModel } from "../layout/model.ts";
 import { scanMarkdownLines } from "../markdown/lineContext.ts";
@@ -65,8 +65,10 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
 
 function editableBlockRightAbove(blocks: readonly V2Block[], lines: readonly string[], first: number): V2Block | null {
   const block = [...blocks].reverse().find((candidate) => candidate.closeLine < first);
-  // New media do not join a block with text beside its media: they get a block of their own.
-  if (!block || !isEditable(block) || hasSideText(block)) {
+  // New media do not join a block with text beside its media: they get a block of their own. Nor do
+  // they join a floating block: it would grow down beside the text, while media dropped below a float
+  // go into the note's flow.
+  if (!block || !isEditable(block) || hasSideText(block) || blockWrap(block) !== null) {
     return null;
   }
   for (let line = block.closeLine + 1; line < first; line += 1) {
