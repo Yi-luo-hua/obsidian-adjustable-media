@@ -4,6 +4,8 @@ import * as format from "../src/format/v2.ts";
 import * as edits from "../src/layout/edits.ts";
 import * as model from "../src/layout/model.ts";
 import * as projections from "../src/layout/viewProjection.ts";
+import * as identity from "../src/layout/blockIdentity.ts";
+import * as snapshots from "../src/layout/documentSnapshot.ts";
 import { mockedModule } from "./support/mockedModule.ts";
 
 type Handler = (event: { isComposing?: boolean }) => boolean | void;
@@ -13,12 +15,17 @@ interface Harness {
   leave(): void;
   enter(): void;
   key(key: string, modifiers?: string[]): boolean | void;
-  /** Whether the layout's element stays for the block after a change to the note (its widget's updateDOM). */
-  keeps(lines: string[]): boolean;
+  /**
+   * Whether the layout's element stays for block `index` of `lines`, the note after a change (its
+   * widget's updateDOM); with `id`, that block has this runtime identity.
+   */
+  keeps(lines: string[], index?: number, id?: string): boolean;
+  /** The note now reads `lines`; with `ids`, its live snapshot has blocks of these runtime identities. */
+  setNote(lines: string[], ids?: string[]): void;
   /** The layout's element goes away (its widget's destroy). */
   abort(): void;
-  /** Types in the column again; with `lines`, the block reads so by then. */
-  reopen(lines?: string[]): void;
+  /** Types in the column again; with `lines`, the note reads so by then, and block `index` is typed in. */
+  reopen(lines?: string[], index?: number): void;
   /** What the column's editor started with or holds now. */
   editorText(): string;
   notices: string[];
@@ -29,8 +36,13 @@ interface Harness {
   destroyed(): boolean;
 }
 
-/** One text column session on a block with left text, the editor and the page stubbed. */
-async function session(): Promise<Harness> {
+const BLOCK = ["<!-- vml -->", "Left text", "![[a.png]]", "<!-- /vml -->"];
+
+/**
+ * One text column session, the editor and the page stubbed: on block `index` of the note `lines`
+ * (one block with left text by default), with the runtime identity `id` when given.
+ */
+async function session(lines: string[] = BLOCK, index = 0, id?: string): Promise<Harness> {
   const notices: string[] = [];
   const written: string[][] = [];
   const executed: string[] = [];
@@ -62,18 +74,25 @@ async function session(): Promise<Harness> {
 
   const module = await mockedModule<{ startTextEdit(host: unknown, side: string, point: null): void; keepWhileEditing(el: unknown, block: unknown): boolean; stopTextEdit(el: unknown): void }>(new URL("../src/view/textEditing.ts", import.meta.url), {
     obsidian: { Notice, Scope }, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/model.ts": model,
-    "../layout/viewProjection.ts": projections,
+    "../layout/viewProjection.ts": projections, "../layout/blockIdentity.ts": identity, "../layout/documentSnapshot.ts": snapshots,
     "./columnEditor.ts": { createColumnEditor: (options: { text: string; onUpdate: typeof onUpdate }) => { text = options.text; onUpdate = options.onUpdate; return editor; } },
     "./interactions.ts": { commitEdits: (_app: unknown, _path: string, planned: edits.BlockEdit[]) => { written.push(planned[0]?.replacement ?? []); return Promise.resolve(true); } },
     "./linkSuggest.ts": { closeLinkSuggest: () => false },
     "./messages.ts": { t: (key: string) => key },
     "./obsidianInternals.ts": { commandHotkeys: (_app: unknown, _id: string, keys: unknown) => keys, executeCommand: (_app: unknown, id: string) => { executed.push(id); return true; } },
   });
-  const [block] = format.findV2Blocks(["<!-- vml -->", "Left text", "![[a.png]]", "<!-- /vml -->"]);
-  assert.ok(block);
+  let note = lines;
+  const viewState = { doc: { toString: () => note.join("\n") } };
+  const blockOf = (source: string[], at: number, as?: string): format.V2Block => {
+    const found = format.findV2Blocks(source)[at];
+    assert.ok(found);
+    if (as !== undefined) identity.identifyBlock(found, as);
+    return found;
+  };
+  const block = blockOf(lines, index, id);
   const host: { context: { block: format.V2Block; model: model.LayoutModel } } & Record<string, unknown> = {
     el: {}, root: { querySelector: () => element() }, app: { keymap: { pushScope: () => scopes.pushed++, popScope: () => scopes.popped++ } },
-    sourcePath: "note.md", editor: {}, view: {}, context: { block, model: model.modelFromBlock(block) },
+    sourcePath: "note.md", editor: {}, view: { state: viewState }, context: { block, model: model.modelFromBlock(block) },
     redraw: () => { redraws++; return host; },
   };
   module.startTextEdit(host, "left", null);
@@ -86,11 +105,16 @@ async function session(): Promise<Harness> {
     leave() { content.doc.activeElement = null; listeners.get("focusout")?.(); },
     enter() { content.doc.activeElement = content; listeners.get("focusin")?.(); },
     key, notices, written, executed, scopes,
-    keeps(lines) { return module.keepWhileEditing(host.el, format.findV2Blocks(lines)[0]); },
+    keeps(source, at = 0, as) { return module.keepWhileEditing(host.el, blockOf(source, at, as)); },
+    setNote(source, ids) {
+      note = source;
+      const live = ids && { blocks: ids.map((blockId) => ({ id: blockId })) } as unknown as snapshots.DocumentSnapshot;
+      snapshots.rememberDocumentSnapshot(viewState as never, live ?? null);
+    },
     abort() { module.stopTextEdit(host.el); },
-    reopen(lines) {
-      const [next] = lines ? format.findV2Blocks(lines) : [host.context.block];
-      assert.ok(next);
+    reopen(source, at = 0) {
+      if (source) note = source;
+      const next = source ? blockOf(source, at) : host.context.block;
       host.context = { block: next, model: model.modelFromBlock(next) };
       destroyed = false;
       module.startTextEdit(host, "left", null);
@@ -218,4 +242,64 @@ test("text that was saved leaves no draft behind", async () => {
   assert.deepEqual(editor.notices, []);
   editor.reopen(["<!-- vml -->", "Saved text", "![[a.png]]", "<!-- /vml -->"]);
   assert.equal(editor.editorText(), "Saved text");
+});
+
+const TWO = [...BLOCK, "", ...BLOCK];
+
+test("an identical block left after this one is deleted does not take its editor", async () => {
+  const editor = await session(TWO, 0, "block-a");
+  editor.type("```js");
+  editor.leave();
+  // Moved, the block keeps its identity and its element.
+  assert.equal(editor.keeps(["Added above", ...TWO], 0, "block-a"), true);
+  // Block A deleted: CodeMirror offers its element to block B, which reads just like A did.
+  assert.equal(editor.keeps(BLOCK, 0, "block-b"), false);
+});
+
+test("a draft is not kept when identical blocks leave no telling where it belongs", async () => {
+  const editor = await session(TWO, 0, "block-a");
+  editor.type("```js");
+  // The note closes with both blocks in it.
+  editor.setNote(TWO, ["block-a", "block-b"]);
+  editor.abort();
+  assert.deepEqual(editor.notices, ["textDraftNotKept"]);
+  editor.reopen(TWO, 1);
+  assert.equal(editor.editorText(), "Left text");
+});
+
+test("a draft is not kept when its block is deleted and an identical one is left", async () => {
+  const editor = await session(TWO, 0, "block-a");
+  editor.type("```js");
+  editor.setNote(BLOCK, ["block-b"]);
+  editor.abort();
+  assert.deepEqual(editor.notices, ["textDraftNotKept"]);
+  editor.reopen(BLOCK);
+  assert.equal(editor.editorText(), "Left text");
+});
+
+test("a kept draft waits while the note has identical blocks, and comes back once one is left", async () => {
+  const editor = await session(BLOCK, 0, "block-a");
+  editor.type("```js");
+  editor.setNote(BLOCK, ["block-a"]);
+  editor.abort();
+  assert.deepEqual(editor.notices, ["textDraftSaved"]);
+  // A copy of the block was pasted meanwhile: neither copy takes the draft.
+  editor.reopen(TWO, 1);
+  assert.equal(editor.editorText(), "Left text");
+  assert.equal(editor.notices.at(-1), "textDraftAmbiguous");
+  editor.abort();
+  // The copy gone again, the draft comes back.
+  editor.reopen(BLOCK);
+  assert.equal(editor.editorText(), "```js");
+  assert.equal(editor.notices.at(-1), "textDraftRestored");
+});
+
+test("a draft of a deleted block, with nothing like it left, is kept for an undo to bring back", async () => {
+  const editor = await session(BLOCK, 0, "block-a");
+  editor.type("```js");
+  editor.setNote(["Only text now"], []);
+  editor.abort();
+  assert.deepEqual(editor.notices, ["textDraftSaved"]);
+  editor.reopen(BLOCK);
+  assert.equal(editor.editorText(), "```js");
 });

@@ -1,7 +1,9 @@
 import { Notice, Scope, type App, type Editor, type Hotkey } from "obsidian";
 import type { EditorView, ViewUpdate } from "@codemirror/view";
 
-import { blockWrap, type TextSide, type V2Block } from "../format/v2.ts";
+import { blockWrap, findV2Blocks, type TextSide, type V2Block } from "../format/v2.ts";
+import { blockIdentity } from "../layout/blockIdentity.ts";
+import { snapshotForState } from "../layout/documentSnapshot.ts";
 import { onlyColumnTextDiffers, planColumnText } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { setBounded } from "../layout/viewProjection.ts";
@@ -77,6 +79,11 @@ function draftKey(sourcePath: string, block: V2Block, side: TextSide): string {
   return JSON.stringify([sourcePath, side, block.lines[0], block.rows.map((row) => row.embeds.map((embed) => embed.raw)), textOf(block, side)]);
 }
 
+/** How many blocks of the note in `view` a draft for `key` could belong to. */
+function draftTargets(view: EditorView, sourcePath: string, side: TextSide, key: string): number {
+  return findV2Blocks(view.state.doc.toString().split("\n")).filter((block) => draftKey(sourcePath, block, side) === key).length;
+}
+
 /** Starts typing the text on `side` right in the layout, with the caret where `point` is on the drawn text, or at its end. */
 export function startTextEdit(host: TextEditHost, side: TextSide, point: Point | null): void {
   if (sessions.has(host.el)) {
@@ -84,7 +91,13 @@ export function startTextEdit(host: TextEditHost, side: TextSide, point: Point |
   }
   const source = textOf(host.context.block, side);
   const key = draftKey(host.sourcePath, host.context.block, side);
-  const draft = drafts.get(key);
+  let draft = drafts.get(key);
+  // With identical blocks in the note, nothing tells which one the draft was typed in: it stays kept,
+  // and comes back once that block is the only one like it.
+  if (draft !== undefined && draftTargets(host.view, host.sourcePath, side, key) > 1) {
+    new Notice(t("textDraftAmbiguous"));
+    draft = undefined;
+  }
   let current = host;
   let column = columnOf(current, side);
   const caret = draft !== undefined ? draft.length : point && column ? caretInSource(column, point, source) : source.length;
@@ -93,9 +106,9 @@ export function startTextEdit(host: TextEditHost, side: TextSide, point: Point |
     column = columnOf(current, side);
   }
   if (column) {
-    drafts.delete(key);
     sessions.set(current.el, new TextEditSession(current, side, column, draft ?? source, caret, draft !== undefined));
     if (draft !== undefined) {
+      drafts.delete(key);
       new Notice(t("textDraftRestored"));
     }
   }
@@ -230,6 +243,12 @@ class TextEditSession {
    * take; the typing goes on, and ends only if the element goes away (stopTextEdit).
    */
   accepts(block: V2Block): boolean {
+    // CodeMirror offers the element to the widgets of other blocks too: an identical block elsewhere,
+    // left when this one is deleted, is another block and does not take this editor or its draft.
+    const mine = blockIdentity(this.block);
+    if (mine !== undefined && blockIdentity(block) !== mine) {
+      return false;
+    }
     // What the note holds of this side: the text being written, the typed text once it is written, or,
     // while the editor holds text that cannot be written, the side as it last was. The block may still
     // move (a line added above it) without the unsaved text going away with its element.
@@ -252,8 +271,13 @@ class TextEditSession {
       return;
     }
     if (this.invalid) {
-      setBounded(drafts, draftKey(this.host.sourcePath, this.block, this.side), this.editor.state.doc.toString(), MAX_DRAFTS);
-      new Notice(t("textDraftSaved"));
+      const key = draftKey(this.host.sourcePath, this.block, this.side);
+      if (this.draftBelongs(key)) {
+        setBounded(drafts, key, this.editor.state.doc.toString(), MAX_DRAFTS);
+        new Notice(t("textDraftSaved"));
+      } else {
+        new Notice(t("textDraftNotKept"));
+      }
     }
     this.finish();
   }
@@ -277,6 +301,19 @@ class TextEditSession {
     }
     this.finish();
     this.host.redraw(this.block);
+  }
+
+  /**
+   * Whether a draft kept under `key` can only come back to this block: it is still in the note and the
+   * only block like it, or it is gone (deleted, or changed elsewhere) with no block like it left, so
+   * that only an undo bringing it back matches. An identical block elsewhere would take the draft.
+   */
+  private draftBelongs(key: string): boolean {
+    const mine = blockIdentity(this.block);
+    const snapshot = snapshotForState(this.host.view.state);
+    const present = mine === undefined || snapshot === null || snapshot.blocks.some((ref) => ref.id === mine);
+    const targets = draftTargets(this.host.view, this.host.sourcePath, this.side, key);
+    return present ? targets === 1 : targets === 0;
   }
 
   /** Gives up the text that cannot be written, and draws the layout again from the note. */

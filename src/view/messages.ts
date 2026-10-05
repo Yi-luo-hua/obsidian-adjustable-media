@@ -220,6 +220,14 @@ const MESSAGES = {
     zh: "文字栏有不能写回的草稿，已暂存：只要这一栏在别处没被改动，下次点开它时会恢复（重启 Obsidian 后不保留）。",
     en: "The text column's draft could not be saved, so it was kept: it comes back the next time you edit that column, unless the column was changed elsewhere (not kept after Obsidian restarts).",
   },
+  textDraftNotKept: {
+    zh: "文字栏有不能写回的草稿，但笔记里有内容完全相同的块，无法确定草稿属于哪一个，所以没有暂存。",
+    en: "The text column's draft could not be saved, and the note has identical blocks, so there is no telling which one it belongs to: it was not kept.",
+  },
+  textDraftAmbiguous: {
+    zh: "有一份未保存的草稿可能属于这一栏，但笔记里有内容完全相同的块，不自动恢复；只剩一个这样的块时再点开它就会恢复。",
+    en: "An unsaved draft may belong to this column, but the note has identical blocks, so it is not restored; it comes back once only one such block is left.",
+  },
   textDraftRestored: {
     zh: "已恢复这一栏之前未保存的草稿。",
     en: "Restored this column's unsaved draft.",
