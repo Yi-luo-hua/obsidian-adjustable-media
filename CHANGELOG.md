@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.1 - 2026-10-05
 
 - **Add text on the left/right** is no longer offered for a floating layout. Text beside media stops a layout from floating, so the editor used to close after the first letter typed and the layout jumped; choose **No text wrap** first.
 - **Move out of layout** keeps the moved embed a paragraph of its own. Moved out of a floating layout, it used to join the paragraph the layout wraps and take over the float's position.
@@ -19,6 +19,8 @@
 - Media dropped or pasted below a floating layout get a layout of their own instead of joining the floating one.
 - Typing in a note without layouts or cross-references no longer reads the whole note on each keystroke, and moving the cursor in a note with references no longer does either.
 - Opening a note no longer draws each of its layouts twice.
+
+Unsaved drafts are kept only in memory for the current plugin session; restarting Obsidian or reloading the plugin clears them. Retention and recovery require an unambiguous block match and retained buffer context. The note format remains V2; no migration is needed.
 
 ## 0.7.0 - 2026-10-01
 
