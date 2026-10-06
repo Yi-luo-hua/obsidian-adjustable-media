@@ -10,6 +10,7 @@ import * as changeScan from "../src/layout/changeScan.ts";
 import * as projections from "../src/layout/viewProjection.ts";
 import * as model from "../src/layout/model.ts";
 import * as crossref from "../src/markdown/crossref.ts";
+import * as paragraphBreaks from "../src/markdown/paragraphBreaks.ts";
 import * as transaction from "../src/layout/editorTransaction.ts";
 import * as identity from "../src/layout/blockIdentity.ts";
 import { mockedModule } from "./support/mockedModule.ts";
@@ -34,7 +35,7 @@ test("an omitted editor file preserves layout identity, dimensions and originati
     obsidian, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
-    "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
@@ -94,7 +95,7 @@ test("a wrapped text box whose source shows still floats with its text drawn bes
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
-    "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => refs }, "./interactions.ts": {},
     "./layoutView.ts": { renderLayout: (_el: unknown, options: (typeof drawn)[number]) => drawn.push(options) },
     "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
@@ -133,7 +134,7 @@ test("a note without layouts is not parsed while typing, until a layout is writt
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
-    "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
@@ -159,7 +160,7 @@ test("the first reading of a pane's environment draws nothing again; a later cha
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan,
     "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
-    "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [], resetWrapGaps: stateApi.StateEffect.define<null>() }, "./viewEnvironment.ts": {},

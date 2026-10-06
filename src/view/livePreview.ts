@@ -10,6 +10,7 @@ import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
+import { paragraphBreaks, type ParagraphBreak } from "../markdown/paragraphBreaks.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { attachInteractions, type LayoutContext } from "./interactions.ts";
@@ -41,6 +42,8 @@ interface LivePreviewState extends Measurements {
   lines: string[];
   /** Each block's spacer skip, found once per parse: cursor moves redraw decorations, not these. */
   skips: Array<number | null>;
+  /** Lines drawn with reading view's paragraph spacing (paragraphBreaks), found once per parse. */
+  breaks: ParagraphBreak[];
   decorations: DecorationSet;
   /** Wrapped layouts drawn as widgets. */
   anchors: WrapAnchor[];
@@ -60,6 +63,7 @@ interface Parsed extends Measurements {
   blocks: V2Block[];
   lines: string[];
   skips: Array<number | null>;
+  breaks: ParagraphBreak[];
   refs: RefContext | undefined;
 }
 
@@ -175,13 +179,13 @@ export function livePreviewExtension(app: App): Extension {
 function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
   const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: PENDING_ENVIRONMENT };
   if (!state.field(editorLivePreviewField, false)) {
-    return { blocks: [], lines: [], skips: [], refs: undefined, snapshot: null, ...measurements };
+    return { blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
   }
   // Runs on every change of a note with layouts; one without them is only read in full when a change
   // may have written an opening comment (the field's update).
   const text = state.doc.toString();
   if (!text.includes(OPENING)) {
-    return { blocks: [], lines: [], skips: [], refs: undefined, snapshot: null, ...measurements };
+    return { blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
   const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, previous?.origin);
@@ -189,6 +193,9 @@ function parse(app: App, state: EditorState, previous: DocumentSnapshot | null =
   const blocks = snapshot.blocks.map(ref => ref.block);
   const lines = [...snapshot.lines];
   return { snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks),
+    breaks: blocks.some(isDrawable)
+      ? paragraphBreaks(lines, blocks.map((block) => ({ ...block, floats: isDrawable(block) && blockWrap(block) !== null })))
+      : [],
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
 }
 
@@ -198,7 +205,7 @@ function userPlaced(tr: Transaction): boolean {
 }
 
 function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCursor: boolean): LivePreviewState {
-  const { blocks, refs, snapshot, skips } = parsed;
+  const { blocks, lines, refs, snapshot, skips } = parsed;
   rememberDocumentSnapshot(state, snapshot);
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
@@ -221,7 +228,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     const key = `${ref.id}:${ref.contentRevision}`;
     hasWraps ||= wraps;
     if (!revealed) {
-      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed) }).range(from, to));
+      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed, false, blankEdges(lines, block)) }).range(from, to));
       if (wraps) {
         anchors.push({ from, to, key, id: ref.id, skip: effectiveSkip ?? 0, block });
       }
@@ -231,7 +238,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     // Keep a text/media layout at its original position while its source opens below it. Replacing
     // the columns with normal Markdown would move the image below all of the left column's text.
     if (hasTextColumns(block)) {
-      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed, true) }).range(from));
+      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed, true, { above: blankEdges(lines, block).above, below: false }) }).range(from));
     }
     // The source shows, with the media Obsidian draws in it as thumbnails.
     for (let line = block.openLine; line <= block.closeLine; line += 1) {
@@ -246,6 +253,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
 
   // Blank lines between two floating layouts written one after the other would push the later one a
   // line down: they take no room while the cursor is elsewhere.
+  const floatGaps = new Set<number>();
   for (let index = 1; index < blocks.length; index += 1) {
     const before = blocks[index - 1];
     const after = blocks[index];
@@ -258,7 +266,20 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     }
     for (let line = before.closeLine + 1; line < after.openLine; line += 1) {
       ranges.push(Decoration.line({ class: "vml-float-gap" }).range(state.doc.line(line + 1).from));
+      floatGaps.add(line);
     }
+  }
+
+  // The note's text keeps reading view's paragraph spacing, which is what it lies on there and in the
+  // PDF (paragraphBreaks); a blank line more takes no room while the cursor is elsewhere.
+  for (const { line, kind } of parsed.breaks) {
+    if (floatGaps.has(line) || line >= state.doc.lines) {
+      continue;
+    }
+    const { from, to } = state.doc.line(line + 1);
+    const hidden = kind === "extra" && !state.selection.ranges.some((range) => range.from <= to && range.to >= from);
+    const cls = kind === "after" ? "vml-break-after" : hidden ? "vml-break vml-break--extra" : "vml-break";
+    ranges.push(Decoration.line({ class: cls }).range(from));
   }
 
   return { ...parsed, decorations: Decoration.set(ranges, true), anchors, hasWraps, placedCursor };
@@ -266,6 +287,29 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
 
 /** What Obsidian draws for the text beside a layout's media lives as long as the widget's element. */
 const components = new WeakMap<HTMLElement, Component>();
+
+/** Whether a blank line lies right above and right below a block. */
+interface BlankEdges {
+  above: boolean;
+  below: boolean;
+}
+
+function blankEdges(lines: readonly string[], block: V2Block): BlankEdges {
+  return { above: lines[block.openLine - 1]?.trim() === "", below: lines[block.closeLine + 1]?.trim() === "" };
+}
+
+/**
+ * In reading view a layout's margin and the paragraph's beside it collapse into one paragraph break.
+ * In live preview the layout's spacing is padding of its widget (see styles.css), so it leaves out
+ * the side where a blank line already makes that break.
+ */
+function applyBlankEdges(el: HTMLElement, edges: BlankEdges): void {
+  el.toggleClass("vml-live-preview--blank-above", edges.above);
+  el.toggleClass("vml-live-preview--blank-below", edges.below);
+}
+
+/** What each widget element was drawn for, apart from the blank lines around it. */
+const drawnFor = new WeakMap<HTMLElement, string>();
 
 /**
  * The heights layouts were drawn at, by runtime instance and content revision, for
@@ -299,10 +343,12 @@ class LayoutWidget extends WidgetType {
   private readonly ref: BlockRef;
   private readonly heightKey: string;
   private readonly cacheEpoch: number;
+  private readonly edges: BlankEdges;
 
   constructor(app: App, ref: BlockRef, sourcePath: string, refs: RefContext | undefined,
-    effectiveSkip: number | null, measurements: Measurements, sourcePreview = false) {
+    effectiveSkip: number | null, measurements: Measurements, sourcePreview = false, edges: BlankEdges = { above: false, below: false }) {
     super();
+    this.edges = edges;
     const block = ref.block;
     this.app = app;
     this.block = block;
@@ -324,7 +370,12 @@ class LayoutWidget extends WidgetType {
   }
 
   override eq(other: LayoutWidget): boolean {
-    return other.key === this.key && other.block.openLine === this.block.openLine && other.sourcePreview === this.sourcePreview;
+    return other.key === this.key && other.block.openLine === this.block.openLine && other.sourcePreview === this.sourcePreview
+      && other.edges.above === this.edges.above && other.edges.below === this.edges.below;
+  }
+
+  private get drawnKey(): string {
+    return `${this.sourcePreview}\n${this.block.openLine}\n${this.key}`;
   }
 
   // A wrapped layout's widget is a zero-height anchor; the layout floats out of it.
@@ -349,15 +400,24 @@ class LayoutWidget extends WidgetType {
     if (blockWrap(this.block) === null) {
       this.watch(el, view);
     }
+    applyBlankEdges(el, this.edges);
+    drawnFor.set(el, this.drawnKey);
     return el;
   }
 
   // While one of its text columns is typed in, the layout keeps its element (textEditing.ts), and
-  // its height goes on under the new text.
+  // its height goes on under the new text. A blank line typed or removed beside it changes only its
+  // spacing.
   override updateDOM(dom: HTMLElement, view: EditorView): boolean {
+    if (drawnFor.get(dom) === this.drawnKey) {
+      applyBlankEdges(dom, this.edges);
+      return true;
+    }
     if (this.sourcePreview || !keepWhileEditing(dom, this.block)) {
       return false;
     }
+    applyBlankEdges(dom, this.edges);
+    drawnFor.set(dom, this.drawnKey);
     this.watch(dom, view);
     return true;
   }

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- In a PDF, a floating layout that does not fit at the bottom of a page moves to the next page together with the text it wraps and the heading right before it. It used to move alone, leaving its text behind at full width and wrapping unrelated text on the next page.
+- In a PDF, a table next to a floating layout shrinks to fit beside it, as in reading view, instead of dropping below the layout at full width.
+- In a note with layouts, live preview spaces the note's text like reading view and the PDF: a blank line takes the height of a paragraph break instead of a whole line, extra blank lines take no room while the cursor is elsewhere, and a paragraph break is added where reading view separates blocks written without a blank line (text right after a heading, a list or quote right after text). Layouts get the same spacing as in reading view. The text beside a floating layout is now the same while editing as in reading view and the PDF.
+
 ## 0.7.1 - 2026-10-05
 
 - **Add text on the left/right** is no longer offered for a floating layout. Text beside media stops a layout from floating, so the editor used to close after the first letter typed and the layout jumped; choose **No text wrap** first.
