@@ -65,3 +65,14 @@ test("a long list switching kinds on every line takes linear time", () => {
   assert.equal(breaks.length, 19999);
   assert.ok(performance.now() - start < 300, `took ${performance.now() - start}ms`);
 });
+
+test("text indented in a list item is text, and code there is indented past the item's text", () => {
+  // Three paragraphs of one item, in a plain list and in a nested one.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "    para a", "", "    para b"], [])), ["1:blank", "3:blank"]);
+  assert.deepEqual(lines(paragraphBreaks(["- a", "  - b", "", "      para a", "", "      para b"], [])), ["2:blank", "4:blank"]);
+  // Code in an item: four columns past where the item's text starts.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "      code one", "", "      code two", "", "After."], [])), ["1:blank", "5:blank"]);
+  // Once the list ends, four columns are code again; right below a paragraph line they are not.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "Text.", "", "    code one", "", "    code two"], [])), ["1:blank", "3:blank"]);
+  assert.deepEqual(lines(paragraphBreaks(["Text.", "    more text", "", "    code"], [])), ["2:blank"]);
+});

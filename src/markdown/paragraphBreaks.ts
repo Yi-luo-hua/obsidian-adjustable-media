@@ -55,6 +55,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     }
   };
   const opens = new Set(blocks.map((block) => block.openLine));
+  const code = indentedCode(lines, text, (line) => inBlock[line] === 1);
 
   for (let line = 0; line < lines.length; line += 1) {
     if (filled(line)) {
@@ -73,7 +74,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
       end += 1;
     }
     // Blank lines inside an indented code block belong to the code.
-    if (INDENTED_CODE.test(lines[line - 1] ?? "") && filled(end + 1) && INDENTED_CODE.test(lines[end + 1] ?? "")) {
+    if (code[line - 1] === 1 && code[end + 1] === 1) {
       line = end;
       continue;
     }
@@ -102,10 +103,9 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
   return breaks.sort((a, b) => a.line - b.line);
 }
 
-const LIST_ITEM = /^( {0,3})(?:([-*+])|(\d{1,9})([.)]))([ \t]*)/;
+const LIST_ITEM = /^([ \t]*)(?:([-*+])|(\d{1,9})([.)]))([ \t]*)/;
 const QUOTE = /^ {0,3}>/;
-/** A line of an indented code block, or of content indented as far. */
-const INDENTED_CODE = /^(?: {4}| {0,3}\t)/;
+const INDENT = /^[ \t]*/;
 
 /** The column after `text`, with tab stops every 4 columns, from column `start`. */
 function columnAfter(text: string, start: number): number {
@@ -130,7 +130,7 @@ function listItem(text: string): ListItem | null {
   if (!match) {
     return null;
   }
-  const indent = match[1]?.length ?? 0;
+  const indent = columnAfter(match[1] ?? "", 0);
   const marker = match[2] ?? `${match[3] ?? ""}${match[4] ?? ""}`;
   const space = match[5] ?? "";
   const rest = text.slice(match[0].length);
@@ -141,6 +141,51 @@ function listItem(text: string): ListItem | null {
   // No text, or a run of five or more columns, puts the text one column after the marker.
   const content = rest === "" || after - indent - marker.length > 4 ? indent + marker.length + 1 : after;
   return { kind: `list${match[2] ?? match[4] ?? ""}`, indent, content, number: match[3] };
+}
+
+/**
+ * Which lines belong to an indented code block. Code is indented four columns past where the text of
+ * the list item it is in starts, or past the margin outside lists, and starts after a blank line: text
+ * indented as far in a list item, or right below a paragraph line, is ordinary text. A list item stays
+ * open across blank lines until a line is indented less than its text, or another item takes over.
+ */
+function indentedCode(lines: readonly string[], text: (line: number) => boolean, layout: (line: number) => boolean): Uint8Array {
+  const code = new Uint8Array(lines.length);
+  /** Where the text of each open list item starts, the innermost last. */
+  const items: number[] = [];
+  let afterBlank = true;
+  let inCode = false;
+  for (let line = 0; line < lines.length; line += 1) {
+    const source = lines[line] ?? "";
+    if (!text(line)) {
+      // A layout is at the top of the note; fenced code and the like stay in their list item.
+      if (layout(line)) {
+        items.length = 0;
+      }
+      afterBlank = false;
+      inCode = false;
+      continue;
+    }
+    if (source.trim() === "") {
+      afterBlank = true;
+      continue;
+    }
+    const indent = columnAfter(INDENT.exec(source)?.[0] ?? "", 0);
+    const item = listItem(source);
+    // Without a blank line before it, text goes on lazily in the item above.
+    if (afterBlank || item) {
+      while (items.length > 0 && indent < (items[items.length - 1] ?? 0)) {
+        items.pop();
+      }
+    }
+    inCode = indent >= (items[items.length - 1] ?? 0) + 4 && (inCode || afterBlank);
+    code[line] = inCode ? 1 : 0;
+    if (item && !inCode) {
+      items.push(item.content);
+    }
+    afterBlank = false;
+  }
+  return code;
 }
 
 /**
@@ -161,7 +206,9 @@ function blockStarts(lines: readonly string[], filled: (line: number) => boolean
       previous = null;
       continue;
     }
-    const item = listItem(text);
+    // An item indented four columns or more is not one at the top: text in the item above.
+    const found = listItem(text);
+    const item = found && found.indent <= 3 ? found : null;
     let block: string;
     if (item && previous?.startsWith("list") === true && item.indent >= content) {
       block = previous;
