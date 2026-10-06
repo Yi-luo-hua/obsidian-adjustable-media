@@ -54,7 +54,8 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
   const lines = text.split("\n");
   // A widget is kept while its block's text stays the same, so the block may have moved since.
   const widget = root.closest<HTMLElement>(".vml-live-preview");
-  const line = widget ? view.state.doc.lineAt(view.posAtDOM(widget)).number - 1 : context.block.openLine;
+  const at = context.position?.() ?? (widget ? view.posAtDOM(widget) : null);
+  const line = at === null ? context.block.openLine : view.state.doc.lineAt(at).number - 1;
   const block = blockForMove(lines, context.block, line);
   if (typeof block === "string") {
     new Notice(t(block === "not-found" ? "writeNotFound" : "writeAmbiguous"));

@@ -1,12 +1,11 @@
-import { editorInfoField, type App } from "obsidian";
+import { editorInfoField } from "obsidian";
 import { StateEffect, StateField, type EditorState, type Extension, type Range } from "@codemirror/state";
 import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockInfo, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 
 import type { V2Block } from "../format/v2.ts";
-import { isEditable } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { planGaps, planProxy, type FlowBox, type FloatSize, type Gap, type ProxyPlan } from "../layout/wrapGaps.ts";
-import { layoutIsRendered, renderLayout } from "./layoutView.ts";
+import { layoutIsRendered } from "./layoutView.ts";
 
 /**
  * Live preview around wrapped layouts (docs/DESIGN.md, section 4).
@@ -31,6 +30,8 @@ export interface WrapAnchor {
   to: number;
   /** Runtime instance and content revision, distinct for identical source blocks. */
   key: string;
+  /** The runtime instance alone, the same across revisions; none for a layout beside its source. */
+  id?: string;
   block: V2Block;
 }
 
@@ -39,6 +40,11 @@ export interface WrapSource {
   /** Whether any layout of the note wraps text, drawn or showing its source. */
   hasWraps(state: EditorState): boolean;
   environmentEpoch(state: EditorState): number;
+  /** Draws the layout of `anchor` into `el` with all its interactions, as its own widget would. */
+  drawStandIn(el: HTMLElement, view: EditorView, anchor: WrapAnchor, sourcePath: string): void;
+  /** Whether `el` keeps its layout for `block`: one of its text columns is being typed in. */
+  keepStandIn(el: HTMLElement, block: V2Block): boolean;
+  releaseStandIn(el: HTMLElement): void;
 }
 
 interface GapUpdate {
@@ -109,22 +115,29 @@ const proxyField = StateField.define<DecorationSet>({
   provide: (field) => EditorView.decorations.from(field),
 });
 
+/**
+ * A stand-in is the layout itself, drawn by its own widget's code with all its interactions: only
+ * where it starts is planned. Its width and height are the layout's, so it follows an edit made in
+ * it before its anchor has been measured again. Under an empty, zero-width float as high as the
+ * lines between the first drawn line and the layout, like the skip of the layout itself; or pulled
+ * up over that line, when it starts above it, and cut off there.
+ */
 class ProxyWidget extends WidgetType {
-  private readonly app: App;
+  private readonly source: WrapSource;
   private readonly anchor: WrapAnchor;
   private readonly sourcePath: string;
-  private readonly size: FloatSize;
+  private readonly side: FloatSize["side"];
   private readonly plan: ProxyPlan;
   readonly key: string;
 
-  constructor(app: App, anchor: WrapAnchor, sourcePath: string, size: FloatSize, plan: ProxyPlan) {
+  constructor(source: WrapSource, anchor: WrapAnchor, sourcePath: string, side: FloatSize["side"], plan: ProxyPlan) {
     super();
-    this.app = app;
+    this.source = source;
     this.anchor = anchor;
     this.sourcePath = sourcePath;
-    this.size = size;
+    this.side = side;
     this.plan = plan;
-    this.key = [anchor.key, size.side, size.width, size.margin, plan.sandbag, plan.height, plan.shift].map(String).join("\n");
+    this.key = [anchor.key, anchor.from, anchor.block.openLine, side, plan.sandbag, plan.shift].map(String).join("\n");
   }
 
   override eq(other: ProxyWidget): boolean {
@@ -135,33 +148,54 @@ class ProxyWidget extends WidgetType {
     return 0;
   }
 
-  toDOM(): HTMLElement {
-    const { side, width, margin } = this.size;
+  toDOM(view: EditorView): HTMLElement {
     const el = createDiv({ cls: "vml-wrap-proxy" });
-    if (this.plan.sandbag > 0) {
-      const sandbag = el.createDiv({ cls: `vml-wrap-proxy__sandbag vml-wrap-proxy__sandbag--${side}` });
-      sandbag.setCssProps({ "--vml-proxy-sandbag": `${this.plan.sandbag}px` });
-    }
-    const box = el.createDiv({ cls: `vml-wrap-proxy__float vml-wrap-proxy__float--${side}` });
-    box.setCssProps({
-      "--vml-proxy-width": `${width}px`,
-      "--vml-proxy-height": `${this.plan.height}px`,
-      "--vml-proxy-margin": `${margin}px`,
-      "--vml-proxy-shift": `${this.plan.shift}px`,
-    });
-    // The layout itself at the float's width, cut off above the line.
-    const content = box.createDiv({ cls: "vml-live-preview vml-live-preview--wrap vml-wrap-proxy__content" });
-    const model = { ...modelFromBlock(this.anchor.block), width: null, wrap: null, skip: null, align: null };
-    renderLayout(content, { app: this.app, sourcePath: this.sourcePath, model, editable: isEditable(this.anchor.block), warning: null });
+    el.createDiv({ cls: "vml-wrap-proxy__sandbag" });
+    const content = el.createDiv({ cls: "vml-live-preview vml-wrap-proxy__live" });
+    this.place(el);
+    this.source.drawStandIn(content, view, this.anchor, this.sourcePath);
     return el;
+  }
+
+  // Another place for the same layout keeps what is drawn; so does a text column being typed in.
+  override updateDOM(dom: HTMLElement): boolean {
+    const content = dom.querySelector<HTMLElement>(":scope > .vml-wrap-proxy__live");
+    const same = dom.dataset.key === this.anchor.key && dom.dataset.from === String(this.anchor.from);
+    if (!content || !(same || this.source.keepStandIn(content, this.anchor.block))) {
+      return false;
+    }
+    this.place(dom);
+    return true;
+  }
+
+  override destroy(dom: HTMLElement): void {
+    const content = dom.querySelector<HTMLElement>(":scope > .vml-wrap-proxy__live");
+    if (content) {
+      this.source.releaseStandIn(content);
+    }
+  }
+
+  override ignoreEvent(): boolean {
+    return true;
+  }
+
+  private place(el: HTMLElement): void {
+    el.dataset.key = this.anchor.key;
+    el.dataset.from = String(this.anchor.from);
+    el.dataset.shift = String(this.plan.shift);
+    const sandbag = el.querySelector<HTMLElement>(":scope > .vml-wrap-proxy__sandbag");
+    sandbag?.toggleClass("vml-wrap-proxy__sandbag--left", this.side === "left");
+    sandbag?.toggleClass("vml-wrap-proxy__sandbag--right", this.side === "right");
+    sandbag?.setCssProps({ "--vml-proxy-sandbag": `${this.plan.sandbag}px` });
+    el.setCssProps({ "--vml-proxy-shift": `${this.plan.shift}px` });
   }
 }
 
-export function wrapGuard(app: App, source: WrapSource): Extension {
+export function wrapGuard(source: WrapSource): Extension {
   return [
     gapField,
     proxyField,
-    ViewPlugin.define((view) => new WrapGuard(view, app, source)),
+    ViewPlugin.define((view) => new WrapGuard(view, source)),
   ];
 }
 
@@ -177,10 +211,17 @@ export function refreshWrapMedia(view: EditorView): void { activeGuards.get(view
 
 class WrapGuard {
   private readonly view: EditorView;
-  private readonly app: App;
   private readonly source: WrapSource;
   /** Float sizes by instance and content revision, measured when its anchor is drawn. */
   private readonly sizes = new Map<string, FloatSize>();
+  /** Sizes measured on a stand-in, which may change as its media load; its anchor's own replace them. */
+  private readonly standInSizes = new Set<string>();
+  /**
+   * Each instance's latest size, and where it was: an edit made in a stand-in makes a revision
+   * nothing has measured yet. Where the layout starts stays the same while its anchor, side and skip
+   * do, so the stand-in is drawn from there and measured for the rest.
+   */
+  private readonly latest = new Map<string, { from: number; place: string; size: FloatSize }>();
   private destroyed = false;
   private serial = 0;
   private epoch: number;
@@ -192,9 +233,8 @@ class WrapGuard {
   private proxyKey = "";
   private proxySerial = 0;
 
-  constructor(view: EditorView, app: App, source: WrapSource) {
+  constructor(view: EditorView, source: WrapSource) {
     this.view = view;
-    this.app = app;
     this.source = source;
     activeGuards.set(view, this);
     this.epoch = source.environmentEpoch(view.state);
@@ -213,9 +253,12 @@ class WrapGuard {
 
   update(update: ViewUpdate): void {
     const environmentChanged = this.epoch !== this.source.environmentEpoch(update.state);
-    if (environmentChanged) { this.epoch = this.source.environmentEpoch(update.state); this.sizes.clear(); this.pendingMedia.clear(); }
+    if (environmentChanged) { this.epoch = this.source.environmentEpoch(update.state); this.forgetSizes(); this.pendingMedia.clear(); }
     const anchorsChanged = signature(this.source.anchors(update.state)) !== signature(this.source.anchors(update.startState));
-    if (update.docChanged || update.viewportChanged || anchorsChanged || environmentChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setGaps)))) {
+    // A stand-in starts below the first drawn line by what the height map has above it, which a
+    // measurement of lines above it may change while the viewport stays.
+    if (update.docChanged || update.viewportChanged || update.heightChanged || update.geometryChanged || anchorsChanged || environmentChanged
+      || update.transactions.some(tr => tr.effects.some(effect => effect.is(setGaps)))) {
       this.placeProxies();
     }
     if (update.docChanged || update.viewportChanged || update.heightChanged || update.geometryChanged || anchorsChanged || environmentChanged) {
@@ -226,8 +269,12 @@ class WrapGuard {
   destroy(): void {
     this.destroyed = true;
     this.serial++;
-    this.resize.disconnect(); this.observed.clear(); this.sizes.clear();
+    this.resize.disconnect(); this.observed.clear(); this.forgetSizes();
     this.pendingMedia.clear(); activeGuards.delete(this.view);
+  }
+
+  private forgetSizes(): void {
+    this.sizes.clear(); this.standInSizes.clear(); this.latest.clear();
   }
 
   measurementsReady(): boolean {
@@ -266,6 +313,11 @@ class WrapGuard {
         continue;
       }
       if (child.hasClass("vml-wrap-proxy")) {
+        const layout = child.querySelector<HTMLElement>(":scope > .vml-wrap-proxy__live > .vml-layout");
+        if (layout) {
+          this.measureStandIn(anchors, child, layout);
+          if (!this.observed.has(layout)) { this.observed.set(layout, ""); this.resize.observe(layout); }
+        }
         boxes.push({ pos: 0, top: 0, height: 0, mapTop: 0, spacer: false, floatBottom: floatBottom(child, docTop), standIn: true });
         continue;
       }
@@ -294,10 +346,17 @@ class WrapGuard {
     }
 
     const keys = new Set(anchors.map((anchor) => anchor.key));
+    const ids = new Set(anchors.map((anchor) => anchor.id));
     for (const el of this.observed.keys()) if (!view.contentDOM.contains(el)) { this.resize.unobserve(el); this.observed.delete(el); }
     for (const key of this.sizes.keys()) {
       if (!keys.has(key)) {
         this.sizes.delete(key);
+        this.standInSizes.delete(key);
+      }
+    }
+    for (const id of this.latest.keys()) {
+      if (!ids.has(id)) {
+        this.latest.delete(id);
       }
     }
 
@@ -337,11 +396,9 @@ class WrapGuard {
     const anchorRect = anchorEl.getBoundingClientRect();
     const rect = layout.getBoundingClientRect();
     const style = getComputedStyle(layout);
-    const ready = layoutIsRendered(layout) && Array.from(layout.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"))
-      .every(media => media.instanceOf(HTMLImageElement) ? media.complete : media.readyState > 0);
-    if (ready) this.pendingMedia.delete(anchor.key); else this.pendingMedia.add(anchor.key);
+    if (isReady(layout)) this.pendingMedia.delete(anchor.key); else this.pendingMedia.add(anchor.key);
     const side = layout.hasClass("vml-layout--wrap-right") ? "right" : "left";
-    this.sizes.set(anchor.key, {
+    this.keep(anchor, {
       side,
       layoutTop: rect.top - anchorRect.top,
       layoutHeight: rect.height,
@@ -349,6 +406,38 @@ class WrapGuard {
       margin: parseFloat(side === "left" ? style.marginRight : style.marginLeft) || 0,
       marginBottom: parseFloat(style.marginBottom) || 0,
     });
+    this.standInSizes.delete(anchor.key);
+  }
+
+  /**
+   * Measures the layout a stand-in draws, for a revision its anchor has not been measured in: its
+   * height and width are the layout's own; where it starts is known from before.
+   */
+  private measureStandIn(anchors: readonly WrapAnchor[], host: HTMLElement, layout: HTMLElement): void {
+    const anchor = anchors.find((candidate) => candidate.key === host.dataset.key);
+    if (!anchor || (this.sizes.has(anchor.key) && !this.standInSizes.has(anchor.key)) || !isReady(layout)) {
+      return;
+    }
+    const known = this.sizes.get(anchor.key) ?? this.carried(anchor);
+    if (!known) {
+      return;
+    }
+    const rect = layout.getBoundingClientRect();
+    this.keep(anchor, { ...known, side: layout.hasClass("vml-layout--wrap-right") ? "right" : "left", layoutHeight: rect.height, width: rect.width });
+    this.standInSizes.add(anchor.key);
+  }
+
+  private keep(anchor: WrapAnchor, size: FloatSize): void {
+    this.sizes.set(anchor.key, size);
+    if (anchor.id !== undefined) {
+      this.latest.set(anchor.id, { from: anchor.from, place: placeOf(anchor), size });
+    }
+  }
+
+  /** The size of an earlier revision of the same layout, while it still starts at the same place. */
+  private carried(anchor: WrapAnchor): FloatSize | undefined {
+    const latest = anchor.id === undefined ? undefined : this.latest.get(anchor.id);
+    return latest && latest.from === anchor.from && latest.place === placeOf(anchor) ? latest.size : undefined;
   }
 
   /**
@@ -384,7 +473,7 @@ class WrapGuard {
     const sourcePath = view.state.field(editorInfoField, false)?.file?.path ?? "";
     const ranges: Array<Range<Decoration>> = [];
     for (const anchor of anchors) {
-      const size = this.sizes.get(anchor.key);
+      const size = this.sizes.get(anchor.key) ?? this.carried(anchor);
       // Drawn, or below the first drawn line.
       if (anchor.to >= view.viewport.from || !size) {
         continue;
@@ -392,11 +481,23 @@ class WrapGuard {
       const plan = planProxy(view.lineBlockAt(anchor.from).top, size, first.top);
       if (plan) {
         // In front of the wrap gaps at the same position (side -1): the float starts at the line's top.
-        ranges.push(Decoration.widget({ widget: new ProxyWidget(this.app, anchor, sourcePath, size, plan), block: true, side: -2 }).range(first.from));
+        ranges.push(Decoration.widget({ widget: new ProxyWidget(this.source, anchor, sourcePath, size.side, plan), block: true, side: -2 }).range(first.from));
       }
     }
     return ranges;
   }
+}
+
+/** Whether the media in a layout have their sizes, and its Markdown is drawn. */
+function isReady(layout: HTMLElement): boolean {
+  return layoutIsRendered(layout) && Array.from(layout.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"))
+    .every(media => media.instanceOf(HTMLImageElement) ? media.complete : media.readyState > 0);
+}
+
+/** What decides where a layout starts beside its anchor. */
+function placeOf(anchor: WrapAnchor): string {
+  const model = modelFromBlock(anchor.block);
+  return `${model.wrap}:${model.skip}`;
 }
 
 /**

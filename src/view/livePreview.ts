@@ -113,10 +113,19 @@ export function livePreviewExtension(app: App): Extension {
   return [
     layoutHistory(),
     Prec.high(field),
-    wrapGuard(app, {
+    wrapGuard({
       anchors: (state) => state.field(field, false)?.anchors ?? [],
       hasWraps: (state) => state.field(field, false)?.hasWraps ?? false,
       environmentEpoch: (state) => state.field(field, false)?.environmentEpoch ?? 0,
+      drawStandIn: (el, view, anchor, sourcePath) => {
+        drawWidget(el, view, app, anchor.block, sourcePath, currentRefs(view), null, undefined, anchor.from);
+      },
+      keepStandIn: (el, block) => keepWhileEditing(el, block),
+      releaseStandIn: (el) => {
+        stopTextEdit(el);
+        components.get(el)?.unload();
+        components.delete(el);
+      },
     }),
     ViewPlugin.define(view => {
       const projection = new ViewProjection();
@@ -198,7 +207,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     if (!revealed) {
       ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed) }).range(from, to));
       if (wraps) {
-        anchors.push({ from, to, key, block });
+        anchors.push({ from, to, key, id: ref.id, block });
       }
       continue;
     }
@@ -359,7 +368,8 @@ class LayoutWidget extends WidgetType {
 
 /**
  * Draws a layout's widget into `el`, in place of what was there. With `side`, that side shows a text
- * column even without text, for its first line to be typed in.
+ * column even without text, for its first line to be typed in. A stand-in for a float whose anchor is
+ * not drawn (wrapGuard.ts) gives where the block starts, `standIn`: its element is elsewhere.
  */
 function drawWidget(
   el: HTMLElement,
@@ -370,6 +380,7 @@ function drawWidget(
   refs: RefContext | undefined,
   effectiveSkip: number | null,
   side?: TextSide,
+  standIn?: number,
 ): TextEditHost {
   components.get(el)?.unload();
   el.empty();
@@ -384,7 +395,9 @@ function drawWidget(
   component.load();
   components.set(el, component);
   const root = renderLayout(el, { app, sourcePath, model, effectiveSkip, editable: isEditable(block), warning: blockWarning(block), component, refs });
-  const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor };
+  // Resolved when asked: the block may have moved since the widget was drawn.
+  const position = (): number => standIn ?? view.posAtDOM(el);
+  const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor, position };
   const host: TextEditHost = {
     el,
     root,
@@ -394,7 +407,7 @@ function drawWidget(
     editor: view.state.field(editorInfoField, false)?.editor,
     view,
     // Drawn again from the note as it is now, numbers included.
-    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), effectiveSkip, editing),
+    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), effectiveSkip, editing, standIn),
   };
   if (isEditable(block)) {
     context.editText = (editing) => startTextEdit(host, editing, null);
@@ -410,8 +423,8 @@ function drawWidget(
   const button = buttonHost.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
   button.addEventListener("click", (event) => {
     event.preventDefault();
-    // Resolve the position at click time; the block may have moved since the widget was drawn.
-    view.dispatch({ selection: { anchor: view.posAtDOM(el) } });
+    // A stand-in's block lies above what is drawn.
+    view.dispatch({ selection: { anchor: position() }, scrollIntoView: standIn !== undefined });
     view.focus();
   });
   return host;
@@ -440,10 +453,9 @@ function setUpText(view: EditorView, host: TextEditHost): void {
       }
       const text = side === "left" ? block.leftText : block.rightText;
       if (text) {
-        // Resolved at click time: the block may have moved since the widget was drawn.
         const { doc } = view.state;
-        const open = doc.lineAt(view.posAtDOM(host.el)).number;
-        view.dispatch({ selection: { anchor: doc.line(Math.min(doc.lines, open + text.to - block.openLine)).to } });
+        const open = doc.lineAt(host.context.position?.() ?? view.posAtDOM(host.el)).number;
+        view.dispatch({ selection: { anchor: doc.line(Math.min(doc.lines, open + text.to - block.openLine)).to }, scrollIntoView: host.el.closest(".vml-wrap-proxy") !== null });
         view.focus();
       }
     });

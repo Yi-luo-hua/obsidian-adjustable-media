@@ -49,6 +49,8 @@ export interface LayoutContext extends WriteOptions {
   model: LayoutModel;
   /** Starts typing the text on one side of the media right in the layout. */
   editText?: (side: TextSide) => void;
+  /** Where the block starts in the note now, found from its widget. */
+  position?: () => number;
 }
 
 export interface DropState {
@@ -577,7 +579,9 @@ function setUpFrame(root: HTMLElement, context: LayoutContext): void {
  */
 function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, edge: FrameEdge, context: LayoutContext, start: PointerEvent, direction: number): void {
   // The width is a share of the layout's container; with text beside the media, of the layout's own content.
-  const available = box === root ? (root.parentElement?.getBoundingClientRect().width ?? 0) : contentWidth(root);
+  // A stand-in's layout sits in a container of its own, as wide as the one its widget would be.
+  const container = root.closest<HTMLElement>(".vml-wrap-proxy") ?? root.parentElement;
+  const available = box === root ? (container?.getBoundingClientRect().width ?? 0) : contentWidth(root);
   const rect = box.getBoundingClientRect();
   if (available <= 0 || rect.width <= 0) {
     return;
