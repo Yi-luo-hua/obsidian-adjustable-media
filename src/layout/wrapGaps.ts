@@ -26,6 +26,11 @@ export interface FlowBox {
   spacer: boolean;
   /** Bottom edge of the margin boxes of the floats inside the element, if any. */
   floatBottom: number | null;
+  /**
+   * The host of stand-ins: no height of its own, and at the position of the line after it. Only its
+   * floats count; as an element it would make that line look like a second child of one widget.
+   */
+  standIn?: boolean;
 }
 
 export interface Gap {
@@ -51,6 +56,12 @@ export function planGaps(boxes: readonly FlowBox[]): Gap[] {
   let lastContentPos: number | null = null;
 
   for (const box of boxes) {
+    if (box.standIn) {
+      if (box.floatBottom !== null) {
+        floatBottom = Math.max(floatBottom, box.floatBottom);
+      }
+      continue;
+    }
     if (box.spacer) {
       if (spacer && spacer.pos === box.pos) {
         // Several block widgets can share a document position. Treat their old spacers as one
@@ -133,7 +144,7 @@ export interface ProxyPlan {
 
 /**
  * A stand-in for a float whose anchor lies above the part of the note CodeMirror has drawn, placed
- * on the first line drawn, which starts at `lineTop`: the part of the float at or below that line,
+ * in front of the first line drawn, which starts at `lineTop`: the part of the float at or below that line,
  * or null when the float ends above it. Without it, the lines beside the float lose their wrap until
  * the anchor is drawn, then jump. With it, the lines sit where they would beside the real float.
  */

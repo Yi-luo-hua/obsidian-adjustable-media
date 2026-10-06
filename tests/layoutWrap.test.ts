@@ -495,6 +495,19 @@ test("block widgets at the same document position do not multiply wrap gaps", ()
   ]), [{ pos: 1012, height: 24 }]);
 });
 
+test("the stand-ins' host in front of the first line drawn only carries floats", () => {
+  // It shares the position of the line after it. As an element, that line would look like a second
+  // child of one widget, and the line's spacer would be dropped, then planned again, and so on.
+  const host = box(50, 100, 0, 100, { standIn: true, floatBottom: 180 });
+  const spacer = box(50, 100, 80, 100, { spacer: true });
+  const pushed = box(50, 180, 24, 100);
+  assert.deepEqual(planGaps([host, spacer, pushed]), [{ pos: 50, height: 80 }]);
+  assert.deepEqual(planGaps([{ ...host, standIn: false }, spacer, pushed]), []);
+  // Its floats push what comes after it like any other float.
+  const tall = { ...host, floatBottom: 400 };
+  assert.deepEqual(planGaps([tall, box(50, 100, 24, 100), box(60, 400, 30, 124)]), [{ pos: 60, height: 276 }]);
+});
+
 const size: FloatSize = { side: "left", layoutTop: 4, layoutHeight: 400, width: 280, margin: 24, marginBottom: 8 };
 
 test("a stand-in covers the part of a float below the first line drawn", () => {

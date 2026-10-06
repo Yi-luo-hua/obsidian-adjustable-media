@@ -821,10 +821,12 @@ body.vml-is-dragging * {
 }
 
 /*
- * Live preview. A wrapped layout's widget is a zero-height anchor the layout floats out of. Obsidian
- * contains the painting of every block widget, which would keep the float inside.
+ * Live preview. A wrapped layout's widget is a zero-height anchor the layout floats out of, and so is
+ * the widget holding stand-ins for floats whose anchors are not drawn. Obsidian contains the painting
+ * of every block widget, which would keep the float inside.
  */
-.markdown-source-view.mod-cm6 .cm-content > .vml-live-preview--wrap[contenteditable="false"] {
+.markdown-source-view.mod-cm6 .cm-content > .vml-live-preview--wrap[contenteditable="false"],
+.markdown-source-view.mod-cm6 .cm-content > .vml-wrap-proxy[contenteditable="false"] {
   contain: none !important;
 }
 

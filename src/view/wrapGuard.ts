@@ -1,6 +1,6 @@
 import { editorInfoField, type App } from "obsidian";
 import { StateEffect, StateField, type EditorState, type Extension, type Range } from "@codemirror/state";
-import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet, type ViewUpdate } from "@codemirror/view";
+import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockInfo, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 
 import type { V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
@@ -17,8 +17,11 @@ import { layoutIsRendered, renderLayout } from "./layoutView.ts";
  * - an element that cannot sit beside a float is pushed below it, by a height no element has; a
  *   spacer in front of it turns the push into a height (see wrapGaps.ts);
  * - CodeMirror draws only part of a long note. When a float's anchor lies above the drawn part but
- *   the float reaches into it, the first drawn line gets a stand-in for the rest of the float, so
- *   the lines beside it keep their wrap and do not jump once the anchor is drawn.
+ *   the float reaches into it, a stand-in for the rest of the float goes in front of the first drawn
+ *   line, so the lines beside it keep their wrap and do not jump once the anchor is drawn. Like the
+ *   anchor, it is a zero-height block widget the float overflows. Inside a line it would be kept in
+ *   any line laid out on its own (lists and quotes beside a float are), which then grows as tall as
+ *   the stand-in reaches: the height map grows with it, and the note jumps (measured: 1086px).
  */
 
 /** A wrapped layout: drawn as a widget, or floating beside its source at the start of its first line. */
@@ -47,6 +50,7 @@ interface GapUpdate {
 
 const setGaps = StateEffect.define<GapUpdate>();
 export const resetWrapGaps = StateEffect.define<null>();
+const setProxies = StateEffect.define<DecorationSet>();
 
 class GapWidget extends WidgetType {
   readonly height: number;
@@ -92,13 +96,26 @@ const gapField = StateField.define<DecorationSet>({
   provide: (field) => EditorView.decorations.from(field),
 });
 
+// The stand-ins depend on the viewport, which only the view knows, but are block widgets too.
+const proxyField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(proxies, tr) {
+    let next = proxies.map(tr.changes);
+    for (const effect of tr.effects) {
+      if (effect.is(setProxies)) next = effect.value;
+    }
+    return next;
+  },
+  provide: (field) => EditorView.decorations.from(field),
+});
+
 class ProxyWidget extends WidgetType {
   private readonly app: App;
   private readonly anchor: WrapAnchor;
   private readonly sourcePath: string;
   private readonly size: FloatSize;
   private readonly plan: ProxyPlan;
-  private readonly key: string;
+  readonly key: string;
 
   constructor(app: App, anchor: WrapAnchor, sourcePath: string, size: FloatSize, plan: ProxyPlan) {
     super();
@@ -114,9 +131,13 @@ class ProxyWidget extends WidgetType {
     return other.key === this.key;
   }
 
+  override get estimatedHeight(): number {
+    return 0;
+  }
+
   toDOM(): HTMLElement {
     const { side, width, margin } = this.size;
-    const el = createSpan({ cls: "vml-wrap-proxy" });
+    const el = createDiv({ cls: "vml-wrap-proxy" });
     if (this.plan.sandbag > 0) {
       const sandbag = el.createDiv({ cls: `vml-wrap-proxy__sandbag vml-wrap-proxy__sandbag--${side}` });
       sandbag.setCssProps({ "--vml-proxy-sandbag": `${this.plan.sandbag}px` });
@@ -139,7 +160,8 @@ class ProxyWidget extends WidgetType {
 export function wrapGuard(app: App, source: WrapSource): Extension {
   return [
     gapField,
-    ViewPlugin.define((view) => new WrapGuard(view, app, source), { decorations: (guard) => guard.decorations }),
+    proxyField,
+    ViewPlugin.define((view) => new WrapGuard(view, app, source)),
   ];
 }
 
@@ -154,8 +176,6 @@ export function wrapMeasurementsReady(view: EditorView): boolean {
 export function refreshWrapMedia(view: EditorView): void { activeGuards.get(view)?.mediaChanged(); }
 
 class WrapGuard {
-  /** Stand-ins for floats whose anchors are above the drawn part of the note. */
-  decorations: DecorationSet = Decoration.none;
   private readonly view: EditorView;
   private readonly app: App;
   private readonly source: WrapSource;
@@ -168,6 +188,9 @@ class WrapGuard {
   private readonly observed = new Map<HTMLElement, string>();
   private readonly pendingMedia = new Set<string>();
   private pendingUpdate = false;
+  /** The stand-ins last sent to proxyField, and the latest plan for them. */
+  private proxyKey = "";
+  private proxySerial = 0;
 
   constructor(view: EditorView, app: App, source: WrapSource) {
     this.view = view;
@@ -184,7 +207,7 @@ class WrapGuard {
       }
       if (changed && !this.destroyed) this.measure();
     });
-    this.decorations = this.proxies();
+    this.placeProxies();
     this.measure();
   }
 
@@ -193,7 +216,7 @@ class WrapGuard {
     if (environmentChanged) { this.epoch = this.source.environmentEpoch(update.state); this.sizes.clear(); this.pendingMedia.clear(); }
     const anchorsChanged = signature(this.source.anchors(update.state)) !== signature(this.source.anchors(update.startState));
     if (update.docChanged || update.viewportChanged || anchorsChanged || environmentChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setGaps)))) {
-      this.decorations = this.proxies();
+      this.placeProxies();
     }
     if (update.docChanged || update.viewportChanged || update.heightChanged || update.geometryChanged || anchorsChanged || environmentChanged) {
       this.measure();
@@ -242,6 +265,10 @@ class WrapGuard {
       if (child.hasClass("cm-gap")) {
         continue;
       }
+      if (child.hasClass("vml-wrap-proxy")) {
+        boxes.push({ pos: 0, top: 0, height: 0, mapTop: 0, spacer: false, floatBottom: floatBottom(child, docTop), standIn: true });
+        continue;
+      }
       let pos: number;
       try {
         pos = view.posAtDOM(child);
@@ -274,8 +301,10 @@ class WrapGuard {
       }
     }
 
-    const first = boxes[0];
-    const last = boxes[boxes.length - 1];
+    // A stand-in's host only carries floats: the elements around it bound what was measured.
+    const elements = boxes.filter((box) => !box.standIn);
+    const first = elements[0];
+    const last = elements[elements.length - 1];
     if (!first || !last) {
       return null;
     }
@@ -322,12 +351,34 @@ class WrapGuard {
     });
   }
 
-  private proxies(): DecorationSet {
+  /**
+   * Plans the stand-ins for the current viewport and sends them to proxyField. A view may not
+   * dispatch while it updates, so they follow right after, before the frame is painted.
+   */
+  private placeProxies(): void {
+    const ranges = this.proxies();
+    const key = ranges.map((range) => `${range.from}\n${(range.value.spec as { widget: ProxyWidget }).widget.key}`).join("\n\n");
+    // A newer plan replaces one still waiting to be sent, even when it is what proxyField has.
+    const serial = ++this.proxySerial;
+    if (key === this.proxyKey) {
+      return;
+    }
+    const doc = this.view.state.doc;
+    queueMicrotask(() => {
+      if (this.destroyed || this.proxySerial !== serial || this.view.state.doc !== doc) {
+        return;
+      }
+      this.proxyKey = key;
+      this.view.dispatch({ effects: setProxies.of(Decoration.set(ranges, true)) });
+    });
+  }
+
+  private proxies(): Array<Range<Decoration>> {
     const view = this.view;
     const anchors = this.source.anchors(view.state);
     const first = view.lineBlockAt(view.viewport.from);
-    if (anchors.length === 0 || first.type !== BlockType.Text) {
-      return Decoration.none;
+    if (anchors.length === 0 || !startsWithText(first)) {
+      return [];
     }
 
     const sourcePath = view.state.field(editorInfoField, false)?.file?.path ?? "";
@@ -340,11 +391,22 @@ class WrapGuard {
       }
       const plan = planProxy(view.lineBlockAt(anchor.from).top, size, first.top);
       if (plan) {
-        ranges.push(Decoration.widget({ widget: new ProxyWidget(this.app, anchor, sourcePath, size, plan), side: -1 }).range(first.from));
+        // In front of the wrap gaps at the same position (side -1): the float starts at the line's top.
+        ranges.push(Decoration.widget({ widget: new ProxyWidget(this.app, anchor, sourcePath, size, plan), block: true, side: -2 }).range(first.from));
       }
     }
-    return Decoration.set(ranges, true);
+    return ranges;
   }
+}
+
+/**
+ * Whether a line block starts with text: a line, possibly behind block widgets (stand-ins, wrap
+ * gaps), not a layout's widget.
+ */
+function startsWithText(block: BlockInfo): boolean {
+  const parts = Array.isArray(block.type) ? (block.type as readonly BlockInfo[]) : [block];
+  return parts.every((part) => part.type === BlockType.Text || part.type === BlockType.WidgetBefore)
+    && parts.some((part) => part.type === BlockType.Text);
 }
 
 /** Bottom edge of the margin boxes of the floats inside `el`, in document pixels. */
