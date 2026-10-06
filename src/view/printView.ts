@@ -1,6 +1,6 @@
 import { MarkdownRenderChild, MarkdownRenderer, TFile, type App, type MarkdownPostProcessorContext } from "obsidian";
 
-import { printPlan } from "../markdown/print.ts";
+import { keepWithNext, printPlan, type PrintElementKind } from "../markdown/print.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { markCaptions, numbered, refContextOf } from "./crossrefView.ts";
@@ -52,6 +52,7 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
         warning: blockWarning(block), component: child, refs, renderTasks: tasks });
     }
   });
+  keepFloatsWithAnchors(content);
   await Promise.all(tasks);
   await Promise.all(Array.from(content.querySelectorAll("img"), (img) => new Promise<void>((resolve) => {
     if (img.complete) {
@@ -64,4 +65,20 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
     img.addEventListener("error", finish);
   })));
   el.replaceChildren(...(title ? [title] : []), content);
+}
+
+/**
+ * Chromium moves a float that does not fit on the page to the next one alone, and the text it is
+ * anchored to stays behind at full width. Kept whole, its slot moves instead, the text after it
+ * follows, and so does a heading or another float right before it.
+ */
+function keepFloatsWithAnchors(content: HTMLElement): void {
+  const children = Array.from(content.children);
+  const kinds = children.map((child): PrintElementKind =>
+    child.hasAttribute("data-vml-print") && child.querySelector(":scope > .vml-layout--wrap") ? "float"
+      : /^H[1-6]$/.test(child.tagName) ? "heading" : "other");
+  keepWithNext(kinds).forEach((keep, index) => {
+    children[index]?.toggleClass("vml-print-keep-with-next", keep);
+    children[index]?.toggleClass("vml-print-float", kinds[index] === "float");
+  });
 }

@@ -878,10 +878,25 @@ body.vml-is-dragging * {
     break-inside: auto;
   }
 
-  /* Screen tables can scroll horizontally; every column must fit on paper. */
+  /*
+   * A float that does not fit on the page moves to the next one with the text it is anchored to
+   * (keepFloatsWithAnchors): alone, it would leave that text behind at full width.
+   */
+  .vml-print-float {
+    break-inside: avoid;
+  }
+
+  .vml-print-keep-with-next {
+    break-after: avoid;
+  }
+
+  /*
+   * Screen tables can scroll horizontally; on paper every column must fit. Cells break anywhere, so a
+   * table shrinks to the room it has, beside a float too, as in reading view: at full width it would
+   * drop below the float.
+   */
   .vml-print-content table {
-    width: 100%;
-    table-layout: fixed;
+    max-width: 100%;
   }
 
   .vml-print-content :is(th, td) {
@@ -892,7 +907,6 @@ body.vml-is-dragging * {
 
   .vml-print-content table:has(tr > :nth-child(9)) {
     font-size: 0.75em;
-    table-layout: auto;
   }
 
   .vml-print-content table:has(tr > :nth-child(9)) :is(th, td) {
