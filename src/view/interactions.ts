@@ -9,9 +9,11 @@ import {
   hasTextColumns,
   insertItem,
   isTextOnly,
+  keepSingleSizes,
   maxBlockWidth,
   moveItem,
   removeItem,
+  resetWeights,
   rowOffset,
   scaleRows,
   setAlign,
@@ -59,8 +61,16 @@ export interface DropState {
 
 type FrameEdge = "right" | "bottom" | "corner";
 
+/** The width a layout's share is of, and what its frame takes from the width of its rows, in pixels. */
+interface FrameMetrics {
+  available: number;
+  inset: number;
+}
+
 const contexts = new WeakMap<HTMLElement, LayoutContext>();
 export const DRAG_THRESHOLD = 6;
+/** How far a column divider must move to count as a drag, so the clicks of a double-click write nothing. */
+const RESIZE_THRESHOLD = 3;
 const MIN_COLUMN_WIDTH = 60;
 /** How close to left, center or right a single item snaps while it is dragged sideways. */
 const POSITION_SNAP = 10;
@@ -515,7 +525,10 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
 
     trackPointer(handle, event, {
       onMove(move) {
-        moved = true;
+        moved ||= movedPast(event, move);
+        if (!moved) {
+          return;
+        }
         widths = resizePair(startWidths, index, move.clientX - event.clientX, MIN_COLUMN_WIDTH);
         itemEls.forEach((el, i) => {
           el.addClass("vml-item--weighted");
@@ -537,6 +550,14 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
         });
       },
     });
+  });
+  // Double-clicking puts the row back to its default: however many items it holds, they all share it
+  // by aspect ratio again, as column weights are stored for the whole row. The event stops here: the
+  // editor would act on it too, and the image below would open in the viewer.
+  handle.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, resetWeights(context.model, row))], context);
   });
 }
 
@@ -576,8 +597,7 @@ function setUpFrame(root: HTMLElement, context: LayoutContext): void {
  * box that grows both ways.
  */
 function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, edge: FrameEdge, context: LayoutContext, start: PointerEvent, direction: number): void {
-  // The width is a share of the layout's container; with text beside the media, of the layout's own content.
-  const available = box === root ? (root.parentElement?.getBoundingClientRect().width ?? 0) : contentWidth(root);
+  const { available, inset } = measureFrame(root, box);
   const rect = box.getBoundingClientRect();
   if (available <= 0 || rect.width <= 0) {
     return;
@@ -608,7 +628,7 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
       const dx = (move.clientX - start.clientX) * direction;
       const dy = move.clientY - start.clientY;
       if (edge === "right") {
-        next = setBlockWidth(context.model, (rect.width + dx) / available);
+        next = keepSingleSizes(context.model, setBlockWidth(context.model, (rect.width + dx) / available), available, inset);
       } else if (edge === "bottom") {
         const scale = clamp(rowsHeight > 0 ? (rowsHeight + dy) / rowsHeight : 1, MIN_SCALE, MAX_SCALE);
         next = scaleRows(context.model, scale, singleWidths);
@@ -636,6 +656,20 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
       applySizing(root, context.model);
     },
   });
+}
+
+/** `box` is what the layout's width applies to: the layout, or with text beside the media, their column. */
+function measureFrame(root: HTMLElement, box: HTMLElement): FrameMetrics {
+  // The width is a share of the layout's container; with text beside the media, of the layout's own content.
+  const available = box === root ? (root.parentElement?.getBoundingClientRect().width ?? 0) : contentWidth(root);
+  const rowEl = box.querySelector<HTMLElement>(".vml-row");
+  const inset = rowEl ? box.getBoundingClientRect().width - rowEl.getBoundingClientRect().width : 0;
+  return { available, inset };
+}
+
+/** Whether a divider has gone far enough to be a drag rather than a click. */
+function movedPast(start: PointerEvent, move: PointerEvent): boolean {
+  return Math.hypot(move.clientX - start.clientX, move.clientY - start.clientY) >= RESIZE_THRESHOLD;
 }
 
 function showItemMenu(at: MouseEvent | { x: number; y: number }, context: LayoutContext, position: ItemPosition): void {
