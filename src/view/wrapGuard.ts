@@ -4,7 +4,7 @@ import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockIn
 
 import type { V2Block } from "../format/v2.ts";
 import { modelFromBlock } from "../layout/model.ts";
-import { carryFloat, planGaps, planProxy, type FlowBox, type FloatSize, type Gap, type PlacedFloat, type ProxyPlan } from "../layout/wrapGaps.ts";
+import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
 import { layoutIsRendered } from "./layoutView.ts";
 
 /**
@@ -129,17 +129,17 @@ class ProxyWidget extends WidgetType {
   private readonly anchor: WrapAnchor;
   private readonly sourcePath: string;
   private readonly side: FloatSize["side"];
-  private readonly plan: ProxyPlan;
+  private readonly plan: LiveProxyPlan;
   readonly key: string;
 
-  constructor(source: WrapSource, anchor: WrapAnchor, sourcePath: string, side: FloatSize["side"], plan: ProxyPlan) {
+  constructor(source: WrapSource, anchor: WrapAnchor, sourcePath: string, side: FloatSize["side"], plan: LiveProxyPlan) {
     super();
     this.source = source;
     this.anchor = anchor;
     this.sourcePath = sourcePath;
     this.side = side;
     this.plan = plan;
-    this.key = [anchor.key, anchor.from, anchor.block.openLine, side, plan.sandbag, plan.shift].map(String).join("\n");
+    this.key = [anchor.key, anchor.from, anchor.block.openLine, side, plan.sandbag, plan.shift, plan.marginTop].map(String).join("\n");
   }
 
   override eq(other: ProxyWidget): boolean {
@@ -189,7 +189,7 @@ class ProxyWidget extends WidgetType {
     sandbag?.toggleClass("vml-wrap-proxy__sandbag--left", this.side === "left");
     sandbag?.toggleClass("vml-wrap-proxy__sandbag--right", this.side === "right");
     sandbag?.setCssProps({ "--vml-proxy-sandbag": `${this.plan.sandbag}px` });
-    el.setCssProps({ "--vml-proxy-shift": `${this.plan.shift}px` });
+    el.setCssProps({ "--vml-proxy-shift": `${this.plan.shift}px`, "--vml-proxy-margin-top": `${this.plan.marginTop}px` });
   }
 }
 
@@ -407,6 +407,7 @@ class WrapGuard {
       width: rect.width,
       margin: parseFloat(side === "left" ? style.marginRight : style.marginLeft) || 0,
       marginBottom: parseFloat(style.marginBottom) || 0,
+      marginTop: parseFloat(style.marginTop) || 0,
     });
     this.standInSizes.delete(anchor.key);
   }
@@ -477,7 +478,7 @@ class WrapGuard {
     }
 
     const sourcePath = view.state.field(editorInfoField, false)?.file?.path ?? "";
-    const ranges: Array<Range<Decoration>> = [];
+    const planned: Array<{ anchor: WrapAnchor; side: FloatSize["side"]; plan: LiveProxyPlan }> = [];
     for (const anchor of anchors) {
       const size = this.sizes.get(anchor.key) ?? this.carried(anchor);
       // Drawn, or below the first drawn line.
@@ -486,11 +487,15 @@ class WrapGuard {
       }
       const plan = planProxy(view.lineBlockAt(anchor.from).top, size, first.top);
       if (plan) {
-        // In front of the wrap gaps at the same position (side -1): the float starts at the line's top.
-        ranges.push(Decoration.widget({ widget: new ProxyWidget(this.source, anchor, sourcePath, size.side, plan), block: true, side: -2 }).range(first.from));
+        planned.push({ anchor, side: size.side, plan: liveProxy(plan, size.marginTop ?? 0) });
       }
     }
-    return ranges;
+    // Drawn in this order, each below the ones before it.
+    const plans = stackProxies(planned.map(({ plan }) => plan));
+    // In front of the wrap gaps at the same position (side -1): the float starts at the line's top.
+    return planned.map(({ anchor, side }, index) => Decoration.widget({
+      widget: new ProxyWidget(this.source, anchor, sourcePath, side, plans[index]), block: true, side: -2,
+    }).range(first.from));
   }
 }
 

@@ -131,6 +131,8 @@ export interface FloatSize {
   /** Margin between the layout and the text. */
   margin: number;
   marginBottom: number;
+  /** Margin above the layout's border box: its float starts that much higher. */
+  marginTop?: number;
 }
 
 /** A layout's float as last measured, with where it was. */
@@ -170,6 +172,44 @@ export interface ProxyPlan {
  * or null when the float ends above it. Without it, the lines beside the float lose their wrap until
  * the anchor is drawn, then jump. With it, the lines sit where they would beside the real float.
  */
+/** A stand-in in live preview: the layout itself, with the top margin it is drawn with. */
+export interface LiveProxyPlan extends ProxyPlan {
+  /** The layout's own top margin, or less to pull it up over the line it starts above. */
+  marginTop: number;
+}
+
+/**
+ * A stand-in drawn as the layout itself, keeping its top margin: its float, which the lines beside
+ * it go around, starts where the real one does, not `marginTop` lower. A list item or a quote laid out
+ * on its own beside it narrows as soon as it overlaps the float by a pixel, so a few pixels decide
+ * whether it takes one line or several (measured: 4px moved the note by 96px). The sandbag holds the
+ * lines above the margin; a layout whose margin starts above the line goes up by less margin.
+ */
+export function liveProxy(plan: ProxyPlan, marginTop: number): LiveProxyPlan {
+  if (plan.shift > 0) {
+    return { ...plan, marginTop: -plan.shift };
+  }
+  return plan.sandbag >= marginTop ? { ...plan, sandbag: plan.sandbag - marginTop, marginTop } : { ...plan, sandbag: 0, marginTop: plan.sandbag };
+}
+
+/**
+ * The stand-ins in front of one line, in the order they are drawn. CSS places no float above one
+ * drawn before it, so a sandbag starts where the stand-ins before it do, not at the line: each
+ * sandbag is only what is left below them, as the skips of floats sharing an anchor are. Without
+ * it a stand-in after a lower one was pushed down by that one's whole height (measured: 412px).
+ */
+export function stackProxies<Plan extends ProxyPlan>(plans: readonly Plan[]): Plan[] {
+  let floor = 0;
+  return plans.map((plan) => {
+    if (plan.shift > 0) {
+      return plan;
+    }
+    const sandbag = Math.max(0, plan.sandbag - floor);
+    floor = Math.max(floor, plan.sandbag);
+    return { ...plan, sandbag };
+  });
+}
+
 export function planProxy(anchorTop: number, size: FloatSize, lineTop: number): ProxyPlan | null {
   const layoutTop = anchorTop + size.layoutTop;
   const bottom = layoutTop + size.layoutHeight + size.marginBottom;

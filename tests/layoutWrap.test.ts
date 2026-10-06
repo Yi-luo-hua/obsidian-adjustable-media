@@ -16,7 +16,7 @@ import {
   type LayoutModel,
 } from "../src/layout/model.ts";
 import { blockForMove, blockGaps, moveGaps, isSamePlace, orderAdjacentFloat, pickGap, placeAboveEarlierFloats, planPlacement } from "../src/layout/placement.ts";
-import { carryFloat, planGaps, planProxy, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
+import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
 function block(lines: readonly string[], index = 0): V2Block {
@@ -561,6 +561,29 @@ test("a stand-in covers the part of a float below the first line drawn", () => {
   assert.equal(planProxy(1000, size, 1500), null);
   // A layout that starts further down leaves the lines above it their full width.
   assert.deepEqual(planProxy(1000, { ...size, layoutTop: 72 }, 1040), { sandbag: 32, height: 408, shift: 0 });
+});
+
+test("a live stand-in keeps its top margin, so its float starts where the real one does", () => {
+  // Measured in 笔记.md: without its 4px margin the text box's float started 4px low, and a list item
+  // ending 2px into it no longer narrowed: the note moved by 96px as the stand-in came and went.
+  assert.deepEqual(liveProxy({ sandbag: 96, height: 422, shift: 0 }, 4), { sandbag: 92, height: 422, shift: 0, marginTop: 4 });
+  // Its margin starts above the line: it keeps what is below it.
+  assert.deepEqual(liveProxy({ sandbag: 3, height: 422, shift: 0 }, 4), { sandbag: 0, height: 422, shift: 0, marginTop: 3 });
+  // Cut off above the line, it is pulled up over it.
+  assert.deepEqual(liveProxy({ sandbag: 0, height: 300, shift: 50 }, 4), { sandbag: 0, height: 300, shift: 50, marginTop: -50 });
+});
+
+test("stand-ins in front of one line each start below the ones drawn before them", () => {
+  // Measured in 笔记.md: an image 18 lines down, then a text box sharing its anchor 22 lines down.
+  // The text box's sandbag starts where the image does, so it only holds the four lines below it.
+  const image = { sandbag: 432, height: 153, shift: 0 };
+  const box = { sandbag: 528, height: 414, shift: 0 };
+  assert.deepEqual(stackProxies([image, box]), [image, { ...box, sandbag: 96 }]);
+  // One that would start higher than a stand-in before it cannot: it starts there, with no sandbag.
+  assert.deepEqual(stackProxies([box, image]), [box, { ...image, sandbag: 0 }]);
+  // One cut off above the line has no sandbag to share.
+  const cut = { sandbag: 0, height: 120, shift: 40 };
+  assert.deepEqual(stackProxies([cut, image]), [cut, image]);
 });
 
 test("an edit made in a stand-in starts where the last measured revision did, moved by its skip", () => {

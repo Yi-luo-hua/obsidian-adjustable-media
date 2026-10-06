@@ -938,8 +938,8 @@ body.vml-is-dragging * {
 
 /*
  * Live preview: a stand-in for a float whose anchor lies above the part of the note the editor has
- * drawn is the layout itself. One that starts above the first drawn line is pulled up over it and
- * cut off there; its handles and glow still reach out on the other sides.
+ * drawn is the layout itself, with its own top margin. One that starts above the first drawn line is
+ * pulled up over it and cut off there; its handles and glow still reach out on the other sides.
  */
 .vml-wrap-proxy__live > .vml-layout {
   clip-path: polygon(
@@ -948,7 +948,7 @@ body.vml-is-dragging * {
     calc(100% + 100px) calc(100% + 100px),
     -100px calc(100% + 100px)
   );
-  margin-top: calc(-1 * var(--vml-proxy-shift, 0px));
+  margin-top: var(--vml-proxy-margin-top, 0px);
 }
 
 /* Stand-in for a float whose anchor lies above the part of the note the editor has drawn. */
