@@ -5,7 +5,7 @@ import { findV2Blocks, MAX_WRAP_SKIP } from "../format/v2.ts";
 import { wrapZone, wrappedDrop } from "../layout/geometry.ts";
 import { visualWrapSkip } from "../layout/floatOrder.ts";
 import { effectiveWidth, hasTextColumns, setWrap } from "../layout/model.ts";
-import { blockForMove, isSamePlace, moveGaps, pickGap, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
+import { blockForMove, isSamePlace, moveGaps, pickGap, placeAboveEarlierFloats, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
 import { createDragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, commitEdits, swallowNextClick, type LayoutContext } from "./interactions.ts";
 import { t } from "./messages.ts";
@@ -104,11 +104,12 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
     const renderedTop = root.isConnected ? root.getBoundingClientRect().top : layout.top + targetTop - initialAnchorTop;
     const { skip, top } = wrappedDrop(pointer.y, targetTop, renderedTop, currentVisualSkip,
       lineHeight, MAX_WRAP_SKIP, samePlace && wrap === context.model.wrap);
-    placement = { line: gap.line, wrap, skip };
+    // Where it shows, ahead of any float written earlier that starts lower.
+    placement = placeAboveEarlierFloats(lines, block, { line: gap.line, wrap, skip }, top, lineTop, lineHeight);
 
     const width = (effectiveWidth(setWrap(context.model, wrap)) ?? 1) * content.width;
     const height = Math.min(MAX_PREVIEW_HEIGHT, Math.max(MIN_PREVIEW_HEIGHT, layout.height * (width / Math.max(layout.width, 1))));
-    const label = t(wrap === "left" ? "wrapLeft" : "wrapRight") + (skip > 0 ? ` · ${t("dropSkip", { lines: String(skip) })}` : "");
+    const label = t(wrap === "left" ? "wrapLeft" : "wrapRight") + (placement.skip > 0 ? ` · ${t("dropSkip", { lines: String(placement.skip) })}` : "");
     indicator.showBox(wrap === "left" ? content.left : content.right - width, top, width, height, label);
   };
 

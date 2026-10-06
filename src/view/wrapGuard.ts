@@ -481,7 +481,7 @@ class WrapGuard {
     for (const anchor of anchors) {
       const size = this.sizes.get(anchor.key) ?? this.carried(anchor);
       // Drawn, or below the first drawn line.
-      if (anchor.to >= view.viewport.from || !size) {
+      if (anchor.to >= view.viewport.from || drawnApart(view, anchor) || !size) {
         continue;
       }
       const plan = planProxy(view.lineBlockAt(anchor.from).top, size, first.top);
@@ -492,6 +492,19 @@ class WrapGuard {
     }
     return ranges;
   }
+}
+
+/**
+ * Whether CodeMirror draws the anchor apart from its viewport: it always draws the lines the main
+ * selection starts and ends on. A layout whose source shows while the cursor sits in its first
+ * line floats from there; a stand-in would come on top of it, cleared below it by the same float.
+ */
+function drawnApart(view: EditorView, anchor: WrapAnchor): boolean {
+  const { main } = view.state.selection;
+  return [main.anchor, main.head].some((pos) => {
+    const line = view.lineBlockAt(pos);
+    return line.from <= anchor.to && line.to >= anchor.from;
+  });
 }
 
 /** Whether the media in a layout have their sizes, and its Markdown is drawn. */

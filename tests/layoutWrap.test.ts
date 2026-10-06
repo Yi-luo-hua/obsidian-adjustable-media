@@ -15,7 +15,7 @@ import {
   setWrap,
   type LayoutModel,
 } from "../src/layout/model.ts";
-import { blockForMove, blockGaps, moveGaps, isSamePlace, orderAdjacentFloat, pickGap, planPlacement } from "../src/layout/placement.ts";
+import { blockForMove, blockGaps, moveGaps, isSamePlace, orderAdjacentFloat, pickGap, placeAboveEarlierFloats, planPlacement } from "../src/layout/placement.ts";
 import { carryFloat, planGaps, planProxy, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
@@ -239,6 +239,30 @@ test("a wrapped block dropped into a run of blank lines goes right there, and le
   ]);
 });
 
+test("a float dropped above one written earlier that starts lower goes in front of it", () => {
+  // Reported in 笔记.md: a text box 21 lines down; the image dropped beside text above it was
+  // pushed down to the text box's top, 192px below where it was dropped.
+  const box = '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":10} -->';
+  const image = '<!-- vml {"v":2,"width":0.4,"wrap":"right"} -->';
+  const lines = [box, "![[t.png]]", "<!-- /vml -->", "", "段一", "", "段二", "", image, "![[a.png]]", "<!-- /vml -->", "段三"];
+  const lineTop = (line: number): number => line * 24;
+  const moved = block(lines, 1);
+  // The box starts at line 10 (240px): beside "段一" (96px) the image goes in front of it, 4 lines down.
+  const placed = placeAboveEarlierFloats(lines, moved, { line: 4, wrap: "right", skip: 0 }, 96, lineTop, 24);
+  assert.deepEqual(placed, { line: 0, wrap: "right", skip: 4 });
+  assert.deepEqual(apply(lines, planPlacement(lines, moved, placed)).slice(0, 7), [
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":4} -->', "![[a.png]]", "<!-- /vml -->", box, "![[t.png]]", "<!-- /vml -->", "",
+  ]);
+  // Below the box, or not wrapped, nothing is in the way.
+  assert.deepEqual(placeAboveEarlierFloats(lines, moved, { line: 6, wrap: "right", skip: 2 }, 288, lineTop, 24), { line: 6, wrap: "right", skip: 2 });
+  assert.deepEqual(placeAboveEarlierFloats(lines, moved, { line: 4, wrap: null, skip: 0 }, 96, lineTop, 24), { line: 4, wrap: null, skip: 0 });
+
+  // Right after the box, sharing its anchor, the image stays at its place for orderAdjacentFloat.
+  const adjacent = [box, "![[t.png]]", "<!-- /vml -->", "", image, "![[a.png]]", "<!-- /vml -->", "段一", "", "段二"];
+  assert.deepEqual(placeAboveEarlierFloats(adjacent, block(adjacent, 1), { line: 9, wrap: "right", skip: 0 }, 144, lineTop, 24),
+    { line: 4, wrap: "right", skip: 2 });
+});
+
 test("a block that wraps text sits right on top of that text", () => {
   assert.deepEqual(apply(note, planPlacement(note, block(note), { line: 8, wrap: "left", skip: 0 })), [
     "第一段", "", "第二段", "", WRAPPED_LEFT, "![[a.png]]", "<!-- /vml -->", "第三段",
@@ -417,7 +441,8 @@ test("dragging the later float above its neighbor leaves that neighbor at its ol
   assert.ok(edits);
   const result = apply(lines, edits);
   assert.deepEqual(result.slice(0, 5), [
-    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[b.png]]', '<!-- /vml -->',
+    // Both move down the line the blank line between them takes once they no longer share it.
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":3} -->', '![[b.png]]', '<!-- /vml -->',
     '<!-- vml {"v":2,"wrap":"left","skip":5} -->', '![[a.png]]',
   ]);
   assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 5);
@@ -433,7 +458,7 @@ test("moving the left float up across the right text block offsets its shifted a
   assert.ok(edits);
   const result = apply(lines, edits);
   assert.deepEqual(result.slice(0, 5), [
-    '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":18} -->', '![[a.png]]', '<!-- /vml -->',
+    '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":19} -->', '![[a.png]]', '<!-- /vml -->',
     '<!-- vml {"v":2,"wrap":"right","skip":20,"type":"text"} -->', '旁注',
   ]);
 });
@@ -471,12 +496,13 @@ test("dragging a float above one that shares its anchor keeps both neighbors' he
   const result = apply(lines, edits);
   assert.deepEqual(result, [
     '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[a.png]]', '<!-- /vml -->', '',
-    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[c.png]]', '<!-- /vml -->',
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":3} -->', '![[c.png]]', '<!-- /vml -->',
     '<!-- vml {"v":2,"wrap":"left","skip":6} -->', '![[b.png]]', '<!-- /vml -->', '', 'body',
   ]);
-  // The dragged float lands at 2; the crossed neighbor's saved skip compensates for its shifted anchor.
+  // The blank line now between b and the body takes its height again: the body moves down a line, and
+  // the dragged float (3) and the crossed neighbor (6) with it, so both stay beside the same text.
   const moved = findV2Blocks(result);
-  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(result, moved, at)), [5, 2, 6]);
+  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(result, moved, at)), [5, 3, 6]);
 
   // One transaction; a changed opening line for the crossed neighbor aborts the whole write.
   const editor = new MemoryEditor(lines.join('\n'));

@@ -1,4 +1,4 @@
-import { findV2Blocks, MAX_WRAP_SKIP, serializeOpener, type V2Block, type WrapSide } from "../format/v2.ts";
+import { findV2Blocks, isDrawable, MAX_WRAP_SKIP, serializeOpener, type V2Block, type WrapSide } from "../format/v2.ts";
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
 import { isEditable, planModelEdit, type BlockEdit } from "./edits.ts";
 import { adjacentOppositeFloat, visualWrapSkip } from "./floatOrder.ts";
@@ -141,6 +141,44 @@ export function isSamePlace(lines: readonly string[], block: V2Block, line: numb
   return line === next;
 }
 
+/**
+ * Where a wrapped block dropped to start at `top` goes in the note. CSS places no float above one
+ * written before it: behind a float written earlier that starts lower, the block would be pushed
+ * down to that float's top, away from where it was dropped. It goes in front of the first such
+ * float instead, its skip counted from there; that float, starting lower, keeps its place. Next to
+ * an opposite float sharing its anchor, the block stays at its place for orderAdjacentFloat, which
+ * also keeps that float's height. `lineTop` gives where a line is drawn, in the units of `top`;
+ * where the other floats start follows from their anchors and skips, and from the floats before
+ * them, which push them down too.
+ */
+export function placeAboveEarlierFloats(lines: readonly string[], block: V2Block, placement: Placement, top: number,
+  lineTop: (line: number) => number, lineHeight: number): Placement {
+  if (placement.wrap === null || lineHeight <= 0) {
+    return placement;
+  }
+  const blocks = findV2Blocks(lines);
+  const index = blocks.findIndex((candidate) => candidate.openLine === block.openLine);
+  const skipFrom = (line: number): number => Math.min(MAX_WRAP_SKIP, Math.max(0, Math.round((top - lineTop(line)) / lineHeight)));
+  let lowest = Number.NEGATIVE_INFINITY;
+  for (const [at, other] of blocks.entries()) {
+    if (other.openLine >= placement.line) {
+      break;
+    }
+    if (at === index || !isDrawable(other) || modelFromBlock(other).wrap === null) {
+      continue;
+    }
+    lowest = Math.max(lowest, lineTop(other.openLine) + visualWrapSkip(lines, blocks, at) * lineHeight);
+    if (lowest <= top + lineHeight / 2) {
+      continue;
+    }
+    if (index >= 0 && adjacentOppositeFloat(lines, blocks, index, -1) === other) {
+      return { line: block.openLine, wrap: placement.wrap, skip: skipFrom(block.openLine) };
+    }
+    return moveGaps(lines).includes(other.openLine) ? { line: other.openLine, wrap: placement.wrap, skip: skipFrom(other.openLine) } : placement;
+  }
+  return placement;
+}
+
 /** Keep adjacent opposite-side floats in the order of the height they start at. CSS cannot place a
  * later float above an earlier one, so a moved block crossing its neighbor must cross it in the
  * note too.
@@ -212,7 +250,9 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
       return null;
     }
   }
-  const model = setSkip(setWrap(current, ordered.wrap), ordered.skip);
+  // The blank line it leaves behind next to that float no longer sits between two floats and takes
+  // its height again, so the text below moves down a line: the moved block follows it, as that float does.
+  const model = setSkip(setWrap(current, ordered.wrap), Math.min(MAX_WRAP_SKIP, ordered.skip + (before ? 1 : 0)));
   if (isSamePlace(lines, block, ordered.line)) {
     const edit = planModelEdit(block, model);
     return [...(edit ? [edit] : []), ...(afterEdit ? [afterEdit] : [])];
