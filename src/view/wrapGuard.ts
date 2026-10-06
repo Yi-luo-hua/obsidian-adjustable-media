@@ -4,7 +4,7 @@ import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockIn
 
 import type { V2Block } from "../format/v2.ts";
 import { modelFromBlock } from "../layout/model.ts";
-import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
+import { carryFloat, liveProxy, mapFloat, mapPlaced, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
 import { layoutIsRendered } from "./layoutView.ts";
 
 /**
@@ -34,6 +34,8 @@ export interface WrapAnchor {
   id?: string;
   /** The skip the layout is drawn with: less than its own beside an opposite float sharing its anchor. */
   skip: number;
+  /** The note's numbering the layout is drawn with, which its captions show. */
+  numbers: string;
   block: V2Block;
 }
 
@@ -139,7 +141,7 @@ class ProxyWidget extends WidgetType {
     this.sourcePath = sourcePath;
     this.side = side;
     this.plan = plan;
-    this.key = [anchor.key, anchor.from, anchor.block.openLine, side, plan.sandbag, plan.shift, plan.marginTop].map(String).join("\n");
+    this.key = [anchor.key, anchor.from, anchor.block.openLine, anchor.numbers, side, plan.sandbag, plan.shift, plan.marginTop].map(String).join("\n");
   }
 
   override eq(other: ProxyWidget): boolean {
@@ -162,7 +164,7 @@ class ProxyWidget extends WidgetType {
   // Another place for the same layout keeps what is drawn; so does a text column being typed in.
   override updateDOM(dom: HTMLElement): boolean {
     const content = dom.querySelector<HTMLElement>(":scope > .vml-wrap-proxy__live");
-    const same = dom.dataset.key === this.anchor.key && dom.dataset.from === String(this.anchor.from);
+    const same = dom.dataset.key === this.anchor.key && dom.dataset.from === String(this.anchor.from) && dom.dataset.numbers === this.anchor.numbers;
     if (!content || !(same || this.source.keepStandIn(content, this.anchor.block))) {
       return false;
     }
@@ -184,6 +186,7 @@ class ProxyWidget extends WidgetType {
   private place(el: HTMLElement): void {
     el.dataset.key = this.anchor.key;
     el.dataset.from = String(this.anchor.from);
+    el.dataset.numbers = this.anchor.numbers;
     el.dataset.shift = String(this.plan.shift);
     const sandbag = el.querySelector<HTMLElement>(":scope > .vml-wrap-proxy__sandbag");
     sandbag?.toggleClass("vml-wrap-proxy__sandbag--left", this.side === "left");
@@ -280,11 +283,12 @@ class WrapGuard {
     this.pendingMedia.clear(); activeGuards.delete(this.view);
   }
 
-  /** The lines the layouts start beside move with the note's text. */
+  /** The anchors and the lines the layouts start beside move with the note's text. */
   private mapSizes(changes: ChangeDesc): void {
-    const map = (size: FloatSize): FloatSize => size.refPos === undefined ? size : { ...size, refPos: changes.mapPos(size.refPos, 1) };
-    for (const [key, size] of this.sizes) this.sizes.set(key, map(size));
-    for (const [id, placed] of this.latest) this.latest.set(id, { ...placed, size: map(placed.size) });
+    // Text typed right at an anchor goes in front of its block.
+    const mapPos = (pos: number): number => changes.mapPos(pos, 1);
+    for (const [key, size] of this.sizes) this.sizes.set(key, mapFloat(size, mapPos));
+    for (const [id, placed] of this.latest) this.latest.set(id, mapPlaced(placed, mapPos));
   }
 
   private forgetSizes(): void {

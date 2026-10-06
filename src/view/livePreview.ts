@@ -199,6 +199,8 @@ function userPlaced(tr: Transaction): boolean {
 
 function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCursor: boolean): LivePreviewState {
   const { blocks, refs, snapshot, skips } = parsed;
+  // The numbering the layouts are drawn with, as their own widgets' keys hold it.
+  const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
   rememberDocumentSnapshot(state, snapshot);
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
@@ -223,7 +225,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     if (!revealed) {
       ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed) }).range(from, to));
       if (wraps) {
-        anchors.push({ from, to, key, id: ref.id, skip: effectiveSkip ?? 0, block });
+        anchors.push({ from, to, key, id: ref.id, skip: effectiveSkip ?? 0, numbers, block });
       }
       continue;
     }
@@ -240,7 +242,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
       ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, refs, effectiveSkip), side: -1 }).range(from));
-      anchors.push({ from, to: from, key: `${key}:source`, skip: effectiveSkip ?? 0, block });
+      anchors.push({ from, to: from, key: `${key}:source`, skip: effectiveSkip ?? 0, numbers, block });
     }
   }
 
