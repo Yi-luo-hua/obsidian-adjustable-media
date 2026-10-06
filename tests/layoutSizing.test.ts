@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { findV2Blocks, serializeOpener } from "../src/format/v2.ts";
 import { positionOffset } from "../src/layout/geometry.ts";
 import {
+  keepSingleSizes,
   metaFromModel,
   modelFromBlock,
   rowOffset,
@@ -109,4 +110,41 @@ test("corner scaling makes native and natural single sizes proportional without 
   assert.deepEqual(resized.rows.map((row) => row.items.map((item) => item.embed.raw)),
     layout.rows.map((row) => row.items.map((item) => item.embed.raw)));
   assert.equal(layout.rows[0]?.width, null);
+});
+
+test("the frame's right edge changes the block's width and keeps single items their size on screen", () => {
+  const layout = model([
+    '<!-- vml {"v":2,"width":0.5,"rows":[{"width":0.8},{},{"height":240}]} -->',
+    "![[a.png]]",
+    "![[b.png]]",
+    "![[c.png]] ![[d.png]]",
+    "<!-- /vml -->",
+  ]);
+  // A 1000px note, with a frame that takes nothing from the rows.
+  const widen = (width: number) => keepSingleSizes(layout, setBlockWidth(layout, width), 1000);
+
+  // 0.8 of a 500px row is 400px: 0.4 of a 1000px row, or 0.5 of an 800px one.
+  assert.deepEqual(metaFromModel(widen(1)).rows, [{ width: 0.4 }, {}, { height: 240 }]);
+  assert.equal(widen(0.8).rows[0]?.width, 0.5);
+  // A block narrower than the item takes it along.
+  assert.equal(widen(0.25).rows[0]?.width, 1);
+  assert.equal(keepSingleSizes(layout, layout, 1000), layout);
+
+  // A floating layout's default width counts as its width.
+  const floating = model(['<!-- vml {"v":2,"wrap":"left","rows":[{"width":0.5}]} -->', "![[a.png]]", "<!-- /vml -->"]);
+  assert.equal(keepSingleSizes(floating, setBlockWidth(floating, 0.8), 1000).rows[0]?.width, 0.25);
+});
+
+test("the frame's own width does not scale with the block, so single items keep their exact size", () => {
+  // A full-width block in a 987px note whose frame takes 22px from its rows, as in live preview.
+  const layout = model(['<!-- vml {"v":2,"rows":[{"width":0.4}]} -->', "![[a.png]]", "<!-- /vml -->"]);
+  const before = 0.4 * (987 - 22);
+  const narrowed = keepSingleSizes(layout, setBlockWidth(layout, 0.6), 987, 22);
+  const after = (narrowed.rows[0]?.width ?? 0) * (0.6 * 987 - 22);
+
+  assert.ok(Math.abs(after - before) < 1e-9, `${before} -> ${after}`);
+  // Writing it keeps three decimals: under half a pixel off.
+  assert.match(serializeOpener(metaFromModel(narrowed)), /"width":0\.677\}/);
+  // A ratio of block widths alone would be off by several pixels.
+  assert.ok(Math.abs(0.4 / 0.6 * (0.6 * 987 - 22) - before) > 5);
 });

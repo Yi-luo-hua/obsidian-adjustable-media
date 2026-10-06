@@ -371,6 +371,33 @@ export function setBlockWidth(model: LayoutModel, width: number): LayoutModel {
   return { ...model, width: value >= 1 ? null : value };
 }
 
+/**
+ * Keeps single items the size they are on screen across a change of the block's width, as the
+ * frame's right edge does: the frame tightens or loosens around them instead of scaling them, which
+ * is the corner's job. A stored width is a share of the item's row, so it is converted to the row's
+ * new width; an item is never wider than its row, so once the frame reaches it, it narrows with the
+ * frame. Items without a stored width already have a size of their own.
+ *
+ * The row is the block less what its frame takes from it, `inset`; `available` is the width the
+ * block's own share is of. Both are in pixels: the inset does not scale with the block, so a ratio of
+ * block widths alone would leave the item a little off its size.
+ */
+export function keepSingleSizes(before: LayoutModel, after: LayoutModel, available: number, inset = 0): LayoutModel {
+  const rowWidth = (model: LayoutModel): number => (effectiveWidth(model) ?? 1) * available - inset;
+  const from = rowWidth(before);
+  const to = rowWidth(after);
+  if (!(from > 0 && to > 0) || from === to) {
+    return after;
+  }
+  const ratio = from / to;
+  return {
+    ...after,
+    // Not rounded here: while the frame is dragged, the item would wobble by up to a pixel. Writing
+    // the opening comment rounds it, once.
+    rows: after.rows.map((row) => (row.items.length === 1 && row.width !== null ? { ...row, width: clampSingleWidth(row.width * ratio) } : row)),
+  };
+}
+
 /** The widest a layout may be: full width, or MAX_WRAP_WIDTH with text beside it. */
 export function maxBlockWidth(model: LayoutModel): number {
   return besideText(model) ? MAX_WRAP_WIDTH : 1;
