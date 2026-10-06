@@ -76,3 +76,15 @@ test("text indented in a list item is text, and code there is indented past the 
   assert.deepEqual(lines(paragraphBreaks(["- a", "", "Text.", "", "    code one", "", "    code two"], [])), ["1:blank", "3:blank"]);
   assert.deepEqual(lines(paragraphBreaks(["Text.", "    more text", "", "    code"], [])), ["2:blank"]);
 });
+
+
+test("a heading or a rule ends a list, and indented code may start right below one", () => {
+  // The heading ends the list: the code below is code at the margin, its blank lines left alone.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "## Heading", "", "    code one", "", "", "    code two"], [])), ["2:blank"]);
+  // Code right below a heading needs no blank line before it.
+  assert.deepEqual(lines(paragraphBreaks(["## Heading", "    code one", "", "", "    code two", "", "After."], [])), ["0:after", "5:blank"]);
+  // So does a rule, which also ends the list.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "***", "", "    code one", "", "    code two"], [])), ["2:blank"]);
+  // A heading in a list item ends no list; code below it is indented past the item's text.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "  ## In item", "      code one", "", "      code two"], [])), ["1:after"]);
+});

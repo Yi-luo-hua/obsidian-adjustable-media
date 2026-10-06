@@ -143,18 +143,23 @@ function listItem(text: string): ListItem | null {
   return { kind: `list${match[2] ?? match[4] ?? ""}`, indent, content, number: match[3] };
 }
 
+const THEMATIC_BREAK = /^([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
+const ATX_HEADING = /^#{1,6}(?:[ \t]|$)/;
+
 /**
  * Which lines belong to an indented code block. Code is indented four columns past where the text of
- * the list item it is in starts, or past the margin outside lists, and starts after a blank line: text
- * indented as far in a list item, or right below a paragraph line, is ordinary text. A list item stays
- * open across blank lines until a line is indented less than its text, or another item takes over.
+ * the list item it is in starts, or past the margin outside lists, and does not start right below a
+ * paragraph line: indented as far there, or only as far as an item's text, it is ordinary text. Only
+ * a paragraph goes on lazily in a line indented less than its list item's text; any other line, or
+ * one after a blank line, closes the items whose text it does not reach.
  */
 function indentedCode(lines: readonly string[], text: (line: number) => boolean, layout: (line: number) => boolean): Uint8Array {
   const code = new Uint8Array(lines.length);
   /** Where the text of each open list item starts, the innermost last. */
   const items: number[] = [];
+  const base = (): number => items[items.length - 1] ?? 0;
   let afterBlank = true;
-  let inCode = false;
+  let afterParagraph = false;
   for (let line = 0; line < lines.length; line += 1) {
     const source = lines[line] ?? "";
     if (!text(line)) {
@@ -163,26 +168,32 @@ function indentedCode(lines: readonly string[], text: (line: number) => boolean,
         items.length = 0;
       }
       afterBlank = false;
-      inCode = false;
+      afterParagraph = false;
       continue;
     }
     if (source.trim() === "") {
       afterBlank = true;
+      afterParagraph = false;
       continue;
     }
     const indent = columnAfter(INDENT.exec(source)?.[0] ?? "", 0);
-    const item = listItem(source);
-    // Without a blank line before it, text goes on lazily in the item above.
-    if (afterBlank || item) {
-      while (items.length > 0 && indent < (items[items.length - 1] ?? 0)) {
+    const trimmed = source.trimStart();
+    const thematic = THEMATIC_BREAK.test(trimmed);
+    const item = thematic ? null : listItem(source);
+    const lazy = !afterBlank && afterParagraph && !item && !thematic && !ATX_HEADING.test(trimmed) && !trimmed.startsWith(">");
+    if (!lazy) {
+      while (items.length > 0 && indent < base()) {
         items.pop();
       }
     }
-    inCode = indent >= (items[items.length - 1] ?? 0) + 4 && (inCode || afterBlank);
+    const inCode: boolean = indent >= base() + 4 && !afterParagraph;
     code[line] = inCode ? 1 : 0;
     if (item && !inCode) {
       items.push(item.content);
     }
+    // A heading or a rule ends where it is; anything else here is a paragraph that may go on.
+    const own = indent - base() <= 3;
+    afterParagraph = !inCode && !(own && (thematic || ATX_HEADING.test(trimmed)));
     afterBlank = false;
   }
   return code;
