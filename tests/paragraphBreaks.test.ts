@@ -44,3 +44,24 @@ test("a list or quote right below another block is parted from it by a break", (
   assert.deepEqual(lines(paragraphBreaks(text, [])), ["0:after", "4:after", "5:after", "6:after", "8:after",
     "10:blank", "12:after", "15:after"]);
 });
+
+test("blank lines inside an indented code block stay as they are", () => {
+  const text = ["Text.", "", "    code one", "", "", "    code two", "", "After."];
+  assert.deepEqual(lines(paragraphBreaks(text, [])), ["1:blank", "6:blank"]);
+});
+
+test("a list item is nested only when indented as far as the text of the item above", () => {
+  assert.deepEqual(lines(paragraphBreaks(["- a", " * b"], [])), ["0:after"]);
+  assert.deepEqual(lines(paragraphBreaks(["1. a", "  - b"], [])), ["0:after"]);
+  assert.deepEqual(lines(paragraphBreaks(["1. a", "   - b"], [])), []);
+  assert.deepEqual(lines(paragraphBreaks(["- a", "  - b", "- c"], [])), []);
+  assert.deepEqual(lines(paragraphBreaks(["-   a", "    * b"], [])), []);
+});
+
+test("a long list switching kinds on every line takes linear time", () => {
+  const text = Array.from({ length: 20000 }, (_, index) => (index % 2 === 0 ? "- item" : "+ item"));
+  const start = performance.now();
+  const breaks = paragraphBreaks(text, []);
+  assert.equal(breaks.length, 19999);
+  assert.ok(performance.now() - start < 300, `took ${performance.now() - start}ms`);
+});

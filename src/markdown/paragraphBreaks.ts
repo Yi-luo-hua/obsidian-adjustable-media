@@ -47,6 +47,13 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
   const blank = (line: number): boolean => text(line) && (lines[line] ?? "").trim() === "";
   const filled = (line: number): boolean => text(line) && (lines[line] ?? "").trim() !== "";
   const breaks: ParagraphBreak[] = [];
+  const taken = new Set<number>();
+  const add = (line: number, kind: ParagraphBreak["kind"]): void => {
+    if (!taken.has(line)) {
+      taken.add(line);
+      breaks.push({ line, kind });
+    }
+  };
   const opens = new Set(blocks.map((block) => block.openLine));
 
   for (let line = 0; line < lines.length; line += 1) {
@@ -54,7 +61,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
       // A heading below which the text goes on right away.
       const level = headingLevel(lines[line]);
       if (level >= 2 && filled(line + 1) && headingLevel(lines[line + 1]) === 0 && !opens.has(line + 1)) {
-        breaks.push({ line, kind: "after" });
+        add(line, "after");
       }
       continue;
     }
@@ -65,68 +72,105 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     while (end + 1 < lines.length && blank(end + 1)) {
       end += 1;
     }
+    // Blank lines inside an indented code block belong to the code.
+    if (INDENTED_CODE.test(lines[line - 1] ?? "") && filled(end + 1) && INDENTED_CODE.test(lines[end + 1] ?? "")) {
+      line = end;
+      continue;
+    }
     if (headingLevel(lines[end + 1]) === 0 && headingLevel(lines[line - 1]) !== 1) {
-      breaks.push({ line, kind: "blank" });
+      add(line, "blank");
     }
     for (let extra = line + 1; extra <= end; extra += 1) {
-      breaks.push({ line: extra, kind: "extra" });
+      add(extra, "extra");
     }
     line = end;
   }
 
   // Blocks written without a blank line between them that reading view still draws apart.
   for (const line of blockStarts(lines, filled)) {
-    if (!breaks.some((item) => item.line === line - 1)) {
-      breaks.push({ line: line - 1, kind: "after" });
-    }
+    add(line - 1, "after");
   }
 
   // Text right above and right below a float: reading view parts the two by a break, the float's
   // anchor between them takes no room.
   for (const block of blocks) {
     const above = block.openLine - 1;
-    if (block.floats && filled(above) && filled(block.closeLine + 1) && !breaks.some((item) => item.line === above)) {
-      breaks.push({ line: above, kind: "after" });
+    if (block.floats && filled(above) && filled(block.closeLine + 1)) {
+      add(above, "after");
     }
   }
   return breaks.sort((a, b) => a.line - b.line);
 }
 
-const LIST_ITEM = /^( {0,3})(?:([-*+])|(\d{1,9})([.)]))(?:[ \t]|$)/;
+const LIST_ITEM = /^( {0,3})(?:([-*+])|(\d{1,9})([.)]))([ \t]*)/;
 const QUOTE = /^ {0,3}>/;
+/** A line of an indented code block, or of content indented as far. */
+const INDENTED_CODE = /^(?: {4}| {0,3}\t)/;
 
-/**
- * The block a line of text belongs to, given the block of the line before it (null after a blank
- * line or a heading): a list of one kind (its items share their bullet, or their number's delimiter),
- * a quote, or a paragraph. Text right below a list or a quote goes on in it (a lazy continuation
- * line), an indented item in a list is a nested one, and only a list starting at 1 interrupts a
- * paragraph.
- */
-function blockOf(text: string, previous: string | null): string {
-  const item = LIST_ITEM.exec(text);
-  if (item) {
-    const nested = previous !== null && previous.startsWith("list") && item[1] !== "";
-    const continues = previous === "paragraph" && item[3] !== undefined && item[3] !== "1";
-    return nested || continues ? previous : `list${item[2] ?? item[4] ?? ""}`;
+/** The column after `text`, with tab stops every 4 columns, from column `start`. */
+function columnAfter(text: string, start: number): number {
+  let column = start;
+  for (const char of text) {
+    column = char === "\t" ? column + 4 - (column % 4) : column + 1;
   }
-  return QUOTE.test(text) ? "quote" : previous ?? "paragraph";
+  return column;
+}
+
+interface ListItem {
+  /** The list it belongs to: its bullet, or its number's delimiter. */
+  kind: string;
+  indent: number;
+  /** Where the item's text starts: an item indented that far or more is nested in it. */
+  content: number;
+  number: string | undefined;
+}
+
+function listItem(text: string): ListItem | null {
+  const match = LIST_ITEM.exec(text);
+  if (!match) {
+    return null;
+  }
+  const indent = match[1]?.length ?? 0;
+  const marker = match[2] ?? `${match[3] ?? ""}${match[4] ?? ""}`;
+  const space = match[5] ?? "";
+  const rest = text.slice(match[0].length);
+  if (space === "" && rest !== "") {
+    return null;
+  }
+  const after = columnAfter(space, indent + marker.length);
+  // No text, or a run of five or more columns, puts the text one column after the marker.
+  const content = rest === "" || after - indent - marker.length > 4 ? indent + marker.length + 1 : after;
+  return { kind: `list${match[2] ?? match[4] ?? ""}`, indent, content, number: match[3] };
 }
 
 /**
  * Lines that start a list or a quote right below another block of text, with no blank line between:
- * below a paragraph, a list of another kind, or a quote or a list. A heading's spacing is the
+ * below a paragraph, a list of another kind, or a quote or a list. Text right below a list or a quote
+ * goes on in it (a lazy continuation line); an item indented as far as the text of the list's item
+ * above is nested in it; only a list starting at 1 interrupts a paragraph; a heading's spacing is the
  * heading's own.
  */
 function blockStarts(lines: readonly string[], filled: (line: number) => boolean): number[] {
   const starts: number[] = [];
-  let previous: string | null = null;
+  let previous = null as string | null;
+  /** Where the text of the current list's last top-level item starts. */
+  let content = 0;
   for (let line = 0; line < lines.length; line += 1) {
     const text = lines[line] ?? "";
     if (!filled(line) || headingLevel(text) > 0) {
       previous = null;
       continue;
     }
-    const block = blockOf(text, previous);
+    const item = listItem(text);
+    let block: string;
+    if (item && previous?.startsWith("list") === true && item.indent >= content) {
+      block = previous;
+    } else if (item && !(previous === "paragraph" && item.number !== undefined && item.number !== "1")) {
+      block = item.kind;
+      content = item.content;
+    } else {
+      block = QUOTE.test(text) ? "quote" : previous ?? "paragraph";
+    }
     if (previous !== null && block !== previous) {
       starts.push(line);
     }
