@@ -190,6 +190,7 @@ class ProxyWidget extends WidgetType {
     sandbag?.toggleClass("vml-wrap-proxy__sandbag--right", this.side === "right");
     sandbag?.setCssProps({ "--vml-proxy-sandbag": `${this.plan.sandbag}px` });
     el.setCssProps({ "--vml-proxy-shift": `${this.plan.shift}px`, "--vml-proxy-margin-top": `${this.plan.marginTop}px` });
+    el.toggleClass("vml-wrap-proxy--cut", this.plan.shift > 0);
   }
 }
 
