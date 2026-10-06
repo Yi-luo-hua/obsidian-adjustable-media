@@ -5,7 +5,7 @@ import { findV2Blocks, MAX_WRAP_SKIP } from "../format/v2.ts";
 import { wrapZone, wrappedDrop } from "../layout/geometry.ts";
 import { visualWrapSkip } from "../layout/floatOrder.ts";
 import { effectiveWidth, hasTextColumns, setWrap } from "../layout/model.ts";
-import { blockForMove, blockGaps, isSamePlace, pickGap, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
+import { blockForMove, isSamePlace, moveGaps, pickGap, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
 import { createDragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, commitEdits, swallowNextClick, type LayoutContext } from "./interactions.ts";
 import { t } from "./messages.ts";
@@ -62,7 +62,7 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
     return;
   }
 
-  const gaps = blockGaps(lines);
+  const gaps = moveGaps(lines);
   const movingBlocks = findV2Blocks(lines);
   const movingIndex = movingBlocks.findIndex((candidate) => candidate.openLine === block.openLine);
   const currentVisualSkip = movingIndex < 0 ? context.model.skip ?? 0 : visualWrapSkip(lines, movingBlocks, movingIndex);

@@ -15,7 +15,7 @@ import {
   setWrap,
   type LayoutModel,
 } from "../src/layout/model.ts";
-import { blockForMove, blockGaps, isSamePlace, orderAdjacentFloat, pickGap, planPlacement } from "../src/layout/placement.ts";
+import { blockForMove, blockGaps, moveGaps, isSamePlace, orderAdjacentFloat, pickGap, planPlacement } from "../src/layout/placement.ts";
 import { carryFloat, planGaps, planProxy, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
@@ -216,6 +216,26 @@ test("a moved block keeps its body, and paragraphs keep one blank line between t
   // A note ending in a line break keeps it.
   assert.deepEqual(apply([...note, ""], planPlacement([...note, ""], layout, { line: 10, wrap: null, skip: 0 })), [
     "第一段", "", "第二段", "", "第三段", "", ...LAYOUT, "",
+  ]);
+});
+
+test("dragged, a block may also go into a run of blank lines between two blocks, but in front of its first", () => {
+  const blanks = [
+    "第一段", "", "", "", "第二段", "", // 0-5: lines 2 and 3 lead to a paragraph
+    "- 列表一", "", "", "- 列表二", "", "", // 6-11: the list goes on after 8; 11 leads to indented code
+    "    缩进代码", "", "末段", "", "", // 12-16: 16 leads to the end
+  ];
+  const plain = blockGaps(blanks);
+  assert.deepEqual(moveGaps(blanks).filter((line) => !plain.includes(line)), [2, 3, 16]);
+  // Only the moves gain them: the gaps that anchor document snapshots stay as they were.
+  assert.equal(plain.includes(2), false);
+});
+
+test("a wrapped block dropped into a run of blank lines goes right there, and leaves the other lines blank", () => {
+  const lines = ["第一段", "", ...LAYOUT, "", "第二段", "", "", "", "", "", "末段"];
+  assert.deepEqual(apply(lines, planPlacement(lines, block(lines), { line: 9, wrap: "left", skip: 0 })), [
+    // In front of line 9: lines 7 and 8 above it, 9 to 11 below.
+    "第一段", "", "第二段", "", "", WRAPPED_LEFT, "![[a.png]]", "<!-- /vml -->", "", "", "", "末段",
   ]);
 });
 

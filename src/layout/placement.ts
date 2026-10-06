@@ -42,32 +42,73 @@ const CLOSE_LINE = /^<!-- \/vml -->[ \t]*$/;
  */
 export function blockGaps(lines: readonly string[], contexts: readonly LineContext[] = scanMarkdownLines(lines, true),
   blocks: readonly V2Block[] = findV2Blocks(lines, contexts)): number[] {
+  const inside = insideBlocks(blocks);
+  const gaps: number[] = [];
+  for (let line = 0; line < lines.length; line += 1) {
+    if (startsBlock(lines, contexts, inside, line)) {
+      gaps.push(line);
+    }
+  }
+  // EOF is not outside an unterminated fence, equation, frontmatter or comment.
+  if (endIsText(lines, contexts)) {
+    gaps.push(lines.length);
+  }
+  return gaps;
+}
+
+/**
+ * The lines a block may be moved in front of by dragging: those of blockGaps, and the blank lines
+ * of a run of them between two top-level blocks but its first. A layout dropped beside such a run
+ * goes there, right where it shows, instead of staying far above with as many lines of skip:
+ * then its anchor is drawn whenever it is (wrapGuard.ts needs no stand-in). One blank line between
+ * blocks adds nothing: the block in front of the next one shows as high.
+ */
+export function moveGaps(lines: readonly string[], contexts: readonly LineContext[] = scanMarkdownLines(lines, true),
+  blocks: readonly V2Block[] = findV2Blocks(lines, contexts)): number[] {
+  const gaps = blockGaps(lines, contexts, blocks);
+  const inside = insideBlocks(blocks);
+  const blank = (line: number): boolean => stripCarriageReturn(lines[line] ?? "").trim() === ""
+    && contexts[line] === "text" && !inside.has(line);
+  const extra: number[] = [];
+  for (let line = 1; line < lines.length; line += 1) {
+    if (!blank(line) || !blank(line - 1)) {
+      continue;
+    }
+    let next = line + 1;
+    while (next < lines.length && blank(next)) {
+      next += 1;
+    }
+    if (next === lines.length ? endIsText(lines, contexts) : startsBlock(lines, contexts, inside, next)) {
+      extra.push(line);
+    }
+  }
+  return [...gaps, ...extra].sort((a, b) => a - b);
+}
+
+function insideBlocks(blocks: readonly V2Block[]): Set<number> {
   const inside = new Set<number>();
   for (const block of blocks) {
     for (let line = block.openLine + 1; line <= block.closeLine; line += 1) {
       inside.add(line);
     }
   }
+  return inside;
+}
 
-  const gaps: number[] = [];
-  for (let line = 0; line < lines.length; line += 1) {
-    const text = stripCarriageReturn(lines[line] ?? "");
-    if (text.trim() === "" || contexts[line] !== "text" || /^[ \t]/.test(text) || inside.has(line)) {
-      continue;
-    }
-    if (line > 0 && !followsBlockEnd(lines, contexts, line)) {
-      continue;
-    }
-    if (LIST_ITEM.test(text) && continuesList(lines, line)) {
-      continue;
-    }
-    gaps.push(line);
+/** Whether `line` starts a top-level Markdown block, which a moved block may go in front of. */
+function startsBlock(lines: readonly string[], contexts: readonly LineContext[], inside: ReadonlySet<number>, line: number): boolean {
+  const text = stripCarriageReturn(lines[line] ?? "");
+  if (text.trim() === "" || contexts[line] !== "text" || /^[ \t]/.test(text) || inside.has(line)) {
+    return false;
   }
-  // EOF is not outside an unterminated fence, equation, frontmatter or comment.
-  if ((contexts[lines.length] ?? scanMarkdownLines(lines, true).at(-1)) === "text") {
-    gaps.push(lines.length);
+  if (line > 0 && !followsBlockEnd(lines, contexts, line)) {
+    return false;
   }
-  return gaps;
+  return !(LIST_ITEM.test(text) && continuesList(lines, line));
+}
+
+function endIsText(lines: readonly string[], contexts: readonly LineContext[]): boolean {
+  return (contexts[lines.length] ?? scanMarkdownLines(lines, true).at(-1)) === "text";
 }
 
 /**
@@ -136,7 +177,7 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
   const crossedAfter = ordered.line !== placement.line && ordered.line > block.closeLine;
   const afterAdjacent = crossedAfter
     && (ordered.line === lines.length || lines[ordered.line]?.trim() === "");
-  const gaps = blockGaps(lines);
+  const gaps = moveGaps(lines);
   if (!isEditable(block) || !gaps.includes(placement.line) || (!gaps.includes(ordered.line) && !afterAdjacent)) {
     return null;
   }
