@@ -120,6 +120,30 @@ export function planGaps(boxes: readonly FlowBox[]): Gap[] {
   return gaps;
 }
 
+/**
+ * The elements to plan spacers for, out of the runs CodeMirror draws apart from each other around
+ * what it has not drawn: the run holding `viewportFrom`. CodeMirror also draws the cursor's line on
+ * its own, far from the viewport; planned together, the spacers of every line between them, not
+ * drawn and not measured, went (measured: a 98px spacer, and the note moved by as much). Floats drawn
+ * in the runs before still reach into this one and count, carried by a host of no height.
+ */
+export function viewportRun(runs: ReadonlyArray<readonly FlowBox[]>, viewportFrom: number): FlowBox[] {
+  const index = runs.findIndex((run) => run.some((box) => !box.standIn && box.pos >= viewportFrom));
+  const run = runs[index];
+  if (!run) {
+    return [];
+  }
+  let carried: number | null = null;
+  for (const before of runs.slice(0, index)) {
+    for (const box of before) {
+      if (box.floatBottom !== null) {
+        carried = carried === null ? box.floatBottom : Math.max(carried, box.floatBottom);
+      }
+    }
+  }
+  return carried === null ? [...run] : [{ pos: 0, top: 0, height: 0, mapTop: 0, spacer: false, floatBottom: carried, standIn: true }, ...run];
+}
+
 /** A wrapped layout's float, measured from the top of its anchor, in pixels. */
 export interface FloatSize {
   side: WrapSide;
@@ -197,9 +221,10 @@ export function liveProxy(plan: ProxyPlan, marginTop: number): LiveProxyPlan {
  * drawn before it, so a sandbag starts where the stand-ins before it do, not at the line: each
  * sandbag is only what is left below them, as the skips of floats sharing an anchor are. Without
  * it a stand-in after a lower one was pushed down by that one's whole height (measured: 412px).
+ * `floor` is where floats drawn before the line already start, below it: a layout drawn apart above
+ * the line (CodeMirror always draws the cursor's line) comes before every stand-in.
  */
-export function stackProxies<Plan extends ProxyPlan>(plans: readonly Plan[]): Plan[] {
-  let floor = 0;
+export function stackProxies<Plan extends ProxyPlan>(plans: readonly Plan[], floor = 0): Plan[] {
   return plans.map((plan) => {
     if (plan.shift > 0) {
       return plan;

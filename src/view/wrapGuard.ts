@@ -4,7 +4,7 @@ import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockIn
 
 import type { V2Block } from "../format/v2.ts";
 import { modelFromBlock } from "../layout/model.ts";
-import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
+import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, viewportRun, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
 import { layoutIsRendered } from "./layoutView.ts";
 
 /**
@@ -308,10 +308,14 @@ class WrapGuard {
     const docTop = view.documentTop;
     const anchors = this.source.anchors(view.state);
     const previousSizes = JSON.stringify([...this.sizes]);
-    const boxes: FlowBox[] = [];
+    // Runs of drawn elements, between the gaps CodeMirror leaves for what it has not drawn.
+    let boxes: FlowBox[] = [];
+    const runs: FlowBox[][] = [boxes];
 
     for (const child of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(":scope > *"))) {
       if (child.hasClass("cm-gap")) {
+        boxes = [];
+        runs.push(boxes);
         continue;
       }
       if (child.hasClass("vml-wrap-proxy")) {
@@ -363,13 +367,14 @@ class WrapGuard {
     }
 
     // A stand-in's host only carries floats: the elements around it bound what was measured.
-    const elements = boxes.filter((box) => !box.standIn);
+    const run = viewportRun(runs, view.viewport.from);
+    const elements = run.filter((box) => !box.standIn);
     const first = elements[0];
     const last = elements[elements.length - 1];
     if (!first || !last) {
       return null;
     }
-    const gaps = planGaps(boxes);
+    const gaps = planGaps(run);
     return sameGaps(gaps, currentGaps(view.state, first.pos, last.pos)) && previousSizes === JSON.stringify([...this.sizes])
       ? null : { from: first.pos, to: last.pos, gaps };
   }
@@ -452,7 +457,19 @@ class WrapGuard {
    * dispatch while it updates, so they follow right after, before the frame is painted.
    */
   private placeProxies(): void {
-    const ranges = this.proxies();
+    const view = this.view;
+    const drawnFrom = view.lineBlockAt(view.viewport.from).from;
+    // Stand-ins left in front of lines no longer drawn stay as they are, until those lines are drawn
+    // again. Taking one away changes that line's decorations, and CodeMirror then estimates the
+    // line's height afresh, as it cannot measure it: a line measured beside a float, several lines
+    // high, lost its height, and the note moved (measured: 98px each way as the stand-in moved on).
+    const left: Array<Range<Decoration>> = [];
+    view.state.field(proxyField, false)?.between(0, view.state.doc.length, (from, _to, value) => {
+      if (from < drawnFrom || from > view.viewport.to) {
+        left.push(value.range(from));
+      }
+    });
+    const ranges = [...left, ...this.proxies()];
     const key = ranges.map((range) => `${range.from}\n${(range.value.spec as { widget: ProxyWidget }).widget.key}`).join("\n\n");
     // A newer plan replaces one still waiting to be sent, even when it is what proxyField has.
     const serial = ++this.proxySerial;
@@ -479,8 +496,13 @@ class WrapGuard {
 
     const sourcePath = view.state.field(editorInfoField, false)?.file?.path ?? "";
     const planned: Array<{ anchor: WrapAnchor; side: FloatSize["side"]; plan: LiveProxyPlan }> = [];
+    // Floats drawn apart above the first drawn line come before the stand-ins: none starts above them.
+    let floor = 0;
     for (const anchor of anchors) {
       const size = this.sizes.get(anchor.key) ?? this.carried(anchor);
+      if (anchor.to < view.viewport.from && drawnApart(view, anchor) && size) {
+        floor = Math.max(floor, view.lineBlockAt(anchor.from).top + size.layoutTop - (size.marginTop ?? 0) - first.top);
+      }
       // Drawn, or below the first drawn line.
       if (anchor.to >= view.viewport.from || drawnApart(view, anchor) || !size) {
         continue;
@@ -491,7 +513,7 @@ class WrapGuard {
       }
     }
     // Drawn in this order, each below the ones before it.
-    const plans = stackProxies(planned.map(({ plan }) => plan));
+    const plans = stackProxies(planned.map(({ plan }) => plan), floor);
     // In front of the wrap gaps at the same position (side -1): the float starts at the line's top.
     return planned.map(({ anchor, side }, index) => Decoration.widget({
       widget: new ProxyWidget(this.source, anchor, sourcePath, side, plans[index]), block: true, side: -2,

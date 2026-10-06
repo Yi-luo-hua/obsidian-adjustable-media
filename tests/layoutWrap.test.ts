@@ -16,7 +16,7 @@ import {
   type LayoutModel,
 } from "../src/layout/model.ts";
 import { blockForMove, blockGaps, moveGaps, isSamePlace, orderAdjacentFloat, pickGap, placeAboveEarlierFloats, planPlacement } from "../src/layout/placement.ts";
-import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
+import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, viewportRun, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
 function block(lines: readonly string[], index = 0): V2Block {
@@ -541,6 +541,16 @@ test("block widgets at the same document position do not multiply wrap gaps", ()
   ]), [{ pos: 1012, height: 24 }]);
 });
 
+test("spacers are planned for the viewport's run only, with the floats drawn above it", () => {
+  // The cursor's line, drawn apart at the top of the note, holds a float reaching 541px down.
+  const cursorLine = [box(0, 0, 0, 0, { floatBottom: 541 })];
+  const viewport = [box(1337, 900, 24, 900), box(1400, 924, 24, 924)];
+  assert.deepEqual(viewportRun([cursorLine, viewport], 1337), [box(0, 0, 0, 0, { floatBottom: 541, standIn: true }), ...viewport]);
+  // Below the viewport, it adds nothing; with nothing drawn at the viewport, there is nothing to plan.
+  assert.deepEqual(viewportRun([viewport, [box(3000, 2000, 24, 2000)]], 1337), viewport);
+  assert.deepEqual(viewportRun([cursorLine], 1337), []);
+});
+
 test("the stand-ins' host in front of the first line drawn only carries floats", () => {
   // It shares the position of the line after it. As an element, that line would look like a second
   // child of one widget, and the line's spacer would be dropped, then planned again, and so on.
@@ -581,6 +591,8 @@ test("stand-ins in front of one line each start below the ones drawn before them
   assert.deepEqual(stackProxies([image, box]), [image, { ...box, sandbag: 96 }]);
   // One that would start higher than a stand-in before it cannot: it starts there, with no sandbag.
   assert.deepEqual(stackProxies([box, image]), [box, { ...image, sandbag: 0 }]);
+  // A layout drawn apart above the line (the cursor's) starting 432px below it comes first too.
+  assert.deepEqual(stackProxies([box], 432), [{ ...box, sandbag: 96 }]);
   // One cut off above the line has no sandbag to share.
   const cut = { sandbag: 0, height: 120, shift: 40 };
   assert.deepEqual(stackProxies([cut, image]), [cut, image]);
