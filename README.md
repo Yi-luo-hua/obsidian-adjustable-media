@@ -17,7 +17,7 @@ The latest release is **0.7.0**. Text boxes, multi-column text and numbered figu
 ### 🎨 Fluid, Intuitive Mouse-Driven Layout
 
 - **Side-by-Side & Grids**: Place images and videos side by side (up to 4 per row) with automatic height equalization.
-- **Direct Mouse Resizing**: Drag the gap between two images to adjust column widths, drag a row's bottom edge to change height, or drag the outer frame to scale the entire layout block.
+- **Direct Mouse Resizing**: Drag the gap between two images to adjust column widths (double-click it to share the row by the images' proportions again), drag a row's bottom edge to change height, or drag the outer frame to scale the entire layout block.
 - **Free Single-Image Placement**: Slide a single image left or right across its row, with smooth magnetic snapping to left, center, and right.
 - **Text Wrap, like LaTeX's `wrapfigure`**: Float a layout to the left or right and let the note's own paragraphs, lists, quotes, headings and code flow around it, then continue at full width below it. The text beside it is ordinary note text: type right next to the image and it reflows as you go.
 - **Text Beside Images, like Side-by-Side Minipages**: Write text in a layout block before its media for a column on their left, after them for a column on their right, or both. It is ordinary Markdown (headings, lists, quotes, links), and the media keep the layout's width in the middle. The text lines up with the media at the top, in the middle or at the bottom. In Live Preview, click the text to edit it right in the layout, where it keeps the look of Live Preview (headings, bold text, bullets, task boxes, links, rendered math and images, wrapped list items lined up under their text) and the keys work as in the note: <kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, brackets pair up, typing `[[` suggests links, and Obsidian's formatting, link, list, task and heading commands work on the hotkeys you gave them (<kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>I</kbd>, <kbd>Ctrl</kbd>+<kbd>K</kbd> and <kbd>Ctrl</kbd>+<kbd>L</kbd> by default). Or right-click an image and choose **Add text on the left** or **Add text on the right** to start one.
@@ -57,7 +57,7 @@ The latest release is **0.7.0**. Text boxes, multi-column text and numbered figu
 
 | Goal | Action |
 | :--- | :--- |
-| **Adjust column width ratio** | Drag the gap between two items |
+| **Adjust column width ratio** | Drag the gap between two items; double-click it to share the row by the images' proportions again |
 | **Change row height** | Drag the bottom edge of the row |
 | **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner for proportional scale; a layout floating right uses its left edge and bottom-left corner; with text beside the media, the handles sit on the media column) |
 | **Position a single item** | Drag the image horizontally; snaps smoothly to left, center, and right |

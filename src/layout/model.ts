@@ -511,6 +511,17 @@ export function scaleRows(model: LayoutModel, factor: number, singleWidths?: Rea
   };
 }
 
+/**
+ * The row shares its width by the media's aspect ratios again. A row that already does comes back
+ * unchanged, so nothing gets written.
+ */
+export function resetWeights(model: LayoutModel, rowIndex: number): LayoutModel {
+  if (!model.rows[rowIndex]?.items.some((item) => item.weight !== null)) {
+    return model;
+  }
+  return updateRow(model, rowIndex, (row) => ({ ...row, items: row.items.map((item) => ({ ...item, weight: null })) }));
+}
+
 export function setCaption(model: LayoutModel, position: ItemPosition, caption: string | null): LayoutModel {
   const text = caption?.trim() || null;
   if (!model.rows[position.row]?.items[position.index]) {

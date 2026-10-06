@@ -13,6 +13,7 @@ import {
   maxBlockWidth,
   moveItem,
   removeItem,
+  resetWeights,
   rowOffset,
   scaleRows,
   setAlign,
@@ -68,6 +69,8 @@ interface FrameMetrics {
 
 const contexts = new WeakMap<HTMLElement, LayoutContext>();
 export const DRAG_THRESHOLD = 6;
+/** How far a column divider must move to count as a drag, so the clicks of a double-click write nothing. */
+const RESIZE_THRESHOLD = 3;
 const MIN_COLUMN_WIDTH = 60;
 /** How close to left, center or right a single item snaps while it is dragged sideways. */
 const POSITION_SNAP = 10;
@@ -522,7 +525,10 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
 
     trackPointer(handle, event, {
       onMove(move) {
-        moved = true;
+        moved ||= movedPast(event, move);
+        if (!moved) {
+          return;
+        }
         widths = resizePair(startWidths, index, move.clientX - event.clientX, MIN_COLUMN_WIDTH);
         itemEls.forEach((el, i) => {
           el.addClass("vml-item--weighted");
@@ -544,6 +550,14 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
         });
       },
     });
+  });
+  // Double-clicking puts the row back to its default: however many items it holds, they all share it
+  // by aspect ratio again, as column weights are stored for the whole row. The event stops here: the
+  // editor would act on it too, and the image below would open in the viewer.
+  handle.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, resetWeights(context.model, row))], context);
   });
 }
 
@@ -651,6 +665,11 @@ function measureFrame(root: HTMLElement, box: HTMLElement): FrameMetrics {
   const rowEl = box.querySelector<HTMLElement>(".vml-row");
   const inset = rowEl ? box.getBoundingClientRect().width - rowEl.getBoundingClientRect().width : 0;
   return { available, inset };
+}
+
+/** Whether a divider has gone far enough to be a drag rather than a click. */
+function movedPast(start: PointerEvent, move: PointerEvent): boolean {
+  return Math.hypot(move.clientX - start.clientX, move.clientY - start.clientY) >= RESIZE_THRESHOLD;
 }
 
 function showItemMenu(at: MouseEvent | { x: number; y: number }, context: LayoutContext, position: ItemPosition): void {

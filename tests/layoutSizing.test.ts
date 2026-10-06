@@ -7,6 +7,7 @@ import {
   keepSingleSizes,
   metaFromModel,
   modelFromBlock,
+  resetWeights,
   rowOffset,
   scaleRows,
   setAlign,
@@ -110,6 +111,24 @@ test("corner scaling makes native and natural single sizes proportional without 
   assert.deepEqual(resized.rows.map((row) => row.items.map((item) => item.embed.raw)),
     layout.rows.map((row) => row.items.map((item) => item.embed.raw)));
   assert.equal(layout.rows[0]?.width, null);
+});
+
+test("double-clicking a column divider shares the whole row by aspect ratio again", () => {
+  const layout = model([
+    '<!-- vml {"v":2,"width":0.6,"rows":[{"height":240,"widths":[1,1.5,0.5],"captions":["A",null,null]},{"width":0.4}]} -->',
+    "![[a.png]] ![[b.png]] ![[c.png]]",
+    "![[d.png]]",
+    "<!-- /vml -->",
+  ]);
+
+  // However many items the row holds; the row's other settings and the other rows stay.
+  assert.deepEqual(metaFromModel(resetWeights(layout, 0)).rows, [{ height: 240, captions: ["A", null, null] }, { width: 0.4 }]);
+  assert.equal(resetWeights(layout, 0).width, 0.6);
+  // A row already sharing by aspect ratio, a single item and a missing row write nothing.
+  const shared = resetWeights(layout, 0);
+  assert.equal(resetWeights(shared, 0), shared);
+  assert.equal(resetWeights(layout, 1), layout);
+  assert.equal(resetWeights(layout, 5), layout);
 });
 
 test("the frame's right edge changes the block's width and keeps single items their size on screen", () => {
