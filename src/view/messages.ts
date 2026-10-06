@@ -310,8 +310,8 @@ const MESSAGES = {
     en: "Drag to resize the row height",
   },
   resizeColumn: {
-    zh: "拖动调整列宽",
-    en: "Drag to resize the columns",
+    zh: "拖动调整列宽，双击恢复按图片比例分配",
+    en: "Drag to resize the columns, double-click to share by aspect ratio",
   },
   resizeWidth: {
     zh: "拖动调整宽度",
