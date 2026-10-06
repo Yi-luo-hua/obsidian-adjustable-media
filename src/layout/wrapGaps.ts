@@ -193,6 +193,19 @@ export function carryFloat(placed: PlacedFloat, from: number, side: WrapSide, sk
 }
 
 /**
+ * A layout's float as last measured, moved with the note's text: where its anchor is and the line
+ * it starts beside. Text typed above the anchor moves both; left where it was, an edit made later
+ * in the stand-in found no earlier revision at its anchor and the stand-in went.
+ */
+export function mapPlaced(placed: PlacedFloat, mapPos: (pos: number) => number): PlacedFloat {
+  return { ...placed, from: mapPos(placed.from), size: mapFloat(placed.size, mapPos) };
+}
+
+export function mapFloat(size: FloatSize, mapPos: (pos: number) => number): FloatSize {
+  return size.refPos === undefined ? size : { ...size, refPos: mapPos(size.refPos) };
+}
+
+/**
  * Where the anchor of a stand-in's layout is taken to be: from the line it starts beside, now at
  * `refTop`, when it was measured with one, so that it keeps its place beside that line; else
  * `anchorTop`.

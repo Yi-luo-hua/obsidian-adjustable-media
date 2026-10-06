@@ -16,7 +16,7 @@ import {
   type LayoutModel,
 } from "../src/layout/model.ts";
 import { blockForMove, blockGaps, moveGaps, isSamePlace, orderAdjacentFloat, pickGap, placeAboveEarlierFloats, planPlacement } from "../src/layout/placement.ts";
-import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
+import { carryFloat, liveProxy, mapPlaced, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
 function block(lines: readonly string[], index = 0): V2Block {
@@ -609,6 +609,17 @@ test("a stand-in keeps its place beside the line it starts beside, not below its
   // Moved by its skip in a stand-in, it moves against that line by as much.
   const carried = carryFloat({ from: 0, skip: 22, size: measured }, 0, "left", 20, 24);
   assert.equal(carried?.refOffset, 18 - 48);
+});
+
+test("a measured float moves with the text typed above it, anchor and line beside it alike", () => {
+  // Found in review: after text typed above the anchor, an edit in the stand-in found no earlier
+  // revision at the anchor's new place, and the stand-in went.
+  const placed = { from: 100, skip: 10, size: { ...size, refPos: 400, refOffset: 6 } };
+  const moved = mapPlaced(placed, (pos) => pos + 12);
+  assert.equal(moved.from, 112);
+  assert.equal(moved.size.refPos, 412);
+  assert.ok(carryFloat(moved, 112, "left", 12, 24));
+  assert.equal(carryFloat(placed, 112, "left", 12, 24), null);
 });
 
 test("an edit made in a stand-in starts where the last measured revision did, moved by its skip", () => {
