@@ -4,7 +4,7 @@ import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockIn
 
 import type { V2Block } from "../format/v2.ts";
 import { modelFromBlock } from "../layout/model.ts";
-import { planGaps, planProxy, type FlowBox, type FloatSize, type Gap, type ProxyPlan } from "../layout/wrapGaps.ts";
+import { carryFloat, planGaps, planProxy, type FlowBox, type FloatSize, type Gap, type PlacedFloat, type ProxyPlan } from "../layout/wrapGaps.ts";
 import { layoutIsRendered } from "./layoutView.ts";
 
 /**
@@ -32,6 +32,8 @@ export interface WrapAnchor {
   key: string;
   /** The runtime instance alone, the same across revisions; none for a layout beside its source. */
   id?: string;
+  /** The skip the layout is drawn with: less than its own beside an opposite float sharing its anchor. */
+  skip: number;
   block: V2Block;
 }
 
@@ -218,10 +220,10 @@ class WrapGuard {
   private readonly standInSizes = new Set<string>();
   /**
    * Each instance's latest size, and where it was: an edit made in a stand-in makes a revision
-   * nothing has measured yet. Where the layout starts stays the same while its anchor, side and skip
-   * do, so the stand-in is drawn from there and measured for the rest.
+   * nothing has measured yet. While its anchor stays, where it starts follows from there
+   * (carryFloat), and the stand-in is measured for the rest.
    */
-  private readonly latest = new Map<string, { from: number; place: string; size: FloatSize }>();
+  private readonly latest = new Map<string, PlacedFloat>();
   private destroyed = false;
   private serial = 0;
   private epoch: number;
@@ -430,14 +432,18 @@ class WrapGuard {
   private keep(anchor: WrapAnchor, size: FloatSize): void {
     this.sizes.set(anchor.key, size);
     if (anchor.id !== undefined) {
-      this.latest.set(anchor.id, { from: anchor.from, place: placeOf(anchor), size });
+      this.latest.set(anchor.id, { from: anchor.from, skip: anchor.skip, size });
     }
   }
 
-  /** The size of an earlier revision of the same layout, while it still starts at the same place. */
+  /** The size of an earlier revision of the same layout, while its anchor stays. */
   private carried(anchor: WrapAnchor): FloatSize | undefined {
     const latest = anchor.id === undefined ? undefined : this.latest.get(anchor.id);
-    return latest && latest.from === anchor.from && latest.place === placeOf(anchor) ? latest.size : undefined;
+    if (!latest) {
+      return undefined;
+    }
+    const side = modelFromBlock(anchor.block).wrap ?? latest.size.side;
+    return carryFloat(latest, anchor.from, side, anchor.skip, this.view.defaultLineHeight) ?? undefined;
   }
 
   /**
@@ -492,12 +498,6 @@ class WrapGuard {
 function isReady(layout: HTMLElement): boolean {
   return layoutIsRendered(layout) && Array.from(layout.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"))
     .every(media => media.instanceOf(HTMLImageElement) ? media.complete : media.readyState > 0);
-}
-
-/** What decides where a layout starts beside its anchor. */
-function placeOf(anchor: WrapAnchor): string {
-  const model = modelFromBlock(anchor.block);
-  return `${model.wrap}:${model.skip}`;
 }
 
 /**

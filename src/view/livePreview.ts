@@ -207,7 +207,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     if (!revealed) {
       ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed) }).range(from, to));
       if (wraps) {
-        anchors.push({ from, to, key, id: ref.id, block });
+        anchors.push({ from, to, key, id: ref.id, skip: effectiveSkip ?? 0, block });
       }
       continue;
     }
@@ -224,7 +224,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
       ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, refs, effectiveSkip), side: -1 }).range(from));
-      anchors.push({ from, to: from, key: `${key}:source`, block });
+      anchors.push({ from, to: from, key: `${key}:source`, skip: effectiveSkip ?? 0, block });
     }
   }
 

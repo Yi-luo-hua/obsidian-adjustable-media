@@ -133,6 +133,28 @@ export interface FloatSize {
   marginBottom: number;
 }
 
+/** A layout's float as last measured, with where it was. */
+export interface PlacedFloat {
+  /** Document position of its anchor. */
+  from: number;
+  /** The skip it was drawn with. */
+  skip: number;
+  size: FloatSize;
+}
+
+/**
+ * The float of a revision of a layout that nothing has measured yet (an edit made in its stand-in),
+ * from the last one measured; null once its anchor has moved. The skip moves it by whole lines, the
+ * way it is drawn and set by dragging (`lineHeight` each); its side leaves where it starts as it was.
+ * Its width and height are measured on the stand-in.
+ */
+export function carryFloat(placed: PlacedFloat, from: number, side: WrapSide, skip: number, lineHeight: number): FloatSize | null {
+  if (placed.from !== from) {
+    return null;
+  }
+  return { ...placed.size, side, layoutTop: Math.max(0, placed.size.layoutTop + (skip - placed.skip) * lineHeight) };
+}
+
 export interface ProxyPlan {
   /** Height of an empty, zero-width float above the stand-in, when the layout starts below the line. */
   sandbag: number;

@@ -16,7 +16,7 @@ import {
   type LayoutModel,
 } from "../src/layout/model.ts";
 import { blockForMove, blockGaps, isSamePlace, orderAdjacentFloat, pickGap, planPlacement } from "../src/layout/placement.ts";
-import { planGaps, planProxy, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
+import { carryFloat, planGaps, planProxy, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
 function block(lines: readonly string[], index = 0): V2Block {
@@ -515,4 +515,17 @@ test("a stand-in covers the part of a float below the first line drawn", () => {
   assert.equal(planProxy(1000, size, 1500), null);
   // A layout that starts further down leaves the lines above it their full width.
   assert.deepEqual(planProxy(1000, { ...size, layoutTop: 72 }, 1040), { sandbag: 32, height: 408, shift: 0 });
+});
+
+test("an edit made in a stand-in starts where the last measured revision did, moved by its skip", () => {
+  // Measured from 笔记.md: a right float 40 lines below its anchor, dragged in place to the left, 34 lines down.
+  const placed = { from: 417, skip: 40, size: { ...size, side: "right" as const, layoutTop: 963.7 } };
+  const carried = carryFloat(placed, 417, "left", 34, 24);
+  assert.equal(carried?.side, "left");
+  assert.ok(Math.abs((carried?.layoutTop ?? 0) - (963.7 - 6 * 24)) < 0.001);
+  assert.equal(carried?.layoutHeight, size.layoutHeight);
+  assert.deepEqual(carryFloat(placed, 417, "right", 40, 24), placed.size);
+  // It never starts above its anchor, and once the anchor has moved nothing is known.
+  assert.equal(carryFloat(placed, 417, "right", 0, 30)?.layoutTop, 0);
+  assert.equal(carryFloat(placed, 500, "right", 40, 24), null);
 });
