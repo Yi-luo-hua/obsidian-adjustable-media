@@ -1,5 +1,5 @@
 import { Component, editorInfoField, editorLivePreviewField, type App } from "obsidian";
-import { Prec, StateEffect, StateField, type ChangeDesc, type EditorState, type Extension, type Range } from "@codemirror/state";
+import { Prec, StateEffect, StateField, type ChangeDesc, type EditorState, type Extension, type Range, type SelectionRange, type Transaction } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
 import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
@@ -48,6 +48,11 @@ interface LivePreviewState extends Measurements {
   hasWraps: boolean;
   /** The note's numbered figures, tables and equations, if it has any labels or references. */
   refs: RefContext | undefined;
+  /**
+   * Whether the user put the cursor where it is: clicked, pressed a key or typed. A note opens with
+   * its cursor at its very start, where it touches a layout written first; that cursor shows no source.
+   */
+  placedCursor: boolean;
 }
 
 interface Parsed extends Measurements {
@@ -69,7 +74,7 @@ interface Parsed extends Measurements {
  */
 export function livePreviewExtension(app: App): Extension {
   const field = StateField.define<LivePreviewState>({
-    create: (state) => withDecorations(app, state, parse(app, state)),
+    create: (state) => withDecorations(app, state, parse(app, state), false),
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
       const info = tr.state.field(editorInfoField, false);
@@ -93,11 +98,14 @@ export function livePreviewExtension(app: App): Extension {
         rememberDocumentSnapshot(tr.state, null);
         return value;
       }
+      // Another note in the editor opens with a cursor nobody put there; one set by code (Obsidian
+      // restoring where a note was left) was not put by the user either.
+      const placedCursor = originChanged ? false : tr.selection ? userPlaced(tr) : value.placedCursor || (tr.docChanged && userPlaced(tr));
       if (tr.docChanged || modeChanged || originChanged) {
-        return withDecorations(app, tr.state, { ...parse(app, tr.state, value.snapshot, tr.changes), ...measurements });
+        return withDecorations(app, tr.state, { ...parse(app, tr.state, value.snapshot, tr.changes), ...measurements }, placedCursor);
       }
-      if (tr.selection || environment) {
-        return withDecorations(app, tr.state, { ...value, ...measurements });
+      if (tr.selection || environment || placedCursor !== value.placedCursor) {
+        return withDecorations(app, tr.state, { ...value, ...measurements }, placedCursor);
       }
       rememberDocumentSnapshot(tr.state, value.snapshot);
       return value;
@@ -184,12 +192,20 @@ function parse(app: App, state: EditorState, previous: DocumentSnapshot | null =
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
 }
 
-function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePreviewState {
+/** Whether a transaction comes from the user's pointer, keys or typing. */
+function userPlaced(tr: Transaction): boolean {
+  return ["select", "input", "delete", "move", "undo", "redo"].some((event) => tr.isUserEvent(event));
+}
+
+function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCursor: boolean): LivePreviewState {
   const { blocks, refs, snapshot, skips } = parsed;
   rememberDocumentSnapshot(state, snapshot);
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
+  // A cursor nobody put at the start of the note touches nothing there.
+  const touches = (range: SelectionRange, from: number, to: number): boolean => range.from <= to && range.to >= from
+    && (placedCursor || !range.empty || range.head > 0);
   let hasWraps = false;
 
   for (const [index, block] of blocks.entries()) {
@@ -198,7 +214,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     }
     const from = state.doc.line(block.openLine + 1).from;
     const to = state.doc.line(block.closeLine + 1).to;
-    const revealed = state.selection.ranges.some((range) => range.from <= to && range.to >= from);
+    const revealed = state.selection.ranges.some((range) => touches(range, from, to));
     const wraps = blockWrap(block) !== null;
     const effectiveSkip = skips[index] ?? null;
     const ref = snapshot!.blocks[index];
@@ -237,7 +253,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
       continue;
     }
     const gap = state.doc.sliceString(state.doc.line(before.closeLine + 1).to, state.doc.line(after.openLine + 1).from);
-    if (gap.trim() !== "" || state.selection.ranges.some((range) => range.from <= state.doc.line(after.closeLine + 1).to && range.to >= state.doc.line(before.openLine + 1).from)) {
+    if (gap.trim() !== "" || state.selection.ranges.some((range) => touches(range, state.doc.line(before.openLine + 1).from, state.doc.line(after.closeLine + 1).to))) {
       continue;
     }
     for (let line = before.closeLine + 1; line < after.openLine; line += 1) {
@@ -245,7 +261,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     }
   }
 
-  return { ...parsed, decorations: Decoration.set(ranges, true), anchors, hasWraps };
+  return { ...parsed, decorations: Decoration.set(ranges, true), anchors, hasWraps, placedCursor };
 }
 
 /** What Obsidian draws for the text beside a layout's media lives as long as the widget's element. */
@@ -424,7 +440,7 @@ function drawWidget(
   button.addEventListener("click", (event) => {
     event.preventDefault();
     // A stand-in's block lies above what is drawn.
-    view.dispatch({ selection: { anchor: position() }, scrollIntoView: standIn !== undefined });
+    view.dispatch({ selection: { anchor: position() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
     view.focus();
   });
   return host;
