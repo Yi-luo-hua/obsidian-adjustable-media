@@ -1,4 +1,4 @@
-import { findV2Blocks, MAX_WRAP_SKIP, serializeOpener, type V2Block, type WrapSide } from "../format/v2.ts";
+import { findV2Blocks, isDrawable, MAX_WRAP_SKIP, serializeOpener, type V2Block, type WrapSide } from "../format/v2.ts";
 import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
 import { isEditable, planModelEdit, type BlockEdit } from "./edits.ts";
 import { adjacentOppositeFloat, visualWrapSkip } from "./floatOrder.ts";
@@ -42,32 +42,73 @@ const CLOSE_LINE = /^<!-- \/vml -->[ \t]*$/;
  */
 export function blockGaps(lines: readonly string[], contexts: readonly LineContext[] = scanMarkdownLines(lines, true),
   blocks: readonly V2Block[] = findV2Blocks(lines, contexts)): number[] {
+  const inside = insideBlocks(blocks);
+  const gaps: number[] = [];
+  for (let line = 0; line < lines.length; line += 1) {
+    if (startsBlock(lines, contexts, inside, line)) {
+      gaps.push(line);
+    }
+  }
+  // EOF is not outside an unterminated fence, equation, frontmatter or comment.
+  if (endIsText(lines, contexts)) {
+    gaps.push(lines.length);
+  }
+  return gaps;
+}
+
+/**
+ * The lines a block may be moved in front of by dragging: those of blockGaps, and the blank lines
+ * of a run of them between two top-level blocks but its first. A layout dropped beside such a run
+ * goes there, right where it shows, instead of staying far above with as many lines of skip:
+ * then its anchor is drawn whenever it is (wrapGuard.ts needs no stand-in). One blank line between
+ * blocks adds nothing: the block in front of the next one shows as high.
+ */
+export function moveGaps(lines: readonly string[], contexts: readonly LineContext[] = scanMarkdownLines(lines, true),
+  blocks: readonly V2Block[] = findV2Blocks(lines, contexts)): number[] {
+  const gaps = blockGaps(lines, contexts, blocks);
+  const inside = insideBlocks(blocks);
+  const blank = (line: number): boolean => stripCarriageReturn(lines[line] ?? "").trim() === ""
+    && contexts[line] === "text" && !inside.has(line);
+  const extra: number[] = [];
+  for (let line = 1; line < lines.length; line += 1) {
+    if (!blank(line) || !blank(line - 1)) {
+      continue;
+    }
+    let next = line + 1;
+    while (next < lines.length && blank(next)) {
+      next += 1;
+    }
+    if (next === lines.length ? endIsText(lines, contexts) : startsBlock(lines, contexts, inside, next)) {
+      extra.push(line);
+    }
+  }
+  return [...gaps, ...extra].sort((a, b) => a - b);
+}
+
+function insideBlocks(blocks: readonly V2Block[]): Set<number> {
   const inside = new Set<number>();
   for (const block of blocks) {
     for (let line = block.openLine + 1; line <= block.closeLine; line += 1) {
       inside.add(line);
     }
   }
+  return inside;
+}
 
-  const gaps: number[] = [];
-  for (let line = 0; line < lines.length; line += 1) {
-    const text = stripCarriageReturn(lines[line] ?? "");
-    if (text.trim() === "" || contexts[line] !== "text" || /^[ \t]/.test(text) || inside.has(line)) {
-      continue;
-    }
-    if (line > 0 && !followsBlockEnd(lines, contexts, line)) {
-      continue;
-    }
-    if (LIST_ITEM.test(text) && continuesList(lines, line)) {
-      continue;
-    }
-    gaps.push(line);
+/** Whether `line` starts a top-level Markdown block, which a moved block may go in front of. */
+function startsBlock(lines: readonly string[], contexts: readonly LineContext[], inside: ReadonlySet<number>, line: number): boolean {
+  const text = stripCarriageReturn(lines[line] ?? "");
+  if (text.trim() === "" || contexts[line] !== "text" || /^[ \t]/.test(text) || inside.has(line)) {
+    return false;
   }
-  // EOF is not outside an unterminated fence, equation, frontmatter or comment.
-  if ((contexts[lines.length] ?? scanMarkdownLines(lines, true).at(-1)) === "text") {
-    gaps.push(lines.length);
+  if (line > 0 && !followsBlockEnd(lines, contexts, line)) {
+    return false;
   }
-  return gaps;
+  return !(LIST_ITEM.test(text) && continuesList(lines, line));
+}
+
+function endIsText(lines: readonly string[], contexts: readonly LineContext[]): boolean {
+  return (contexts[lines.length] ?? scanMarkdownLines(lines, true).at(-1)) === "text";
 }
 
 /**
@@ -98,6 +139,44 @@ export function isSamePlace(lines: readonly string[], block: V2Block, line: numb
     next += 1;
   }
   return line === next;
+}
+
+/**
+ * Where a wrapped block dropped to start at `top` goes in the note. CSS places no float above one
+ * written before it: behind a float written earlier that starts lower, the block would be pushed
+ * down to that float's top, away from where it was dropped. It goes in front of the first such
+ * float instead, its skip counted from there; that float, starting lower, keeps its place. Next to
+ * an opposite float sharing its anchor, the block stays at its place for orderAdjacentFloat, which
+ * also keeps that float's height. `lineTop` gives where a line is drawn, in the units of `top`;
+ * where the other floats start follows from their anchors and skips, and from the floats before
+ * them, which push them down too.
+ */
+export function placeAboveEarlierFloats(lines: readonly string[], block: V2Block, placement: Placement, top: number,
+  lineTop: (line: number) => number, lineHeight: number): Placement {
+  if (placement.wrap === null || lineHeight <= 0) {
+    return placement;
+  }
+  const blocks = findV2Blocks(lines);
+  const index = blocks.findIndex((candidate) => candidate.openLine === block.openLine);
+  const skipFrom = (line: number): number => Math.min(MAX_WRAP_SKIP, Math.max(0, Math.round((top - lineTop(line)) / lineHeight)));
+  let lowest = Number.NEGATIVE_INFINITY;
+  for (const [at, other] of blocks.entries()) {
+    if (other.openLine >= placement.line) {
+      break;
+    }
+    if (at === index || !isDrawable(other) || modelFromBlock(other).wrap === null) {
+      continue;
+    }
+    lowest = Math.max(lowest, lineTop(other.openLine) + visualWrapSkip(lines, blocks, at) * lineHeight);
+    if (lowest <= top + lineHeight / 2) {
+      continue;
+    }
+    if (index >= 0 && adjacentOppositeFloat(lines, blocks, index, -1) === other) {
+      return { line: block.openLine, wrap: placement.wrap, skip: skipFrom(block.openLine) };
+    }
+    return moveGaps(lines).includes(other.openLine) ? { line: other.openLine, wrap: placement.wrap, skip: skipFrom(other.openLine) } : placement;
+  }
+  return placement;
 }
 
 /** Keep adjacent opposite-side floats in the order of the height they start at. CSS cannot place a
@@ -136,7 +215,7 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
   const crossedAfter = ordered.line !== placement.line && ordered.line > block.closeLine;
   const afterAdjacent = crossedAfter
     && (ordered.line === lines.length || lines[ordered.line]?.trim() === "");
-  const gaps = blockGaps(lines);
+  const gaps = moveGaps(lines);
   if (!isEditable(block) || !gaps.includes(placement.line) || (!gaps.includes(ordered.line) && !afterAdjacent)) {
     return null;
   }
@@ -171,7 +250,9 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
       return null;
     }
   }
-  const model = setSkip(setWrap(current, ordered.wrap), ordered.skip);
+  // The blank line it leaves behind next to that float no longer sits between two floats and takes
+  // its height again, so the text below moves down a line: the moved block follows it, as that float does.
+  const model = setSkip(setWrap(current, ordered.wrap), Math.min(MAX_WRAP_SKIP, ordered.skip + (before ? 1 : 0)));
   if (isSamePlace(lines, block, ordered.line)) {
     const edit = planModelEdit(block, model);
     return [...(edit ? [edit] : []), ...(afterEdit ? [afterEdit] : [])];
