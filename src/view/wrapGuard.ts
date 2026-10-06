@@ -1,10 +1,10 @@
 import { editorInfoField } from "obsidian";
-import { StateEffect, StateField, type EditorState, type Extension, type Range } from "@codemirror/state";
+import { StateEffect, StateField, type ChangeDesc, type EditorState, type Extension, type Range } from "@codemirror/state";
 import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockInfo, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 
 import type { V2Block } from "../format/v2.ts";
 import { modelFromBlock } from "../layout/model.ts";
-import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, viewportRun, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
+import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
 import { layoutIsRendered } from "./layoutView.ts";
 
 /**
@@ -254,13 +254,17 @@ class WrapGuard {
   }
 
   update(update: ViewUpdate): void {
+    if (update.docChanged) {
+      this.mapSizes(update.changes);
+    }
     const environmentChanged = this.epoch !== this.source.environmentEpoch(update.state);
     if (environmentChanged) { this.epoch = this.source.environmentEpoch(update.state); this.forgetSizes(); this.pendingMedia.clear(); }
     const anchorsChanged = signature(this.source.anchors(update.state)) !== signature(this.source.anchors(update.startState));
     // A stand-in starts below the first drawn line by what the height map has above it, which a
     // measurement of lines above it may change while the viewport stays.
-    if (update.docChanged || update.viewportChanged || update.heightChanged || update.geometryChanged || anchorsChanged || environmentChanged
-      || update.transactions.some(tr => tr.effects.some(effect => effect.is(setGaps)))) {
+    // So does the selection: CodeMirror draws its lines, stand-ins left there included.
+    if (update.docChanged || update.viewportChanged || update.heightChanged || update.geometryChanged || update.selectionSet || anchorsChanged
+      || environmentChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setGaps)))) {
       this.placeProxies();
     }
     if (update.docChanged || update.viewportChanged || update.heightChanged || update.geometryChanged || anchorsChanged || environmentChanged) {
@@ -273,6 +277,13 @@ class WrapGuard {
     this.serial++;
     this.resize.disconnect(); this.observed.clear(); this.forgetSizes();
     this.pendingMedia.clear(); activeGuards.delete(this.view);
+  }
+
+  /** The lines the layouts start beside move with the note's text. */
+  private mapSizes(changes: ChangeDesc): void {
+    const map = (size: FloatSize): FloatSize => size.refPos === undefined ? size : { ...size, refPos: changes.mapPos(size.refPos, 1) };
+    for (const [key, size] of this.sizes) this.sizes.set(key, map(size));
+    for (const [id, placed] of this.latest) this.latest.set(id, { ...placed, size: map(placed.size) });
   }
 
   private forgetSizes(): void {
@@ -405,7 +416,12 @@ class WrapGuard {
     const style = getComputedStyle(layout);
     if (isReady(layout)) this.pendingMedia.delete(anchor.key); else this.pendingMedia.add(anchor.key);
     const side = layout.hasClass("vml-layout--wrap-right") ? "right" : "left";
+    // The line it starts beside, as the height map has it: the stand-in follows that line.
+    const top = rect.top - this.view.documentTop;
+    const beside = this.view.lineBlockAtHeight(top);
     this.keep(anchor, {
+      refPos: beside.from,
+      refOffset: top - beside.top,
       side,
       layoutTop: rect.top - anchorRect.top,
       layoutHeight: rect.height,
@@ -465,7 +481,8 @@ class WrapGuard {
     // high, lost its height, and the note moved (measured: 98px each way as the stand-in moved on).
     const left: Array<Range<Decoration>> = [];
     view.state.field(proxyField, false)?.between(0, view.state.doc.length, (from, _to, value) => {
-      if (from < drawnFrom || from > view.viewport.to) {
+      // Not in the viewport, nor on the cursor's lines, which CodeMirror draws apart from it.
+      if ((from < drawnFrom || from > view.viewport.to) && !onSelectionLine(view, from)) {
         left.push(value.range(from));
       }
     });
@@ -507,7 +524,8 @@ class WrapGuard {
       if (anchor.to >= view.viewport.from || drawnApart(view, anchor) || !size) {
         continue;
       }
-      const plan = planProxy(view.lineBlockAt(anchor.from).top, size, first.top);
+      const ref = size.refPos !== undefined && size.refPos <= view.state.doc.length ? view.lineBlockAt(size.refPos).top : null;
+      const plan = planProxy(standInAnchorTop(size, view.lineBlockAt(anchor.from).top, ref), size, first.top);
       if (plan) {
         planned.push({ anchor, side: size.side, plan: liveProxy(plan, size.marginTop ?? 0) });
       }
@@ -527,10 +545,15 @@ class WrapGuard {
  * line floats from there; a stand-in would come on top of it, cleared below it by the same float.
  */
 function drawnApart(view: EditorView, anchor: WrapAnchor): boolean {
+  return onSelectionLine(view, anchor.from, anchor.to);
+}
+
+/** Whether `from`..`to` meets a line the main selection starts or ends on. */
+function onSelectionLine(view: EditorView, from: number, to = from): boolean {
   const { main } = view.state.selection;
   return [main.anchor, main.head].some((pos) => {
     const line = view.lineBlockAt(pos);
-    return line.from <= anchor.to && line.to >= anchor.from;
+    return line.from <= to && line.to >= from;
   });
 }
 

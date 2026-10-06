@@ -16,7 +16,7 @@ import {
   type LayoutModel,
 } from "../src/layout/model.ts";
 import { blockForMove, blockGaps, moveGaps, isSamePlace, orderAdjacentFloat, pickGap, placeAboveEarlierFloats, planPlacement } from "../src/layout/placement.ts";
-import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, viewportRun, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
+import { carryFloat, liveProxy, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
 function block(lines: readonly string[], index = 0): V2Block {
@@ -596,6 +596,19 @@ test("stand-ins in front of one line each start below the ones drawn before them
   // One cut off above the line has no sandbag to share.
   const cut = { sandbag: 0, height: 120, shift: 40 };
   assert.deepEqual(stackProxies([cut, image]), [cut, image]);
+});
+
+test("a stand-in keeps its place beside the line it starts beside, not below its anchor", () => {
+  // Measured in 笔记.md: the float starts 532px below its anchor, 18px below the top of the line beside
+  // it. With the cursor's heading drawn apart, 18px lower, that line is now at 496, not 514.
+  const measured: FloatSize = { ...size, layoutTop: 532, refPos: 1200, refOffset: 18 };
+  assert.equal(standInAnchorTop(measured, 0, 496) + measured.layoutTop, 514);
+  // Not measured beside a line, or that line unknown: from its anchor as before.
+  assert.equal(standInAnchorTop({ ...size, layoutTop: 532 }, 0, 496), 0);
+  assert.equal(standInAnchorTop(measured, 0, null), 0);
+  // Moved by its skip in a stand-in, it moves against that line by as much.
+  const carried = carryFloat({ from: 0, skip: 22, size: measured }, 0, "left", 20, 24);
+  assert.equal(carried?.refOffset, 18 - 48);
 });
 
 test("an edit made in a stand-in starts where the last measured revision did, moved by its skip", () => {

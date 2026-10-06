@@ -157,6 +157,15 @@ export interface FloatSize {
   marginBottom: number;
   /** Margin above the layout's border box: its float starts that much higher. */
   marginTop?: number;
+  /**
+   * The line the layout starts beside (its document position), and how far below that line's top
+   * it starts. A stand-in follows that line rather than its anchor: the lines between may change
+   * height undrawn, and the text beside it would then move against it. CodeMirror draws the
+   * cursor's line on its own without the viewport's decorations: a heading so drawn is 18px
+   * lower, and the lines beside the float took other breaks, moving the note by up to 160px.
+   */
+  refPos?: number;
+  refOffset?: number;
 }
 
 /** A layout's float as last measured, with where it was. */
@@ -178,7 +187,18 @@ export function carryFloat(placed: PlacedFloat, from: number, side: WrapSide, sk
   if (placed.from !== from) {
     return null;
   }
-  return { ...placed.size, side, layoutTop: Math.max(0, placed.size.layoutTop + (skip - placed.skip) * lineHeight) };
+  const layoutTop = Math.max(0, placed.size.layoutTop + (skip - placed.skip) * lineHeight);
+  const { refOffset } = placed.size;
+  return { ...placed.size, side, layoutTop, ...(refOffset === undefined ? {} : { refOffset: refOffset + layoutTop - placed.size.layoutTop }) };
+}
+
+/**
+ * Where the anchor of a stand-in's layout is taken to be: from the line it starts beside, now at
+ * `refTop`, when it was measured with one, so that it keeps its place beside that line; else
+ * `anchorTop`.
+ */
+export function standInAnchorTop(size: FloatSize, anchorTop: number, refTop: number | null): number {
+  return refTop !== null && size.refOffset !== undefined ? refTop + size.refOffset - size.layoutTop : anchorTop;
 }
 
 export interface ProxyPlan {
