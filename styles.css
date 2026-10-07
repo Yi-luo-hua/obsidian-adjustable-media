@@ -259,9 +259,43 @@
  * CodeMirror measures a widget by its box and ignores margins, so a layout's spacing is padding of
  * its widget. As a margin it could reach out of a widget whose painting is not contained
  * (see .vml-has-wraps below), and every line after it would be placed too high.
+ *
+ * In reading view the layout's margin collapses with the paragraph's beside it into one paragraph
+ * break. So does the widget's padding here: a paragraph break against text, none on a side where a
+ * blank line (.vml-break) already makes it.
  */
 .vml-live-preview:not(.vml-live-preview--wrap) {
-  padding: 0.75em 0;
+  padding: var(--p-spacing, 1rem) 0;
+}
+
+.vml-live-preview.vml-live-preview--blank-above:not(.vml-live-preview--wrap) {
+  padding-top: 0;
+}
+
+.vml-live-preview.vml-live-preview--blank-below:not(.vml-live-preview--wrap) {
+  padding-bottom: 0;
+}
+
+/*
+ * In a note with layouts the text keeps reading view's paragraph spacing (paragraphBreaks.ts), so it,
+ * and what of it sits beside a float, lies where reading view and the PDF put it. A blank line is as
+ * high as the break; a blank line more takes no room while the cursor is elsewhere: reading view
+ * makes one break of them all.
+ */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break {
+  line-height: var(--p-spacing, 1rem);
+}
+
+/* A line that reading view parts from the next block by a paragraph break, where no blank line does. */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break-after {
+  padding-bottom: var(--p-spacing, 1rem);
+}
+
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break--extra {
+  height: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+  padding-top: 0;
 }
 
 .vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout {
@@ -878,10 +912,25 @@ body.vml-is-dragging * {
     break-inside: auto;
   }
 
-  /* Screen tables can scroll horizontally; every column must fit on paper. */
+  /*
+   * A float that does not fit on the page moves to the next one with the text it is anchored to
+   * (keepFloatsWithAnchors): alone, it would leave that text behind at full width.
+   */
+  .vml-print-float {
+    break-inside: avoid;
+  }
+
+  .vml-print-keep-with-next {
+    break-after: avoid;
+  }
+
+  /*
+   * Screen tables can scroll horizontally; on paper every column must fit. Cells break anywhere, so a
+   * table shrinks to the room it has, beside a float too, as in reading view: at full width it would
+   * drop below the float.
+   */
   .vml-print-content table {
-    width: 100%;
-    table-layout: fixed;
+    max-width: 100%;
   }
 
   .vml-print-content :is(th, td) {
@@ -892,7 +941,6 @@ body.vml-is-dragging * {
 
   .vml-print-content table:has(tr > :nth-child(9)) {
     font-size: 0.75em;
-    table-layout: auto;
   }
 
   .vml-print-content table:has(tr > :nth-child(9)) :is(th, td) {

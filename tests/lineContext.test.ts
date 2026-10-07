@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { scanMarkdownLines, type LineContext } from "../src/markdown/lineContext.ts";
+import { scanMarkdownConstructs, scanMarkdownLines, type LineContext } from "../src/markdown/lineContext.ts";
 
 function scan(...lines: string[]): LineContext[] {
   return scanMarkdownLines(lines);
@@ -140,4 +140,12 @@ test("comment markers inside inline code are ignored", () => {
 
 test("CRLF line endings", () => {
   assert.deepEqual(scan("```\r", "x\r", "```\r", "t\r"), ["code", "code", "code", "text"]);
+});
+
+test("constructs report the line each one opens on, also right after another", () => {
+  // A comment closed on its own line, like a layout's, is text.
+  const lines = ["Text", "```", "a", "```", "```", "b", "```", "$$ x $$", "<!--", "c -->", "<!-- d -->", "Text"];
+  const { contexts, opens } = scanMarkdownConstructs(lines);
+  assert.deepEqual(contexts, scanMarkdownLines(lines));
+  assert.deepEqual(opens, [false, true, false, false, true, false, false, true, true, false, false, false]);
 });

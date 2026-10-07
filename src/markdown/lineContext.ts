@@ -46,6 +46,25 @@ export function scanMarkdownLines(lines: readonly string[], includeEnd = false):
   return contexts;
 }
 
+/**
+ * Each line's context, as `scanMarkdownLines` finds it, and which lines open a construct that is not
+ * the note's text: fenced code, math, a comment, frontmatter. One construct can start right where
+ * another ends, on the next line.
+ */
+export function scanMarkdownConstructs(lines: readonly string[]): { contexts: LineContext[]; opens: boolean[] } {
+  const contexts: LineContext[] = [];
+  const opens: boolean[] = [];
+  let state: ScanState = hasFrontmatter(lines) ? { kind: "frontmatter" } : TEXT;
+
+  lines.forEach((rawLine, index) => {
+    const [context, nextState] = classifyLine(stripCarriageReturn(rawLine), index, state);
+    contexts.push(context);
+    opens.push(context !== "text" && (state.kind === "text" || (index === 0 && state.kind === "frontmatter")));
+    state = nextState;
+  });
+  return { contexts, opens };
+}
+
 function classifyLine(line: string, index: number, state: ScanState): [LineContext, ScanState] {
   switch (state.kind) {
     case "frontmatter":

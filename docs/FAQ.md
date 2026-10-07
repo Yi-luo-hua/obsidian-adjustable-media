@@ -32,6 +32,10 @@ It changes your note when you drop or paste media, so you turn it on yourself in
 
 The comments are kept as HTML comments, which don't show on the page, and the images display however your publishing tool shows them. Without the plugin's styling, large images from the same row will stack vertically.
 
+## Why do lines break differently in the PDF than on screen?
+
+When no text font is set, Obsidian exports PDFs in Arial while the screen uses your system font, so words take a different width and lines break elsewhere. Set a font under **Settings → Appearance → Text font** and both use it. Paper width also differs from your window, so lines break where the paper ends; the layouts themselves keep their proportions.
+
 ## Why desktop only?
 
 Dragging with touch isn't supported yet.

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { printPlan } from "../src/markdown/print.ts";
+import { keepWithNext, printPlan } from "../src/markdown/print.ts";
 import { collectRefs, numberMarkdown } from "../src/markdown/crossref.ts";
 
 test("export replaces whole drawable layouts and preserves code and surrounding Markdown", () => {
@@ -37,4 +37,11 @@ test("export body keeps the whole note's numbering after layouts become placehol
   assert.ok(!numbered.includes(String.raw`\label{eq:outside}`));
   assert.ok(numbered.includes(String.raw`\label{eq:example}`));
   assert.match(numbered, /data-vml-label="tbl:outside">Table 1\./);
+});
+
+test("export keeps a float with the heading and the float right before it", () => {
+  assert.deepEqual(keepWithNext(["heading", "float", "float", "other", "float", "heading", "other"]),
+    [true, true, false, false, false, false, false]);
+  assert.deepEqual(keepWithNext(["other", "float"]), [false, false]);
+  assert.deepEqual(keepWithNext([]), []);
 });
