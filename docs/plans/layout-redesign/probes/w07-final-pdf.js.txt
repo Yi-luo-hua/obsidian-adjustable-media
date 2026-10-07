@@ -1,0 +1,69 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs'), crypto = require('crypto');
+  const root = 'E:/TOOLS/obsidian-adjustable-media/', base = app.vault.adapter.getBasePath();
+  const phase = window.__w07PdfPhase;
+  if (!['baseline','current','acceptance'].includes(phase)) throw new Error('Set PDF phase');
+  const hash = data => crypto.createHash('sha256').update(data).digest('hex');
+  const originals = Object.fromEntries(app.vault.getMarkdownFiles().map(f => [f.path, hash(fs.readFileSync(base + '/' + f.path))]));
+  const appPath = base + '/.obsidian/app.json';
+  const configBytes = fs.existsSync(appPath) ? fs.readFileSync(appPath) : null;
+  const config = structuredClone(app.vault.getConfig('pdfExportSettings'));
+  const previous = app.workspace.activeLeaf, leaf = app.workspace.getLeaf(true);
+  const dialog = require('electron').remote.dialog, save = dialog.showSaveDialog, open = window.open;
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const result = { phase, buildHash: hash(fs.readFileSync(base + '/.obsidian/plugins/adjustable-media/main.js')), exports: [] };
+  const output = root + 'dist/w07-final-pdfs/'; fs.mkdirSync(output, { recursive: true });
+  let destination, sent, children = [];
+  try {
+    dialog.showSaveDialog = async () => ({ canceled: false, filePath: destination });
+    window.open = function(...args) {
+      const child = open.apply(this, args); children.push(child);
+      const timer = setInterval(() => {
+        if (child.closed) { clearInterval(timer); return; }
+        if (!child.electron) return;
+        clearInterval(timer);
+        const style = child.document.createElement('style');
+        style.textContent = '.print{--font-text:Microsoft YaHei UI;--font-print:Microsoft YaHei UI}';
+        child.document.head.appendChild(style);
+        const ipc = child.electron.ipcRenderer, send = ipc.send;
+        ipc.send = function(channel, ...values) {
+          if (channel === 'print-to-pdf') {
+            values[0].open = false;
+            sent = { options: { ...values[0] }, layouts: child.document.querySelectorAll('.vml-layout').length,
+              imagesReady: [...child.document.querySelectorAll('img')].every(img => img.complete && img.naturalWidth > 0),
+              text: child.document.querySelector('.print')?.textContent };
+          }
+          return send.call(this, channel, ...values);
+        };
+      }, 10);
+      return child;
+    };
+    for (const path of ['wrap-test.md','wrap-multi.md','text-test.md','text-block-test.md']) {
+      destination = output + phase + '-' + path.replace('.md','.pdf'); sent = null;
+      if (fs.existsSync(destination)) throw new Error('PDF output already exists: ' + destination);
+      await leaf.setViewState({ type: 'markdown', state: { file: path, mode: 'preview' } });
+      app.workspace.setActiveLeaf(leaf, { focus: false });
+      app.vault.setConfig('pdfExportSettings', { includeName: false, pageSize: 'Letter', landscape: false, margin: '0', downscalePercent: 100 });
+      leaf.view.printToPdf();
+      document.querySelector('.modal .mod-cta').click();
+      for (let n = 0; n < 300 && !fs.existsSync(destination); n++) await wait(100);
+      if (!fs.existsSync(destination)) throw new Error('Native PDF export timed out');
+      await wait(300);
+      const data = fs.readFileSync(destination);
+      if (data.subarray(0,5).toString() !== '%PDF-') throw new Error('Invalid PDF');
+      result.exports.push({ path, destination, sha256: hash(data), bytes: data.length, print: sent });
+    }
+  } finally {
+    window.open = open; dialog.showSaveDialog = save;
+    for (const child of children) if (!child.closed) child.close();
+    app.vault.setConfig('pdfExportSettings', config);
+    await wait(500);
+    if (configBytes) fs.writeFileSync(appPath, configBytes);
+    leaf.detach(); if (previous) app.workspace.setActiveLeaf(previous, { focus: false });
+    result.notesUnchanged = Object.entries(originals).every(([p,h]) => hash(fs.readFileSync(base + '/' + p)) === h);
+    result.configRestored = !configBytes || hash(fs.readFileSync(appPath)) === hash(configBytes);
+    fs.writeFileSync(root + 'docs/plans/layout-redesign/probes/w07-final-' + phase + '-pdf.json', JSON.stringify(result,null,2));
+    window.__w07FinalPdf = { phase, exports: result.exports.length, notesUnchanged: result.notesUnchanged, configRestored: result.configRestored };
+  }
+})().catch(error => { window.__w07FinalPdf = { error: String(error), stack: error.stack }; console.error(error); });

@@ -1,0 +1,101 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs'), crypto = require('crypto'), remote = require('@electron/remote');
+  const base = app.vault.adapter.getBasePath(), root = 'E:/TOOLS/obsidian-adjustable-media/docs/plans/layout-redesign/probes/';
+  const hash = data => crypto.createHash('sha256').update(data).digest('hex');
+  const before = Object.fromEntries(app.vault.getMarkdownFiles().map(f => [f.path, hash(fs.readFileSync(base + '/' + f.path))]));
+  const previous = app.workspace.activeLeaf;
+  const path = 'W07 performance transient.md';
+  if (app.vault.getAbstractFileByPath(path)) throw new Error('Probe file exists');
+  const original = 'W07 temporary performance fixture';
+  const file = await app.vault.create(path, original);
+  const leaf = app.workspace.getLeaf(true);
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const cache = app.metadataCache;
+  const compute = cache.computeMetadataAsync;
+  const result = { buildHash: hash(fs.readFileSync(base + '/.obsidian/plugins/adjustable-media/main.js')), samples: [],
+    encoding: [], typing: null, queueContention: null, observations: 'Warm editor; actual worker queue, DOM decorations and CodeMirror measurement. Synthetic contention is not cold startup or a full cache rebuild.' };
+  let cm, dispatch, workerStart, workerEnd, started, finish, requests = 0;
+  cache.computeMetadataAsync = async function(buffer) {
+    requests++;
+    workerStart = performance.now();
+    const metadata = await compute.call(this, buffer);
+    workerEnd = performance.now();
+    return metadata;
+  };
+  try {
+    await leaf.setViewState({ type: 'markdown', state: { file: path, mode: 'source' } });
+    app.workspace.setActiveLeaf(leaf, { focus: false });
+    await wait(100);
+    cm = leaf.view.editor.cm;
+    dispatch = cm.dispatch;
+    cm.dispatch = function(...specs) {
+      const host = specs.some(spec => {
+        const effects = spec.effects ? (Array.isArray(spec.effects) ? spec.effects : [spec.effects]) : [];
+        return effects.some(effect => effect.value?.snapshot && Array.isArray(effect.value?.sections));
+      });
+      const dispatched = performance.now();
+      const returned = dispatch.apply(this, specs);
+      if (host && finish) {
+        const installed = performance.now();
+        const complete = finish; finish = null;
+        cm.requestMeasure({ read: () => performance.now(), write: measured => complete({ total: measured - started,
+          worker: workerEnd - workerStart, validation: dispatched - workerEnd, decoration: installed - dispatched,
+          remeasure: measured - installed }) });
+      }
+      return returned;
+    };
+    const real = await app.vault.read(app.vault.getAbstractFileByPath('wrap-test.md'));
+    const large = '<!-- vml {"v":2,"type":"text"} -->\nLayout\n<!-- /vml -->\n\n' +
+      Array.from({ length: 9996 }, (_, i) => i % 2 ? '' : 'Line ' + i + '. Current editing buffer, paragraph and list boundaries.').join('\n');
+    for (const [name, text] of [['real', real], ['10000-lines', large]]) {
+      for (let n = 0; n < 20; n++) {
+        const input = text + '\n\nEnd ' + n;
+        const encodedAt = performance.now(); new TextEncoder().encode(input);
+        result.encoding.push({ name, ms: performance.now() - encodedAt });
+        const sample = await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error('No host parse installation')), 5000);
+          finish = measured => { clearTimeout(timeout); resolve(measured); };
+          started = performance.now();
+          cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: input }, selection: { anchor: 0 } });
+        });
+        result.samples.push({ name, ...sample });
+      }
+    }
+    // A sustained 50 Hz stream, using actual CodeMirror typing transactions in this test buffer.
+    cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: real }, selection: { anchor: 0 } });
+    await wait(500);
+    const requestBase = requests;
+    for (let n = 0; n < 100; n++) {
+      cm.dispatch({ changes: { from: cm.state.doc.length, insert: 'x' }, userEvent: 'input.type' });
+      await wait(20);
+    }
+    await wait(500);
+    result.typing = { transactions: 100, intervalMs: 20, workerRequests: requests - requestBase };
+    // These calls enter the same ordered queue as host indexing. Do not relabel them as a rebuild.
+    const queuedAt = performance.now();
+    const blockers = Array.from({ length: 5 }, () => compute.call(cache, new TextEncoder().encode(large).buffer));
+    const queued = await compute.call(cache, new TextEncoder().encode(real).buffer);
+    result.queueContention = { ahead: 5, elapsedMs: performance.now() - queuedAt, parsed: !!queued.sections };
+    await Promise.all(blockers);
+    const stats = values => {
+      const sorted = [...values].sort((a,b) => a-b);
+      return { p50: sorted[Math.floor(sorted.length * .5)], p95: sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * .95))] };
+    };
+    result.stats = Object.fromEntries(['real','10000-lines'].map(name => [name, Object.fromEntries(
+      ['total','worker','validation','decoration','remeasure'].map(key => [key, stats(result.samples.filter(s => s.name === name).map(s => s[key]))]))]));
+    result.encodingStats = Object.fromEntries(['real','10000-lines'].map(name => [name, stats(result.encoding.filter(s => s.name === name).map(s => s.ms))]));
+  } finally {
+    if (cm && dispatch) cm.dispatch = dispatch;
+    cache.computeMetadataAsync = compute;
+    leaf.detach();
+    await wait(500);
+    await app.vault.process(file, () => original);
+    result.probeRestored = hash(fs.readFileSync(base + '/' + path)) === hash(original);
+    await app.vault.trash(file, true);
+    if (previous) app.workspace.setActiveLeaf(previous, { focus: false });
+    result.notesUnchanged = Object.entries(before).every(([p, h]) => hash(fs.readFileSync(base + '/' + p)) === h);
+    fs.writeFileSync(root + (window.__w07EvidencePrefix || 'w07') + '-performance.json', JSON.stringify(result, null, 2));
+    window.__w07Performance = { samples: result.samples.length, notesUnchanged: result.notesUnchanged, stats: result.stats };
+  }
+})().catch(error => { window.__w07Performance = { error: String(error), stack: error.stack }; console.error(error); });

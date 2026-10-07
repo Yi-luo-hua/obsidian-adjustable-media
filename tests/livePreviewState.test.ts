@@ -11,6 +11,7 @@ import * as projections from "../src/layout/viewProjection.ts";
 import * as model from "../src/layout/model.ts";
 import * as crossref from "../src/markdown/crossref.ts";
 import * as paragraphBreaks from "../src/markdown/paragraphBreaks.ts";
+import * as paragraphParser from "../src/markdown/paragraphParser.ts";
 import * as transaction from "../src/layout/editorTransaction.ts";
 import * as identity from "../src/layout/blockIdentity.ts";
 import { mockedModule } from "./support/mockedModule.ts";
@@ -35,7 +36,7 @@ test("an omitted editor file preserves layout identity, dimensions and originati
     obsidian, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
-    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
@@ -95,7 +96,7 @@ test("a wrapped text box whose source shows still floats with its text drawn bes
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
-    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => refs }, "./interactions.ts": {},
     "./layoutView.ts": { renderLayout: (_el: unknown, options: (typeof drawn)[number]) => drawn.push(options) },
     "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
@@ -134,7 +135,7 @@ test("a note without layouts is not parsed while typing, until a layout is writt
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
-    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
@@ -160,7 +161,7 @@ test("the first reading of a pane's environment draws nothing again; a later cha
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan,
     "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
-    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [], resetWrapGaps: stateApi.StateEffect.define<null>() }, "./viewEnvironment.ts": {},
@@ -193,4 +194,56 @@ test("the first reading of a pane's environment draws nothing again; a later cha
   assert.equal(widgetOf(state).eq(drawn), false, "a new width draws the layout again");
   assert.equal(cache.environmentEpoch, 1);
   assert.equal(cache.get("measured"), undefined);
+});
+
+test("host paragraph results install only in the exact buffer version; structural edits use the fallback", async () => {
+  const info = { editor: {}, file: { path: "note.md" } };
+  const editorInfoField = stateApi.StateField.define({ create: () => info, update: value => value });
+  const editorLivePreviewField = stateApi.StateField.define({ create: () => true, update: value => value });
+  const live = await mockedModule<{
+    livePreviewExtension(app: unknown): stateApi.Extension;
+    setParagraphSections: stateApi.StateEffectType<{ snapshot: snapshots.DocumentSnapshot; sections: paragraphBreaks.MarkdownSection[] }>;
+  }>(new URL("../src/view/livePreview.ts", import.meta.url), {
+    obsidian: { editorInfoField, editorLivePreviewField, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
+    "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
+    "../markdown/paragraphParser.ts": paragraphParser,
+    "./blockDrag.ts": {}, "./crossrefView.ts": {}, "./interactions.ts": {}, "./layoutView.ts": {},
+    "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {}, "./textEditing.ts": {},
+    "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {}, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": {},
+  });
+  let state = stateApi.EditorState.create({ doc: media + '\n> quote\n    code one\n\n    code two',
+    extensions: [editorInfoField, editorLivePreviewField, live.livePreviewExtension({})] });
+  const after = (current: stateApi.EditorState): number[] => {
+    const found: number[] = [];
+    for (const source of current.facet(viewApi.EditorView.decorations)) {
+      if (typeof source !== "function") source.between(0, current.doc.length, (from, _to, deco) => {
+        if ((deco.spec as { class?: string }).class === "vml-break-after") found.push(current.doc.lineAt(from).number - 1);
+      });
+    }
+    return found;
+  };
+  const original = snapshots.snapshotForState(state)!;
+  const sections: paragraphBreaks.MarkdownSection[] = [
+    { type: "paragraph", from: 0, to: 0 }, { type: "html", from: 2, to: 2 }, { type: "paragraph", from: 3, to: 3 },
+    { type: "html", from: 4, to: 4 }, { type: "paragraph", from: 6, to: 6 }, { type: "blockquote", from: 7, to: 7 },
+    { type: "code", from: 8, to: 10 },
+  ];
+  const result = live.setParagraphSections.of({ snapshot: original, sections });
+  state = state.update({ effects: result }).state;
+  assert.deepEqual(after(state), [6, 7]);
+  state = state.update({ changes: { from: state.doc.line(8).from, to: state.doc.line(8).to, insert: 'ordinary paragraph' } }).state;
+  assert.deepEqual(after(state), [], "a structural edit does not map old boundaries onto new text");
+  state = state.update({ effects: result }).state;
+  assert.deepEqual(after(state), [], "a late worker response cannot undo the edit's fallback");
+  const beforeRename = snapshots.snapshotForState(state)!;
+  info.file.path = "renamed.md";
+  state = state.update({ selection: { anchor: 0 } }).state;
+  assert.equal(snapshots.snapshotForState(state)!.blocks[0].id, beforeRename.blocks[0].id, "renaming preserves the layout instance");
+  const oldBuffer = snapshots.snapshotForState(state)!;
+  info.editor = {};
+  state = state.update({ effects: live.setParagraphSections.of({ snapshot: oldBuffer, sections }) }).state;
+  assert.notEqual(snapshots.snapshotForState(state), oldBuffer);
+  assert.deepEqual(after(state), [], "the same document in a replacement buffer rejects the old callback");
 });

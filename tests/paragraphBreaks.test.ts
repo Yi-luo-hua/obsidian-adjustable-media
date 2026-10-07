@@ -1,9 +1,49 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
-import { paragraphBreaks, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
+import { hostParagraphBreaks, paragraphBreaks, type BreakBlock, type MarkdownSection, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
 
 const lines = (breaks: ParagraphBreak[]): string[] => breaks.map((item) => `${item.line}:${item.kind}`);
+
+// Captured from Obsidian 1.14.4's worker and verified against its reading renderer (W07 probe).
+const hostCases = JSON.parse(readFileSync(new URL("./fixtures/paragraphSections.json", import.meta.url), "utf8")) as
+  Array<{ name: string; lines: string[]; sections: MarkdownSection[]; expected: string[] }>;
+for (const fixture of hostCases) {
+  test(`host paragraph boundaries: ${fixture.name}`, () => {
+    assert.deepEqual(lines(hostParagraphBreaks(fixture.lines, [], fixture.sections)), fixture.expected);
+  });
+}
+
+// Worker sections captured in Obsidian 1.14.4 for the PR #20 spacing regressions.
+const spacingCases = JSON.parse(readFileSync(new URL("./fixtures/paragraphSpacingRegressions.json", import.meta.url), "utf8")) as
+  Array<{ name: string; lines: string[]; sections: MarkdownSection[]; blocks: BreakBlock[]; expected: string[] }>;
+for (const fixture of spacingCases) {
+  test(`host paragraph spacing: ${fixture.name}`, () => {
+    assert.deepEqual(lines(hostParagraphBreaks(fixture.lines, fixture.blocks, fixture.sections)), fixture.expected);
+  });
+}
+
+test("host boundaries leave code/math/comment contents alone and exclude layouts", () => {
+  const text = ["<!-- vml -->", "inside", "", "more", "<!-- /vml -->", "Body", "", "$$", "", "$$", "", "End"];
+  const sections: MarkdownSection[] = [
+    { type: "html", from: 0, to: 0 }, { type: "paragraph", from: 1, to: 1 }, { type: "paragraph", from: 3, to: 3 },
+    { type: "html", from: 4, to: 4 }, { type: "paragraph", from: 5, to: 5 },
+    { type: "math", from: 7, to: 9 }, { type: "paragraph", from: 11, to: 11 },
+  ];
+  assert.deepEqual(lines(hostParagraphBreaks(text, [{ openLine: 0, closeLine: 4, floats: true }], sections)), ["6:blank", "10:blank"]);
+});
+
+test("a floating anchor does not add a paragraph break to code, math or a comment beside it", () => {
+  for (const type of ["code", "math", "html", "comment", "yaml"]) {
+    const text = ["protected", "<!-- vml -->", "inside", "<!-- /vml -->", "Body"];
+    const sections: MarkdownSection[] = [{ type, from: 0, to: 0 }, { type: "html", from: 1, to: 1 },
+      { type: "paragraph", from: 2, to: 2 }, { type: "html", from: 3, to: 3 }, { type: "paragraph", from: 4, to: 4 }];
+    assert.deepEqual(hostParagraphBreaks(text, [{ openLine: 1, closeLine: 3, floats: true }], sections), [], type);
+    assert.deepEqual(hostParagraphBreaks(text, [{ openLine: 1, closeLine: 3, floats: true }],
+      [{ ...sections[0], type: "paragraph" }, ...sections.slice(1, 4), { ...sections[4], type }]), [], type);
+  }
+});
 
 test("blank lines between paragraphs become breaks; more blank lines in a run are extra", () => {
   assert.deepEqual(lines(paragraphBreaks(["One.", "", "Two.", "", "", "", "Three."], [])),
