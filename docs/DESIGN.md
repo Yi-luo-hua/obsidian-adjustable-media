@@ -2,7 +2,7 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-2026-09-30 的布局、拖动与双视图同步研究见 [LAYOUT_CONFLICTS.md](research/LAYOUT_CONFLICTS.md)，工作包见 [改进实施方案](plans/layout-redesign/README.md)。快照、依赖与入口基础见 [首批记录](plans/layout-redesign/07-execution-record.md)，每窗格协调／缓存基础与当前验证见 [每窗格记录](plans/layout-redesign/08-pane-foundation-record.md)，提交状态与后续执行顺序见 [进度与后续安排](plans/layout-redesign/09-progress-and-next-steps.md)。完整生命周期、最终几何规划和新组格式仍待验收。
+2026-09-30 的布局、拖动与双视图同步研究见 [LAYOUT_CONFLICTS.md](research/LAYOUT_CONFLICTS.md)，工作包见 [改进实施方案](plans/layout-redesign/README.md)。快照、依赖与入口基础见 [首批记录](plans/layout-redesign/07-execution-record.md)，每窗格协调／缓存基础与当前验证见 [每窗格记录](plans/layout-redesign/08-pane-foundation-record.md)，当前状态与任务队列见 [09 进度与任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。完整生命周期、最终几何规划和新组格式仍待验收。
 
 ## 1. 存储格式
 
