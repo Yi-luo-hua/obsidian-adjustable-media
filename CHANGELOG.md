@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Double-click the divider between two items of a row to reset the row's column widths to the media's proportions. Only the dividers respond to a double-click.
+- Dragging a layout frame's right edge keeps single images at their size and only tightens or widens the frame; the bottom-right corner still scales them.
+- Floating layouts whose anchor is above the drawn part of a note in live preview: their stand-ins now have the layout's handles, menu and move grip, no longer stretch a list or quote line, stay put after an edit, and line up with the real layout.
+- Moving a whole layout can drop it into a run of blank lines, and dropping it higher than a floating layout written before it no longer pushes it down.
+- A note that starts with a layout no longer opens showing that layout's source.
 - In a PDF, a floating layout that does not fit at the bottom of a page moves to the next page together with the text it wraps and the heading right before it. It used to move alone, leaving its text behind at full width and wrapping unrelated text on the next page.
 - In a PDF, a table next to a floating layout shrinks to fit beside it, as in reading view, instead of dropping below the layout at full width.
 - In a note with layouts, live preview spaces the note's text like reading view and the PDF: a blank line takes the height of a paragraph break instead of a whole line, extra blank lines take no room while the cursor is elsewhere, and a paragraph break is added where reading view separates blocks written without a blank line (text right after a heading, a list or quote right after text). Layouts get the same spacing as in reading view. The text beside a floating layout is now the same while editing as in reading view and the PDF.
