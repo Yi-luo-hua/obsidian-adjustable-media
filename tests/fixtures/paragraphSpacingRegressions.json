@@ -1,0 +1,425 @@
+[
+  {
+    "name": "setext h1",
+    "lines": [
+      "Title",
+      "===",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "from": 0,
+        "to": 1
+      },
+      {
+        "type": "paragraph",
+        "from": 2,
+        "to": 2
+      }
+    ],
+    "blocks": [],
+    "expected": []
+  },
+  {
+    "name": "setext h1 blank",
+    "lines": [
+      "Title",
+      "===",
+      "",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "from": 0,
+        "to": 1
+      },
+      {
+        "type": "paragraph",
+        "from": 3,
+        "to": 3
+      }
+    ],
+    "blocks": [],
+    "expected": []
+  },
+  {
+    "name": "setext h2",
+    "lines": [
+      "Title",
+      "---",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "from": 0,
+        "to": 1
+      },
+      {
+        "type": "paragraph",
+        "from": 2,
+        "to": 2
+      }
+    ],
+    "blocks": [],
+    "expected": [
+      "1:after"
+    ]
+  },
+  {
+    "name": "before setext",
+    "lines": [
+      "> Quote",
+      "Title",
+      "===",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "blockquote",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "heading",
+        "from": 1,
+        "to": 2
+      },
+      {
+        "type": "paragraph",
+        "from": 3,
+        "to": 3
+      }
+    ],
+    "blocks": [],
+    "expected": []
+  },
+  {
+    "name": "before setext blank",
+    "lines": [
+      "Text",
+      "",
+      "Title",
+      "===",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "paragraph",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "heading",
+        "from": 2,
+        "to": 3
+      },
+      {
+        "type": "paragraph",
+        "from": 4,
+        "to": 4
+      }
+    ],
+    "blocks": [],
+    "expected": []
+  },
+  {
+    "name": "multiline h1",
+    "lines": [
+      "Title",
+      "continued",
+      "===",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "paragraph",
+        "from": 0,
+        "to": 3
+      }
+    ],
+    "blocks": [],
+    "expected": []
+  },
+  {
+    "name": "indented setext",
+    "lines": [
+      "  Title",
+      "  =   ",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "paragraph",
+        "from": 0,
+        "to": 2
+      }
+    ],
+    "blocks": [],
+    "expected": []
+  },
+  {
+    "name": "definition after h2",
+    "lines": [
+      "## H",
+      "[ref]: https://example.com",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "definition",
+        "from": 1,
+        "to": 1
+      },
+      {
+        "type": "paragraph",
+        "from": 2,
+        "to": 2
+      }
+    ],
+    "blocks": [],
+    "expected": [
+      "0:after"
+    ]
+  },
+  {
+    "name": "definitions after h2",
+    "lines": [
+      "## H",
+      "[ref]: https://example.com",
+      "[other]: https://example.org",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "definition",
+        "from": 1,
+        "to": 1
+      },
+      {
+        "type": "definition",
+        "from": 2,
+        "to": 2
+      },
+      {
+        "type": "paragraph",
+        "from": 3,
+        "to": 3
+      }
+    ],
+    "blocks": [],
+    "expected": [
+      "0:after"
+    ]
+  },
+  {
+    "name": "definition before heading",
+    "lines": [
+      "Text",
+      "[ref]: https://example.com",
+      "## H",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "paragraph",
+        "from": 0,
+        "to": 1
+      },
+      {
+        "type": "heading",
+        "from": 2,
+        "to": 2
+      },
+      {
+        "type": "paragraph",
+        "from": 3,
+        "to": 3
+      }
+    ],
+    "blocks": [],
+    "expected": [
+      "2:after"
+    ]
+  },
+  {
+    "name": "definition then body",
+    "lines": [
+      "[ref]: https://example.com",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "definition",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "paragraph",
+        "from": 1,
+        "to": 1
+      }
+    ],
+    "blocks": [],
+    "expected": []
+  },
+  {
+    "name": "definition after h1",
+    "lines": [
+      "# H",
+      "[ref]: https://example.com",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "definition",
+        "from": 1,
+        "to": 1
+      },
+      {
+        "type": "paragraph",
+        "from": 2,
+        "to": 2
+      }
+    ],
+    "blocks": [],
+    "expected": []
+  },
+  {
+    "name": "multiline definition",
+    "lines": [
+      "## H",
+      "[ref]:",
+      "  https://example.com",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "definition",
+        "from": 1,
+        "to": 2
+      },
+      {
+        "type": "paragraph",
+        "from": 3,
+        "to": 3
+      }
+    ],
+    "blocks": [],
+    "expected": [
+      "0:after"
+    ]
+  },
+  {
+    "name": "definition above float",
+    "lines": [
+      "[ref]: https://example.com",
+      "<!-- vml {\"v\":2,\"type\":\"text\",\"wrap\":\"right\"} -->",
+      "Aside",
+      "<!-- /vml -->",
+      "Text"
+    ],
+    "sections": [
+      {
+        "type": "definition",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "html",
+        "from": 1,
+        "to": 1
+      },
+      {
+        "type": "paragraph",
+        "from": 2,
+        "to": 2
+      },
+      {
+        "type": "html",
+        "from": 3,
+        "to": 3
+      },
+      {
+        "type": "paragraph",
+        "from": 4,
+        "to": 4
+      }
+    ],
+    "blocks": [
+      {
+        "openLine": 1,
+        "closeLine": 3,
+        "floats": true
+      }
+    ],
+    "expected": []
+  },
+  {
+    "name": "definition below float",
+    "lines": [
+      "Text",
+      "<!-- vml {\"v\":2,\"type\":\"text\",\"wrap\":\"right\"} -->",
+      "Aside",
+      "<!-- /vml -->",
+      "[ref]: https://example.com"
+    ],
+    "sections": [
+      {
+        "type": "paragraph",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "html",
+        "from": 1,
+        "to": 1
+      },
+      {
+        "type": "paragraph",
+        "from": 2,
+        "to": 2
+      },
+      {
+        "type": "html",
+        "from": 3,
+        "to": 3
+      },
+      {
+        "type": "definition",
+        "from": 4,
+        "to": 4
+      }
+    ],
+    "blocks": [
+      {
+        "openLine": 1,
+        "closeLine": 3,
+        "floats": true
+      }
+    ],
+    "expected": []
+  }
+]

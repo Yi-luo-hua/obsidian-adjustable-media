@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-import { hostParagraphBreaks, paragraphBreaks, type MarkdownSection, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
+import { hostParagraphBreaks, paragraphBreaks, type BreakBlock, type MarkdownSection, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
 
 const lines = (breaks: ParagraphBreak[]): string[] => breaks.map((item) => `${item.line}:${item.kind}`);
 
@@ -12,6 +12,15 @@ const hostCases = JSON.parse(readFileSync(new URL("./fixtures/paragraphSections.
 for (const fixture of hostCases) {
   test(`host paragraph boundaries: ${fixture.name}`, () => {
     assert.deepEqual(lines(hostParagraphBreaks(fixture.lines, [], fixture.sections)), fixture.expected);
+  });
+}
+
+// Worker sections captured in Obsidian 1.14.4 for the PR #20 spacing regressions.
+const spacingCases = JSON.parse(readFileSync(new URL("./fixtures/paragraphSpacingRegressions.json", import.meta.url), "utf8")) as
+  Array<{ name: string; lines: string[]; sections: MarkdownSection[]; blocks: BreakBlock[]; expected: string[] }>;
+for (const fixture of spacingCases) {
+  test(`host paragraph spacing: ${fixture.name}`, () => {
+    assert.deepEqual(lines(hostParagraphBreaks(fixture.lines, fixture.blocks, fixture.sections)), fixture.expected);
   });
 }
 

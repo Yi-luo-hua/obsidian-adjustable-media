@@ -53,6 +53,7 @@ export function metadataSections(metadata: unknown, lineCount: number): Markdown
 export function hostParagraphBreaks(lines: readonly string[], blocks: readonly BreakBlock[], sections: readonly MarkdownSection[]): ParagraphBreak[] {
   const owner = new Int32Array(lines.length).fill(-1);
   sections.forEach((section, index) => owner.fill(index, section.from, section.to + 1));
+  const headingAt = (line: number): number => sectionHeadingLevel(lines, sections[owner[line]]);
   const layout = new Uint8Array(lines.length);
   for (const block of blocks) layout.fill(1, block.openLine, block.closeLine + 1);
   const breaks = new Map<number, ParagraphBreak["kind"]>();
@@ -70,24 +71,32 @@ export function hostParagraphBreaks(lines: readonly string[], blocks: readonly B
     if (owner[line] !== -1 || layout[line] || lines[line].trim() !== "") continue;
     const start = line;
     while (line + 1 < lines.length && owner[line + 1] === -1 && !layout[line + 1] && lines[line + 1].trim() === "") line++;
-    if (headingLevel(lines[line + 1]) === 0 && headingLevel(lines[start - 1]) !== 1) add(start, "blank");
+    if (headingAt(line + 1) === 0 && headingAt(start - 1) !== 1) add(start, "blank");
     for (let extra = start + 1; extra <= line; extra++) add(extra, "extra");
   }
   for (let index = 1; index < sections.length; index++) {
     const before = sections[index - 1];
-    const after = sections[index];
-    if (after.from !== before.to + 1 || layout[before.to] || layout[after.from]) continue;
+    if (before.type === "definition") continue;
+    // Reference definitions draw no box: part the visible blocks around a contiguous run once.
+    let end = before.to;
+    let next = index;
+    while (next < sections.length && sections[next].type === "definition" && sections[next].from === end + 1) {
+      end = sections[next].to;
+      next++;
+    }
+    const after = sections[next];
+    if (!after || after.from !== end + 1 || layout[before.to] || layout[after.from]) continue;
     // Comments and frontmatter do not draw paragraph boxes. Their surrounding whitespace keeps
     // the existing policy; drawn code/math blocks retain their own editor height.
     if (["html", "comment", "yaml"].includes(before.type) || ["html", "comment", "yaml"].includes(after.type)) continue;
-    if (headingLevel(lines[after.from]) > 0 || headingLevel(lines[before.from]) === 1) continue;
+    if (sectionHeadingLevel(lines, after) > 0 || sectionHeadingLevel(lines, before) === 1) continue;
     add(before.to, "after");
   }
   for (const block of blocks) {
     const above = block.openLine - 1;
     const below = block.closeLine + 1;
     const body = (line: number): boolean => line >= 0 && line < lines.length && !layout[line] && lines[line].trim() !== ""
-      && owner[line] >= 0 && !["code", "math", "html", "comment", "yaml"].includes(sections[owner[line]].type);
+      && owner[line] >= 0 && !["code", "math", "html", "comment", "yaml", "definition"].includes(sections[owner[line]].type);
     if (block.floats && body(above) && body(below)) add(above, "after");
   }
   return Array.from(breaks, ([line, kind]) => ({ line, kind })).sort((a, b) => a.line - b.line);
@@ -98,6 +107,12 @@ const HEADING = /^ {0,3}(#{1,6})(?:\s|$)/;
 /** The level of a heading line, else 0. */
 function headingLevel(line: string | undefined): number {
   return line === undefined ? 0 : HEADING.exec(line)?.[1]?.length ?? 0;
+}
+
+/** Host-confirmed headings can use ATX markers or a Setext underline on their last line. */
+function sectionHeadingLevel(lines: readonly string[], section: MarkdownSection | undefined): number {
+  if (section?.type !== "heading") return 0;
+  return headingLevel(lines[section.from]) || (/^ {0,3}=+[ \t]*$/.test(lines[section.to]) ? 1 : 2);
 }
 
 /**
