@@ -164,9 +164,15 @@ function indentedCode(lines: readonly string[], text: (line: number) => boolean,
   for (let line = 0; line < lines.length; line += 1) {
     const source = lines[line] ?? "";
     if (!text(line)) {
-      // A layout is at the top of the note; fenced code and the like stay in their list item.
+      // A layout is at the top of the note. Fenced code, math or a comment stays in the list items its
+      // opening line reaches the text of, and ends the others; the lines inside it say nothing.
       if (layout(line)) {
         items.length = 0;
+      } else if (line === 0 || text(line - 1)) {
+        const indent = columnAfter(INDENT.exec(source)?.[0] ?? "", 0);
+        while (items.length > 0 && indent < base()) {
+          items.pop();
+        }
       }
       afterBlank = false;
       afterParagraph = false;

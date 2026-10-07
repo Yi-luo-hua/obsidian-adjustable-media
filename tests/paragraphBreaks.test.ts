@@ -94,3 +94,13 @@ test("indented code may start right below a quote, as Obsidian draws it", () => 
   // In a list item too, indented past the item's text; the quote is parted from the item's text.
   assert.deepEqual(lines(paragraphBreaks(["- a", "  > quote", "      code one", "", "      code two"], [])), ["0:after"]);
 });
+
+test("fenced code at the margin ends a list, and fenced code in an item keeps it", () => {
+  // At the margin: a list, the fence, and indented code at the margin, its blank lines left alone.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "```", "x", "```", "    code one", "", "", "    code two"], [])), []);
+  // In the item: indented code there is indented past the item's text, text only as far is text.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "", "      code one", "", "      code two"], [])),
+    ["1:blank", "5:blank"]);
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "", "    para one", "", "    para two"], [])),
+    ["1:blank", "5:blank", "7:blank"]);
+});
