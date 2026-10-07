@@ -114,3 +114,14 @@ test("a fence right after another one is judged by its own opening line", () => 
   assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "  ```", "  y", "  ```", "    para one", "", "    para two"], [])),
     ["1:blank", "9:blank"]);
 });
+
+test("math or an HTML comment at the margin stays in the list item; a %% comment ends it, as a fence does", () => {
+  // After a fence in the item: the paragraphs below are the item's text, the blank lines breaks.
+  for (const construct of [["$$", "y", "$$"], ["<!--", "c", "-->"]]) {
+    assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", ...construct, "    para one", "", "", "    para two"], [])),
+      ["1:blank", "9:blank", "10:extra"], construct[0]);
+  }
+  // Obsidian ends the list at a %% comment: the lines below are code at the margin.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "%%", "c", "%%", "    code one", "", "", "    code two"], [])),
+    ["1:blank"]);
+});

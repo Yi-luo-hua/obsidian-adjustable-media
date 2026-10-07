@@ -55,7 +55,8 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     }
   };
   const opens = new Set(blocks.map((block) => block.openLine));
-  const code = indentedCode(lines, text, (line) => inBlock[line] === 1, (line) => constructs[line] === true);
+  const code = indentedCode(lines, text, (line) => inBlock[line] === 1, (line) => constructs[line] === true
+    && (contexts[line] === "code" || (contexts[line] === "comment" && (lines[line] ?? "").trimStart().startsWith("%%"))));
 
   for (let line = 0; line < lines.length; line += 1) {
     if (filled(line)) {
@@ -155,7 +156,7 @@ const ATX_HEADING = /^#{1,6}(?:[ \t]|$)/;
  * one after a blank line, closes the items whose text it does not reach.
  */
 function indentedCode(lines: readonly string[], text: (line: number) => boolean, layout: (line: number) => boolean,
-  opens: (line: number) => boolean): Uint8Array {
+  endsList: (line: number) => boolean): Uint8Array {
   const code = new Uint8Array(lines.length);
   /** Where the text of each open list item starts, the innermost last. */
   const items: number[] = [];
@@ -165,11 +166,12 @@ function indentedCode(lines: readonly string[], text: (line: number) => boolean,
   for (let line = 0; line < lines.length; line += 1) {
     const source = lines[line] ?? "";
     if (!text(line)) {
-      // A layout is at the top of the note. Fenced code, math or a comment stays in the list items its
+      // A layout is at the top of the note. Fenced code or a %% comment stays in the list items its
       // opening line reaches the text of, and ends the others; the lines inside it say nothing.
+      // Obsidian keeps math and HTML comments in the list item they are written in, wherever they start.
       if (layout(line)) {
         items.length = 0;
-      } else if (opens(line)) {
+      } else if (endsList(line)) {
         const indent = columnAfter(INDENT.exec(source)?.[0] ?? "", 0);
         while (items.length > 0 && indent < base()) {
           items.pop();
