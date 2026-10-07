@@ -104,3 +104,13 @@ test("fenced code at the margin ends a list, and fenced code in an item keeps it
   assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "", "    para one", "", "    para two"], [])),
     ["1:blank", "5:blank", "7:blank"]);
 });
+
+test("a fence right after another one is judged by its own opening line", () => {
+  // The first fence is in the item, the second at the margin ends the list: the indented code after
+  // it is code at the margin, its blank lines left alone.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "```", "y", "```", "    code one", "", "", "    code two"], [])),
+    ["1:blank"]);
+  // Two fences in the item keep it.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "  ```", "  y", "  ```", "    para one", "", "    para two"], [])),
+    ["1:blank", "9:blank"]);
+});

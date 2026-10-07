@@ -1,4 +1,4 @@
-import { scanMarkdownLines } from "./lineContext.ts";
+import { scanMarkdownConstructs } from "./lineContext.ts";
 
 /**
  * A line live preview draws with reading view's break between two paragraphs:
@@ -38,7 +38,7 @@ function headingLevel(line: string | undefined): number {
  * layouts, code, math, comments and frontmatter are left alone.
  */
 export function paragraphBreaks(lines: readonly string[], blocks: readonly BreakBlock[]): ParagraphBreak[] {
-  const contexts = scanMarkdownLines(lines);
+  const { contexts, opens: constructs } = scanMarkdownConstructs(lines);
   const inBlock = new Uint8Array(lines.length);
   for (const block of blocks) {
     inBlock.fill(1, block.openLine, block.closeLine + 1);
@@ -55,7 +55,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     }
   };
   const opens = new Set(blocks.map((block) => block.openLine));
-  const code = indentedCode(lines, text, (line) => inBlock[line] === 1);
+  const code = indentedCode(lines, text, (line) => inBlock[line] === 1, (line) => constructs[line] === true);
 
   for (let line = 0; line < lines.length; line += 1) {
     if (filled(line)) {
@@ -154,7 +154,8 @@ const ATX_HEADING = /^#{1,6}(?:[ \t]|$)/;
  * a paragraph goes on lazily in a line indented less than its list item's text; any other line, or
  * one after a blank line, closes the items whose text it does not reach.
  */
-function indentedCode(lines: readonly string[], text: (line: number) => boolean, layout: (line: number) => boolean): Uint8Array {
+function indentedCode(lines: readonly string[], text: (line: number) => boolean, layout: (line: number) => boolean,
+  opens: (line: number) => boolean): Uint8Array {
   const code = new Uint8Array(lines.length);
   /** Where the text of each open list item starts, the innermost last. */
   const items: number[] = [];
@@ -168,7 +169,7 @@ function indentedCode(lines: readonly string[], text: (line: number) => boolean,
       // opening line reaches the text of, and ends the others; the lines inside it say nothing.
       if (layout(line)) {
         items.length = 0;
-      } else if (line === 0 || text(line - 1)) {
+      } else if (opens(line)) {
         const indent = columnAfter(INDENT.exec(source)?.[0] ?? "", 0);
         while (items.length > 0 && indent < base()) {
           items.pop();
