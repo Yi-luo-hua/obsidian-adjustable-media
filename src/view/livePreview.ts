@@ -10,7 +10,8 @@ import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
-import { paragraphBreaks, type ParagraphBreak } from "../markdown/paragraphBreaks.ts";
+import { hostParagraphBreaks, paragraphBreaks, type MarkdownSection, type ParagraphBreak } from "../markdown/paragraphBreaks.ts";
+import { ParagraphParser } from "../markdown/paragraphParser.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { attachInteractions, type LayoutContext } from "./interactions.ts";
@@ -20,11 +21,13 @@ import { blockWarning, t } from "./messages.ts";
 import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
 import { refreshWrapMedia, resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
-import { fileOfEditor } from "./obsidianInternals.ts";
+import { fileOfEditor, parseBufferSections } from "./obsidianInternals.ts";
 import { eventElement } from "./windows.ts";
 
 /** The pane's environment as viewEnvironment.ts reads it: width, fonts and page classes that change layout. */
 export const setEnvironment = StateEffect.define<string>();
+/** Results are owned by an exact pane snapshot, including its buffer and source revision. */
+export const setParagraphSections = StateEffect.define<{ snapshot: DocumentSnapshot; sections: MarkdownSection[] }>();
 /** The environment of a pane before its first reading (viewEnvironment.ts). */
 const PENDING_ENVIRONMENT = "pending";
 /** How every layout block opens; a note without it has no layouts. */
@@ -37,6 +40,7 @@ interface Measurements {
 }
 
 interface LivePreviewState extends Measurements {
+  buffer: object | undefined;
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
@@ -59,6 +63,7 @@ interface LivePreviewState extends Measurements {
 }
 
 interface Parsed extends Measurements {
+  buffer: object | undefined;
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
@@ -83,7 +88,8 @@ export function livePreviewExtension(app: App): Extension {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
       const info = tr.state.field(editorInfoField, false);
       const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, value.snapshot?.origin);
-      const originChanged = value.snapshot !== null && (value.snapshot.origin.file !== origin.file || value.snapshot.origin.path !== origin.path);
+      const bufferChanged = value.snapshot !== null && value.buffer !== info?.editor;
+      const originChanged = value.snapshot !== null && (value.snapshot.origin.file !== origin.file || value.snapshot.origin.path !== origin.path || bufferChanged);
       const environment = tr.effects.find(effect => effect.is(setEnvironment));
       let measurements: Measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch, environmentSpec: value.environmentSpec };
       if (environment) {
@@ -106,7 +112,12 @@ export function livePreviewExtension(app: App): Extension {
       // restoring where a note was left) was not put by the user either.
       const placedCursor = originChanged ? false : tr.selection ? userPlaced(tr) : value.placedCursor || (tr.docChanged && userPlaced(tr));
       if (tr.docChanged || modeChanged || originChanged) {
-        return withDecorations(app, tr.state, { ...parse(app, tr.state, value.snapshot, tr.changes), ...measurements }, placedCursor);
+        return withDecorations(app, tr.state, { ...parse(app, tr.state, bufferChanged ? null : value.snapshot, tr.changes), ...measurements }, placedCursor);
+      }
+      const paragraphs = tr.effects.find(effect => effect.is(setParagraphSections));
+      if (paragraphs?.is(setParagraphSections) && paragraphs.value.snapshot === value.snapshot) {
+        return withDecorations(app, tr.state, { ...value, ...measurements,
+          breaks: hostParagraphBreaks(value.lines, breakBlocks(value.blocks), paragraphs.value.sections) }, placedCursor);
       }
       if (tr.selection || environment || placedCursor !== value.placedCursor) {
         return withDecorations(app, tr.state, { ...value, ...measurements }, placedCursor);
@@ -141,6 +152,15 @@ export function livePreviewExtension(app: App): Extension {
     }),
     ViewPlugin.define(view => {
       const projection = new ViewProjection();
+      const paragraphs = new ParagraphParser<DocumentSnapshot, MarkdownSection[] | null>(
+        snapshot => parseBufferSections(app, snapshot.text, snapshot.lines.length),
+        (snapshot, sections) => {
+          if (sections && view.state.field(field).snapshot === snapshot) view.dispatch({ effects: setParagraphSections.of({ snapshot, sections }) });
+        }, view.contentDOM.win);
+      const parseParagraphs = (): void => {
+        const value = view.state.field(field);
+        paragraphs.request(value.blocks.some(isDrawable) ? value.snapshot : null);
+      };
       let destroyed = false;
       let epoch = -1;
       const measure = (): void => {
@@ -170,33 +190,41 @@ export function livePreviewExtension(app: App): Extension {
         queueMicrotask(() => { if (!destroyed) view.dispatch({ effects }); });
       }, () => { refreshWrapMedia(view); measure(); });
       measure();
-      return { update(update) { if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure(); },
-        destroy() { destroyed = true; stop(); projection.dispose(); } };
+      parseParagraphs();
+      return { update(update) {
+        if (update.startState.field(field).snapshot !== update.state.field(field).snapshot) parseParagraphs();
+        if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure();
+      }, destroy() { destroyed = true; paragraphs.dispose(); stop(); projection.dispose(); } };
     }),
   ];
 }
 
 function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
   const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: PENDING_ENVIRONMENT };
+  const buffer = state.field(editorInfoField, false)?.editor;
   if (!state.field(editorLivePreviewField, false)) {
-    return { blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
+    return { buffer, blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
   }
   // Runs on every change of a note with layouts; one without them is only read in full when a change
   // may have written an opening comment (the field's update).
   const text = state.doc.toString();
   if (!text.includes(OPENING)) {
-    return { blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
+    return { buffer, blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
   const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, previous?.origin);
   const snapshot = documentSnapshot(text, origin, previous ?? undefined, changes);
   const blocks = snapshot.blocks.map(ref => ref.block);
   const lines = [...snapshot.lines];
-  return { snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks),
+  return { buffer, snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks),
     breaks: blocks.some(isDrawable)
-      ? paragraphBreaks(lines, blocks.map((block) => ({ ...block, floats: isDrawable(block) && blockWrap(block) !== null })))
+      ? paragraphBreaks(lines, breakBlocks(blocks))
       : [],
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
+}
+
+function breakBlocks(blocks: readonly V2Block[]): Array<V2Block & { floats: boolean }> {
+  return blocks.map(block => ({ ...block, floats: isDrawable(block) && blockWrap(block) !== null }));
 }
 
 /** Whether a transaction comes from the user's pointer, keys or typing. */

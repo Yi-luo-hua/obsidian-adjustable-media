@@ -1,0 +1,19 @@
+(async()=>{
+  if(app.vault.getName()!=='vml-test-vault')throw new Error('Test vault required');
+  const fs=require('fs'),crypto=require('crypto'),root='E:/TOOLS/obsidian-adjustable-media/',base=app.vault.adapter.getBasePath();
+  const hash=data=>crypto.createHash('sha256').update(data).digest('hex');
+  const notes=Object.fromEntries(app.vault.getMarkdownFiles().map(f=>[f.path,hash(fs.readFileSync(base+'/'+f.path))]));
+  const paths=Array.from({length:20},(_,i)=>'W07 indexing load '+String(i).padStart(2,'0')+'.md');
+  if(paths.some(p=>app.vault.getAbstractFileByPath(p)))throw new Error('Index fixtures already exist');
+  const seeds={};
+  for(const [i,path] of paths.entries()){
+    const seed='Temporary index fixture '+i;seeds[path]=seed;
+    const file=await app.vault.create(path,seed);
+    const body=Array.from({length:10000},(_,line)=>line%2?'':'Unique file '+i+' line '+line+' for native metadata indexing.').join('\n');
+    await app.vault.process(file,()=>body);
+  }
+  fs.writeFileSync(root+'dist/w07-startup-backup/index-fixtures.json',JSON.stringify({notes,seeds},null,2));
+  fs.writeFileSync(root+'dist/w07-startup-phase.txt',window.__w07ReindexPhase || 'full-reindex');
+  await app.metadataCache.clear();
+  window.location.reload();
+})().catch(error=>{window.__w07ReindexError={error:String(error),stack:error.stack};console.error(error)});

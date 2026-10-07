@@ -21,6 +21,78 @@ export interface BreakBlock {
   floats: boolean;
 }
 
+/** Top-level blocks from the host parser, with inclusive, zero-based line ranges. */
+export interface MarkdownSection {
+  type: string;
+  from: number;
+  to: number;
+}
+
+/** Validate the worker's boundary data before it can affect editor line decorations. */
+export function metadataSections(metadata: unknown, lineCount: number): MarkdownSection[] | null {
+  if (!metadata || typeof metadata !== "object" || !("sections" in metadata) || !Array.isArray(metadata.sections)) return null;
+  const sections: MarkdownSection[] = [];
+  let previous = -1;
+  for (const item of metadata.sections as unknown[]) {
+    if (!item || typeof item !== "object") return null;
+    const section = item as { type?: unknown; position?: { start?: { line?: unknown }; end?: { line?: unknown } } };
+    const from = section.position?.start?.line;
+    const to = section.position?.end?.line;
+    if (typeof section.type !== "string" || typeof from !== "number" || typeof to !== "number"
+      || !Number.isInteger(from) || !Number.isInteger(to) || from <= previous || to < from || to >= lineCount) return null;
+    sections.push({ type: section.type, from, to });
+    previous = to;
+  }
+  return sections;
+}
+
+/**
+ * Host boundaries replace top-level Markdown guesses. Only the contents of a list still use the
+ * item-relative code/paragraph rules: the worker deliberately exposes no nested sections.
+ */
+export function hostParagraphBreaks(lines: readonly string[], blocks: readonly BreakBlock[], sections: readonly MarkdownSection[]): ParagraphBreak[] {
+  const owner = new Int32Array(lines.length).fill(-1);
+  sections.forEach((section, index) => owner.fill(index, section.from, section.to + 1));
+  const layout = new Uint8Array(lines.length);
+  for (const block of blocks) layout.fill(1, block.openLine, block.closeLine + 1);
+  const breaks = new Map<number, ParagraphBreak["kind"]>();
+  const add = (line: number, kind: ParagraphBreak["kind"]): void => {
+    if (line >= 0 && line < lines.length && !layout[line] && !breaks.has(line)) breaks.set(line, kind);
+  };
+  // Reset the item stack at each host list boundary (a quote/fence/comment can have ended a list).
+  for (const section of sections) {
+    if (section.type !== "list") continue;
+    for (const item of paragraphBreaks(lines.slice(section.from, section.to + 1), [], true)) {
+      add(item.line + section.from, item.kind);
+    }
+  }
+  for (let line = 0; line < lines.length; line++) {
+    if (owner[line] !== -1 || layout[line] || lines[line].trim() !== "") continue;
+    const start = line;
+    while (line + 1 < lines.length && owner[line + 1] === -1 && !layout[line + 1] && lines[line + 1].trim() === "") line++;
+    if (headingLevel(lines[line + 1]) === 0 && headingLevel(lines[start - 1]) !== 1) add(start, "blank");
+    for (let extra = start + 1; extra <= line; extra++) add(extra, "extra");
+  }
+  for (let index = 1; index < sections.length; index++) {
+    const before = sections[index - 1];
+    const after = sections[index];
+    if (after.from !== before.to + 1 || layout[before.to] || layout[after.from]) continue;
+    // Comments and frontmatter do not draw paragraph boxes. Their surrounding whitespace keeps
+    // the existing policy; drawn code/math blocks retain their own editor height.
+    if (["html", "comment", "yaml"].includes(before.type) || ["html", "comment", "yaml"].includes(after.type)) continue;
+    if (headingLevel(lines[after.from]) > 0 || headingLevel(lines[before.from]) === 1) continue;
+    add(before.to, "after");
+  }
+  for (const block of blocks) {
+    const above = block.openLine - 1;
+    const below = block.closeLine + 1;
+    const body = (line: number): boolean => line >= 0 && line < lines.length && !layout[line] && lines[line].trim() !== ""
+      && owner[line] >= 0 && !["code", "math", "html", "comment", "yaml"].includes(sections[owner[line]].type);
+    if (block.floats && body(above) && body(below)) add(above, "after");
+  }
+  return Array.from(breaks, ([line, kind]) => ({ line, kind })).sort((a, b) => a.line - b.line);
+}
+
 const HEADING = /^ {0,3}(#{1,6})(?:\s|$)/;
 
 /** The level of a heading line, else 0. */
@@ -37,7 +109,7 @@ function headingLevel(line: string | undefined): number {
  * the two modes by level and theme, and a whole blank line there already comes out close. Lines in
  * layouts, code, math, comments and frontmatter are left alone.
  */
-export function paragraphBreaks(lines: readonly string[], blocks: readonly BreakBlock[]): ParagraphBreak[] {
+export function paragraphBreaks(lines: readonly string[], blocks: readonly BreakBlock[], listContents = false): ParagraphBreak[] {
   const { contexts, opens: constructs } = scanMarkdownConstructs(lines);
   const inBlock = new Uint8Array(lines.length);
   for (const block of blocks) {
@@ -60,6 +132,9 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
 
   for (let line = 0; line < lines.length; line += 1) {
     if (filled(line)) {
+      // Within a host-confirmed list, Obsidian ends a quote before item-relative indented code.
+      // The code keeps its own blank lines; the quote's bottom margin still parts the two blocks.
+      if (listContents && code[line] !== 1 && /^[ \t]*>/.test(lines[line]) && code[line + 1] === 1) add(line, "after");
       // A heading below which the text goes on right away.
       const level = headingLevel(lines[line]);
       if (level >= 2 && filled(line + 1) && headingLevel(lines[line + 1]) === 0 && !opens.has(line + 1)) {

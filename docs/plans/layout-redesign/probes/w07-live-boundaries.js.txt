@@ -1,0 +1,55 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs'), crypto = require('crypto');
+  const root = 'E:/TOOLS/obsidian-adjustable-media/', base = app.vault.adapter.getBasePath();
+  const hash = data => crypto.createHash('sha256').update(data).digest('hex');
+  const before = Object.fromEntries(app.vault.getMarkdownFiles().map(f => [f.path, hash(fs.readFileSync(base + '/' + f.path))]));
+  const cases = JSON.parse(fs.readFileSync(root + 'tests/fixtures/paragraphSections.json','utf8'));
+  const prefix = '<!-- vml {"v":2,"type":"text"} -->\nProbe\n<!-- /vml -->\n\n';
+  const path = 'W07 live boundaries transient.md';
+  if (app.vault.getAbstractFileByPath(path)) throw new Error('Probe file exists');
+  const previous = app.workspace.activeLeaf;
+  const file = await app.vault.create(path, prefix);
+  const leaf = app.workspace.getLeaf(true);
+  const result = { buildHash: hash(fs.readFileSync(base + '/.obsidian/plugins/adjustable-media/main.js')), cases: [] };
+  const wait = ms => new Promise(resolve => setTimeout(resolve,ms));
+  const compute = app.metadataCache.computeMetadataAsync;
+  let cm;
+  const marked = () => [...cm.contentDOM.querySelectorAll('.cm-line')].flatMap(el => {
+    const line = cm.state.doc.lineAt(cm.posAtDOM(el)).number - 5;
+    if (line < 0) return [];
+    const kind = el.classList.contains('vml-break-after') ? 'after' : el.classList.contains('vml-break--extra') ? 'extra' : el.classList.contains('vml-break') ? 'blank' : null;
+    return kind ? [line + ':' + kind] : [];
+  });
+  try {
+    await leaf.setViewState({ type: 'markdown', state: { file: path, mode: 'source' } });
+    app.workspace.setActiveLeaf(leaf, { focus: false });
+    await wait(200);
+    cm = leaf.view.editor.cm;
+    for (const fixture of cases) {
+      const text = prefix + fixture.lines.join('\n');
+      cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: text }, selection: { anchor: 0 } });
+      cm.scrollDOM.scrollTop = 0;
+      await wait(300);
+      const actual = marked();
+      result.cases.push({ name: fixture.name, expected: fixture.expected, actual,
+        matches: JSON.stringify(fixture.expected) === JSON.stringify(actual) });
+    }
+    const fixture = cases.find(c => c.name === 'quote then code');
+    app.metadataCache.computeMetadataAsync = undefined;
+    cm.dispatch({ changes: { from: 0, to: cm.state.doc.length, insert: prefix + fixture.lines.join('\n') }, selection: { anchor: 0 } });
+    await wait(200);
+    result.missingInterface = { actual: marked(), expected: ['5:blank'] };
+    app.metadataCache.computeMetadataAsync = compute;
+  } finally {
+    app.metadataCache.computeMetadataAsync = compute;
+    leaf.detach(); await wait(500);
+    await app.vault.process(file, () => prefix);
+    result.probeRestored = hash(fs.readFileSync(base + '/' + path)) === hash(prefix);
+    await app.vault.trash(file, true);
+    if (previous) app.workspace.setActiveLeaf(previous, { focus: false });
+    result.notesUnchanged = Object.entries(before).every(([p,h]) => hash(fs.readFileSync(base + '/' + p)) === h);
+    fs.writeFileSync(root + 'docs/plans/layout-redesign/probes/' + (window.__w07EvidencePrefix || 'w07') + '-live-boundaries.json',JSON.stringify(result,null,2));
+    window.__w07Live = { passed: result.cases.filter(c => c.matches).length, total: result.cases.length, fallback: result.missingInterface, notesUnchanged: result.notesUnchanged };
+  }
+})().catch(error => { window.__w07Live = { error: String(error), stack: error.stack }; console.error(error); });

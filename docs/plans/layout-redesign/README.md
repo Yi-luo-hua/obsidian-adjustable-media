@@ -1,6 +1,6 @@
 # 布局、拖动与视图同步改进实施方案
 
-状态：P0a 数据契约、P1 与 P2 协调／缓存基础已随 0.7.0 发布（[PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12)）；完整 P2 和 P3–P6 尚未开始。更新日期：2026-10-07。当前状态与任务队列见 [09 进度与任务队列](09-progress-and-next-steps.md)。
+状态：P0a 数据契约、P1 与 P2 协调／缓存基础已随 0.7.0 发布（[PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12)）；完整 P2 和 P3–P6 尚未开始。W07 的宿主段落分块实现与验收已完成，待独立 PR 合入（[11 验收记录](11-host-paragraph-boundary-acceptance.md)）。更新日期：2026-10-08。当前状态与任务队列见 [09 进度与任务队列](09-progress-and-next-steps.md)。
 
 规划的研究基线是 `main` 的 `34f5896`（0.6.1），见 [研究报告](../../research/LAYOUT_CONFLICTS.md)；其纯函数、独立浏览器证据与 Obsidian 实测范围分别记录，不互相替代。此后的代码变化以 09 第 1 节为准。
 
@@ -20,6 +20,8 @@
 | [07 首批实施记录](07-execution-record.md) | P1 基础批次的代码与宿主证据 |
 | [08 每窗格基础实施记录](08-pane-foundation-record.md) | 当前同步／缓存基础、双窗与延迟证据、剩余门槛 |
 | [09 进度与任务队列](09-progress-and-next-steps.md) | 当前状态、待办任务（W01–W07）、进入／退出条件与执行约定 |
+| [10 宿主段落分块首批记录](10-host-paragraph-boundary-record.md) | W07 的实现、宿主边界与热态性能证据，以及尚未执行的验收项 |
+| [11 宿主段落分块验收](11-host-paragraph-boundary-acceptance.md) | W07 最终构建的列表内部、真实输入、启动／索引队列和三视图验收 |
 
 两项代价较高的推荐决策单独记录为 proposed ADR：[布局关系分层](../../adr/0001-explicit-layout-relations.md)、[分组格式的版本边界](../../adr/0002-versioned-flat-groups.md)。ADR 通过相应原型门槛后才转为 accepted。
 

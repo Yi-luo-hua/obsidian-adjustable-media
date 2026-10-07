@@ -1,0 +1,16 @@
+(async()=>{
+  if(app.vault.getName()!=='vml-test-vault')throw new Error('Test vault required');
+  const fs=require('fs'),crypto=require('crypto'),root='E:/TOOLS/obsidian-adjustable-media/',base=app.vault.adapter.getBasePath();
+  const hash=data=>crypto.createHash('sha256').update(data).digest('hex');
+  const backup=JSON.parse(fs.readFileSync(root+'dist/w07-startup-backup/index-fixtures.json','utf8'));
+  const result={restored:[],originalNotesUnchanged:false};
+  for(const [path,seed] of Object.entries(backup.seeds)){
+    const file=app.vault.getAbstractFileByPath(path);
+    await app.vault.process(file,()=>seed);
+    if(hash(fs.readFileSync(base+'/'+path))!==hash(seed))throw new Error('Fixture restoration failed');
+    await app.vault.trash(file,true);result.restored.push(path);
+  }
+  result.originalNotesUnchanged=Object.entries(backup.notes).every(([p,h])=>hash(fs.readFileSync(base+'/'+p))===h);
+  fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w07-final-index-cleanup'+(window.__w07IndexCleanupSuffix || '')+'.json',JSON.stringify(result,null,2));
+  window.__w07IndexCleanup={restored:result.restored.length,originalNotesUnchanged:result.originalNotesUnchanged};
+})().catch(error=>{window.__w07IndexCleanup={error:String(error),stack:error.stack};console.error(error)});

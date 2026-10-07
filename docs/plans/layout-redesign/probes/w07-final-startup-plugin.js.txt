@@ -1,0 +1,48 @@
+const {Plugin} = require('obsidian');
+module.exports = class W07StartupProbe extends Plugin {
+  onload() {
+    this.app.workspace.onLayoutReady(() => this.startProbe());
+  }
+  startProbe() {
+    if (this.app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+    const fs=require('fs'), crypto=require('crypto');
+    const root='E:/TOOLS/obsidian-adjustable-media/';
+    const phase=fs.readFileSync(root+'dist/w07-startup-phase.txt','utf8').trim();
+    const cache=this.app.metadataCache, work=cache.work;
+    const text=fs.readFileSync(this.app.vault.adapter.getBasePath()+'/wrap-test.md','utf8');
+    const encodedAt=performance.now();
+    const buffer=new TextEncoder().encode(text+'\n\nW07 startup latency marker').buffer;
+    const result={phase,loadedAtMs:encodedAt,encodingMs:performance.now()-encodedAt,
+      initialIndexTasks:cache.inProgressTaskCount,maxIndexTasks:cache.inProgressTaskCount,workerCalls:[],indexSamples:[],
+      buildHash:crypto.createHash('sha256').update(fs.readFileSync(this.app.vault.adapter.getBasePath()+'/.obsidian/plugins/adjustable-media/main.js')).digest('hex')};
+    window.__w07StartupResult=result;
+    const started=performance.now();
+    const wrapped=async function(input) {
+      const row={startMs:performance.now(),probe:input===buffer,indexTasks:cache.inProgressTaskCount};
+      result.workerCalls.push(row);
+      if(row.probe) result.queueWaitMs=row.startMs-started;
+      const metadata=await work.call(this,input);
+      row.elapsedMs=performance.now()-row.startMs;
+      return metadata;
+    };
+    cache.work=wrapped;
+    this.register(()=>{if(cache.work===wrapped)cache.work=work});
+    let completed=false,quiet=0;
+    const timer=setInterval(()=>{
+      const count=cache.inProgressTaskCount;
+      result.maxIndexTasks=Math.max(result.maxIndexTasks,count);
+      result.indexSamples.push({atMs:performance.now(),count});
+      quiet=completed&&count===0?quiet+1:0;
+      if(quiet<25)return;
+      clearInterval(timer);
+      result.finalIndexTasks=count;
+      fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w07-final-'+phase+'-startup.json',JSON.stringify(result,null,2));
+    },20);
+    this.register(()=>clearInterval(timer));
+    cache.computeMetadataAsync(buffer).then(metadata=>{
+      result.totalMs=performance.now()-started;
+      result.parsed=Array.isArray(metadata?.sections);
+      completed=true;
+    },error=>{result.error=String(error);completed=true});
+  }
+};

@@ -3,7 +3,7 @@ import obsidianmd from "eslint-plugin-obsidianmd";
 
 // The same rules the Obsidian community plugin review runs.
 export default defineConfig([
-  globalIgnores(["node_modules/", "dist/", "main.js"]),
+  globalIgnores(["node_modules/", "dist/", "main.js", ".claude/worktrees/"]),
   ...obsidianmd.configs.recommended,
   {
     languageOptions: {
