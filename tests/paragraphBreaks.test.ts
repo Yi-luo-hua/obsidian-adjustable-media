@@ -88,3 +88,9 @@ test("a heading or a rule ends a list, and indented code may start right below o
   // A heading in a list item ends no list; code below it is indented past the item's text.
   assert.deepEqual(lines(paragraphBreaks(["- a", "  ## In item", "      code one", "", "      code two"], [])), ["1:after"]);
 });
+
+test("indented code may start right below a quote, as Obsidian draws it", () => {
+  assert.deepEqual(lines(paragraphBreaks(["> quote", "    code one", "", "", "    code two", "", "After."], [])), ["5:blank"]);
+  // In a list item too, indented past the item's text.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "  > quote", "      code one", "", "      code two"], [])), []);
+});

@@ -149,7 +149,8 @@ const ATX_HEADING = /^#{1,6}(?:[ \t]|$)/;
 /**
  * Which lines belong to an indented code block. Code is indented four columns past where the text of
  * the list item it is in starts, or past the margin outside lists, and does not start right below a
- * paragraph line: indented as far there, or only as far as an item's text, it is ordinary text. Only
+ * paragraph line (a quote's line does not count as one, as Obsidian draws it): indented as far there,
+ * or only as far as an item's text, it is ordinary text. Only
  * a paragraph goes on lazily in a line indented less than its list item's text; any other line, or
  * one after a blank line, closes the items whose text it does not reach.
  */
@@ -191,9 +192,10 @@ function indentedCode(lines: readonly string[], text: (line: number) => boolean,
     if (item && !inCode) {
       items.push(item.content);
     }
-    // A heading or a rule ends where it is; anything else here is a paragraph that may go on.
+    // A heading or a rule ends where it is, and Obsidian ends a quote before a line indented as code
+    // (CommonMark would take it lazily into the quote); anything else here is a paragraph that may go on.
     const own = indent - base() <= 3;
-    afterParagraph = !inCode && !(own && (thematic || ATX_HEADING.test(trimmed)));
+    afterParagraph = !inCode && !(own && (thematic || ATX_HEADING.test(trimmed) || trimmed.startsWith(">")));
     afterBlank = false;
   }
   return code;
