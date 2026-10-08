@@ -1,0 +1,47 @@
+import { readFile, writeFile, access } from 'node:fs/promises';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
+
+const root = process.cwd();
+const docs = ['CHANGELOG.md', 'docs/STATUS.md', 'docs/DESIGN.md', ...[
+  'README', '09-progress-and-next-steps', '13-highlight-and-mobile-plan',
+  '19-w10-w02-and-tablet-continuation', '20-tablet-acceptance',
+  '21-mobile-touch-interaction-fixes', '22-mobile-corner-input-guard',
+  '23-video-resize-player-preservation', '24-mobile-video-controls-focus',
+  '25-documentation-and-artifact-cleanup',
+].map(name => `docs/plans/layout-redesign/${name}.md`)];
+const missing = [];
+let links = 0;
+for (const doc of docs) {
+  const text = (await readFile(doc, 'utf8')).replace(/^```[^\n]*\n[\s\S]*?^```[^\n]*$/gm, '').replace(/`[^`\n]*`/g, '');
+  for (const match of text.matchAll(/\]\(([^)]+)\)/g)) {
+    const href = match[1];
+    if (/^(?:https?:|codex:|mailto:|#)/.test(href)) continue;
+    const target = decodeURIComponent(href.split('#')[0]);
+    if (!target) continue;
+    links++;
+    try { await access(path.resolve(path.dirname(doc), target)); }
+    catch { missing.push({ doc, target }); }
+  }
+}
+const hash = async file => createHash('sha256').update(await readFile(file)).digest('hex');
+const hashes = { 'main.js': await hash('main.js'), 'styles.css': await hash('styles.css') };
+const seeds = [];
+for (const name of ['adjustable-media-mobile-test', 'adjustable-media-tablet-test']) {
+  const base = `dist/${name}`, metadata = JSON.parse(await readFile(`${base}/build-info.json`, 'utf8'));
+  seeds.push({ name, filesMatch: (await Promise.all(Object.keys(hashes).map(async file =>
+    await hash(`${base}/.obsidian/plugins/adjustable-media/${file}`) === hashes[file] && metadata.hashes[file] === hashes[file]))).every(Boolean) });
+}
+const cleanup = await Promise.all(['artifact-cleanup-20261009.json', 'artifact-cleanup-extra-20261009.json'].map(async file =>
+  JSON.parse(await readFile(`docs/plans/layout-redesign/probes/${file}`, 'utf8'))));
+const currentEvidence = JSON.parse(await readFile('docs/plans/layout-redesign/probes/tablet-video-controls-report.json', 'utf8'));
+const result = { docs: docs.length, links, missing, hashes, seeds, cleanup: {
+  files: cleanup.reduce((sum, item) => sum + item.fileCount, 0),
+  bytes: cleanup.reduce((sum, item) => sum + item.bytes, 0),
+  verified: cleanup.every(item => item.stagedHashesMatch && item.sourceAbsent && item.recycleBinMatch),
+}, evidenceMatchesCurrentBuild: currentEvidence.buildHash === hashes['main.js'],
+formalDesktopOnly: JSON.parse(await readFile('manifest.json', 'utf8')).isDesktopOnly };
+result.passed = !missing.length && seeds.every(item => item.filesMatch) && result.cleanup.verified && result.evidenceMatchesCurrentBuild && result.formalDesktopOnly;
+await writeFile('docs/plans/layout-redesign/probes/document-alignment-20261009.json', JSON.stringify(result, null, 2));
+process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+if (!result.passed) process.exitCode = 1;

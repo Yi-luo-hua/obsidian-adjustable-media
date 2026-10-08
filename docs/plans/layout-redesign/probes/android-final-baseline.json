@@ -1,0 +1,582 @@
+{
+  "result": {
+    "at": "2026-10-08T11:59:42.297Z",
+    "userAgent": "Mozilla/5.0 (Linux; Android 12; ADA-AL00U Build/HUAWEIADA-AL00U; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/114.0.5735.196 Mobile Safari/537.36",
+    "viewport": {
+      "width": 363,
+      "height": 823,
+      "ratio": 3.375
+    },
+    "samples": [
+      {
+        "at": "2026-10-08T11:59:43.999Z",
+        "file": "01 显示与媒体.md",
+        "mode": "preview",
+        "viewport": {
+          "width": 363,
+          "height": 823,
+          "ratio": 3.375,
+          "visual": {
+            "width": 363.2592468261719,
+            "height": 823.111083984375,
+            "offsetTop": 0
+          }
+        },
+        "visibility": "visible",
+        "capabilities": {
+          "resizeObserver": "function",
+          "mutationObserver": "function",
+          "fontFaceSet": true,
+          "computeMetadataAsync": "function",
+          "editorCM": true,
+          "rendererSections": true
+        },
+        "layouts": [
+          {
+            "rect": {
+              "x": 24,
+              "y": 207.9583282470703,
+              "width": 310.5185241699219,
+              "height": 202.9629669189453
+            },
+            "editing": false,
+            "overflow": 0,
+            "media": [
+              {
+                "type": "IMG",
+                "rect": {
+                  "x": 35.481483459472656,
+                  "y": 219.4398193359375,
+                  "width": 116.48148345947266,
+                  "height": 180
+                },
+                "width": 1000,
+                "height": 1000,
+                "ready": true
+              },
+              {
+                "type": "IMG",
+                "rect": {
+                  "x": 159.9629669189453,
+                  "y": 219.4398193359375,
+                  "width": 163.07408142089844,
+                  "height": 180
+                },
+                "width": 1600,
+                "height": 900,
+                "ready": true
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 24,
+              "y": 422.9212951660156,
+              "width": 310.5185241699219,
+              "height": 433.754638671875
+            },
+            "editing": false,
+            "overflow": 0,
+            "media": [
+              {
+                "type": "VIDEO",
+                "rect": {
+                  "x": 35.481483459472656,
+                  "y": 434.40277099609375,
+                  "width": 287.5555725097656,
+                  "height": 410.7916564941406
+                },
+                "width": 896,
+                "height": 1280,
+                "ready": 4
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 24,
+              "y": 868.6759033203125,
+              "width": 310.5185241699219,
+              "height": 154.21759033203125
+            },
+            "editing": false,
+            "overflow": 0,
+            "media": []
+          }
+        ],
+        "bufferMatchesSaved": true,
+        "selection": [
+          {
+            "anchor": 0,
+            "head": 0
+          }
+        ],
+        "formulaCount": 1
+      },
+      {
+        "at": "2026-10-08T11:59:45.961Z",
+        "file": "01 显示与媒体.md",
+        "mode": "source",
+        "viewport": {
+          "width": 363,
+          "height": 823,
+          "ratio": 3.375,
+          "visual": {
+            "width": 363.2592468261719,
+            "height": 823.111083984375,
+            "offsetTop": 0
+          }
+        },
+        "visibility": "visible",
+        "capabilities": {
+          "resizeObserver": "function",
+          "mutationObserver": "function",
+          "fontFaceSet": true,
+          "computeMetadataAsync": "function",
+          "editorCM": true,
+          "rendererSections": true
+        },
+        "layouts": [
+          {
+            "rect": {
+              "x": 24,
+              "y": 231.86111450195312,
+              "width": 310.5185241699219,
+              "height": 202.9629669189453
+            },
+            "block": "block:25",
+            "editing": false,
+            "overflow": 8,
+            "media": [
+              {
+                "type": "IMG",
+                "rect": {
+                  "x": 35.481483459472656,
+                  "y": 243.34259033203125,
+                  "width": 116.48148345947266,
+                  "height": 180
+                },
+                "width": 1000,
+                "height": 1000,
+                "ready": true
+              },
+              {
+                "type": "IMG",
+                "rect": {
+                  "x": 159.9629669189453,
+                  "y": 243.34259033203125,
+                  "width": 163.07408142089844,
+                  "height": 180
+                },
+                "width": 1600,
+                "height": 900,
+                "ready": true
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 24,
+              "y": 450.8240661621094,
+              "width": 310.5185241699219,
+              "height": 433.754638671875
+            },
+            "block": "block:26",
+            "editing": false,
+            "overflow": 8,
+            "media": [
+              {
+                "type": "VIDEO",
+                "rect": {
+                  "x": 35.481483459472656,
+                  "y": 462.3055725097656,
+                  "width": 287.5555725097656,
+                  "height": 410.7916564941406
+                },
+                "width": 896,
+                "height": 1280,
+                "ready": 4
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 24,
+              "y": 900.5787353515625,
+              "width": 310.5185241699219,
+              "height": 154.21759033203125
+            },
+            "block": "block:27",
+            "editing": false,
+            "overflow": 7,
+            "media": []
+          }
+        ],
+        "bufferMatchesSaved": true,
+        "selection": [
+          {
+            "anchor": 374,
+            "head": 374
+          }
+        ],
+        "formulaCount": 1
+      },
+      {
+        "scenario": "missing",
+        "at": "2026-10-08T11:59:47.218Z",
+        "file": "01 显示与媒体.md",
+        "mode": "source",
+        "viewport": {
+          "width": 363,
+          "height": 823,
+          "ratio": 3.375,
+          "visual": {
+            "width": 363.2592468261719,
+            "height": 823.111083984375,
+            "offsetTop": 0
+          }
+        },
+        "visibility": "visible",
+        "capabilities": {
+          "resizeObserver": "function",
+          "mutationObserver": "function",
+          "fontFaceSet": true,
+          "computeMetadataAsync": "undefined",
+          "editorCM": true,
+          "rendererSections": true
+        },
+        "layouts": [
+          {
+            "rect": {
+              "x": 24,
+              "y": 231.86111450195312,
+              "width": 310.5185241699219,
+              "height": 202.9629669189453
+            },
+            "block": "block:45",
+            "editing": false,
+            "overflow": 8,
+            "media": [
+              {
+                "type": "IMG",
+                "rect": {
+                  "x": 35.481483459472656,
+                  "y": 243.34259033203125,
+                  "width": 116.48148345947266,
+                  "height": 180
+                },
+                "width": 1000,
+                "height": 1000,
+                "ready": true
+              },
+              {
+                "type": "IMG",
+                "rect": {
+                  "x": 159.9629669189453,
+                  "y": 243.34259033203125,
+                  "width": 163.07408142089844,
+                  "height": 180
+                },
+                "width": 1600,
+                "height": 900,
+                "ready": true
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 24,
+              "y": 450.8240661621094,
+              "width": 310.5185241699219,
+              "height": 433.754638671875
+            },
+            "block": "block:46",
+            "editing": false,
+            "overflow": 8,
+            "media": [
+              {
+                "type": "VIDEO",
+                "rect": {
+                  "x": 35.481483459472656,
+                  "y": 462.3055725097656,
+                  "width": 287.5555725097656,
+                  "height": 410.7916564941406
+                },
+                "width": 896,
+                "height": 1280,
+                "ready": 4
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 24,
+              "y": 900.5787353515625,
+              "width": 310.5185241699219,
+              "height": 154.21759033203125
+            },
+            "block": "block:47",
+            "editing": false,
+            "overflow": 7,
+            "media": []
+          }
+        ],
+        "bufferMatchesSaved": true,
+        "selection": [
+          {
+            "anchor": 374,
+            "head": 374
+          }
+        ],
+        "formulaCount": 1
+      },
+      {
+        "scenario": "rejected",
+        "at": "2026-10-08T11:59:48.461Z",
+        "file": "01 显示与媒体.md",
+        "mode": "source",
+        "viewport": {
+          "width": 363,
+          "height": 823,
+          "ratio": 3.375,
+          "visual": {
+            "width": 363.2592468261719,
+            "height": 823.111083984375,
+            "offsetTop": 0
+          }
+        },
+        "visibility": "visible",
+        "capabilities": {
+          "resizeObserver": "function",
+          "mutationObserver": "function",
+          "fontFaceSet": true,
+          "computeMetadataAsync": "function",
+          "editorCM": true,
+          "rendererSections": true
+        },
+        "layouts": [
+          {
+            "rect": {
+              "x": 24,
+              "y": 231.86111450195312,
+              "width": 310.5185241699219,
+              "height": 202.9629669189453
+            },
+            "block": "block:55",
+            "editing": false,
+            "overflow": 8,
+            "media": [
+              {
+                "type": "IMG",
+                "rect": {
+                  "x": 35.481483459472656,
+                  "y": 243.34259033203125,
+                  "width": 116.48148345947266,
+                  "height": 180
+                },
+                "width": 1000,
+                "height": 1000,
+                "ready": true
+              },
+              {
+                "type": "IMG",
+                "rect": {
+                  "x": 159.9629669189453,
+                  "y": 243.34259033203125,
+                  "width": 163.07408142089844,
+                  "height": 180
+                },
+                "width": 1600,
+                "height": 900,
+                "ready": true
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 24,
+              "y": 450.8240661621094,
+              "width": 310.5185241699219,
+              "height": 433.754638671875
+            },
+            "block": "block:56",
+            "editing": false,
+            "overflow": 8,
+            "media": [
+              {
+                "type": "VIDEO",
+                "rect": {
+                  "x": 35.481483459472656,
+                  "y": 462.3055725097656,
+                  "width": 287.5555725097656,
+                  "height": 410.7916564941406
+                },
+                "width": 896,
+                "height": 1280,
+                "ready": 4
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 24,
+              "y": 900.5787353515625,
+              "width": 310.5185241699219,
+              "height": 154.21759033203125
+            },
+            "block": "block:57",
+            "editing": false,
+            "overflow": 7,
+            "media": []
+          }
+        ],
+        "bufferMatchesSaved": true,
+        "selection": [
+          {
+            "anchor": 374,
+            "head": 374
+          }
+        ],
+        "formulaCount": 1
+      },
+      {
+        "scenario": "first long-float middle",
+        "at": "2026-10-08T11:59:50.384Z",
+        "file": "02 长浮动.md",
+        "mode": "source",
+        "viewport": {
+          "width": 363,
+          "height": 823,
+          "ratio": 3.375,
+          "visual": {
+            "width": 363.2592468261719,
+            "height": 823.111083984375,
+            "offsetTop": 0
+          }
+        },
+        "visibility": "visible",
+        "capabilities": {
+          "resizeObserver": "function",
+          "mutationObserver": "function",
+          "fontFaceSet": true,
+          "computeMetadataAsync": "function",
+          "editorCM": true,
+          "rendererSections": true
+        },
+        "layouts": [
+          {
+            "rect": {
+              "x": 210.3148193359375,
+              "y": -2483.0556640625,
+              "width": 124.20370483398438,
+              "height": 3862.962890625
+            },
+            "block": "block:65",
+            "editing": false,
+            "overflow": 0,
+            "media": []
+          }
+        ],
+        "bufferMatchesSaved": true,
+        "selection": [
+          {
+            "anchor": 1714,
+            "head": 1714
+          }
+        ],
+        "formulaCount": 0
+      }
+    ],
+    "checks": [
+      {
+        "name": "native bundle loaded",
+        "passed": true
+      },
+      {
+        "name": "worker accepts exact buffer",
+        "passed": true
+      },
+      {
+        "name": "visible positive geometry",
+        "passed": true
+      },
+      {
+        "name": "read-only source preserved",
+        "passed": true
+      },
+      {
+        "name": "first-middle stand-in actually present",
+        "passed": true
+      }
+    ],
+    "metadataInterface": "function",
+    "metadata": {
+      "sections": [
+        {
+          "type": "paragraph",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "col": 19,
+              "offset": 19
+            }
+          }
+        },
+        {
+          "type": "html",
+          "position": {
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 21
+            },
+            "end": {
+              "line": 2,
+              "col": 12,
+              "offset": 33
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "position": {
+            "start": {
+              "line": 3,
+              "col": 0,
+              "offset": 34
+            },
+            "end": {
+              "line": 3,
+              "col": 27,
+              "offset": 61
+            }
+          }
+        },
+        {
+          "type": "html",
+          "position": {
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 62
+            },
+            "end": {
+              "line": 4,
+              "col": 13,
+              "offset": 75
+            }
+          }
+        }
+      ],
+      "parsed": true
+    },
+    "standIns": 1,
+    "originalsUnchanged": true
+  },
+  "errors": []
+}

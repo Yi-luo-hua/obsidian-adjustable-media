@@ -1,0 +1,21 @@
+{
+  "buildHash": "7cd242a183af090250051150bf57819cc8415925513abb925714ba6fa0d67bfe",
+  "simulation": "Windows rendered auxiliary test. Visible mobile controls enabled on the test pane only; not Android acceptance.",
+  "checks": [
+    {
+      "name": "visible done and disabled discard",
+      "passed": false
+    },
+    {
+      "name": "Done during composition keeps editor and source unchanged",
+      "passed": false
+    },
+    {
+      "name": "candidate confirmed only left text written",
+      "passed": true
+    }
+  ],
+  "error": "Error: Click target missing\n    at click (eval at <anonymous> (eval at <anonymous> (app://obsidian.md/app.js:1:1638663)), <anonymous>:15:39)\n    at eval (eval at <anonymous> (eval at <anonymous> (app://obsidian.md/app.js:1:1638663)), <anonymous>:30:11)",
+  "passed": false,
+  "originalNotesUnchanged": true
+}

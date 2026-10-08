@@ -1,0 +1,265 @@
+{
+  "result": {
+    "file": "02 长浮动.md",
+    "unchanged": true,
+    "sample": {
+      "at": "2026-10-08T12:01:41.518Z",
+      "file": "02 长浮动.md",
+      "mode": "source",
+      "viewport": {
+        "width": 363,
+        "height": 823,
+        "ratio": 3.375,
+        "visual": {
+          "width": 363.2592468261719,
+          "height": 823.111083984375,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 210.3148193359375,
+            "y": -2483.0556640625,
+            "width": 124.20370483398438,
+            "height": 3862.962890625
+          },
+          "block": "block:65",
+          "editing": false,
+          "overflow": 0,
+          "media": []
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 1714,
+          "head": 1714
+        }
+      ],
+      "formulaCount": 0
+    },
+    "rows": [
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      },
+      {
+        "scroll": 2643.851806640625,
+        "epoch": 0,
+        "proxies": 1,
+        "detached": 0
+      }
+    ],
+    "visibilityEvents": [
+      {
+        "name": "visibilitychange",
+        "at": 1791457509903,
+        "trusted": true,
+        "visibility": "hidden",
+        "file": "02 长浮动.md"
+      },
+      {
+        "name": "visibilitychange",
+        "at": 1791457509913,
+        "trusted": true,
+        "visibility": "visible",
+        "file": "02 长浮动.md"
+      },
+      {
+        "name": "visibilitychange",
+        "at": 1791460895763,
+        "trusted": true,
+        "visibility": "hidden",
+        "file": "02 长浮动.md"
+      },
+      {
+        "name": "visibilitychange",
+        "at": 1791460896397,
+        "trusted": true,
+        "visibility": "visible",
+        "file": "02 长浮动.md"
+      }
+    ]
+  },
+  "errors": []
+}

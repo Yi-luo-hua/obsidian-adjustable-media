@@ -5,7 +5,9 @@ import { autoConvert } from "./src/input/autoConvert.ts";
 import { crossrefExtension, registerCrossrefs, setRefLanguage } from "./src/view/crossrefView.ts";
 import { DEFAULT_SETTINGS, VmlSettingTab, readSettings, type VmlSettings } from "./src/settings.ts";
 import { registerImageMenu } from "./src/view/imageMenu.ts";
-import { livePreviewExtension } from "./src/view/livePreview.ts";
+import { registerLayoutTouch } from "./src/view/layoutTouch.ts";
+import { registerCornerInputGuard } from "./src/view/cornerInput.ts";
+import { livePreviewExtension, refreshLayoutHighlights } from "./src/view/livePreview.ts";
 import { plainImageDrag } from "./src/view/plainDrag.ts";
 import { registerReadingView } from "./src/view/readingView.ts";
 import { GuideModal } from "./src/guide/guideModal.ts";
@@ -24,12 +26,14 @@ export default class AdjustableMediaPlugin extends Plugin {
     registerReadingView(this);
     registerCrossrefs(this);
     this.registerEditorExtension([
-      livePreviewExtension(this.app),
+      livePreviewExtension(this.app, () => this.settings.keepLayoutHighlight),
       crossrefExtension(),
       plainImageDrag(this.app),
       autoConvert(this, () => this.settings.autoConvert),
     ]);
     registerImageMenu(this);
+    registerLayoutTouch(this);
+    registerCornerInputGuard(this);
     registerCommands(this);
     let guide: GuideModal | null = null;
     let unloaded = false;
@@ -54,6 +58,7 @@ export default class AdjustableMediaPlugin extends Plugin {
   }
 
   async saveSettings(): Promise<void> {
+    refreshLayoutHighlights();
     await this.saveData(this.settings);
   }
 }

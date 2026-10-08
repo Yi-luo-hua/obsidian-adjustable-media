@@ -1,0 +1,78 @@
+(async()=>{
+  if(app.vault.getName()!=='vml-test-vault')throw new Error('Test vault required');
+  const fs=require('fs'),crypto=require('crypto'),remote=require('@electron/remote');
+  const root='E:/TOOLS/obsidian-adjustable-media/',base=app.vault.adapter.getBasePath(),trace=window.__w01Trace;
+  const hash=x=>crypto.createHash('sha256').update(x).digest('hex'),wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const original=Object.fromEntries(app.vault.getMarkdownFiles().map(f=>[f.path,hash(fs.readFileSync(base+'/'+f.path))]));
+  const source='<!-- vml {"v":2,"type":"text","wrap":"right","width":0.4} -->\n'+Array.from({length:100},(_,i)=>'Side note '+i+'  \n').join('')+'\n$$\nx^2+y^2=z^2\\label{eq:cold}\n$$\n\n<!-- /vml -->\n'+Array.from({length:180},(_,i)=>'Body '+i+' is a paragraph used for measuring convergence.\n\n').join('');
+  const path='W01 remaining gates transient.md',file=await app.vault.create(path,source),leaves=[],restores=[];
+  const previous=app.workspace.activeLeaf,checks=[],result={startup:window.__w01Startup,buildHash:hash(fs.readFileSync(base+'/.obsidian/plugins/adjustable-media/main.js')),checks,samples:[],rounds:[],failures:[]};
+  const check=(name,passed,details)=>{checks.push({name,passed,details});if(!passed)result.failures.push(name);};
+  const projection=v=>trace.projections.filter(p=>!p.w01Disposed&&p.w01Owner===(v.getMode()==='source'?v.editor:v)).at(-1);
+  const sample=(name,views)=>result.samples.push({name,at:performance.now(),states:views.map(v=>{const p=projection(v);return{mode:v.getMode(),phase:p?.phase,desired:p?.desired?.id,host:p?.hostRevision,rendered:p?.renderedRevision,measured:p?.measuredRevision,epoch:p?.environmentEpoch,required:p?.required,coverage:p?.measuredCoverage};})});
+  const settle=async(name,views)=>{const start=performance.now();for(let i=0;i<160&&views.some(v=>projection(v)?.phase!=='settled');i++)await wait(40);sample(name,views);check(name,views.every(v=>projection(v)?.phase==='settled'),{waitMs:performance.now()-start});};
+  let style,font;
+  try{
+    check('MathJax absent before candidate plugin loads',result.startup?.mathJaxPresent===false,result.startup);
+    for(const mode of ['source','preview']){const leaf=app.workspace.getLeaf('split');leaves.push(leaf);await leaf.openFile(file,{state:{mode},active:false});app.workspace.setActiveLeaf(leaf,{focus:false});}
+    const views=leaves.map(l=>l.view),cm=views[0].editor.cm;
+    cm.dispatch({selection:{anchor:source.length}});cm.scrollDOM.scrollTop=0;
+    await wait(150);sample('cold first render',views);await settle('cold global MathJax loaded',views);
+    check('formula rendered in both modes',views.every(v=>(v.getMode()==='source'?v.editor.cm.dom:v.previewMode.containerEl).querySelector('mjx-container,.MathJax')), {mathJaxPresent:!!window.MathJax});
+    const dispatch=cm.dispatch;let effects=0;
+    cm.dispatch=function(...specs){for(const spec of specs)for(const effect of(Array.isArray(spec.effects)?spec.effects:spec.effects?[spec.effects]:[]))if(trace.effectsTypes.some(t=>effect.is(t)))effects++;return dispatch.apply(this,specs);};restores.push(()=>{cm.dispatch=dispatch;});
+    const fontName='W01Slow'+Date.now();font=new FontFace(fontName,'url(http://127.0.0.1:18708/font.ttf?delay=1700&run='+Date.now()+')');document.fonts.add(font);
+    style=document.createElement('style');style.textContent='.w01-slow-font,.w01-slow-font *{font-family:'+fontName+',serif!important}';document.head.appendChild(style);
+    for(const v of views)(v.getMode()==='source'?v.editor.cm.contentDOM:v.previewMode.containerEl).addClass('w01-slow-font');
+    const before=views.map(v=>projection(v)?.environmentEpoch),load=font.load();await wait(200);sample('actual network font pending',views);
+    check('font loading keeps measurement pending',font.status==='loading'&&views.every(v=>projection(v)?.phase!=='settled'),{status:font.status,fontSetStatus:document.fonts.status});
+    await load;await wait(120);await settle('network font loaded',views);
+    check('font completion advances both pane epochs',views.every((v,i)=>projection(v).environmentEpoch>before[i]),{before,after:views.map(v=>projection(v).environmentEpoch)});
+    const mark=trace.rounds.length;for(const width of [397,720,1000]){
+      style.textContent+='.w01-measure-width{width:'+width+'px!important;min-width:'+width+'px!important;max-width:'+width+'px!important}';
+      for(const v of views)for(const el of v.getMode()==='source'?[v.editor.cm.contentDOM]:[v.previewMode.containerEl,v.previewMode.renderer.sizerEl])el.addClass('w01-measure-width');
+      await wait(180);await settle('font-loaded width '+width,views);
+    }
+    result.rounds=trace.rounds.slice(mark);
+    // Native editor transaction creates a genuinely distinct CM document. Only host persistence
+    // and cross-pane synchronization are held, never editor getters or plugin source reads.
+    const b=app.workspace.getLeaf('split');leaves.push(b);await b.openFile(file,{state:{mode:'source'},active:false});app.workspace.setActiveLeaf(b,{focus:false});await wait(250);
+    const second=b.view,other=second.editor.cm;
+    const protoNames=[];for(let p=second;p;p=Object.getPrototypeOf(p))protoNames.push(...Object.getOwnPropertyNames(p));
+    result.nativeViewSaveMethods=[...new Set(protoNames.filter(n=>/save|sync|data/i.test(n)))];
+    const heldSave=second.requestSave;second.requestSave=()=>{};restores.push(()=>{second.requestSave=heldSave;});
+    const heldSaveA=views[0].requestSave;views[0].requestSave=()=>{};restores.push(()=>{views[0].requestSave=heldSaveA;});
+    for(const view of [views[0],second]){const receive=view.receiveSyncState;view.receiveSyncState=()=>{};restores.push(()=>{view.receiveSyncState=receive;});}
+    const trigger=app.workspace.trigger;app.workspace.trigger=function(name,...args){if(name==='quick-preview'&&args[0]===file)return;return trigger.call(this,name,...args);};restores.push(()=>{app.workspace.trigger=trigger;});
+    other.dispatch({changes:{from:other.state.doc.length,insert:'\nActual unsaved branch B'},userEvent:'input'});
+    await wait(250);const bufferA=cm.state.doc.toString(),bufferB=other.state.doc.toString();
+    const setA=views[0].setViewData,setB=second.setViewData;let pluginForced=0;
+    views[0].setViewData=function(...args){if(new Error().stack.includes('adjustable-media'))pluginForced++;return setA.apply(this,args);};second.setViewData=function(...args){if(new Error().stack.includes('adjustable-media'))pluginForced++;return setB.apply(this,args);};restores.push(()=>{views[0].setViewData=setA;second.setViewData=setB;});
+    await wait(800);
+    check('actual divergent CM buffers remain independent',bufferA!==bufferB&&cm.state.doc.toString()===bufferA&&other.state.doc.toString()===bufferB&&pluginForced===0,{different:bufferA!==bufferB,aHash:hash(bufferA),bHash:hash(bufferB),vaultHash:hash(await app.vault.read(file)),pluginForced});sample('actual divergent native buffers',views.concat(second));
+    other.dispatch({changes:{from:0,to:other.state.doc.length,insert:source}});cm.dispatch({changes:{from:0,to:cm.state.doc.length,insert:source}});
+    await wait(400);await settle('branches restored',views.concat(second));
+    const startEffects=effects,startCalls=trace.calls.length,startRounds=trace.rounds.length;await wait(2200);
+    result.stable={ms:2200,effects:effects-startEffects,newRequests:trace.calls.slice(startCalls).filter(c=>['request','environmentChanged'].includes(c.method)).length,reads:trace.rounds.slice(startRounds).filter(r=>r.method==='read').length};check('stable 2.2s no feedback',!result.stable.effects&&!result.stable.newRequests,result.stable);
+    const guard=trace.guards.find(g=>g.view===cm);guard.budget.reset();
+    for(let i=0;i<40;i++)guard.read();guard.source.measurementsChanged(cm);await wait(100);
+    check('live measurement ceiling withdraws ready',guard.budget.blocked&&guard.budget.rounds===16&&!guard.measurementsReady()&&projection(views[0]).phase==='measuring',{rounds:guard.budget.rounds,phase:projection(views[0]).phase});
+    guard.mediaChanged();await settle('valid resource resumes live measurement',views);
+    const reading=trace.readingSectionsOfView(views[1]),api=trace.readingApi;
+    const section=reading.sections.find(s=>s.computed&&s.el.isConnected&&!s.el.classList.contains('vml-rv-anchor')&&s.el.getBoundingClientRect().height>0);
+    if(!section)throw new Error('No rendered dependent section for budget probe');
+    const oldHeight=section.height,roundMark=trace.readingRounds.length;
+    for(let i=0;i<40;i++){section.computed=true;section.height=oldHeight+100+(i%2)*100;api.settle(app,reading);}
+    const blocked=api.budgets.get(section.el);section.height=oldHeight;await wait(120);
+    check('oscillating host heights stop reading remeasurement',blocked?.blocked&&blocked.rounds===16&&!api.readingMeasurementsReady(section.el),{rounds:blocked?.rounds,remeasureCalls:trace.readingRounds.length-roundMark});
+    api.refreshReadingWrap(app,section.el);await wait(250);await settle('environment invalidation resumes reader',views);
+    await remote.getCurrentWebContents().capturePage();await wait(40);fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w01-remaining-gates.png',(await remote.getCurrentWebContents().capturePage()).toPNG());
+  }catch(error){result.error=String(error.stack??error);result.failures.push('probe error');}
+  finally{
+    for(const restore of restores.reverse())restore();style?.remove();if(font)document.fonts.delete(font);
+    for(const leaf of leaves.reverse())leaf.detach();if(previous)app.workspace.setActiveLeaf(previous,{focus:false});await wait(300);await app.vault.trash(file,true);
+    result.originalNotesUnchanged=Object.entries(original).every(([p,h])=>hash(fs.readFileSync(base+'/'+p))===h);
+    result.allRounds=trace.rounds;result.readingRounds=trace.readingRounds;result.calls=trace.calls;result.passed=!result.failures.length&&result.originalNotesUnchanged;
+    fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w01-remaining-gates.json',JSON.stringify(result,null,2));window.w01RemainingResult={passed:result.passed,checks,error:result.error};
+  }
+})();

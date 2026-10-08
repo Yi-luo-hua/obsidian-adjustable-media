@@ -1,0 +1,27 @@
+{
+  "docs": 13,
+  "links": 158,
+  "missing": [],
+  "hashes": {
+    "main.js": "ff0e440cc258f2448feec85910fee7856f448e8a7f5b871b6b924360ad392c2a",
+    "styles.css": "b2012bec744d6250b7fc336b247cc1c77f92deb8203c3294307cc7c8b1a5f914"
+  },
+  "seeds": [
+    {
+      "name": "adjustable-media-mobile-test",
+      "filesMatch": true
+    },
+    {
+      "name": "adjustable-media-tablet-test",
+      "filesMatch": true
+    }
+  ],
+  "cleanup": {
+    "files": 341,
+    "bytes": 132193819,
+    "verified": true
+  },
+  "evidenceMatchesCurrentBuild": true,
+  "formalDesktopOnly": true,
+  "passed": true
+}

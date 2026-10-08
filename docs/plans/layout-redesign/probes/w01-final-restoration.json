@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "name": "main.js",
+      "original": "be6f2a2265eec5250c2ef87f3fa7fff9d45b6d849499d4b0a857c93852ca486b",
+      "restored": "be6f2a2265eec5250c2ef87f3fa7fff9d45b6d849499d4b0a857c93852ca486b"
+    },
+    {
+      "name": "styles.css",
+      "original": "daec4452395c622432f893a0e6bfa862103450b33cac045b73a783b79353f314",
+      "restored": "daec4452395c622432f893a0e6bfa862103450b33cac045b73a783b79353f314"
+    },
+    {
+      "name": "manifest.json",
+      "original": "45109cea69509c6ac78a217c0150f774fae5ef273a3384df948ec752d68f663e",
+      "restored": "45109cea69509c6ac78a217c0150f774fae5ef273a3384df948ec752d68f663e"
+    },
+    {
+      "name": "data.json",
+      "original": "f7bff6905638884f9f09296bf40b11fb1c3d66c11c251abe7c6347c047c9749b",
+      "restored": "f7bff6905638884f9f09296bf40b11fb1c3d66c11c251abe7c6347c047c9749b"
+    }
+  ],
+  "community": {
+    "original": "ffea01bff14c4e2877c7881fc2f47c56f1526a9c91b473d15192029f525cb503",
+    "restored": "ffea01bff14c4e2877c7881fc2f47c56f1526a9c91b473d15192029f525cb503"
+  },
+  "passed": true
+}

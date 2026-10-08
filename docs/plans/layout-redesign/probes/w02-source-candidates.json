@@ -1,0 +1,361 @@
+{
+  "scope": "Pure source round-trip. No DOM, host measurement or ready geometry acceptance.",
+  "samples": [
+    {
+      "name": "Width rounding",
+      "state": "parsed",
+      "backend": "file",
+      "baseHash": "87d48157a2166e20c91a79e164398c4b0e8e7451b739cb0ee94fec76d65ebff8",
+      "candidateHash": "fbd8ac74ffa3bf311c92fe9da4092f8225f2b21ad45e8a9f132221b748d1ce90",
+      "sourceEdits": [
+        {
+          "blockId": "block:1",
+          "anchorLine": 2,
+          "anchorLines": [
+            "<!-- vml -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->"
+          ],
+          "start": 0,
+          "end": 0,
+          "replacement": [
+            "<!-- vml {\"v\":2,\"width\":0.333} -->"
+          ]
+        }
+      ],
+      "source": "Before  \n\n<!-- vml -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter\n",
+      "candidate": "Before  \n\n<!-- vml {\"v\":2,\"width\":0.333} -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter\n",
+      "blocks": [
+        {
+          "from": 10,
+          "to": 79,
+          "openLine": 2,
+          "width": 0.333,
+          "skip": null,
+          "wrap": null,
+          "embeds": [
+            "![[A.png|alias|200]]"
+          ]
+        }
+      ],
+      "floatCount": 0
+    },
+    {
+      "name": "CRLF width",
+      "state": "parsed",
+      "backend": "file",
+      "baseHash": "5a181644d467ca8d1d7e2bc1a7601338802ab6c7a04a0f4043000d774e37de78",
+      "candidateHash": "e886ca9698c03fbf64e3638fcbbc1787ff06ae708c08f5df6d0c992133e9ba02",
+      "sourceEdits": [
+        {
+          "blockId": "block:15",
+          "anchorLine": 2,
+          "anchorLines": [
+            "<!-- vml -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->"
+          ],
+          "start": 0,
+          "end": 0,
+          "replacement": [
+            "<!-- vml {\"v\":2,\"width\":0.333} -->"
+          ]
+        }
+      ],
+      "source": "Before  \r\n\r\n<!-- vml -->\r\n![[A.png|alias|200]]\r\n<!-- /vml -->\r\n\r\nAfter\r\n",
+      "candidate": "Before  \r\n\r\n<!-- vml {\"v\":2,\"width\":0.333} -->\r\n![[A.png|alias|200]]\r\n<!-- /vml -->\r\n\r\nAfter\r\n",
+      "blocks": [
+        {
+          "from": 12,
+          "to": 84,
+          "openLine": 2,
+          "width": 0.333,
+          "skip": null,
+          "wrap": null,
+          "embeds": [
+            "![[A.png|alias|200]]"
+          ]
+        }
+      ],
+      "floatCount": 0
+    },
+    {
+      "name": "EOF with newline",
+      "state": "parsed",
+      "backend": "file",
+      "baseHash": "87d48157a2166e20c91a79e164398c4b0e8e7451b739cb0ee94fec76d65ebff8",
+      "candidateHash": "6263ca505730e989a984ab81027d2260ee4991705f5cd28eaa7276abc21527d6",
+      "sourceEdits": [
+        {
+          "anchorLine": 2,
+          "anchorLines": [
+            "<!-- vml -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->"
+          ],
+          "start": 0,
+          "end": 2,
+          "replacement": []
+        },
+        {
+          "anchorLine": 6,
+          "anchorLines": [
+            "After",
+            ""
+          ],
+          "start": 1,
+          "end": 1,
+          "replacement": [
+            "",
+            "<!-- vml {\"v\":2,\"width\":0.4,\"wrap\":\"right\"} -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->",
+            ""
+          ]
+        }
+      ],
+      "source": "Before  \n\n<!-- vml -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter\n",
+      "candidate": "Before  \n\nAfter\n\n<!-- vml {\"v\":2,\"width\":0.4,\"wrap\":\"right\"} -->\n![[A.png|alias|200]]\n<!-- /vml -->\n",
+      "blocks": [
+        {
+          "from": 17,
+          "to": 99,
+          "openLine": 4,
+          "width": 0.4,
+          "skip": null,
+          "wrap": "right",
+          "embeds": [
+            "![[A.png|alias|200]]"
+          ]
+        }
+      ],
+      "floatCount": 1
+    },
+    {
+      "name": "EOF without newline",
+      "state": "parsed",
+      "backend": "file",
+      "baseHash": "97498a8fd9fce889fb214c4d6d688adce4af56f37eea9b2911ebcb1da5b5677e",
+      "candidateHash": "7acad6b1692fec98986681aedc8c96fbb9cd8103f2f41983b59d6f45b826cc4d",
+      "sourceEdits": [
+        {
+          "anchorLine": 2,
+          "anchorLines": [
+            "<!-- vml -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->"
+          ],
+          "start": 0,
+          "end": 2,
+          "replacement": []
+        },
+        {
+          "anchorLine": 6,
+          "anchorLines": [
+            "After"
+          ],
+          "start": 0,
+          "end": 0,
+          "replacement": [
+            "After",
+            "",
+            "<!-- vml {\"v\":2,\"width\":0.4,\"wrap\":\"right\"} -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->"
+          ]
+        }
+      ],
+      "source": "Before  \n\n<!-- vml -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter",
+      "candidate": "Before  \n\nAfter\n\n<!-- vml {\"v\":2,\"width\":0.4,\"wrap\":\"right\"} -->\n![[A.png|alias|200]]\n<!-- /vml -->",
+      "blocks": [
+        {
+          "from": 17,
+          "to": 99,
+          "openLine": 4,
+          "width": 0.4,
+          "skip": null,
+          "wrap": "right",
+          "embeds": [
+            "![[A.png|alias|200]]"
+          ]
+        }
+      ],
+      "floatCount": 1
+    },
+    {
+      "name": "Skip 40",
+      "state": "parsed",
+      "backend": "file",
+      "baseHash": "87d48157a2166e20c91a79e164398c4b0e8e7451b739cb0ee94fec76d65ebff8",
+      "candidateHash": "fa165a91ec4250f16ac5731a97ff32a282d3325a81690647f71462f7890b3f66",
+      "sourceEdits": [
+        {
+          "anchorLine": 2,
+          "anchorLines": [
+            "<!-- vml -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->"
+          ],
+          "start": 0,
+          "end": 2,
+          "replacement": []
+        },
+        {
+          "anchorLine": 6,
+          "anchorLines": [
+            "After",
+            ""
+          ],
+          "start": 1,
+          "end": 1,
+          "replacement": [
+            "",
+            "<!-- vml {\"v\":2,\"width\":0.4,\"wrap\":\"right\",\"skip\":40} -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->",
+            ""
+          ]
+        }
+      ],
+      "source": "Before  \n\n<!-- vml -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter\n",
+      "candidate": "Before  \n\nAfter\n\n<!-- vml {\"v\":2,\"width\":0.4,\"wrap\":\"right\",\"skip\":40} -->\n![[A.png|alias|200]]\n<!-- /vml -->\n",
+      "blocks": [
+        {
+          "from": 17,
+          "to": 109,
+          "openLine": 4,
+          "width": 0.4,
+          "skip": 40,
+          "wrap": "right",
+          "embeds": [
+            "![[A.png|alias|200]]"
+          ]
+        }
+      ],
+      "floatCount": 1
+    },
+    {
+      "name": "Duplicate instance",
+      "state": "parsed",
+      "backend": "file",
+      "baseHash": "d9eeba90f187b5b1a703a7b1fafbd6082301b4c1d83437dab0274cd79f25ef0c",
+      "candidateHash": "9c72c63032b844267f024087a61b67c1fd9b0c240c17786db9a3f1dde14b5316",
+      "sourceEdits": [
+        {
+          "blockId": "block:72",
+          "anchorLine": 10,
+          "anchorLines": [
+            "<!-- vml -->",
+            "![[A.png|alias|200]]",
+            "<!-- /vml -->"
+          ],
+          "start": 0,
+          "end": 0,
+          "replacement": [
+            "<!-- vml {\"v\":2,\"width\":0.333} -->"
+          ]
+        }
+      ],
+      "source": "Before  \n\n<!-- vml -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter\n\nBefore  \n\n<!-- vml -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter\n",
+      "candidate": "Before  \n\n<!-- vml -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter\n\nBefore  \n\n<!-- vml {\"v\":2,\"width\":0.333} -->\n![[A.png|alias|200]]\n<!-- /vml -->\n\nAfter\n",
+      "blocks": [
+        {
+          "from": 10,
+          "to": 57,
+          "openLine": 2,
+          "width": null,
+          "skip": null,
+          "wrap": null,
+          "embeds": [
+            "![[A.png|alias|200]]"
+          ]
+        },
+        {
+          "from": 76,
+          "to": 145,
+          "openLine": 10,
+          "width": 0.333,
+          "skip": null,
+          "wrap": null,
+          "embeds": [
+            "![[A.png|alias|200]]"
+          ]
+        }
+      ],
+      "floatCount": 0
+    },
+    {
+      "name": "Three floats",
+      "state": "parsed",
+      "backend": "file",
+      "baseHash": "d378bc37655fb9e31e5a86f212b8bcc0b6c34a4d5abae5999e9d3cb16f738ed1",
+      "candidateHash": "a71f53317e89e00d4d9afae947498c2ddf6997e2a14150ed82a9a2ab338ddf87",
+      "sourceEdits": [
+        {
+          "anchorLine": 0,
+          "anchorLines": [
+            "<!-- vml {\"v\":2,\"wrap\":\"left\",\"width\":0.6} -->",
+            "![[0.png]]",
+            "<!-- /vml -->"
+          ],
+          "start": 0,
+          "end": 2,
+          "replacement": []
+        },
+        {
+          "anchorLine": 12,
+          "anchorLines": [
+            "Body"
+          ],
+          "start": 0,
+          "end": 0,
+          "replacement": [
+            "Body",
+            "",
+            "<!-- vml {\"v\":2,\"width\":0.6,\"wrap\":\"right\"} -->",
+            "![[0.png]]",
+            "<!-- /vml -->"
+          ]
+        }
+      ],
+      "source": "<!-- vml {\"v\":2,\"wrap\":\"left\",\"width\":0.6} -->\n![[0.png]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"wrap\":\"left\",\"width\":0.6} -->\n![[1.png]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"wrap\":\"right\",\"width\":0.6} -->\n![[2.png]]\n<!-- /vml -->\n\nBody",
+      "candidate": "<!-- vml {\"v\":2,\"wrap\":\"left\",\"width\":0.6} -->\n![[1.png]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"wrap\":\"right\",\"width\":0.6} -->\n![[2.png]]\n<!-- /vml -->\n\nBody\n\n<!-- vml {\"v\":2,\"width\":0.6,\"wrap\":\"right\"} -->\n![[0.png]]\n<!-- /vml -->",
+      "blocks": [
+        {
+          "from": 0,
+          "to": 71,
+          "openLine": 0,
+          "width": 0.6,
+          "skip": null,
+          "wrap": "left",
+          "embeds": [
+            "![[1.png]]"
+          ]
+        },
+        {
+          "from": 73,
+          "to": 145,
+          "openLine": 4,
+          "width": 0.6,
+          "skip": null,
+          "wrap": "right",
+          "embeds": [
+            "![[2.png]]"
+          ]
+        },
+        {
+          "from": 153,
+          "to": 225,
+          "openLine": 10,
+          "width": 0.6,
+          "skip": null,
+          "wrap": "right",
+          "embeds": [
+            "![[0.png]]"
+          ]
+        }
+      ],
+      "floatCount": 3
+    }
+  ]
+}

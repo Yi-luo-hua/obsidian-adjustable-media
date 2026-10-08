@@ -140,6 +140,7 @@ class TextEditSession {
   /** The frame around the column's editor. */
   private readonly box: HTMLElement;
   private readonly editor: EditorView;
+  private readonly discardButton: HTMLButtonElement;
   // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here, but
   // for the few that act on no editor (GLOBAL_COMMANDS). The column's editor carries out Obsidian's
   // editor commands on their keys itself (columnKeys.ts).
@@ -176,6 +177,29 @@ class TextEditSession {
       text,
       caret,
       onUpdate: (update) => this.updated(update),
+    });
+    const actions = column.createDiv({ cls: "vml-text-editor__actions" });
+    const done = actions.createEl("button", { text: t("textDone"), attr: { type: "button" } });
+    this.discardButton = actions.createEl("button", { text: t("textDiscardDraft"),
+      attr: { type: "button", title: t("textDiscardDraftDesc") } });
+    this.discardButton.disabled = true;
+    // Decide what happens to the draft and IME before the buttons take input focus.
+    for (const name of ["pointerdown", "mousedown"]) actions.addEventListener(name, event => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    done.addEventListener("click", event => {
+      event.stopPropagation();
+      if (this.editor.composing || this.editor.compositionStarted) {
+        new Notice(t("textFinishComposition"));
+        this.editor.focus();
+        return;
+      }
+      this.end();
+    });
+    this.discardButton.addEventListener("click", event => {
+      event.stopPropagation();
+      if (this.invalid) this.discard();
     });
     this.scope.register([], "Escape", (event) => {
       // Esc during an input method's composition cancels the composition, and with link suggestions
@@ -351,6 +375,7 @@ class TextEditSession {
     const plan = planColumnText(this.block, this.side, text);
     this.invalid = !plan.fits;
     this.box.toggleClass("is-invalid", this.invalid);
+    this.discardButton.disabled = !this.invalid;
     if (!plan.edit) {
       return;
     }

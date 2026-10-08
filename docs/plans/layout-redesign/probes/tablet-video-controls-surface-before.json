@@ -1,0 +1,77 @@
+{
+  "result": {
+    "selection": 128,
+    "initial": 128,
+    "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet",
+    "toolbar": false,
+    "playing": false,
+    "time": 2.733333,
+    "sameVideo": true,
+    "sourceUnchanged": true,
+    "events": [
+      {
+        "name": "pointerdown",
+        "target": "VIDEO",
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet",
+        "phase": 1
+      },
+      {
+        "node": "content",
+        "name": "pointerdown",
+        "target": "VIDEO",
+        "prevented": false,
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "node": "document",
+        "name": "pointerdown",
+        "target": "VIDEO",
+        "prevented": false,
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "touchstart",
+        "target": "VIDEO",
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet",
+        "phase": 1
+      },
+      {
+        "node": "content",
+        "name": "touchstart",
+        "target": "VIDEO",
+        "prevented": false,
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "node": "document",
+        "name": "touchstart",
+        "target": "VIDEO",
+        "prevented": false,
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "node": "content",
+        "name": "touchend",
+        "target": "VIDEO",
+        "prevented": false,
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "node": "document",
+        "name": "touchend",
+        "target": "VIDEO",
+        "prevented": false,
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      }
+    ]
+  },
+  "errors": []
+}

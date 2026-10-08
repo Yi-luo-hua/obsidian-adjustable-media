@@ -1,0 +1,21 @@
+{
+  "result": {
+    "fixtureRemoved": true,
+    "userUnchanged": true,
+    "file": "01 显示与媒体.md",
+    "selection": 418,
+    "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet",
+    "toolbar": false,
+    "rect": {
+      "x": 35.20000076293945,
+      "y": 115.8125,
+      "width": 403.57501220703125,
+      "height": 576.53125,
+      "top": 115.8125,
+      "right": 438.7750129699707,
+      "bottom": 692.34375,
+      "left": 35.20000076293945
+    }
+  },
+  "errors": []
+}

@@ -1,0 +1,31 @@
+(async()=>{
+  if(app.vault.getName()!=='adjustable-media-tablet-test')throw new Error('Dedicated tablet vault required');
+  const helper=app.plugins.plugins['mobile-acceptance'],leaf=app.workspace.activeLeaf,wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const original=Object.fromEntries(await Promise.all(app.vault.getMarkdownFiles().map(async f=>[f.path,await app.vault.read(f)])));
+  window.__tabletOriginals=original;
+  const result={at:new Date().toISOString(),build:JSON.parse(await app.vault.adapter.read('build-info.json')),userAgent:navigator.userAgent,samples:[],checks:[]};
+  for(const file of ['01 显示与媒体.md','05 窄屏与宽表格.md'])for(const mode of ['preview','source']){
+    await leaf.setViewState({type:'empty'});await leaf.openFile(app.vault.getAbstractFileByPath(file),{state:{mode,source:false},active:true});await wait(900);
+    const v=leaf.view,cm=v.editor.cm;
+    if(mode==='source'){cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.scrollDOM.scrollTop=0;}else{v.previewMode.containerEl.scrollTop=0;v.previewMode.renderer.containerEl?.scrollTo(0,0);}
+    await wait(300);
+    const container=mode==='source'?cm.dom:v.previewMode.containerEl;
+    result.samples.push({...await helper.capture(false),tables:[...container.querySelectorAll('.vml-layout table')].map(el=>({width:el.getBoundingClientRect().width,cells:el.querySelectorAll('th').length,parent:el.parentElement.className,parentWidth:el.parentElement.clientWidth,parentScroll:el.parentElement.scrollWidth})),codes:[...container.querySelectorAll('.vml-layout pre')].map(el=>({width:el.clientWidth,scroll:el.scrollWidth})),text:[...container.querySelectorAll('.vml-layout__text')].map(el=>({width:el.clientWidth,scroll:el.scrollWidth,columns:getComputedStyle(el).columnCount}))});
+  }
+  const cache=app.metadataCache,compute=cache.computeMetadataAsync;
+  if(typeof compute==='function'){const parsed=await compute.call(cache,new TextEncoder().encode('Exact tablet buffer\n\n<!-- vml -->\n![[attachments/square.png]]\n<!-- /vml -->').buffer);result.worker=!!parsed?.sections;}
+  try{
+    for(const scenario of ['missing','rejected']){
+      cache.computeMetadataAsync=scenario==='missing'?undefined:()=>Promise.reject(new Error('Tablet worker fallback probe'));
+      await leaf.setViewState({type:'empty'});await leaf.openFile(app.vault.getAbstractFileByPath('01 显示与媒体.md'),{state:{mode:'source'},active:true});await wait(650);
+      const cm=leaf.view.editor.cm;cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.scrollDOM.scrollTop=0;await wait(250);
+      result.samples.push({scenario,...await helper.capture(false)});
+    }
+  }finally{cache.computeMetadataAsync=compute;}
+  await leaf.setViewState({type:'empty'});await leaf.openFile(app.vault.getAbstractFileByPath('02 长浮动.md'),{state:{mode:'source'},active:true});await wait(900);
+  const cm=leaf.view.editor.cm,pos=cm.state.doc.toString().indexOf('正文 20：');cm.dispatch({selection:{anchor:pos},effects:cm.constructor.scrollIntoView(pos,{y:'center'})});await wait(350);
+  result.samples.push({scenario:'long float middle',...await helper.capture(false)});result.proxies=cm.dom.querySelectorAll('.vml-wrap-proxy').length;
+  result.originalsUnchanged=(await Promise.all(Object.entries(original).map(async([p,text])=>(await app.vault.read(app.vault.getAbstractFileByPath(p)))===text))).every(Boolean);
+  result.checks=[{name:'native bundle and helper loaded',passed:!!app.plugins.plugins['adjustable-media']&&!!helper},{name:'native Worker accepts exact buffer',passed:result.worker===true},{name:'positive rendered geometry',passed:result.samples.every(s=>s.layouts.some(l=>l.rect.width>0&&l.rect.height>0))},{name:'read-only source preserved',passed:result.originalsUnchanged},{name:'long float middle has stand-in',passed:result.proxies>0},{name:'wide content confined to pane',passed:result.samples.filter(s=>s.file==='05 窄屏与宽表格.md').every(s=>s.pane.overflow<=2&&s.text.every(t=>t.scroll-t.width<=2))}];
+  result.passed=result.checks.every(c=>c.passed);window.__tabletBaseline=result;return result;
+})();

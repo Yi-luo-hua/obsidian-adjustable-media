@@ -1,0 +1,152 @@
+{
+  "result": {
+    "at": "2026-10-08T10:57:50.994Z",
+    "saved": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试组字中\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "buffer": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试组字中\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "events": [
+      {
+        "name": "input",
+        "data": "组字中",
+        "trusted": true,
+        "at": 1127617.3999999762,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+        "target": "只在这栏末尾输入“手机中文测试”。手机中文测试组字中"
+      },
+      {
+        "name": "focusout",
+        "trusted": true,
+        "at": 1132819.300000012,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试组字中\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+        "target": "只在这栏末尾输入“手机中文测试”。手机中文测试组字中"
+      }
+    ],
+    "initial": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "editorStillOpen": false,
+    "helperEvents": [
+      {
+        "name": "pointerdown",
+        "at": 1791456511366,
+        "trusted": true,
+        "pointerType": "touch",
+        "visibility": "visible",
+        "file": "03 文字输入.md"
+      },
+      {
+        "name": "pointerup",
+        "at": 1791456511404,
+        "trusted": true,
+        "pointerType": "touch",
+        "visibility": "visible",
+        "file": "03 文字输入.md"
+      },
+      {
+        "name": "pointerdown",
+        "at": 1791456538779,
+        "trusted": true,
+        "pointerType": "touch",
+        "visibility": "visible",
+        "file": "03 文字输入.md"
+      },
+      {
+        "name": "pointerup",
+        "at": 1791456538834,
+        "trusted": true,
+        "pointerType": "touch",
+        "visibility": "visible",
+        "file": "03 文字输入.md"
+      },
+      {
+        "name": "pointerdown",
+        "at": 1791456713938,
+        "trusted": true,
+        "pointerType": "touch",
+        "visibility": "visible",
+        "file": "03 文字输入.md"
+      },
+      {
+        "name": "pointerup",
+        "at": 1791456714020,
+        "trusted": true,
+        "pointerType": "touch",
+        "visibility": "visible",
+        "file": "03 文字输入.md"
+      },
+      {
+        "name": "pointerdown",
+        "at": 1791456979019,
+        "trusted": true,
+        "pointerType": "touch",
+        "visibility": "visible",
+        "file": "03 文字输入.md"
+      },
+      {
+        "name": "pointerup",
+        "at": 1791456979060,
+        "trusted": true,
+        "pointerType": "touch",
+        "visibility": "visible",
+        "file": "03 文字输入.md"
+      }
+    ],
+    "sample": {
+      "at": "2026-10-08T10:57:50.994Z",
+      "file": "03 文字输入.md",
+      "mode": "source",
+      "viewport": {
+        "width": 363,
+        "height": 823,
+        "ratio": 3.375,
+        "visual": {
+          "width": 363.2592468261719,
+          "height": 823.111083984375,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 24,
+            "y": 231.86111450195312,
+            "width": 310.5185241699219,
+            "height": 214.9629669189453
+          },
+          "block": "block:668",
+          "editing": false,
+          "overflow": 0,
+          "media": [
+            {
+              "type": "IMG",
+              "rect": {
+                "x": 121.75,
+                "y": 243.34259033203125,
+                "width": 115.01851654052734,
+                "height": 115.01851654052734
+              },
+              "width": 1000,
+              "height": 1000,
+              "ready": true
+            }
+          ]
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 128,
+          "head": 128
+        }
+      ],
+      "formulaCount": 0
+    }
+  },
+  "errors": []
+}

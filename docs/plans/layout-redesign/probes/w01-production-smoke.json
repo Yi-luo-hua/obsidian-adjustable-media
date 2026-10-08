@@ -1,0 +1,42 @@
+{
+  "buildHash": "b06981d9c95f07c8d4e014b6f4ceac8f402f1e87a616d87b42c399e7cd0153fc",
+  "repositoryHash": "b06981d9c95f07c8d4e014b6f4ceac8f402f1e87a616d87b42c399e7cd0153fc",
+  "samples": [
+    {
+      "mode": "source",
+      "layoutSizes": [
+        {
+          "width": 398.3593444824219,
+          "height": 5780.5380859375
+        }
+      ],
+      "diagnosticSizes": [
+        {
+          "width": 398.3593444824219,
+          "height": 5780.5380859375
+        }
+      ],
+      "geometryMatches": true,
+      "standIns": 1
+    },
+    {
+      "mode": "preview",
+      "layoutSizes": [
+        {
+          "width": 398.3593444824219,
+          "height": 5780.5380859375
+        }
+      ],
+      "diagnosticSizes": [
+        {
+          "width": 398.3593444824219,
+          "height": 5780.5380859375
+        }
+      ],
+      "geometryMatches": true,
+      "standIns": 61
+    }
+  ],
+  "passed": true,
+  "originalNotesUnchanged": true
+}

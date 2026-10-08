@@ -1,0 +1,28 @@
+(async()=>{
+ const kind='near-text',g=window.__tabletCorner,leaf=app.workspace.activeLeaf;
+ if(!g||leaf.view.file?.path!==g.file)throw new Error('Isolated corner fixture required');
+ document.querySelector('.vml-text-editor__actions button')?.click();
+ await new Promise(r=>setTimeout(r,300));
+ const v=leaf.view,cm=v.editor.cm,source=cm.state.doc.toString();
+ cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.scrollDOM.scrollTop=0;
+ await new Promise(r=>setTimeout(r,250));
+ const roots=[...cm.dom.querySelectorAll('.vml-layout')],handle=roots[0].querySelector('.vml-frame__handle--corner'),b=handle.getBoundingClientRect(),text=roots[1].querySelector('.vml-layout__text').getBoundingClientRect(),frame=handle.parentElement.getBoundingClientRect();
+ const points=[[b.x+b.width/2,b.top+3],[b.x+b.width/2,b.bottom-3],[b.left+3,b.y+b.height/2],[b.right-3,b.y+b.height/2]].map(([x,y])=>({x,y,onHandle:document.elementFromPoint(x,y)?.closest('.vml-frame__handle--corner')===handle}));
+ let x=Math.min(frame.right-16,text.right-8),y=text.top+3,dx=0,dy=0;
+ if(kind==='normal-text'){x=text.left+30;y=text.top+12;}
+ if(kind.startsWith('corner')){x=b.x+b.width/2;y=b.y+b.height/2;}
+ if(kind==='corner-drag'||kind==='corner-cancel'){dx=-40;dy=-24;}
+ const target=document.elementFromPoint(x,y);
+ if(kind.startsWith('corner')&&!target?.closest('.vml-frame__handle--corner'))throw new Error('Corner is not the touch target');
+ if(kind==='near-text'&&!target?.closest('.vml-layout__text'))throw new Error('Expected nearby text hit');
+ const events=[],stops=[];g.stops?.forEach(stop=>stop());
+ for(const name of ['pointerdown','pointerup','pointercancel','click','touchstart','touchend','focusin']){
+  const fn=e=>events.push({type:name,trusted:e.isTrusted,target:e.target?.getAttribute?.('class'),editing:!!document.querySelector('.vml-text-editor'),sourceLines:cm.dom.querySelectorAll('.vml-source-line').length});
+  document.addEventListener(name,fn,true);stops.push(()=>document.removeEventListener(name,fn,true));
+ }
+ const actions=[{method:'Input.dispatchTouchEvent',params:{type:'touchStart',touchPoints:[{x,y}]}}];
+ if(dx)for(let i=1;i<=8;i++)actions.push({method:'Input.dispatchTouchEvent',params:{type:'touchMove',touchPoints:[{x:x+dx*i/8,y:y+dy*i/8}]}},{method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,12))',awaitPromise:true}});
+ actions.push({method:'Input.dispatchTouchEvent',params:{type:kind==='corner-cancel'?'touchCancel':'touchEnd',touchPoints:[]}},{method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,700))',awaitPromise:true}});
+ Object.assign(g,{kind,before:source,events,stops,corner:b.toJSON(),frame:frame.toJSON(),points,x,y,hit:target?.getAttribute('class')});
+ return {kind,x,y,hit:g.hit,corner:g.corner,points,actions};
+})()

@@ -4,18 +4,20 @@ import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } fr
 
 import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable } from "../layout/edits.ts";
+import { blockIdentity } from "../layout/blockIdentity.ts";
+import { cursorBlocks } from "../layout/cursorHighlight.ts";
 import { documentSnapshot, editorDocumentOrigin, rememberDocumentSnapshot, snapshotForState, type BlockRef, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { changesMayAdd } from "../layout/changeScan.ts";
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
-import { modelFromBlock } from "../layout/model.ts";
+import { modelFromBlock, onlySizingDiffers } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
 import { hostParagraphBreaks, paragraphBreaks, type MarkdownSection, type ParagraphBreak } from "../markdown/paragraphBreaks.ts";
 import { ParagraphParser } from "../markdown/paragraphParser.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
-import { attachInteractions, type LayoutContext } from "./interactions.ts";
-import { layoutIsRendered, renderLayout } from "./layoutView.ts";
+import { attachInteractions, refreshSizingHandles, type LayoutContext } from "./interactions.ts";
+import { applySizing, layoutIsRendered, renderLayout } from "./layoutView.ts";
 import { layoutHistory } from "./layoutHistory.ts";
 import { blockWarning, t } from "./messages.ts";
 import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
@@ -32,6 +34,37 @@ export const setParagraphSections = StateEffect.define<{ snapshot: DocumentSnaps
 const PENDING_ENVIRONMENT = "pending";
 /** How every layout block opens; a note without it has no layouts. */
 const OPENING = "<!-- vml";
+
+interface HighlightState { cursorOnly: boolean; focused: boolean; columnId: string | null }
+export const setLayoutHighlight = StateEffect.define<HighlightState>();
+const highlightField = StateField.define<HighlightState>({
+  create: () => ({ cursorOnly: false, focused: false, columnId: null }),
+  update(value, tr) {
+    for (const effect of tr.effects) if (effect.is(setLayoutHighlight)) return effect.value;
+    return value;
+  },
+  provide: self => EditorView.editorAttributes.from(self, (value): Record<string, string> => value.cursorOnly ? { class: "vml-cursor-highlights" } : {}),
+});
+const highlightRefreshers = new Set<() => void>();
+const widgetHighlighters = new WeakMap<EditorView, (el: HTMLElement) => void>();
+const projectionMeasures = new WeakMap<EditorView, () => void>();
+
+/** Update open panes without rebuilding their widgets or interrupting column composition. */
+export function refreshLayoutHighlights(): void { for (const refresh of highlightRefreshers) refresh(); }
+
+function markHighlightWidget(el: HTMLElement, view: EditorView, block: V2Block): void {
+  const id = blockIdentity(block);
+  if (id !== undefined) el.dataset.vmlBlockId = id;
+  widgetHighlighters.get(view)?.(el);
+}
+
+function highlightedBlocks(state: EditorState, placedCursor: boolean): Set<string> {
+  const highlight = state.field(highlightField);
+  const snapshot = snapshotForState(state);
+  return cursorBlocks(snapshot?.blocks.map(ref => ({ id: ref.id,
+    from: state.doc.line(ref.block.openLine + 1).from, to: state.doc.line(ref.block.closeLine + 1).to })) ?? [],
+  state.selection.ranges, placedCursor, highlight.focused, highlight.columnId);
+}
 
 interface Measurements {
   heights: PaneMeasurements<number>;
@@ -81,7 +114,7 @@ interface Parsed extends Measurements {
  * the layouts can then be dragged into them, and show a grab cursor. One showing a note with
  * wrapped layouts gets `vml-has-wraps`, which lets the note's lines wrap around them.
  */
-export function livePreviewExtension(app: App): Extension {
+export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolean = () => true): Extension {
   const field = StateField.define<LivePreviewState>({
     create: (state) => withDecorations(app, state, parse(app, state), false),
     update(value, tr) {
@@ -119,7 +152,7 @@ export function livePreviewExtension(app: App): Extension {
         return withDecorations(app, tr.state, { ...value, ...measurements,
           breaks: hostParagraphBreaks(value.lines, breakBlocks(value.blocks), paragraphs.value.sections) }, placedCursor);
       }
-      if (tr.selection || environment || placedCursor !== value.placedCursor) {
+      if (tr.selection || environment || placedCursor !== value.placedCursor || tr.effects.some(effect => effect.is(setLayoutHighlight))) {
         return withDecorations(app, tr.state, { ...value, ...measurements }, placedCursor);
       }
       rememberDocumentSnapshot(tr.state, value.snapshot);
@@ -133,22 +166,87 @@ export function livePreviewExtension(app: App): Extension {
       }),
     ],
   });
+  const standInPlace = (view: EditorView, anchor: WrapAnchor, path: string): string => {
+    const pane = view.state.field(field);
+    return `${path}\n${pane.heights.key(anchor.id ?? anchor.key, 0, `${anchor.numbers}\n${anchor.skip}`, "proxy")}`;
+  };
   return [
+    highlightField,
     layoutHistory(),
     Prec.high(field),
+    ViewPlugin.define(view => {
+      let destroyed = false;
+      let queued = false;
+      const paint = (el: HTMLElement, active = highlightedBlocks(view.state, view.state.field(field).placedCursor)): void => {
+        el.toggleClass("vml-cursor-in-block", active.has(el.dataset.vmlBlockId ?? ""));
+      };
+      widgetHighlighters.set(view, paint);
+      const refresh = (): void => {
+        if (queued || destroyed) return;
+        queued = true;
+        queueMicrotask(() => {
+          queued = false;
+          if (destroyed) return;
+          const doc = view.dom.doc;
+          const focused = doc.hasFocus() && view.dom.contains(doc.activeElement)
+            && app.workspace.activeEditor?.editor === view.state.field(editorInfoField, false)?.editor;
+          const column = focused ? doc.activeElement?.closest<HTMLElement>(".vml-text-editor") : null;
+          const columnId = column?.closest<HTMLElement>("[data-vml-block-id]")?.dataset.vmlBlockId ?? null;
+          const next = { cursorOnly: !keepLayoutHighlight(), focused, columnId };
+          const current = view.state.field(highlightField);
+          if (current.cursorOnly !== next.cursorOnly || current.focused !== focused || current.columnId !== columnId) {
+            view.dispatch({ effects: setLayoutHighlight.of(next) });
+          }
+          const active = highlightedBlocks(view.state, view.state.field(field).placedCursor);
+          for (const el of Array.from(view.dom.querySelectorAll<HTMLElement>("[data-vml-block-id]"))) paint(el, active);
+        });
+      };
+      highlightRefreshers.add(refresh);
+      view.dom.doc.addEventListener("focusin", refresh);
+      view.dom.doc.addEventListener("focusout", refresh);
+      view.dom.win.addEventListener("focus", refresh);
+      view.dom.win.addEventListener("blur", refresh);
+      const leafChange = app.workspace.on("active-leaf-change", refresh);
+      refresh();
+      return { update: refresh, destroy() {
+        destroyed = true;
+        highlightRefreshers.delete(refresh);
+        widgetHighlighters.delete(view);
+        view.dom.doc.removeEventListener("focusin", refresh);
+        view.dom.doc.removeEventListener("focusout", refresh);
+        view.dom.win.removeEventListener("focus", refresh);
+        view.dom.win.removeEventListener("blur", refresh);
+        app.workspace.offref(leafChange);
+      } };
+    }),
     wrapGuard({
       anchors: (state) => state.field(field, false)?.anchors ?? [],
       hasWraps: (state) => state.field(field, false)?.hasWraps ?? false,
       environmentEpoch: (state) => state.field(field, false)?.environmentEpoch ?? 0,
       drawStandIn: (el, view, anchor, sourcePath) => {
         drawWidget(el, view, app, anchor.block, sourcePath, currentRefs(view), null, undefined, anchor.from);
+        sizingPlaces.set(el, standInPlace(view, anchor, sourcePath));
+      },
+      drawMeasurement: (el, view, anchor, sourcePath) => {
+        const component = new Component(); component.load(); components.set(el, component);
+        renderLayout(el, { app, sourcePath, model: modelFromBlock(anchor.block), effectiveSkip: anchor.skip,
+          editable: false, warning: null, component, refs: currentRefs(view) });
       },
       keepStandIn: (el, block) => keepWhileEditing(el, block),
+      resizeStandIn: (el, anchor, path) => {
+        const host = widgetHosts.get(el);
+        if (!host || sizingPlaces.get(el) !== standInPlace(host.view, anchor, path) || !updateSizingWidget(el, anchor.block)) return false;
+        host.context.position = () => anchor.from;
+        return true;
+      },
       releaseStandIn: (el) => {
         stopTextEdit(el);
         components.get(el)?.unload();
         components.delete(el);
+        widgetHosts.delete(el);
+        sizingPlaces.delete(el);
       },
+      measurementsChanged: view => projectionMeasures.get(view)?.(),
     }),
     ViewPlugin.define(view => {
       const projection = new ViewProjection();
@@ -165,7 +263,7 @@ export function livePreviewExtension(app: App): Extension {
       let epoch = -1;
       const measure = (): void => {
         const value = view.state.field(field);
-        if (!value.snapshot) return;
+        if (!value.snapshot) { projection.clear(); return; }
         projection.request(value.snapshot);
         projection.observeHost(view.state.doc.toString());
         if (epoch !== value.environmentEpoch) { epoch = value.environmentEpoch; projection.environmentChanged(); }
@@ -179,22 +277,26 @@ export function livePreviewExtension(app: App): Extension {
             && Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".vml-layout")).every(layoutIsRendered);
           return { coverage, measured: ready && view.contentDOM.clientWidth > 0 && view.contentDOM.doc.fonts.status === "loaded" };
         }, write: result => {
-          if (result && projection.installed(token, result.coverage) && result.measured && wrapMeasurementsReady(view)) projection.measured(token, result.coverage);
+          if (!result || !projection.installed(token, result.coverage)) return;
+          if (result.measured && wrapMeasurementsReady(view)) projection.measured(token, result.coverage);
+          else projection.measurementPending(token);
         } });
       };
+      projectionMeasures.set(view, measure);
       const stop = watchEnvironment(view.contentDOM, spec => {
         const current = view.state.field(field).environmentSpec;
         if (destroyed || spec === current) return;
         // Wrap gaps measured before the first reading belong to this same environment.
         const effects = current === PENDING_ENVIRONMENT ? [setEnvironment.of(spec)] : [setEnvironment.of(spec), resetWrapGaps.of(null)];
         queueMicrotask(() => { if (!destroyed) view.dispatch({ effects }); });
-      }, () => { refreshWrapMedia(view); measure(); });
+      }, () => { refreshWrapMedia(view); measure(); }, () => { refreshWrapMedia(view); measure(); });
       measure();
       parseParagraphs();
       return { update(update) {
-        if (update.startState.field(field).snapshot !== update.state.field(field).snapshot) parseParagraphs();
-        if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure();
-      }, destroy() { destroyed = true; paragraphs.dispose(); stop(); projection.dispose(); } };
+        const sourceChanged = update.startState.field(field).snapshot !== update.state.field(field).snapshot;
+        if (sourceChanged) parseParagraphs();
+        if (sourceChanged || update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure();
+      }, destroy() { destroyed = true; projectionMeasures.delete(view); paragraphs.dispose(); stop(); projection.dispose(); } };
     }),
   ];
 }
@@ -240,6 +342,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
+  const active = state.field(highlightField).cursorOnly ? highlightedBlocks(state, placedCursor) : new Set<string>();
   // A cursor nobody put at the start of the note touches nothing there.
   const touches = (range: SelectionRange, from: number, to: number): boolean => range.from <= to && range.to >= from
     && (placedCursor || !range.empty || range.head > 0);
@@ -272,7 +375,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     }
     // The source shows, with the media Obsidian draws in it as thumbnails.
     for (let line = block.openLine; line <= block.closeLine; line += 1) {
-      ranges.push(Decoration.line({ class: "vml-source-line" }).range(state.doc.line(line + 1).from));
+      ranges.push(Decoration.line({ class: active.has(ref.id) ? "vml-source-line vml-source-line--active" : "vml-source-line" }).range(state.doc.line(line + 1).from));
     }
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
@@ -340,6 +443,21 @@ function applyBlankEdges(el: HTMLElement, edges: BlankEdges): void {
 
 /** What each widget element was drawn for, apart from the blank lines around it. */
 const drawnFor = new WeakMap<HTMLElement, string>();
+const sizingPlaces = new WeakMap<HTMLElement, string>();
+const widgetHosts = new WeakMap<HTMLElement, TextEditHost>();
+
+/** Keep media connected and their playback intact when only the layout's sizing changes. */
+function updateSizingWidget(el: HTMLElement, block: V2Block): boolean {
+  const host = widgetHosts.get(el);
+  if (!host || isEditingText(el) || !isEditable(block) || !isEditable(host.context.block)) return false;
+  const next = modelFromBlock(block);
+  if (!onlySizingDiffers(host.context.model, next)) return false;
+  host.context.block = block;
+  host.context.model = next;
+  applySizing(host.root, next);
+  refreshSizingHandles(host.root, host.context);
+  return true;
+}
 
 /**
  * The heights layouts were drawn at, by runtime instance and content revision, for
@@ -431,7 +549,9 @@ class LayoutWidget extends WidgetType {
       this.watch(el, view);
     }
     applyBlankEdges(el, this.edges);
+    markHighlightWidget(el, view, this.block);
     drawnFor.set(el, this.drawnKey);
+    sizingPlaces.set(el, `${this.sourcePath}\n${this.placeKey}`);
     return el;
   }
 
@@ -439,8 +559,15 @@ class LayoutWidget extends WidgetType {
   // its height goes on under the new text. A blank line typed or removed beside it changes only its
   // spacing.
   override updateDOM(dom: HTMLElement, view: EditorView): boolean {
+    markHighlightWidget(dom, view, this.block);
     if (drawnFor.get(dom) === this.drawnKey) {
       applyBlankEdges(dom, this.edges);
+      return true;
+    }
+    if (!this.sourcePreview && sizingPlaces.get(dom) === `${this.sourcePath}\n${this.placeKey}` && updateSizingWidget(dom, this.block)) {
+      applyBlankEdges(dom, this.edges);
+      drawnFor.set(dom, this.drawnKey);
+      this.watch(dom, view);
       return true;
     }
     if (this.sourcePreview || !keepWhileEditing(dom, this.block)) {
@@ -458,6 +585,8 @@ class LayoutWidget extends WidgetType {
     stopTextEdit(dom);
     components.get(dom)?.unload();
     components.delete(dom);
+    widgetHosts.delete(dom);
+    sizingPlaces.delete(dom);
   }
 
   override ignoreEvent(): boolean {
@@ -501,6 +630,7 @@ function drawWidget(
   component.load();
   components.set(el, component);
   const root = renderLayout(el, { app, sourcePath, model, effectiveSkip, editable: isEditable(block), warning: blockWarning(block), component, refs });
+  markHighlightWidget(el, view, block);
   // Resolved when asked: the block may have moved since the widget was drawn.
   const position = (): number => standIn ?? view.posAtDOM(el);
   const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor, position };
@@ -518,30 +648,34 @@ function drawWidget(
   if (isEditable(block)) {
     context.editText = (editing) => startTextEdit(host, editing, null);
   }
+  context.editSource = () => {
+    view.dispatch({ selection: { anchor: context.position!() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
+    view.focus();
+  };
   attachInteractions(root, context);
   if (isEditable(block)) {
     setUpBlockMove(root, context);
   }
-  setUpText(view, host);
+  setUpText(host);
 
   // On the media, where it hides none of the text beside them.
   const buttonHost = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
   const button = buttonHost.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
   button.addEventListener("click", (event) => {
     event.preventDefault();
-    // A stand-in's block lies above what is drawn.
-    view.dispatch({ selection: { anchor: position() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
-    view.focus();
+    event.stopPropagation();
+    context.editSource!();
   });
+  widgetHosts.set(el, host);
   return host;
 }
 
 /**
- * A click on the text beside a layout's media types it right in the layout (textEditing.ts); in a
- * block the plugin cannot write to, it shows the block's source there instead. Links in the text are
+ * A click on editable text beside a layout's media types it right in the layout (textEditing.ts).
+ * Read-only columns stay selectable; source editing is an explicit menu action. Links in the text are
  * Obsidian's and open as anywhere else, and selecting some of the text to copy it changes nothing.
  */
-function setUpText(view: EditorView, host: TextEditHost): void {
+function setUpText(host: TextEditHost): void {
   const { block } = host.context;
   for (const textEl of Array.from(host.root.querySelectorAll<HTMLElement>(":scope > .vml-layout__text"))) {
     const side: TextSide = textEl.dataset.side === "left" ? "left" : "right";
@@ -556,13 +690,6 @@ function setUpText(view: EditorView, host: TextEditHost): void {
       if (isEditable(block)) {
         startTextEdit(host, side, { x: event.clientX, y: event.clientY });
         return;
-      }
-      const text = side === "left" ? block.leftText : block.rightText;
-      if (text) {
-        const { doc } = view.state;
-        const open = doc.lineAt(host.context.position?.() ?? view.posAtDOM(host.el)).number;
-        view.dispatch({ selection: { anchor: doc.line(Math.min(doc.lines, open + text.to - block.openLine)).to }, scrollIntoView: host.el.closest(".vml-wrap-proxy") !== null });
-        view.focus();
       }
     });
   }
@@ -590,20 +717,21 @@ class RevealedWrapWidget extends WidgetType {
     this.effectiveSkip = effectiveSkip;
     // New numbers draw the layout again.
     const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
-    this.key = `${sourcePath}\n${effectiveSkip}\n${numbers}\n${block.lines.join("\n")}`;
+    this.key = `${blockIdentity(block)}\n${sourcePath}\n${effectiveSkip}\n${numbers}\n${block.lines.join("\n")}`;
   }
 
   override eq(other: RevealedWrapWidget): boolean {
     return other.key === this.key;
   }
 
-  toDOM(): HTMLElement {
+  toDOM(view: EditorView): HTMLElement {
     const el = createSpan({ cls: "vml-wrap-reveal vml-live-preview vml-live-preview--wrap" });
     const component = new Component();
     component.load();
     components.set(el, component);
     renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block),
       effectiveSkip: this.effectiveSkip, editable: false, warning: null, component, refs: this.refs });
+    markHighlightWidget(el, view, this.block);
     return el;
   }
 

@@ -1,0 +1,15 @@
+(async()=>{
+  if(app.vault.getName()!=='vml-test-vault')throw new Error('Test vault required');
+  const fs=require('fs'),remote=require('@electron/remote'),root='E:/TOOLS/obsidian-adjustable-media/';
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  app.setting.open();app.setting.openTabById('adjustable-media');await wait(180);
+  const tab=app.setting.pluginTabs.find(t=>t.id==='adjustable-media');
+  const row=[...tab.containerEl.querySelectorAll('.setting-item')].find(el=>el.querySelector('.setting-item-name')?.textContent==='保持布局块边框高亮');
+  const result={name:row?.querySelector('.setting-item-name')?.textContent,description:row?.querySelector('.setting-item-description')?.textContent,value:tab.getControlValue('keepLayoutHighlight'),toggleEnabled:row?.querySelector('.checkbox-container')?.hasClass('is-enabled')};
+  result.passed=result.name==='保持布局块边框高亮'&&result.value===true&&result.toggleEnabled===true;
+  const windows=remote.BrowserWindow.getAllWindows().filter(w=>w.getTitle().includes('vml-test-vault'));
+  result.windows=windows.map(w=>({id:w.id,title:w.getTitle(),url:w.webContents.getURL()}));
+  const settingsWindow=windows.find(w=>w.webContents.getURL()==='about:blank');
+  if(settingsWindow){settingsWindow.webContents.setBackgroundThrottling(false);await wait(150);await settingsWindow.webContents.capturePage();await wait(80);fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w08-settings-ui.png',(await settingsWindow.webContents.capturePage()).toPNG());result.screenshotWindow=settingsWindow.getTitle();}
+  app.setting.close();fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w08-settings-ui.json',JSON.stringify(result,null,2));window.w08SettingsUiResult=result;
+})();

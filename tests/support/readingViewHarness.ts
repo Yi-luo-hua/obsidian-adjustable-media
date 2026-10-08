@@ -33,10 +33,10 @@ class FileStub { path = "note.md"; }
 class ViewStub {}
 
 /** Run the actual adapter; mock only Obsidian and DOM integrations, not source/queue logic. */
-export async function readingViewHarness(initialText: string, startup = true) {
+export async function readingViewHarness(initialText: string, startup = true, initialDiskText = initialText) {
   const file = new FileStub();
   let hostText = initialText;
-  let diskText = initialText;
+  let diskText = initialDiskText;
   let rerenders = 0;
   const renders: string[] = [];
   const renderedRows: Array<Array<number | null>> = [];
@@ -104,7 +104,7 @@ export async function readingViewHarness(initialText: string, startup = true) {
     "./noteText.ts": { sectionNoteText: (_app: unknown, _ctx: unknown, info: { text: string }) => info.text },
     "./obsidianInternals.ts": { readingViewOfSection: () => reader,
       readingSectionsOfView() { counts.sectionLookups++; return { sections, sizer: container }; } },
-    "./readingWrap.ts": { keepWrapped: () => () => {}, keepWrapsBeside() {}, refreshReadingWrap() {}, refreshReadingMedia() {} },
+    "./readingWrap.ts": { keepWrapped: () => () => {}, keepWrapsBeside() {}, refreshReadingWrap() {}, refreshReadingMedia() {}, readingMeasurementsReady: () => true, resetReadingMeasurements() {} },
     "./printView.ts": { renderPrintLayouts() {} },
     "./viewEnvironment.ts": { watchEnvironment: () => { counts.environments++; return () => {}; } },
   };
@@ -117,6 +117,12 @@ export async function readingViewHarness(initialText: string, startup = true) {
     renders,
     renderedRows,
     counts,
+    fileOpened() { listeners.get("file-open")!(); },
+    openFile(text: string) {
+      reader.file = new FileStub(); sourceView.file = reader.file;
+      hostText = text; diskText = text;
+      listeners.get("file-open")!();
+    },
     scroll() { scroll(); },
     frame() { const callbacks = [...frames.values()]; frames.clear(); for (const callback of callbacks) callback(); },
     setHost(text: string) { hostText = text; for (const info of infos.values()) info.text = text; },

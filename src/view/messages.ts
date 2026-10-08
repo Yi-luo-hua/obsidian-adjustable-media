@@ -208,6 +208,16 @@ const MESSAGES = {
     zh: "文字底端对齐",
     en: "Text at the bottom",
   },
+  textDone: { zh: "完成", en: "Done" },
+  textDiscardDraft: { zh: "放弃草稿", en: "Discard draft" },
+  textDiscardDraftDesc: {
+    zh: "仅放弃未保存的无效草稿；已写入的内容可通过撤销恢复。",
+    en: "Discard only the unsaved invalid draft. Use undo to restore text already saved.",
+  },
+  textFinishComposition: {
+    zh: "请先选定或取消输入法候选词，再完成编辑。",
+    en: "Confirm or cancel the input method candidate before finishing editing.",
+  },
   textUnsavedEsc: {
     zh: "这段文字还不能写回笔记（框是红的）。改好它，或者再按一次 Esc 放弃这些修改。",
     en: "This text cannot go into the note yet (the frame is red). Fix it, or press Esc again to give up these changes.",
@@ -344,6 +354,14 @@ const MESSAGES = {
   settingRefLanguage: {
     zh: "图表编号的语言",
     en: "Language of figure and table numbers",
+  },
+  settingCursorHighlight: {
+    zh: "保持布局块边框高亮",
+    en: "Keep layout borders highlighted",
+  },
+  settingCursorHighlightDesc: {
+    zh: "默认开启，保持实时预览中的布局块边框高亮。关闭后，仅在编辑光标进入布局块源码或内部文字栏时高亮，离开后隐藏。悬停仍可使用缩放手柄；不改变布局大小或笔记内容。",
+    en: "On by default: keep layout borders highlighted in live preview. When off, highlight only while the editing caret is in a layout's source or text column. Resize handles remain available on hover. Layout size and note content stay unchanged.",
   },
   settingRefLanguageDesc: {
     zh: "图注、表注和引用（@fig:名字、@tbl:名字、@eq:名字）显示成“图 1”还是“Figure 1”。改动后重新打开笔记生效。",

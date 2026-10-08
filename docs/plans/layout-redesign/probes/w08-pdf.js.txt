@@ -1,0 +1,46 @@
+(async()=>{
+  if(app.vault.getName()!=='vml-test-vault')throw new Error('Test vault required');
+  const fs=require('fs'),crypto=require('crypto'),base=app.vault.adapter.getBasePath(),root='E:/TOOLS/obsidian-adjustable-media/';
+  const hash=value=>crypto.createHash('sha256').update(value).digest('hex'),wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const original=Object.fromEntries(app.vault.getMarkdownFiles().map(f=>[f.path,hash(fs.readFileSync(base+'/'+f.path))]));
+  const plugin=app.plugins.plugins['adjustable-media'],saved={...plugin.settings},dataPath=base+'/.obsidian/plugins/adjustable-media/data.json',data=fs.readFileSync(dataPath);
+  const configPath=base+'/.obsidian/app.json',configBytes=fs.existsSync(configPath)?fs.readFileSync(configPath):null,config=structuredClone(app.vault.getConfig('pdfExportSettings'));
+  const path='W08 PDF transient.md';if(app.vault.getAbstractFileByPath(path))throw new Error('Probe file exists');
+  const source='# Highlight export\n\n<!-- vml {"v":2,"rows":[{"width":0.25}]} -->\n![[attachments/square-1x1.png]]\n<!-- /vml -->\n\n<!-- vml {"v":2,"type":"text","wrap":"right","width":0.4} -->\nA side note with ordinary text.\n<!-- /vml -->\n'+Array.from({length:16},(_,i)=>'Paragraph '+i+'. '+ 'The border setting should not change exported layout or content. '.repeat(5)+'\n\n').join('');
+  const file=await app.vault.create(path,source),previous=app.workspace.activeLeaf,leaf=app.workspace.getLeaf(true),children=[];
+  const dialog=require('electron').remote.dialog,save=dialog.showSaveDialog,open=window.open;
+  const output=root+'dist/w08-pdf/';fs.mkdirSync(output,{recursive:true});let destination,sent;
+  const result={buildHash:hash(fs.readFileSync(base+'/.obsidian/plugins/adjustable-media/main.js')),exports:[]};
+  try{
+    await leaf.setViewState({type:'markdown',state:{file:path,mode:'preview'}});app.workspace.setActiveLeaf(leaf,{focus:false});await wait(250);
+    dialog.showSaveDialog=async()=>({canceled:false,filePath:destination});
+    window.open=function(...args){
+      const child=open.apply(this,args);children.push(child);
+      const timer=setInterval(()=>{
+        if(child.closed){clearInterval(timer);return;}if(!child.electron)return;clearInterval(timer);
+        const ipc=child.electron.ipcRenderer,send=ipc.send;
+        ipc.send=function(channel,...values){if(channel==='print-to-pdf'){values[0].open=false;sent={layouts:child.document.querySelectorAll('.vml-layout').length,editingFrames:child.document.querySelectorAll('.vml-live-preview,.vml-cursor-highlights').length,text:child.document.querySelector('.print')?.textContent};}return send.call(this,channel,...values);};
+      },10);return child;
+    };
+    for(const keep of [true,false]){
+      plugin.settings.keepLayoutHighlight=keep;await plugin.saveSettings();await wait(180);
+      const reading=[...leaf.view.previewMode.containerEl.querySelectorAll('.vml-layout')].filter(el=>el.getBoundingClientRect().width>0).map(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return {width:r.width,height:r.height,border:s.borderTopColor,shadow:s.boxShadow};});
+      destination=output+(keep?'keep':'cursor')+'.pdf';sent=null;
+      app.vault.setConfig('pdfExportSettings',{includeName:false,pageSize:'Letter',landscape:false,margin:'0',downscalePercent:100});
+      leaf.view.printToPdf();document.querySelector('.modal .mod-cta').click();
+      for(let i=0;i<150&&!fs.existsSync(destination);i++)await wait(100);await wait(250);
+      if(!fs.existsSync(destination))throw new Error('Native PDF export timed out');
+      result.exports.push({keep,destination,sha256:hash(fs.readFileSync(destination)),reading,print:sent});
+    }
+    result.passed=result.exports.every(e=>e.print?.editingFrames===0&&e.print.layouts===2)&&JSON.stringify(result.exports[0].reading)===JSON.stringify(result.exports[1].reading)&&result.exports[0].print.text===result.exports[1].print.text;
+  }catch(error){result.error=String(error.stack??error);}
+  finally{
+    window.open=open;dialog.showSaveDialog=save;for(const child of children)if(!child.closed)child.close();
+    plugin.settings=saved;await plugin.saveSettings();fs.writeFileSync(dataPath,data);
+    app.vault.setConfig('pdfExportSettings',config);await wait(300);if(configBytes)fs.writeFileSync(configPath,configBytes);
+    leaf.detach();if(previous)app.workspace.setActiveLeaf(previous,{focus:false});await wait(150);await app.vault.trash(file,true);
+    result.originalNotesUnchanged=Object.entries(original).every(([p,h])=>hash(fs.readFileSync(base+'/'+p))===h);
+    result.settingsRestored=fs.readFileSync(dataPath).equals(data);result.configRestored=!configBytes||fs.readFileSync(configPath).equals(configBytes);
+    fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w08-pdf.json',JSON.stringify(result,null,2));window.w08PdfResult=result;
+  }
+})();

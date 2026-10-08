@@ -1,0 +1,35 @@
+$ErrorActionPreference = 'Stop'
+$repoRoot = (Resolve-Path -LiteralPath 'E:\TOOLS\obsidian-adjustable-media').Path
+$distRoot = (Resolve-Path -LiteralPath (Join-Path $repoRoot 'dist')).Path
+$stagingRoot = Join-Path $repoRoot '.artifact-cleanup-extra-20261009'
+$recordPath = Join-Path $repoRoot 'docs\plans\layout-redesign\probes\artifact-cleanup-extra-20261009.json'
+if ((Test-Path -LiteralPath $stagingRoot) -or (Test-Path -LiteralPath $recordPath)) { throw 'Extra cleanup already exists' }
+$text = (@(rg --files docs scripts tests src -g '*.md' -g '*.json' -g '*.txt' -g '*.ts' -g '*.mjs') | ForEach-Object { Get-Content -LiteralPath $_ -Raw }) -join "`n"
+$files = @(Get-ChildItem -LiteralPath $distRoot -File | Where-Object {
+  ($_.Name -match '^(build-tablet-reading-diagnostic\.mjs|mobile-(disable|enable)\.js\.txt|reading-.*-before\.log|w07-(pr-body\.md|progress-index\.patch|startup-phase\.txt)|w10-restoration-kit\.cjs)$' -and !$text.Contains($_.Name))
+})
+$moves = @($files | ForEach-Object {
+  if (!$_.FullName.StartsWith($distRoot + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Outside dist' }
+  if ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Linked target' }
+  [PSCustomObject]@{ original=$_.FullName; relative=[IO.Path]::GetRelativePath($repoRoot,$_.FullName); bytes=$_.Length; sha256=(Get-FileHash -LiteralPath $_.FullName).Hash.ToLower() }
+})
+$record = [PSCustomObject]@{ date='2026-10-09'; workspace=$repoRoot; staging=$stagingRoot; fileCount=$moves.Count; bytes=($moves|Measure-Object bytes -Sum).Sum; moves=$moves; stagedHashesMatch=$false; sourceAbsent=$false; recycleBinMatch=$false; recycleBinItem=$null }
+function Save-Record { [IO.File]::WriteAllText($recordPath,($record|ConvertTo-Json -Depth 6),[Text.UTF8Encoding]::new($false)) }
+Save-Record
+New-Item -ItemType Directory -Path (Join-Path $stagingRoot 'dist') | Out-Null
+foreach ($move in $moves) { Move-Item -LiteralPath $move.original -Destination (Join-Path $stagingRoot $move.relative) }
+foreach ($move in $moves) { if ((Get-FileHash -LiteralPath (Join-Path $stagingRoot $move.relative)).Hash.ToLower() -ne $move.sha256) { throw 'Staging hash mismatch' } }
+$record.stagedHashesMatch=$true
+Save-Record
+$resolved = (Resolve-Path -LiteralPath $stagingRoot).Path
+if ($resolved -ne (Join-Path $repoRoot '.artifact-cleanup-extra-20261009')) { throw 'Unexpected recycle target' }
+Add-Type -AssemblyName Microsoft.VisualBasic
+[Microsoft.VisualBasic.FileIO.FileSystem]::DeleteDirectory($resolved,[Microsoft.VisualBasic.FileIO.UIOption]::OnlyErrorDialogs,[Microsoft.VisualBasic.FileIO.RecycleOption]::SendToRecycleBin)
+$record.sourceAbsent=!(Test-Path -LiteralPath $stagingRoot) -and @($moves|Where-Object{Test-Path -LiteralPath $_.original}).Count -eq 0
+$shell=New-Object -ComObject Shell.Application
+$matches=@($shell.Namespace(10).Items()|Where-Object{$_.Name -eq '.artifact-cleanup-extra-20261009' -and $_.ExtendedProperty('System.Recycle.DeletedFrom') -eq $repoRoot})
+$record.recycleBinMatch=$matches.Count -eq 1
+if($record.recycleBinMatch){$record.recycleBinItem=$matches[0].Path}
+Save-Record
+if(!$record.sourceAbsent -or !$record.recycleBinMatch){throw 'Recycle verification incomplete'}
+$record|Select-Object fileCount,bytes,stagedHashesMatch,sourceAbsent,recycleBinMatch|ConvertTo-Json

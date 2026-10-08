@@ -1,0 +1,944 @@
+{
+  "buildHash": "1ec5538f9956016d254dad0cc8d72507b547ee7c23bf5f0e9cfe32b2ca3ba606",
+  "samples": [
+    {
+      "name": "three panes open",
+      "states": [
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3459",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 82
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 82
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 82
+            }
+          ],
+          "epoch": 2
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3473",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3487",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "epoch": 1
+        }
+      ]
+    },
+    {
+      "name": "source text updated",
+      "states": [
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3489",
+          "revision": 2,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "epoch": 2
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3495",
+          "revision": 2,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3501",
+          "revision": 2,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        }
+      ]
+    },
+    {
+      "name": "native undo",
+      "states": [
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3502",
+          "revision": 3,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 82
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 82
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 82
+            }
+          ],
+          "epoch": 2
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3508",
+          "revision": 3,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3514",
+          "revision": 3,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 73
+            },
+            {
+              "from": 74,
+              "to": 82
+            }
+          ],
+          "epoch": 1
+        }
+      ]
+    },
+    {
+      "name": "native redo",
+      "states": [
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3515",
+          "revision": 4,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "epoch": 2
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3521",
+          "revision": 4,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:3527",
+          "revision": 4,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        }
+      ]
+    },
+    {
+      "name": "own sources restored after injected divergence",
+      "states": [
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:51",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:84",
+          "revision": 3,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:90",
+          "revision": 3,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        }
+      ]
+    },
+    {
+      "name": "file rename",
+      "states": [
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:51",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:96",
+          "revision": 4,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:102",
+          "revision": 4,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        }
+      ]
+    },
+    {
+      "name": "pop-out window open",
+      "states": [
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:108",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        }
+      ]
+    },
+    {
+      "name": "plugin reload",
+      "states": [
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:51",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:6",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        },
+        {
+          "phase": "settled",
+          "snapshot": "snapshot:13",
+          "revision": 1,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 12
+            },
+            {
+              "from": 13,
+              "to": 81
+            },
+            {
+              "from": 82,
+              "to": 90
+            }
+          ],
+          "epoch": 1
+        }
+      ]
+    }
+  ],
+  "emptySectionText": {
+    "text": "Alternate B",
+    "ownPaneFallback": true,
+    "firstPaneIgnored": true
+  },
+  "popup": {
+    "ownDocument": true,
+    "width": 950,
+    "tokenBeforeClose": {
+      "snapshotId": "snapshot:108",
+      "environmentEpoch": 1,
+      "viewportRevision": 4,
+      "sequence": 6
+    },
+    "disposed": true,
+    "oldCallbackAccepted": false
+  },
+  "unload": {
+    "oldCallbacksRejected": true,
+    "remainingEnvironments": 0
+  },
+  "reload": {
+    "before": {
+      "started": 24,
+      "stopped": 18,
+      "active": 6
+    },
+    "after": {
+      "started": 30,
+      "stopped": 24,
+      "active": 6
+    }
+  },
+  "passed": true,
+  "originalNotesUnchanged": true
+}

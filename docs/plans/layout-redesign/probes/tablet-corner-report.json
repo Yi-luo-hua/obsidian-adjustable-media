@@ -1,0 +1,65 @@
+{
+  "at": "2026-10-08T17:08:25.271Z",
+  "hashes": {
+    "main.js": "4b33975d3b0aba5e548ca5e815b18c4ca8edad2e511ccd4e0e0de4c091c701f2",
+    "styles.css": "b2012bec744d6250b7fc336b247cc1c77f92deb8203c3294307cc7c8b1a5f914"
+  },
+  "checks": {
+    "near-text": {
+      "editing": false,
+      "unchanged": true,
+      "sourceLines": 0,
+      "visible": true,
+      "savedMatches": true,
+      "onlySettingsChanged": true
+    },
+    "corner-tap": {
+      "editing": false,
+      "unchanged": true,
+      "sourceLines": 0,
+      "visible": true,
+      "savedMatches": true,
+      "onlySettingsChanged": true
+    },
+    "corner-drag": {
+      "editing": false,
+      "unchanged": false,
+      "sourceLines": 0,
+      "visible": true,
+      "savedMatches": true,
+      "restored": true,
+      "onlySettingsChanged": true
+    },
+    "corner-cancel": {
+      "editing": false,
+      "unchanged": true,
+      "sourceLines": 0,
+      "visible": true,
+      "savedMatches": true,
+      "onlySettingsChanged": true
+    },
+    "normal-text": {
+      "editing": true,
+      "unchanged": true,
+      "sourceLines": 0,
+      "visible": true,
+      "savedMatches": true,
+      "onlySettingsChanged": true
+    }
+  },
+  "userNoteUnchanged": true,
+  "fixtureRemoved": true,
+  "mirrored": {
+    "width": 44,
+    "height": 44,
+    "inside": true,
+    "points": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "restored": true
+  },
+  "passed": true
+}

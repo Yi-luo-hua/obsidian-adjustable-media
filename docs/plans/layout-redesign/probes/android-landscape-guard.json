@@ -1,0 +1,71 @@
+{
+  "result": {
+    "guard": true,
+    "viewport": {
+      "from": 6665,
+      "to": 7296
+    },
+    "scroll": 9592,
+    "width": 727,
+    "first": "",
+    "plugins": null,
+    "sizes": [
+      [
+        "block:676:1",
+        {
+          "refPos": 1406,
+          "refOffset": 0,
+          "side": "right",
+          "layoutTop": 0,
+          "layoutHeight": 3862.962890625,
+          "width": 290.6064758300781,
+          "margin": 0,
+          "marginBottom": 0,
+          "marginTop": 0
+        }
+      ]
+    ],
+    "latest": [
+      [
+        "block:676",
+        {
+          "from": 0,
+          "skip": 0,
+          "size": {
+            "refPos": 1406,
+            "refOffset": 0,
+            "side": "right",
+            "layoutTop": 0,
+            "layoutHeight": 3862.962890625,
+            "width": 290.6064758300781,
+            "margin": 0,
+            "marginBottom": 0,
+            "marginTop": 0
+          }
+        }
+      ]
+    ],
+    "detached": 0,
+    "pending": [],
+    "anchors": [
+      {
+        "from": 0,
+        "to": 1405,
+        "key": "block:676:1"
+      }
+    ],
+    "budget": {
+      "rounds": 3,
+      "blocked": false
+    },
+    "ready": true,
+    "anchorBlock": {
+      "from": 0,
+      "to": 1405,
+      "top": 0,
+      "height": 0
+    },
+    "textStarts": "<!-- vml {\"v\":2,\"type\":\"text\",\"wrap\":\"right\",\"width\":0.4} -->\n旁注 0  \n旁注 1  \n旁注 2  \n旁注 3  \n旁注 4  \n旁注 "
+  },
+  "errors": []
+}

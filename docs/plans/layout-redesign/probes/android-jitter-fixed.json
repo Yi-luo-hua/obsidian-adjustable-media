@@ -1,0 +1,1553 @@
+{
+  "result": {
+    "samples": [
+      {
+        "at": 2678350.600000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2678434.300000012,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2678520.300000012,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2678606.399999976,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2678690.100000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2678774.399999976,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2678861.300000012,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2678947.899999976,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679034.300000012,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679120.199999988,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679204.899999976,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679288.600000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679374.199999988,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679460.600000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679546.300000012,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679632.600000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679718.100000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679804.199999988,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679890.600000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2679973.399999976,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680056.5,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680140,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680224.199999988,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680309.699999988,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680395.300000012,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680480.699999988,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680566,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680652.600000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680737,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680822.100000024,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680907.800000012,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2680991,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2681076.800000012,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2681159.399999976,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      },
+      {
+        "at": 2681244.699999988,
+        "scroll": 1854.22216796875,
+        "viewport": {
+          "from": 1773,
+          "to": 2525
+        },
+        "selection": 1976,
+        "width": 311,
+        "proxyShift": "1080",
+        "proxyTop": -613.4259033203125,
+        "layout": {
+          "x": 210.3148193359375,
+          "y": -1693.4259033203125,
+          "width": 124.20370483398438,
+          "height": 3862.962890625
+        },
+        "body": {
+          "text": "正文 21：滚动到中段，再回到顶部，文字与浮动应连续。",
+          "y": 90.5740737915039
+        },
+        "budget": {
+          "rounds": 2,
+          "blocked": false
+        },
+        "epoch": 2,
+        "detached": 0,
+        "sizes": [
+          [
+            "block:1:1",
+            {
+              "refPos": 1406,
+              "refOffset": 0,
+              "side": "right",
+              "layoutTop": 0,
+              "layoutHeight": 3862.962890625,
+              "width": 124.20370483398438,
+              "margin": 0,
+              "marginBottom": 0,
+              "marginTop": 0
+            }
+          ]
+        ]
+      }
+    ],
+    "viewport": {
+      "width": 363,
+      "height": 823
+    },
+    "file": "02 长浮动.md",
+    "sourceUnchanged": true
+  },
+  "errors": []
+}

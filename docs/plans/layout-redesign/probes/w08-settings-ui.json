@@ -1,0 +1,20 @@
+{
+  "name": "保持布局块边框高亮",
+  "description": "默认开启，保持实时预览中的布局块边框高亮。关闭后，仅在编辑光标进入布局块源码或内部文字栏时高亮，离开后隐藏。悬停仍可使用缩放手柄；不改变布局大小或笔记内容。",
+  "value": true,
+  "toggleEnabled": true,
+  "passed": true,
+  "windows": [
+    {
+      "id": 23,
+      "title": "设置 - vml-test-vault - Obsidian 1.14.4",
+      "url": "about:blank"
+    },
+    {
+      "id": 1,
+      "title": "笔记 - vml-test-vault - Obsidian 1.14.4",
+      "url": "app://obsidian.md/index.html"
+    }
+  ],
+  "screenshotWindow": "设置 - vml-test-vault - Obsidian 1.14.4"
+}

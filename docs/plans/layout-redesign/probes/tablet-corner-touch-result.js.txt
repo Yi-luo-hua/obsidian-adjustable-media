@@ -1,0 +1,16 @@
+(async()=>{
+ const g=window.__tabletCorner,v=app.workspace.activeLeaf.view,cm=v.editor.cm,current=cm.state.doc.toString();
+ for(let i=0;i<30&&await app.vault.read(v.file)!==current;i++)await new Promise(r=>setTimeout(r,200));
+ const file=await app.vault.read(v.file),editing=!!cm.dom.querySelector('.vml-text-editor');
+ const result={kind:g.kind,viewport:[innerWidth,innerHeight],corner:g.corner,frame:g.frame,points:g.points,x:g.x,y:g.y,hit:g.hit,editing,sourceLines:cm.dom.querySelectorAll('.vml-source-line').length,events:g.events,source:current,unchanged:current===g.before,savedMatches:file===current,onlySettingsChanged:current.split('\n').filter(l=>!l.startsWith('<!-- vml')).join('\n')===g.before.split('\n').filter(l=>!l.startsWith('<!-- vml')).join('\n'),left:app.workspace.leftSplit.collapsed,right:app.workspace.rightSplit.collapsed};
+ g.stops.forEach(stop=>stop());
+ document.querySelector('.vml-text-editor__actions button')?.click();
+ if(current!==g.before){
+  if(file!==current||!result.onlySettingsChanged)throw new Error('Unexpected fixture write');
+  await app.workspace.activeLeaf.setViewState({type:'empty'});
+  await app.vault.process(app.vault.getAbstractFileByPath(g.file),text=>{if(text!==current)throw new Error('Fixture changed before restoration');return g.before;});
+  await app.workspace.activeLeaf.setViewState({type:'markdown',state:{file:g.file,mode:'source',source:false},active:true});
+  result.restored=await app.vault.read(app.vault.getAbstractFileByPath(g.file))===g.before;
+ }
+ return result;
+})()

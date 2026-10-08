@@ -1,0 +1,49 @@
+{
+  "result": {
+    "sample": {
+      "at": "2026-10-08T13:04:21.806Z",
+      "vault": "adjustable-media-tablet-test",
+      "file": "05 窄屏与宽表格.md",
+      "mode": "preview",
+      "bodyClasses": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-phone",
+      "documentOverflow": 0,
+      "pane": {
+        "width": 556,
+        "overflow": 0
+      },
+      "viewport": {
+        "width": 556,
+        "height": 736,
+        "ratio": 2.5,
+        "visual": {
+          "width": 556,
+          "height": 736,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 0,
+          "head": 0
+        }
+      ],
+      "formulaCount": 0,
+      "inputActions": []
+    },
+    "tables": [],
+    "documentScroll": 0,
+    "unchanged": true
+  },
+  "errors": []
+}

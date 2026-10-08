@@ -1,0 +1,78 @@
+{
+  "buildHash": "7cd242a183af090250051150bf57819cc8415925513abb925714ba6fa0d67bfe",
+  "simulation": "Windows rendered auxiliary test. Visible mobile controls enabled on the test pane only; not Android acceptance.",
+  "checks": [
+    {
+      "name": "visible done and disabled discard",
+      "passed": false
+    },
+    {
+      "name": "Done during composition keeps editor and source unchanged",
+      "passed": true
+    },
+    {
+      "name": "candidate confirmed only left text written",
+      "passed": false
+    },
+    {
+      "name": "Done closes confirmed editor",
+      "passed": true
+    },
+    {
+      "name": "invalid input leaves note untouched",
+      "passed": true
+    },
+    {
+      "name": "discard closes without writing",
+      "passed": true
+    },
+    {
+      "name": "discarded draft not restored",
+      "passed": false
+    }
+  ],
+  "events": [
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "compositionstart",
+      "trusted": true
+    },
+    {
+      "name": "input",
+      "trusted": true
+    },
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "input",
+      "trusted": true
+    },
+    {
+      "name": "compositionend",
+      "trusted": false
+    },
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "click",
+      "trusted": true
+    }
+  ],
+  "passed": false,
+  "originalNotesUnchanged": true
+}

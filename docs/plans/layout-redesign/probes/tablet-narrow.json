@@ -1,0 +1,193 @@
+{
+  "result": {
+    "sample": {
+      "at": "2026-10-08T16:00:12.654Z",
+      "vault": "adjustable-media-tablet-test",
+      "file": "05 窄屏与宽表格.md",
+      "mode": "preview",
+      "bodyClasses": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-phone",
+      "documentOverflow": 0,
+      "pane": {
+        "width": 370,
+        "overflow": 0
+      },
+      "viewport": {
+        "width": 370,
+        "height": 736,
+        "ratio": 2.5,
+        "visual": {
+          "width": 370,
+          "height": 736,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 0,
+          "head": 0
+        }
+      ],
+      "formulaCount": 0,
+      "inputActions": []
+    },
+    "tables": [],
+    "documentScroll": 0,
+    "root": {
+      "connected": true,
+      "children": 1,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 370,
+        "height": 736,
+        "top": 0,
+        "right": 370,
+        "bottom": 736,
+        "left": 0
+      },
+      "scroll": 0
+    },
+    "hostTextLength": 1255,
+    "sections": [
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      }
+    ],
+    "unchanged": true
+  },
+  "errors": []
+}

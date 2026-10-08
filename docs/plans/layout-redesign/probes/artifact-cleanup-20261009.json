@@ -1,0 +1,3277 @@
+{
+  "date": "2026-10-09",
+  "workspace": "E:\\TOOLS\\obsidian-adjustable-media",
+  "staging": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009",
+  "disposition": "Windows Recycle Bin; recoverable, no permanent disk-space claim",
+  "itemCount": 178,
+  "fileCount": 332.0,
+  "bytes": 132178294.0,
+  "moves": [
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-background-after.js.txt",
+      "relative": "dist\\android-background-after.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-background-after.js.txt",
+      "isDirectory": false,
+      "bytes": 759.0,
+      "files": [
+        {
+          "relative": "dist\\android-background-after.js.txt",
+          "bytes": 759,
+          "sha256": "983bd616b126509c1d782b7ad6d8bb459aac2a0435500950ad4ca57c0bb8c027"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-background-before.js.txt",
+      "relative": "dist\\android-background-before.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-background-before.js.txt",
+      "isDirectory": false,
+      "bytes": 244.0,
+      "files": [
+        {
+          "relative": "dist\\android-background-before.js.txt",
+          "bytes": 244,
+          "sha256": "d78a9e149cf283c90dadfa0a7517302052a0bed13bbc69d9cc942aa7cea38abb"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-cleanup-builder.cjs",
+      "relative": "dist\\android-cleanup-builder.cjs",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-cleanup-builder.cjs",
+      "isDirectory": false,
+      "bytes": 1562.0,
+      "files": [
+        {
+          "relative": "dist\\android-cleanup-builder.cjs",
+          "bytes": 1562,
+          "sha256": "ebb0593f22497506dd73fb7039ed918c0ce9d53c84fcc626d982a286d1e957c9"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-current-environment.js.txt",
+      "relative": "dist\\android-current-environment.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-current-environment.js.txt",
+      "isDirectory": false,
+      "bytes": 849.0,
+      "files": [
+        {
+          "relative": "dist\\android-current-environment.js.txt",
+          "bytes": 849,
+          "sha256": "e03c6949c85415b8c85fdf5045d162d18b8c13e4f54604205f971526de298def"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-export-final.cjs",
+      "relative": "dist\\android-export-final.cjs",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-export-final.cjs",
+      "isDirectory": false,
+      "bytes": 1398.0,
+      "files": [
+        {
+          "relative": "dist\\android-export-final.cjs",
+          "bytes": 1398,
+          "sha256": "3551a922675427bad948cf946bcd0db5cfba9d9588a178334b88349011473d3e"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-final-check.txt",
+      "relative": "dist\\android-final-check.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-final-check.txt",
+      "isDirectory": false,
+      "bytes": 33347.0,
+      "files": [
+        {
+          "relative": "dist\\android-final-check.txt",
+          "bytes": 33347,
+          "sha256": "054f8203ef526d11985faea02f268734bebbe9852d1987b53d7de3595cdfb8db"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-final-cleanup.js.txt",
+      "relative": "dist\\android-final-cleanup.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-final-cleanup.js.txt",
+      "isDirectory": false,
+      "bytes": 1641.0,
+      "files": [
+        {
+          "relative": "dist\\android-final-cleanup.js.txt",
+          "bytes": 1641,
+          "sha256": "851b12eb90037dedd97023e2c5a51d335fe1b2f1d9aca625191eb13a63c3d593"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-final-input.md",
+      "relative": "dist\\android-final-input.md",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-final-input.md",
+      "isDirectory": false,
+      "bytes": 194.0,
+      "files": [
+        {
+          "relative": "dist\\android-final-input.md",
+          "bytes": 194,
+          "sha256": "a5dd81c6e7dcc7e1c0565fbf533f0b4a436d805d71b50e7b7bf1195f6d93a618"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-final-main.js",
+      "relative": "dist\\android-final-main.js",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-final-main.js",
+      "isDirectory": false,
+      "bytes": 475893.0,
+      "files": [
+        {
+          "relative": "dist\\android-final-main.js",
+          "bytes": 475893,
+          "sha256": "b06981d9c95f07c8d4e014b6f4ceac8f402f1e87a616d87b42c399e7cd0153fc"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-highlight-coordinates.json",
+      "relative": "dist\\android-highlight-coordinates.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-highlight-coordinates.json",
+      "isDirectory": false,
+      "bytes": 1824.0,
+      "files": [
+        {
+          "relative": "dist\\android-highlight-coordinates.json",
+          "bytes": 1824,
+          "sha256": "399f1b427600fe329330aac8566e7532483731b956971a10a6a0a60931a0e2cc"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-highlight-read.js.txt",
+      "relative": "dist\\android-highlight-read.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-highlight-read.js.txt",
+      "isDirectory": false,
+      "bytes": 525.0,
+      "files": [
+        {
+          "relative": "dist\\android-highlight-read.js.txt",
+          "bytes": 525,
+          "sha256": "91a043e3af0cc791078fa54049f8118b39dc8a839ebb4c53176f62e92fc129d6"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-highlight-restore.js.txt",
+      "relative": "dist\\android-highlight-restore.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-highlight-restore.js.txt",
+      "isDirectory": false,
+      "bytes": 326.0,
+      "files": [
+        {
+          "relative": "dist\\android-highlight-restore.js.txt",
+          "bytes": 326,
+          "sha256": "7a20f44deabcb41e01b17cd1b52d11baaf6a8c1e8c096bf3c999074d97541777"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-input-observe.js.txt",
+      "relative": "dist\\android-input-observe.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-input-observe.js.txt",
+      "isDirectory": false,
+      "bytes": 778.0,
+      "files": [
+        {
+          "relative": "dist\\android-input-observe.js.txt",
+          "bytes": 778,
+          "sha256": "1a58743084db89d1950d757a8d0139c61a5e02ac76957e5fbe52c71f22637e23"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-inspect.js.txt",
+      "relative": "dist\\android-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 557.0,
+      "files": [
+        {
+          "relative": "dist\\android-inspect.js.txt",
+          "bytes": 557,
+          "sha256": "8165b1045e14f1119efaaa2357f393b68c5ba26ec90da2a134992c2c6afd3bf7"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-jitter-check.txt",
+      "relative": "dist\\android-jitter-check.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-jitter-check.txt",
+      "isDirectory": false,
+      "bytes": 33373.0,
+      "files": [
+        {
+          "relative": "dist\\android-jitter-check.txt",
+          "bytes": 33373,
+          "sha256": "854e2b3e6b589bb9f997d9201e2ff31a815250e91b1ebea799201742f92342da"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-jitter-selection.json",
+      "relative": "dist\\android-jitter-selection.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-jitter-selection.json",
+      "isDirectory": false,
+      "bytes": 1310.0,
+      "files": [
+        {
+          "relative": "dist\\android-jitter-selection.json",
+          "bytes": 1310,
+          "sha256": "22163d50663d1a7d50f4552574a41ee693ec6a313c5ca4705e1a5d56009806dc"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-middle-inspect.js.txt",
+      "relative": "dist\\android-middle-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-middle-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 949.0,
+      "files": [
+        {
+          "relative": "dist\\android-middle-inspect.js.txt",
+          "bytes": 949,
+          "sha256": "21cec6744f784acb9de0c9e07edb9413e71dfa6a85bdfdc84bdc397258fecefc"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-middle-selection.js.txt",
+      "relative": "dist\\android-middle-selection.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-middle-selection.js.txt",
+      "isDirectory": false,
+      "bytes": 618.0,
+      "files": [
+        {
+          "relative": "dist\\android-middle-selection.js.txt",
+          "bytes": 618,
+          "sha256": "a5856c6c6eb6b0af5e9dcd53d0e78128c83adf2fdfc3347ff3be868e5f8b9dce"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-module-inspect.js.txt",
+      "relative": "dist\\android-module-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-module-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 587.0,
+      "files": [
+        {
+          "relative": "dist\\android-module-inspect.js.txt",
+          "bytes": 587,
+          "sha256": "0b39564ec9e2cdd324fb9ee02d31d8b6774f21636146d693de443ed8e2bd677a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-native-guard.js.txt",
+      "relative": "dist\\android-native-guard.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-native-guard.js.txt",
+      "isDirectory": false,
+      "bytes": 851.0,
+      "files": [
+        {
+          "relative": "dist\\android-native-guard.js.txt",
+          "bytes": 851,
+          "sha256": "b342074c389c25b26ff906b400fdbe086a6e00795b3fb88165b92a4f532fc7e3"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-pause.js.txt",
+      "relative": "dist\\android-pause.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-pause.js.txt",
+      "isDirectory": false,
+      "bytes": 197.0,
+      "files": [
+        {
+          "relative": "dist\\android-pause.js.txt",
+          "bytes": 197,
+          "sha256": "80ef58382561cd7aefdbfadfbeb64944e51567bc837f57c84a97c720ad0caaba"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-reading-inspect.js.txt",
+      "relative": "dist\\android-reading-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-reading-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 721.0,
+      "files": [
+        {
+          "relative": "dist\\android-reading-inspect.js.txt",
+          "bytes": 721,
+          "sha256": "38b88134027e5b62e66693b432150b6894406572fc2bf54bbbcc08402bc62550"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-ready-input.js.txt",
+      "relative": "dist\\android-ready-input.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-ready-input.js.txt",
+      "isDirectory": false,
+      "bytes": 462.0,
+      "files": [
+        {
+          "relative": "dist\\android-ready-input.js.txt",
+          "bytes": 462,
+          "sha256": "11284de15a3bf4ea4584a593a9694d502c86a6653696bb6a1db15436364ba822"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-rotate-prepare.js.txt",
+      "relative": "dist\\android-rotate-prepare.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-rotate-prepare.js.txt",
+      "isDirectory": false,
+      "bytes": 647.0,
+      "files": [
+        {
+          "relative": "dist\\android-rotate-prepare.js.txt",
+          "bytes": 647,
+          "sha256": "b5c0ea99aa0df2240c9517cbf298f77bc58717903d13db5211bfae3c85870d20"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-touch-read.js.txt",
+      "relative": "dist\\android-touch-read.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-touch-read.js.txt",
+      "isDirectory": false,
+      "bytes": 350.0,
+      "files": [
+        {
+          "relative": "dist\\android-touch-read.js.txt",
+          "bytes": 350,
+          "sha256": "b3b25ebf1ff0883c0f0aa43bdb149fb251c217d71521a5f19b4f1ad6143c9c25"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-trace-inspect.js.txt",
+      "relative": "dist\\android-trace-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-trace-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 676.0,
+      "files": [
+        {
+          "relative": "dist\\android-trace-inspect.js.txt",
+          "bytes": 676,
+          "sha256": "9312aa7a3924185119e7330335c2b49ee33612f2775f965f7062ae5b2a8e3422"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-trace-load.js.txt",
+      "relative": "dist\\android-trace-load.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-trace-load.js.txt",
+      "isDirectory": false,
+      "bytes": 99.0,
+      "files": [
+        {
+          "relative": "dist\\android-trace-load.js.txt",
+          "bytes": 99,
+          "sha256": "4951a5bb7b0da5bda7741bbd25797ee99a69294b71722316cbb04b88731c9ec9"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-trace-prepare.js.txt",
+      "relative": "dist\\android-trace-prepare.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-trace-prepare.js.txt",
+      "isDirectory": false,
+      "bytes": 62.0,
+      "files": [
+        {
+          "relative": "dist\\android-trace-prepare.js.txt",
+          "bytes": 62,
+          "sha256": "33e89603a5fe02f43c3a667ef0adba37d99af3badc1e333e635d0bdd1ec69ad7"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-video-trace-start.js.txt",
+      "relative": "dist\\android-video-trace-start.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-video-trace-start.js.txt",
+      "isDirectory": false,
+      "bytes": 784.0,
+      "files": [
+        {
+          "relative": "dist\\android-video-trace-start.js.txt",
+          "bytes": 784,
+          "sha256": "3cb7f5f4c18381de4371c613154ef98b098df0c06b0f1eec1c6c15dd54c6e45d"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\android-video-trace-stop.js.txt",
+      "relative": "dist\\android-video-trace-stop.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\android-video-trace-stop.js.txt",
+      "isDirectory": false,
+      "bytes": 85.0,
+      "files": [
+        {
+          "relative": "dist\\android-video-trace-stop.js.txt",
+          "bytes": 85,
+          "sha256": "bc1da9950e2c6c1f4e7520c77755039d8636d578a8b1999f86590e1f9d7c83da"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\corner-check.log",
+      "relative": "dist\\corner-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\corner-check.log",
+      "isDirectory": false,
+      "bytes": 34553.0,
+      "files": [
+        {
+          "relative": "dist\\corner-check.log",
+          "bytes": 34553,
+          "sha256": "aae92d7e8b4ba33e1773180559e00c0730e0c0bd5ea0e3bc27a15de320fe8acc"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\desktop-restoration-hashes.cjs",
+      "relative": "dist\\desktop-restoration-hashes.cjs",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\desktop-restoration-hashes.cjs",
+      "isDirectory": false,
+      "bytes": 812.0,
+      "files": [
+        {
+          "relative": "dist\\desktop-restoration-hashes.cjs",
+          "bytes": 812,
+          "sha256": "9ee75a413d726424dec12a4cc09ef23f81a6887a33b63801ad37404d0ba5869e"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\final-check.log",
+      "relative": "dist\\final-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\final-check.log",
+      "isDirectory": false,
+      "bytes": 31792.0,
+      "files": [
+        {
+          "relative": "dist\\final-check.log",
+          "bytes": 31792,
+          "sha256": "d2bcf8d8ef34cf3529c060bbc26efb0d045a0a847d3cdcd113e97c5a54dbc0fc"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\play-cm-listeners.jsonl",
+      "relative": "dist\\play-cm-listeners.jsonl",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\play-cm-listeners.jsonl",
+      "isDirectory": false,
+      "bytes": 0.0,
+      "files": [
+        {
+          "relative": "dist\\play-cm-listeners.jsonl",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\play-content-listeners.jsonl",
+      "relative": "dist\\play-content-listeners.jsonl",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\play-content-listeners.jsonl",
+      "isDirectory": false,
+      "bytes": 39404.0,
+      "files": [
+        {
+          "relative": "dist\\play-content-listeners.jsonl",
+          "bytes": 39404,
+          "sha256": "792c2baf1f77a8a25758eb116680a49c0c44a3769045e9ee95986b451aa35733"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\play-inspect.json",
+      "relative": "dist\\play-inspect.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\play-inspect.json",
+      "isDirectory": false,
+      "bytes": 1494.0,
+      "files": [
+        {
+          "relative": "dist\\play-inspect.json",
+          "bytes": 1494,
+          "sha256": "b9bb26878718d22021d0ccb1c6165a030d09411f917f79473ad64e292804256b"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\resume-check.txt",
+      "relative": "dist\\resume-check.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\resume-check.txt",
+      "isDirectory": false,
+      "bytes": 33381.0,
+      "files": [
+        {
+          "relative": "dist\\resume-check.txt",
+          "bytes": 33381,
+          "sha256": "52c467362aa7632fd3cfe45efedcf42de70e44c45a75134c1a5f69dbd0c7035d"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-action-builder.cjs",
+      "relative": "dist\\tablet-action-builder.cjs",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-action-builder.cjs",
+      "isDirectory": false,
+      "bytes": 735.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-action-builder.cjs",
+          "bytes": 735,
+          "sha256": "afd15df46ec07b8cb0fe51adff5c3ba2def63ceb2e7cafd4f16f7f4657202d51"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-app-listeners.jsonl",
+      "relative": "dist\\tablet-app-listeners.jsonl",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-app-listeners.jsonl",
+      "isDirectory": false,
+      "bytes": 0.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-app-listeners.jsonl",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-before-swipe.json",
+      "relative": "dist\\tablet-before-swipe.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-before-swipe.json",
+      "isDirectory": false,
+      "bytes": 5072.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-before-swipe.json",
+          "bytes": 5072,
+          "sha256": "e1b836cc279cdd4231fd89ea2292d8f70e3470946878ee95534bec1c640f0b8c"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-button-hit.js.txt",
+      "relative": "dist\\tablet-button-hit.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-button-hit.js.txt",
+      "isDirectory": false,
+      "bytes": 572.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-button-hit.js.txt",
+          "bytes": 572,
+          "sha256": "43ccfc4dbad93e0c31cd2d85a7f87f2f5bad5ad84e5a407f7987cd24bec1a01f"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-check.txt",
+      "relative": "dist\\tablet-check.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-check.txt",
+      "isDirectory": false,
+      "bytes": 33330.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-check.txt",
+          "bytes": 33330,
+          "sha256": "97b6b12c0377fbd5c008fcf44956ba1c370146de3dab4c931b0fc4de930dab64"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-close-viewer.js.txt",
+      "relative": "dist\\tablet-close-viewer.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-close-viewer.js.txt",
+      "isDirectory": false,
+      "bytes": 131.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-close-viewer.js.txt",
+          "bytes": 131,
+          "sha256": "97644af48ec0fc5914e5ca65a1475633c7d853fc6f24b326af96929e41f31339"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-close-viewer.json",
+      "relative": "dist\\tablet-close-viewer.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-close-viewer.json",
+      "isDirectory": false,
+      "bytes": 57.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-close-viewer.json",
+          "bytes": 57,
+          "sha256": "3c6ee8c8eed2d28429cb799aa27e22a920f9f77ac9e52b24ce828b2970445901"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-controlled-start.json",
+      "relative": "dist\\tablet-controlled-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-controlled-start.json",
+      "isDirectory": false,
+      "bytes": 227.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-controlled-start.json",
+          "bytes": 227,
+          "sha256": "d79730e5d05197eb3b3bd5f71eb14f740b6e075035cd7e87b16caaab08430602"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-controlled-touch.json",
+      "relative": "dist\\tablet-controlled-touch.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-controlled-touch.json",
+      "isDirectory": false,
+      "bytes": 12312.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-controlled-touch.json",
+          "bytes": 12312,
+          "sha256": "822b742da02894e6dfc928b5a11afbcbf7f935b788961bec6ac4c1066a17c38a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-corner-current.js.txt",
+      "relative": "dist\\tablet-corner-current.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-corner-current.js.txt",
+      "isDirectory": false,
+      "bytes": 2797.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-corner-current.js.txt",
+          "bytes": 2797,
+          "sha256": "4e83c576415c401c42ce3b677e7dfb16b63acf4a7c4815a7562c47b35be80e7a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-corner-finish.js.txt",
+      "relative": "dist\\tablet-corner-finish.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-corner-finish.js.txt",
+      "isDirectory": false,
+      "bytes": 1031.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-corner-finish.js.txt",
+          "bytes": 1031,
+          "sha256": "51d6b13430d664c4b8130230e44bcbcc440984da7f3ce7b9970b47a31be683c9"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-corner-inspect.js.txt",
+      "relative": "dist\\tablet-corner-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-corner-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 827.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-corner-inspect.js.txt",
+          "bytes": 827,
+          "sha256": "182f0378e6ee76981477483d01841bb3c4757203faf6efd387b993ba216a15cb"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-corner-mirrored.js.txt",
+      "relative": "dist\\tablet-corner-mirrored.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-corner-mirrored.js.txt",
+      "isDirectory": false,
+      "bytes": 1805.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-corner-mirrored.js.txt",
+          "bytes": 1805,
+          "sha256": "ba7b4df77067378c194535e74739ba0865c29e04159afbe6f71916f5176961f3"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-corner-old-tap.json",
+      "relative": "dist\\tablet-corner-old-tap.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-corner-old-tap.json",
+      "isDirectory": false,
+      "bytes": 1456.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-corner-old-tap.json",
+          "bytes": 1456,
+          "sha256": "64383778cba304ec56804364aaa40b0f7da47d57864823f5a85849d53c869c34"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-corner-prepared-current.json",
+      "relative": "dist\\tablet-corner-prepared-current.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-corner-prepared-current.json",
+      "isDirectory": false,
+      "bytes": 1456.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-corner-prepared-current.json",
+          "bytes": 1456,
+          "sha256": "faa237a09d7808e09cf510a2d13bb025c03476dd4cd9a9f24372e905b5943b7c"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-corner-reload.json",
+      "relative": "dist\\tablet-corner-reload.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-corner-reload.json",
+      "isDirectory": false,
+      "bytes": 102.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-corner-reload.json",
+          "bytes": 102,
+          "sha256": "1fadfb1dedb2b9129801cde4a87e9c316c62064545953c9bf890b915da9c40c0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-diagnostic-reload.json",
+      "relative": "dist\\tablet-diagnostic-reload.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-diagnostic-reload.json",
+      "isDirectory": false,
+      "bytes": 102.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-diagnostic-reload.json",
+          "bytes": 102,
+          "sha256": "1fadfb1dedb2b9129801cde4a87e9c316c62064545953c9bf890b915da9c40c0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-diagnostic-switch.json",
+      "relative": "dist\\tablet-diagnostic-switch.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-diagnostic-switch.json",
+      "isDirectory": false,
+      "bytes": 1384.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-diagnostic-switch.json",
+          "bytes": 1384,
+          "sha256": "a7ba63f8e34f42014bd068889dd6d8fefcf6219f7d879036c6d40f29bfabe64e"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-discard-compare.js.txt",
+      "relative": "dist\\tablet-discard-compare.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-discard-compare.js.txt",
+      "isDirectory": false,
+      "bytes": 224.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-discard-compare.js.txt",
+          "bytes": 224,
+          "sha256": "7e19b2f9047fddc9889257bd35ea9dc5179b83e5c4a5eb847ad1a44fe7ed08eb"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-discard-state.js.txt",
+      "relative": "dist\\tablet-discard-state.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-discard-state.js.txt",
+      "isDirectory": false,
+      "bytes": 416.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-discard-state.js.txt",
+          "bytes": 416,
+          "sha256": "bd179f15ea6b9355cbe18b3ace5e634eff07875c4f3f996ca278d96c381ab907"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-discard-tap.json",
+      "relative": "dist\\tablet-discard-tap.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-discard-tap.json",
+      "isDirectory": false,
+      "bytes": 218.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-discard-tap.json",
+          "bytes": 218,
+          "sha256": "c5a87813c2632e26458191d9d41fb701d8bc312654788b9060c06ee712ad8ec2"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-draft-clear.js.txt",
+      "relative": "dist\\tablet-draft-clear.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-draft-clear.js.txt",
+      "isDirectory": false,
+      "bytes": 279.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-draft-clear.js.txt",
+          "bytes": 279,
+          "sha256": "8b67b0899f8adced399bffb702978081666439129386c4104c6f148f386c6047"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-draft-open.json",
+      "relative": "dist\\tablet-draft-open.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-draft-open.json",
+      "isDirectory": false,
+      "bytes": 11731.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-draft-open.json",
+          "bytes": 11731,
+          "sha256": "438a666f747b17f3c44fabf7ec8872a5ff1d5e5c3426c8a6a504764ad048f699"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-floating-video-prepared.json",
+      "relative": "dist\\tablet-floating-video-prepared.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-floating-video-prepared.json",
+      "isDirectory": false,
+      "bytes": 5073.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-floating-video-prepared.json",
+          "bytes": 5073,
+          "sha256": "bcf90874c82a2eec16de5c56620eec8099a4492ebd5da327ef0e66ce48c0391d"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-floating-video-result.js.txt",
+      "relative": "dist\\tablet-floating-video-result.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-floating-video-result.js.txt",
+      "isDirectory": false,
+      "bytes": 1016.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-floating-video-result.js.txt",
+          "bytes": 1016,
+          "sha256": "05b32fe5f1b7968ffa260a115dbc0b2abb520105144cd05afae336ab9cebea71"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-floating-video-start.js.txt",
+      "relative": "dist\\tablet-floating-video-start.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-floating-video-start.js.txt",
+      "isDirectory": false,
+      "bytes": 3339.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-floating-video-start.js.txt",
+          "bytes": 3339,
+          "sha256": "6d80bf31c7c77033558eab9282f553f10b991d2012e86f55db74ae1ea702fba6"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-history-events.js.txt",
+      "relative": "dist\\tablet-history-events.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-history-events.js.txt",
+      "isDirectory": false,
+      "bytes": 275.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-history-events.js.txt",
+          "bytes": 275,
+          "sha256": "a1c80bc2c230a5a961a87ebe568a31d14983bdb54508c438333e08591f033bff"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-history-inspect.js.txt",
+      "relative": "dist\\tablet-history-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-history-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 318.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-history-inspect.js.txt",
+          "bytes": 318,
+          "sha256": "2977c426e3e7d3f88bae758bc66ffde69bff7f3cfe8916e999173aa749a1288d"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-input-observe.json",
+      "relative": "dist\\tablet-input-observe.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-input-observe.json",
+      "isDirectory": false,
+      "bytes": 281.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-input-observe.json",
+          "bytes": 281,
+          "sha256": "a125ba1579dce4e2c8ff94d7be24062b8334bc4c7c88f8a1970cd6faf6439d8d"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-input-open.js.txt",
+      "relative": "dist\\tablet-input-open.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-input-open.js.txt",
+      "isDirectory": false,
+      "bytes": 488.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-input-open.js.txt",
+          "bytes": 488,
+          "sha256": "8e86abb8e3a4812323ec1f440c9281522e5b25786b8a28c79df8fa3b647e17a4"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-input-open.json",
+      "relative": "dist\\tablet-input-open.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-input-open.json",
+      "isDirectory": false,
+      "bytes": 597.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-input-open.json",
+          "bytes": 597,
+          "sha256": "058c055a57e1987101b1285d1253e1a1e823e00ada4605eaae99f3fb8eddebda"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-input-restored.md",
+      "relative": "dist\\tablet-input-restored.md",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-input-restored.md",
+      "isDirectory": false,
+      "bytes": 194.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-input-restored.md",
+          "bytes": 194,
+          "sha256": "a5dd81c6e7dcc7e1c0565fbf533f0b4a436d805d71b50e7b7bf1195f6d93a618"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-input-tap-result.json",
+      "relative": "dist\\tablet-input-tap-result.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-input-tap-result.json",
+      "isDirectory": false,
+      "bytes": 572.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-input-tap-result.json",
+          "bytes": 572,
+          "sha256": "4efb3555e9dd9a1aad93fade2a9e716a41ae51afcfff3e690ae2f26cef0b6249"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-input-tap.json",
+      "relative": "dist\\tablet-input-tap.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-input-tap.json",
+      "isDirectory": false,
+      "bytes": 217.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-input-tap.json",
+          "bytes": 217,
+          "sha256": "793314fff198c02bbdc69a8c9a12b933d83357ab77ba3562a829e9a0f73bd559"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-interaction-before.png",
+      "relative": "dist\\tablet-interaction-before.png",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-interaction-before.png",
+      "isDirectory": false,
+      "bytes": 66959.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-interaction-before.png",
+          "bytes": 66959,
+          "sha256": "da2ab1f181e04cec3ada4ef34e081694cba5eecc227a57bfae046bba6b87602a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-interaction-inspect.js.txt",
+      "relative": "dist\\tablet-interaction-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-interaction-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 1263.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-interaction-inspect.js.txt",
+          "bytes": 1263,
+          "sha256": "418e1720789c209a69eba64693ed042a47846f9a971868cfea3881c124a74508"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-interaction-inspect.json",
+      "relative": "dist\\tablet-interaction-inspect.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-interaction-inspect.json",
+      "isDirectory": false,
+      "bytes": 6813.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-interaction-inspect.json",
+          "bytes": 6813,
+          "sha256": "1894fc020cac758047887ec894957b3f0cbba0c9ca9ddbac0f7c36fad3be2f64"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-interaction-state.js.txt",
+      "relative": "dist\\tablet-interaction-state.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-interaction-state.js.txt",
+      "isDirectory": false,
+      "bytes": 389.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-interaction-state.js.txt",
+          "bytes": 389,
+          "sha256": "b14f3336bba0587e8b2437dcf84d30007908cb9cf99c687d005e0d24377afee6"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-keyboard-clipping.js.txt",
+      "relative": "dist\\tablet-keyboard-clipping.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-keyboard-clipping.js.txt",
+      "isDirectory": false,
+      "bytes": 561.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-keyboard-clipping.js.txt",
+          "bytes": 561,
+          "sha256": "8fde2648cee61872c5980c1245600242de2e55ac6c2bdf53d2be16399939d032"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-listeners.jsonl",
+      "relative": "dist\\tablet-listeners.jsonl",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-listeners.jsonl",
+      "isDirectory": false,
+      "bytes": 257468.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-listeners.jsonl",
+          "bytes": 257468,
+          "sha256": "3dfacb33d4017bbd6cce204e19a60ed6569135adf9e2fb241a0441e7fb3eab71"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-loaded-main.js",
+      "relative": "dist\\tablet-loaded-main.js",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-loaded-main.js",
+      "isDirectory": false,
+      "bytes": 477218.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-loaded-main.js",
+          "bytes": 477218,
+          "sha256": "7cd242a183af090250051150bf57819cc8415925513abb925714ba6fa0d67bfe"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-modal-inspect.js.txt",
+      "relative": "dist\\tablet-modal-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-modal-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 181.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-modal-inspect.js.txt",
+          "bytes": 181,
+          "sha256": "8b45560b31481135530bcacdde29753a23ed3399bcefe48c8f75cd3b531b1262"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-modal-inspect.json",
+      "relative": "dist\\tablet-modal-inspect.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-modal-inspect.json",
+      "isDirectory": false,
+      "bytes": 467.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-modal-inspect.json",
+          "bytes": 467,
+          "sha256": "ed2fe91dc2ff0649139d2dc985225da7e9702a730e4a56e39f61780f2df7c104"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-modal-listeners.jsonl",
+      "relative": "dist\\tablet-modal-listeners.jsonl",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-modal-listeners.jsonl",
+      "isDirectory": false,
+      "bytes": 37256.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-modal-listeners.jsonl",
+          "bytes": 37256,
+          "sha256": "1cfc1888e8dfc3e570040bde44215f067a3470521b9b8355af26385ff2bb5561"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-prepare-manual.js.txt",
+      "relative": "dist\\tablet-prepare-manual.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-prepare-manual.js.txt",
+      "isDirectory": false,
+      "bytes": 2143.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-prepare-manual.js.txt",
+          "bytes": 2143,
+          "sha256": "f7c7cba89de9253d5659437048ece792bfde1708ecd583b94b809a5ac4eb5805"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-prepare-manual.mjs",
+      "relative": "dist\\tablet-prepare-manual.mjs",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-prepare-manual.mjs",
+      "isDirectory": false,
+      "bytes": 2143.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-prepare-manual.mjs",
+          "bytes": 2143,
+          "sha256": "ac0e6c92e7b7f018a35be50ef747717610115df5e4d8b725c0d91eb808d3a6f5"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-reading-current.png",
+      "relative": "dist\\tablet-reading-current.png",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-reading-current.png",
+      "isDirectory": false,
+      "bytes": 120052.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-reading-current.png",
+          "bytes": 120052,
+          "sha256": "3a8819fc3819f6e6394900a4a55f50e94fabb329b672b27f83f94c3204348a8f"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-reading-diagnostic.js",
+      "relative": "dist\\tablet-reading-diagnostic.js",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-reading-diagnostic.js",
+      "isDirectory": false,
+      "bytes": 479140.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-reading-diagnostic.js",
+          "bytes": 479140,
+          "sha256": "6340192bdbed97e6de3e6efdd43ec9c85448c120b96967bba1bff6eaac3fd90a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-reading-inspect.js.txt",
+      "relative": "dist\\tablet-reading-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-reading-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 878.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-reading-inspect.js.txt",
+          "bytes": 878,
+          "sha256": "b73e736ba48b35bb107c3d7eb2c667fb5e48bd3c89b10d8109deb05c613231ec"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-reading-inspect.json",
+      "relative": "dist\\tablet-reading-inspect.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-reading-inspect.json",
+      "isDirectory": false,
+      "bytes": 8424.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-reading-inspect.json",
+          "bytes": 8424,
+          "sha256": "f186af254bcc4dbec249b37778dae14dbfc70a78aed259169919364ffb407f55"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-reading-map.js.txt",
+      "relative": "dist\\tablet-reading-map.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-reading-map.js.txt",
+      "isDirectory": false,
+      "bytes": 555.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-reading-map.js.txt",
+          "bytes": 555,
+          "sha256": "ae27cf821f4f7880071207b0b46dcbf20b4413e6515fd00920a9f620524d89d0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-reading-map.json",
+      "relative": "dist\\tablet-reading-map.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-reading-map.json",
+      "isDirectory": false,
+      "bytes": 42035.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-reading-map.json",
+          "bytes": 42035,
+          "sha256": "3f025e4075c5a385fdd65f1443dd0a5b18af73422d913161b2277a7b4ddd2aba"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-reload.js.txt",
+      "relative": "dist\\tablet-reload.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-reload.js.txt",
+      "isDirectory": false,
+      "bytes": 245.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-reload.js.txt",
+          "bytes": 245,
+          "sha256": "5cc9be44cd2b474ab9d56dfa9a1a55537763349239b9def3ffcf099cb5a3fd83"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-reload.json",
+      "relative": "dist\\tablet-reload.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-reload.json",
+      "isDirectory": false,
+      "bytes": 102.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-reload.json",
+          "bytes": 102,
+          "sha256": "1fadfb1dedb2b9129801cde4a87e9c316c62064545953c9bf890b915da9c40c0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-source-accidental.png",
+      "relative": "dist\\tablet-source-accidental.png",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-source-accidental.png",
+      "isDirectory": false,
+      "bytes": 84124.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-source-accidental.png",
+          "bytes": 84124,
+          "sha256": "9a5e94cf1c6efb1de8b298d33bcf1710006259bd4658f3d543525b11ae11e62d"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-source-tap-after.json",
+      "relative": "dist\\tablet-source-tap-after.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-source-tap-after.json",
+      "isDirectory": false,
+      "bytes": 775.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-source-tap-after.json",
+          "bytes": 775,
+          "sha256": "3287b4530d16f6cbb203d951e9dd762597e4c9e1995e9fb8f702792facff2bf8"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-source-tap-before.json",
+      "relative": "dist\\tablet-source-tap-before.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-source-tap-before.json",
+      "isDirectory": false,
+      "bytes": 779.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-source-tap-before.json",
+          "bytes": 779,
+          "sha256": "83da15e955448f5ff1adf0b567bf06b0b4cc4b5818d1ed8784d0f74d50b879cf"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-state-short.js.txt",
+      "relative": "dist\\tablet-state-short.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-state-short.js.txt",
+      "isDirectory": false,
+      "bytes": 131.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-state-short.js.txt",
+          "bytes": 131,
+          "sha256": "0ff275a80a1f053e8249c5825dc597af664a6178032fb375300583fa6bb2c2a4"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-state-short.json",
+      "relative": "dist\\tablet-state-short.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-state-short.json",
+      "isDirectory": false,
+      "bytes": 142.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-state-short.json",
+          "bytes": 142,
+          "sha256": "0330e7a01f494fb52df4a3f9a88ca220b1b9291fa50e6bdc5167ce82b6ac42f0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-table-swipe.json",
+      "relative": "dist\\tablet-table-swipe.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-table-swipe.json",
+      "isDirectory": false,
+      "bytes": 1903.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-table-swipe.json",
+          "bytes": 1903,
+          "sha256": "878320c8b390fbf61970e60bb6ed00b94b8fe719aec01c931714709e00cf4724"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-tap-prepared.json",
+      "relative": "dist\\tablet-tap-prepared.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-tap-prepared.json",
+      "isDirectory": false,
+      "bytes": 788.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-tap-prepared.json",
+          "bytes": 788,
+          "sha256": "39690ddd5e1622baffd6fa650adc7a23a85f23b6ccba5003763cee1c93f11b93"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-tap.json",
+      "relative": "dist\\tablet-tap.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-tap.json",
+      "isDirectory": false,
+      "bytes": 299.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-tap.json",
+          "bytes": 299,
+          "sha256": "f5d97b4acf08cc43516c2c645e76025a2dfa48192bde53a41539dc7b2958df43"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-touch-current.js.txt",
+      "relative": "dist\\tablet-touch-current.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-touch-current.js.txt",
+      "isDirectory": false,
+      "bytes": 3307.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-touch-current.js.txt",
+          "bytes": 3307,
+          "sha256": "4c3c49a342503236c16ab7c229236342e40464945b29256b1c6da570b14deb4a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-touch-prepared.json",
+      "relative": "dist\\tablet-touch-prepared.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-touch-prepared.json",
+      "isDirectory": false,
+      "bytes": 788.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-touch-prepared.json",
+          "bytes": 788,
+          "sha256": "39690ddd5e1622baffd6fa650adc7a23a85f23b6ccba5003763cee1c93f11b93"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-final-prepared.json",
+      "relative": "dist\\tablet-video-final-prepared.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-final-prepared.json",
+      "isDirectory": false,
+      "bytes": 5169.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-final-prepared.json",
+          "bytes": 5169,
+          "sha256": "cbe2a155647c14fbb75853b358786b2c55a0e6680e86542aa0108bb13f02a9c9"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-final-proxy-start.json",
+      "relative": "dist\\tablet-video-final-proxy-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-final-proxy-start.json",
+      "isDirectory": false,
+      "bytes": 5073.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-final-proxy-start.json",
+          "bytes": 5073,
+          "sha256": "bcf90874c82a2eec16de5c56620eec8099a4492ebd5da327ef0e66ce48c0391d"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-final-reload.json",
+      "relative": "dist\\tablet-video-final-reload.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-final-reload.json",
+      "isDirectory": false,
+      "bytes": 102.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-final-reload.json",
+          "bytes": 102,
+          "sha256": "1fadfb1dedb2b9129801cde4a87e9c316c62064545953c9bf890b915da9c40c0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-final-repeat-again.json",
+      "relative": "dist\\tablet-video-final-repeat-again.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-final-repeat-again.json",
+      "isDirectory": false,
+      "bytes": 4447.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-final-repeat-again.json",
+          "bytes": 4447,
+          "sha256": "155b5733ed0da8fbb16baf03fe7f291cad290866d46c7294612f9c8a3802ba45"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-final-repeat-history.json",
+      "relative": "dist\\tablet-video-final-repeat-history.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-final-repeat-history.json",
+      "isDirectory": false,
+      "bytes": 295.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-final-repeat-history.json",
+          "bytes": 295,
+          "sha256": "82b42468d6063d1f6a24039e26e76279698e061f70f0c50225746ea24bfeb896"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-final-repeat-start.json",
+      "relative": "dist\\tablet-video-final-repeat-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-final-repeat-start.json",
+      "isDirectory": false,
+      "bytes": 5169.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-final-repeat-start.json",
+          "bytes": 5169,
+          "sha256": "cbe2a155647c14fbb75853b358786b2c55a0e6680e86542aa0108bb13f02a9c9"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-fixed-reload.json",
+      "relative": "dist\\tablet-video-fixed-reload.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-fixed-reload.json",
+      "isDirectory": false,
+      "bytes": 102.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-fixed-reload.json",
+          "bytes": 102,
+          "sha256": "1fadfb1dedb2b9129801cde4a87e9c316c62064545953c9bf890b915da9c40c0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-manual-ready.js.txt",
+      "relative": "dist\\tablet-video-manual-ready.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-manual-ready.js.txt",
+      "isDirectory": false,
+      "bytes": 509.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-manual-ready.js.txt",
+          "bytes": 509,
+          "sha256": "d3dc5aa4fba4e2fdc4066084b1b2c0f4b19dcaf66217386871564df48fa44aea"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-play-inspect.js.txt",
+      "relative": "dist\\tablet-video-play-inspect.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-play-inspect.js.txt",
+      "isDirectory": false,
+      "bytes": 597.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-play-inspect.js.txt",
+          "bytes": 597,
+          "sha256": "60e3765e33944de877afe05102dee78ccbb4dde0ea8a9679ac427b69b5196450"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-repeat-again.json",
+      "relative": "dist\\tablet-video-repeat-again.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-repeat-again.json",
+      "isDirectory": false,
+      "bytes": 4447.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-repeat-again.json",
+          "bytes": 4447,
+          "sha256": "155b5733ed0da8fbb16baf03fe7f291cad290866d46c7294612f9c8a3802ba45"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-repeat-history.json",
+      "relative": "dist\\tablet-video-repeat-history.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-repeat-history.json",
+      "isDirectory": false,
+      "bytes": 295.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-repeat-history.json",
+          "bytes": 295,
+          "sha256": "82b42468d6063d1f6a24039e26e76279698e061f70f0c50225746ea24bfeb896"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-repeat-start.json",
+      "relative": "dist\\tablet-video-repeat-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-repeat-start.json",
+      "isDirectory": false,
+      "bytes": 5169.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-repeat-start.json",
+          "bytes": 5169,
+          "sha256": "cbe2a155647c14fbb75853b358786b2c55a0e6680e86542aa0108bb13f02a9c9"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-resize-fixed-prepared.json",
+      "relative": "dist\\tablet-video-resize-fixed-prepared.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-resize-fixed-prepared.json",
+      "isDirectory": false,
+      "bytes": 5169.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-resize-fixed-prepared.json",
+          "bytes": 5169,
+          "sha256": "cbe2a155647c14fbb75853b358786b2c55a0e6680e86542aa0108bb13f02a9c9"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-video-resize-prepared.json",
+      "relative": "dist\\tablet-video-resize-prepared.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-video-resize-prepared.json",
+      "isDirectory": false,
+      "bytes": 5169.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-video-resize-prepared.json",
+          "bytes": 5169,
+          "sha256": "cbe2a155647c14fbb75853b358786b2c55a0e6680e86542aa0108bb13f02a9c9"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-viewport-trace-stop.js.txt",
+      "relative": "dist\\tablet-viewport-trace-stop.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-viewport-trace-stop.js.txt",
+      "isDirectory": false,
+      "bytes": 89.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-viewport-trace-stop.js.txt",
+          "bytes": 89,
+          "sha256": "c319a4d418d2dc1d176f17a527c406590463944fc0211a06388b185f9463073a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-wide-before-narrow.json",
+      "relative": "dist\\tablet-wide-before-narrow.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-wide-before-narrow.json",
+      "isDirectory": false,
+      "bytes": 1071.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-wide-before-narrow.json",
+          "bytes": 1071,
+          "sha256": "4b2dd763b6c0c4726355aab95ef8954c01e718c0a9501f519cffc33c10b2b859"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-wide-half-open.json",
+      "relative": "dist\\tablet-wide-half-open.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-wide-half-open.json",
+      "isDirectory": false,
+      "bytes": 1570.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-wide-half-open.json",
+          "bytes": 1570,
+          "sha256": "01995082b53cf4feff5400fa8213c54117baf7339587ef6e8f0a24842b154739"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-wide-open.json",
+      "relative": "dist\\tablet-wide-open.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-wide-open.json",
+      "isDirectory": false,
+      "bytes": 1074.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-wide-open.json",
+          "bytes": 1074,
+          "sha256": "39c924804af49ded95afabdab6f360f4adeaea3fcb60eec90a98275054a1690c"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-window-listeners.jsonl",
+      "relative": "dist\\tablet-window-listeners.jsonl",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-window-listeners.jsonl",
+      "isDirectory": false,
+      "bytes": 22010.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-window-listeners.jsonl",
+          "bytes": 22010,
+          "sha256": "c88b91e35d8b4bb3e2c9f927aee6f488371b1f58d3a56dbd192f7f1e026d3c98"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\tablet-workspace-listeners.jsonl",
+      "relative": "dist\\tablet-workspace-listeners.jsonl",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\tablet-workspace-listeners.jsonl",
+      "isDirectory": false,
+      "bytes": 7499.0,
+      "files": [
+        {
+          "relative": "dist\\tablet-workspace-listeners.jsonl",
+          "bytes": 7499,
+          "sha256": "471e5507e57d3ab061b7cca6cb92c078e2e3f1b3fb0aadf13874e8a4be035a81"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\touch-check.log",
+      "relative": "dist\\touch-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\touch-check.log",
+      "isDirectory": false,
+      "bytes": 33870.0,
+      "files": [
+        {
+          "relative": "dist\\touch-check.log",
+          "bytes": 33870,
+          "sha256": "40e0e3e98e10683f7372620372919818ad13f5c2489c0de0664eb464ef54f52c"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\touch-final-check.log",
+      "relative": "dist\\touch-final-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\touch-final-check.log",
+      "isDirectory": false,
+      "bytes": 34072.0,
+      "files": [
+        {
+          "relative": "dist\\touch-final-check.log",
+          "bytes": 34072,
+          "sha256": "aa5371298377f5af47fb6c908f0b0db0401da32f5a3ab5aac38e495a75d17f31"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\update-acceptance-docs.cjs",
+      "relative": "dist\\update-acceptance-docs.cjs",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\update-acceptance-docs.cjs",
+      "isDirectory": false,
+      "bytes": 3957.0,
+      "files": [
+        {
+          "relative": "dist\\update-acceptance-docs.cjs",
+          "bytes": 3957,
+          "sha256": "f5f687624978f765c858f417df8542a0ace3689eaea695fc8367a5f861e1ccbb"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\update-w02-progress.cjs",
+      "relative": "dist\\update-w02-progress.cjs",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\update-w02-progress.cjs",
+      "isDirectory": false,
+      "bytes": 1279.0,
+      "files": [
+        {
+          "relative": "dist\\update-w02-progress.cjs",
+          "bytes": 1279,
+          "sha256": "67ca188231745db05f94eb5a2102fd4abee9ccceaed887ea458b8be9cd403cc6"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-check.log",
+      "relative": "dist\\video-controls-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-check.log",
+      "isDirectory": false,
+      "bytes": 34930.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-check.log",
+          "bytes": 34930,
+          "sha256": "933ce7857c58b323b2a8641a8ab1ca0e55d303c9bd6b8c096f5ddf81c2cc1e9e"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-diff-check.log",
+      "relative": "dist\\video-controls-diff-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-diff-check.log",
+      "isDirectory": false,
+      "bytes": 0.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-diff-check.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-final-blurred-resize-start.json",
+      "relative": "dist\\video-controls-final-blurred-resize-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-final-blurred-resize-start.json",
+      "isDirectory": false,
+      "bytes": 5169.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-final-blurred-resize-start.json",
+          "bytes": 5169,
+          "sha256": "056a962a16cb9972b42533c3fa2f58a14f1932a761deb40e26dac0c22f562ee4"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-final-pause-start.json",
+      "relative": "dist\\video-controls-final-pause-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-final-pause-start.json",
+      "isDirectory": false,
+      "bytes": 1144.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-final-pause-start.json",
+          "bytes": 1144,
+          "sha256": "20a9616011bdb6d2a66edf5fd42a374894147e6cf3978cbc8b058aa889e2d03f"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-final-play-start.json",
+      "relative": "dist\\video-controls-final-play-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-final-play-start.json",
+      "isDirectory": false,
+      "bytes": 1144.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-final-play-start.json",
+          "bytes": 1144,
+          "sha256": "20a9616011bdb6d2a66edf5fd42a374894147e6cf3978cbc8b058aa889e2d03f"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-final-reload.json",
+      "relative": "dist\\video-controls-final-reload.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-final-reload.json",
+      "isDirectory": false,
+      "bytes": 102.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-final-reload.json",
+          "bytes": 102,
+          "sha256": "1fadfb1dedb2b9129801cde4a87e9c316c62064545953c9bf890b915da9c40c0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-final-resize-start.json",
+      "relative": "dist\\video-controls-final-resize-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-final-resize-start.json",
+      "isDirectory": false,
+      "bytes": 5169.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-final-resize-start.json",
+          "bytes": 5169,
+          "sha256": "70ba7bc36baa23cc247eaf82e7ede758aca2288d1ec1f8fc5296cb13b683b79b"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-final-seek-start.json",
+      "relative": "dist\\video-controls-final-seek-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-final-seek-start.json",
+      "isDirectory": false,
+      "bytes": 1191.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-final-seek-start.json",
+          "bytes": 1191,
+          "sha256": "a51c6eda891128c7878ff430487f59b08f0c36848256fba8c81d464348d8417a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-fixed.png",
+      "relative": "dist\\video-controls-fixed.png",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-fixed.png",
+      "isDirectory": false,
+      "bytes": 104847.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-fixed.png",
+          "bytes": 104847,
+          "sha256": "e422b0d3f6786fa60ac2bc2377897a562a128d2652232a520a82599d021356c8"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-mouse-fixed-start.json",
+      "relative": "dist\\video-controls-mouse-fixed-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-mouse-fixed-start.json",
+      "isDirectory": false,
+      "bytes": 740.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-mouse-fixed-start.json",
+          "bytes": 740,
+          "sha256": "aa4b9ee02eafcf241b7cde480cac419b9b1dc6fea53d9f29ee6f42bf387929ae"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-mouse.js.txt",
+      "relative": "dist\\video-controls-mouse.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-mouse.js.txt",
+      "isDirectory": false,
+      "bytes": 591.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-mouse.js.txt",
+          "bytes": 591,
+          "sha256": "7869e1b898f57351d6598f6252b8184ae2f408ee8e162ceda0ed652c55204d86"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-mouse.json",
+      "relative": "dist\\video-controls-mouse.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-mouse.json",
+      "isDirectory": false,
+      "bytes": 740.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-mouse.json",
+          "bytes": 740,
+          "sha256": "16579b5eabd8cd291d81091d261676df1835927e4b83cfb9882cc2e2ae5e64ae"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-pause-touch.json",
+      "relative": "dist\\video-controls-pause-touch.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-pause-touch.json",
+      "isDirectory": false,
+      "bytes": 1144.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-pause-touch.json",
+          "bytes": 1144,
+          "sha256": "20a9616011bdb6d2a66edf5fd42a374894147e6cf3978cbc8b058aa889e2d03f"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-reload.json",
+      "relative": "dist\\video-controls-reload.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-reload.json",
+      "isDirectory": false,
+      "bytes": 102.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-reload.json",
+          "bytes": 102,
+          "sha256": "1fadfb1dedb2b9129801cde4a87e9c316c62064545953c9bf890b915da9c40c0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-resize-start.json",
+      "relative": "dist\\video-controls-resize-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-resize-start.json",
+      "isDirectory": false,
+      "bytes": 5169.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-resize-start.json",
+          "bytes": 5169,
+          "sha256": "056a962a16cb9972b42533c3fa2f58a14f1932a761deb40e26dac0c22f562ee4"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-seek-start.json",
+      "relative": "dist\\video-controls-seek-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-seek-start.json",
+      "isDirectory": false,
+      "bytes": 1198.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-seek-start.json",
+          "bytes": 1198,
+          "sha256": "1211fc4f4ccb291c68905cfc224a40dff4a09fdeaf10426c0c4c4f84d03ccf6e"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-seek-visible-start.json",
+      "relative": "dist\\video-controls-seek-visible-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-seek-visible-start.json",
+      "isDirectory": false,
+      "bytes": 1191.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-seek-visible-start.json",
+          "bytes": 1191,
+          "sha256": "a51c6eda891128c7878ff430487f59b08f0c36848256fba8c81d464348d8417a"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-start.json",
+      "relative": "dist\\video-controls-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-start.json",
+      "isDirectory": false,
+      "bytes": 414.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-start.json",
+          "bytes": 414,
+          "sha256": "7ff0f98915e1b35c8f72b382e3171328770b40bd02d3c335963ef29af4809fad"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-start.png",
+      "relative": "dist\\video-controls-start.png",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-start.png",
+      "isDirectory": false,
+      "bytes": 105860.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-start.png",
+          "bytes": 105860,
+          "sha256": "6d64b597e9a4f788bfc8ae8521f1ec9ebb75f9d17d5c32dbc7070653be23c605"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-surface-start.json",
+      "relative": "dist\\video-controls-surface-start.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-surface-start.json",
+      "isDirectory": false,
+      "bytes": 1239.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-surface-start.json",
+          "bytes": 1239,
+          "sha256": "d001cab46f4c92fbe603e1e92a5260b1b028693f51ce1168aa2dbd5d637d1ef3"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-surface-state.json",
+      "relative": "dist\\video-controls-surface-state.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-surface-state.json",
+      "isDirectory": false,
+      "bytes": 3035.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-surface-state.json",
+          "bytes": 3035,
+          "sha256": "7cf3a1e1b0a85e9bca96c8d2bde1a5a9fe51171a36f4fdc79b1063ecb176774b"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-surface.js.txt",
+      "relative": "dist\\video-controls-surface.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-surface.js.txt",
+      "isDirectory": false,
+      "bytes": 1069.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-surface.js.txt",
+          "bytes": 1069,
+          "sha256": "d53fef4d071c352efd476a4761e81ab72659288455e10a6fd3a8884cfa97f5ed"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-tap.js.txt",
+      "relative": "dist\\video-controls-tap.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-tap.js.txt",
+      "isDirectory": false,
+      "bytes": 659.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-tap.js.txt",
+          "bytes": 659,
+          "sha256": "4db0a2eeab371c53fd30cca74a66568a3d521f2ecb9a2221a1cb89855579dcab"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-tap.json",
+      "relative": "dist\\video-controls-tap.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-tap.json",
+      "isDirectory": false,
+      "bytes": 834.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-tap.json",
+          "bytes": 834,
+          "sha256": "ca3137d8a3ebfe9a57dc6f3464a4271a8dcdb291f6a9f166409617f5319835f8"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-touch-before.json",
+      "relative": "dist\\video-controls-touch-before.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-touch-before.json",
+      "isDirectory": false,
+      "bytes": 1124.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-touch-before.json",
+          "bytes": 1124,
+          "sha256": "fd5cc6a15ca169beee8a1597a09f213274e511fca290d0d44c9c81dede3e92a8"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-controls-touch-fixed.json",
+      "relative": "dist\\video-controls-touch-fixed.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-controls-touch-fixed.json",
+      "isDirectory": false,
+      "bytes": 1144.0,
+      "files": [
+        {
+          "relative": "dist\\video-controls-touch-fixed.json",
+          "bytes": 1144,
+          "sha256": "20a9616011bdb6d2a66edf5fd42a374894147e6cf3978cbc8b058aa889e2d03f"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-delegates.js.txt",
+      "relative": "dist\\video-delegates.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-delegates.js.txt",
+      "isDirectory": false,
+      "bytes": 273.0,
+      "files": [
+        {
+          "relative": "dist\\video-delegates.js.txt",
+          "bytes": 273,
+          "sha256": "4946837d6ec48a15954fc281ccbe34346990e5ed325c852ded231b6cae2e41d8"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-delegates.json",
+      "relative": "dist\\video-delegates.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-delegates.json",
+      "isDirectory": false,
+      "bytes": 2983.0,
+      "files": [
+        {
+          "relative": "dist\\video-delegates.json",
+          "bytes": 2983,
+          "sha256": "0b737989861c78e74322302d0c4eb70dd118f36a85ec92cc76e70b13a14b3251"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-desktop-final-w10-cli.txt",
+      "relative": "dist\\video-desktop-final-w10-cli.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-desktop-final-w10-cli.txt",
+      "isDirectory": false,
+      "bytes": 12.0,
+      "files": [
+        {
+          "relative": "dist\\video-desktop-final-w10-cli.txt",
+          "bytes": 12,
+          "sha256": "02a713f76226c52a198adae80526740fc4d6057636326bc8dec49635db8ae7a7"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-desktop-w10-cli.txt",
+      "relative": "dist\\video-desktop-w10-cli.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-desktop-w10-cli.txt",
+      "isDirectory": false,
+      "bytes": 12.0,
+      "files": [
+        {
+          "relative": "dist\\video-desktop-w10-cli.txt",
+          "bytes": 12,
+          "sha256": "02a713f76226c52a198adae80526740fc4d6057636326bc8dec49635db8ae7a7"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-final-check.log",
+      "relative": "dist\\video-final-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-final-check.log",
+      "isDirectory": false,
+      "bytes": 34838.0,
+      "files": [
+        {
+          "relative": "dist\\video-final-check.log",
+          "bytes": 34838,
+          "sha256": "37491120bcffcbfb15a47151ae6313d65d9ac38bee33e7ddeac1dd73401117bc"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-input-handlers.js.txt",
+      "relative": "dist\\video-input-handlers.js.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-input-handlers.js.txt",
+      "isDirectory": false,
+      "bytes": 295.0,
+      "files": [
+        {
+          "relative": "dist\\video-input-handlers.js.txt",
+          "bytes": 295,
+          "sha256": "4fddbc39cea689af51eba2b160c61d82dfb8eb20608a585f890f74028e5d5baa"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-input-handlers.json",
+      "relative": "dist\\video-input-handlers.json",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-input-handlers.json",
+      "isDirectory": false,
+      "bytes": 1803.0,
+      "files": [
+        {
+          "relative": "dist\\video-input-handlers.json",
+          "bytes": 1803,
+          "sha256": "ab951d4cca9a03e86b8946050cb7ce3f67bf3b105ceb579b2b76116730fe9666"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-resize-check-accepted.log",
+      "relative": "dist\\video-resize-check-accepted.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-resize-check-accepted.log",
+      "isDirectory": false,
+      "bytes": 236.0,
+      "files": [
+        {
+          "relative": "dist\\video-resize-check-accepted.log",
+          "bytes": 236,
+          "sha256": "92bd0a6d6536c216e5428735b75f07fdaa93602ae04f053dbd14a3d6c25a3ac0"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-resize-check-accepted2.log",
+      "relative": "dist\\video-resize-check-accepted2.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-resize-check-accepted2.log",
+      "isDirectory": false,
+      "bytes": 34822.0,
+      "files": [
+        {
+          "relative": "dist\\video-resize-check-accepted2.log",
+          "bytes": 34822,
+          "sha256": "62111f42c3ecd1979ae9ff1a5cd9715c88fd9a5992ad1003b02119334f4f2c34"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-resize-check-final.log",
+      "relative": "dist\\video-resize-check-final.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-resize-check-final.log",
+      "isDirectory": false,
+      "bytes": 810.0,
+      "files": [
+        {
+          "relative": "dist\\video-resize-check-final.log",
+          "bytes": 810,
+          "sha256": "5d190bd206281b22010fe1fef0dac2b2da193c453262f3f90fa92da20ba86136"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-resize-check-final2.log",
+      "relative": "dist\\video-resize-check-final2.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-resize-check-final2.log",
+      "isDirectory": false,
+      "bytes": 810.0,
+      "files": [
+        {
+          "relative": "dist\\video-resize-check-final2.log",
+          "bytes": 810,
+          "sha256": "5d190bd206281b22010fe1fef0dac2b2da193c453262f3f90fa92da20ba86136"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-resize-check-verified.log",
+      "relative": "dist\\video-resize-check-verified.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-resize-check-verified.log",
+      "isDirectory": false,
+      "bytes": 35510.0,
+      "files": [
+        {
+          "relative": "dist\\video-resize-check-verified.log",
+          "bytes": 35510,
+          "sha256": "792cab239b033c04bee181c3cc2d2e0cf7f8464c03720cbe2d19b5cc644a6033"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\video-resize-check.log",
+      "relative": "dist\\video-resize-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\video-resize-check.log",
+      "isDirectory": false,
+      "bytes": 34563.0,
+      "files": [
+        {
+          "relative": "dist\\video-resize-check.log",
+          "bytes": 34563,
+          "sha256": "2f15580e8d2fd7d0a7d4710b25b1c4075aa65d1309b47ce1ec066d258fb9faee"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w01-check.log",
+      "relative": "dist\\w01-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w01-check.log",
+      "isDirectory": false,
+      "bytes": 31788.0,
+      "files": [
+        {
+          "relative": "dist\\w01-check.log",
+          "bytes": 31788,
+          "sha256": "c98e6369ed3caeddaa15c42d218c92201c4b7795346727034ac7d9990256dff7"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w01-check.txt",
+      "relative": "dist\\w01-check.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w01-check.txt",
+      "isDirectory": false,
+      "bytes": 33125.0,
+      "files": [
+        {
+          "relative": "dist\\w01-check.txt",
+          "bytes": 33125,
+          "sha256": "093fd8b6fa8d65f2ed674923de961e1603bbc42da009c5fb0a82e7278774f397"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w02-final-check.txt",
+      "relative": "dist\\w02-final-check.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w02-final-check.txt",
+      "isDirectory": false,
+      "bytes": 33332.0,
+      "files": [
+        {
+          "relative": "dist\\w02-final-check.txt",
+          "bytes": 33332,
+          "sha256": "44a0423e83f30030efbadf95349502a9bb01d9782c70a0a3a36637b3fae8d853"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w02-source-check.txt",
+      "relative": "dist\\w02-source-check.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w02-source-check.txt",
+      "isDirectory": false,
+      "bytes": 33225.0,
+      "files": [
+        {
+          "relative": "dist\\w02-source-check.txt",
+          "bytes": 33225,
+          "sha256": "470a2100abf66b2d1d96c4a3f893d19957aaea59512c550277e604a131d84181"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w07-check.log",
+      "relative": "dist\\w07-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w07-check.log",
+      "isDirectory": false,
+      "bytes": 30173.0,
+      "files": [
+        {
+          "relative": "dist\\w07-check.log",
+          "bytes": 30173,
+          "sha256": "c2319949ff1d8a7eb1d7e7fedf40e42d69ee88da58056e87d5fafbcfa603118c"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w07-final-check.log",
+      "relative": "dist\\w07-final-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w07-final-check.log",
+      "isDirectory": false,
+      "bytes": 30267.0,
+      "files": [
+        {
+          "relative": "dist\\w07-final-check.log",
+          "bytes": 30267,
+          "sha256": "69048d0260d6c1649c7a0debe78bed2c88634defe38e66eebb16f5ee4dc8be8e"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w08-check.log",
+      "relative": "dist\\w08-check.log",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w08-check.log",
+      "isDirectory": false,
+      "bytes": 31889.0,
+      "files": [
+        {
+          "relative": "dist\\w08-check.log",
+          "bytes": 31889,
+          "sha256": "6268011de26bf42bbf4c5e1c212c0b82fe6c0ab2da23fdae1a3fd61861bf3141"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w10-check.txt",
+      "relative": "dist\\w10-check.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w10-check.txt",
+      "isDirectory": false,
+      "bytes": 33523.0,
+      "files": [
+        {
+          "relative": "dist\\w10-check.txt",
+          "bytes": 33523,
+          "sha256": "56e4b85b1ba8bbf2bb74512b0b1d5b0d3bdc2a08350ff3e7e905a724d85fb5bb"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w10-desktop-final-cli.txt",
+      "relative": "dist\\w10-desktop-final-cli.txt",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w10-desktop-final-cli.txt",
+      "isDirectory": false,
+      "bytes": 12.0,
+      "files": [
+        {
+          "relative": "dist\\w10-desktop-final-cli.txt",
+          "bytes": 12,
+          "sha256": "02a713f76226c52a198adae80526740fc4d6057636326bc8dec49635db8ae7a7"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w07-env",
+      "relative": "dist\\w07-env",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w07-env",
+      "isDirectory": true,
+      "bytes": 56104902.0,
+      "files": [
+        {
+          "relative": "dist\\w07-env\\.gitignore",
+          "bytes": 1,
+          "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+        },
+        {
+          "relative": "dist\\w07-env\\.lock",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relative": "dist\\w07-env\\CACHEDIR.TAG",
+          "bytes": 43,
+          "sha256": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae"
+        },
+        {
+          "relative": "dist\\w07-env\\pyvenv.cfg",
+          "bytes": 188,
+          "sha256": "3cccf29d0376ee517af0912248f4f3594d44425f9377101a757d137ee4978dd1"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\_virtualenv.pth",
+          "bytes": 18,
+          "sha256": "69ac3d8f27e679c81b94ab30b3b56e9cd138219b1ba94a1fa3606d5a76a1433d"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\_virtualenv.py",
+          "bytes": 5246,
+          "sha256": "cfb3db86aaa53bb62b5ff764970bec2d71c9228590a0ebec57f6ec926cc0bf1a"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\fitz\\__init__.py",
+          "bytes": 589,
+          "sha256": "399f8de397746c980c547f7c345d2c90d4cb2922cf7e9532c78b31c088951118"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\fitz\\table.py",
+          "bytes": 85,
+          "sha256": "8ab84abc4a59ff83cdfbe4c95ccdaf6eb4ac438415bdee3747d0b2d8a65e2713"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\fitz\\utils.py",
+          "bytes": 85,
+          "sha256": "4e72ca23d6bad3e263113f4a8fda7b1a5e0ca00be96847031bd64fef2c2fa130"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\fitz\\__pycache__\\__init__.cpython-312.pyc",
+          "bytes": 742,
+          "sha256": "8b56f261fe69be77da3060d3d9589a716ad78364cd4b5a7cdf3303d7f1c60ee9"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__init__.py",
+          "bytes": 924164,
+          "sha256": "e8cdb45ed0afa21f919cec30e69b7b572c3db7bc80d203e4e07e4c7ea2b19cce"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__main__.py",
+          "bytes": 41358,
+          "sha256": "763a97305937d0665a43d4b6920924efb15d8f87795ec2926c09f9da69bfd2cb"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_apply_pages.py",
+          "bytes": 7716,
+          "sha256": "720b52015d70320bb3603c1a724c0741c9b53e87a9943ec96a911ef38b5bd457"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_build.py",
+          "bytes": 471,
+          "sha256": "6561ced4e8b28638d0ca36a028d4f91d1ac2ca309750930283f125aa0b04cae2"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_extra.pyd",
+          "bytes": 190976,
+          "sha256": "43292c50f18dafa1d92dec67e076d2340a361a24e510edb6ccfe8de7364b6b10"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_mupdf.pyd",
+          "bytes": 13063168,
+          "sha256": "8b0a0a990523eaecf695ec7f9bb5660047b11948649a7e89369141c03dc589d9"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_table_headers.py",
+          "bytes": 38558,
+          "sha256": "881a63053ebcb2ce48c87689380774391bbe09eb0996a14b8df7f0b2465e9215"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_table_refine.py",
+          "bytes": 31792,
+          "sha256": "37e9f101c3285633a4d62181f008fa36daba1efde30eda1bb7395908aa3af5d2"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_table_spans.py",
+          "bytes": 23067,
+          "sha256": "caec10e8e755984e14f3b27463b9e725897d7b98c22e4b447951a9c563b5f949"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_table_union.py",
+          "bytes": 15322,
+          "sha256": "efd332e5b513c758425a53c8b8f6b5b99c15bdda7f884818ee62e406d9265592"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\_wxcolors.py",
+          "bytes": 20533,
+          "sha256": "02363faab89d46857e25e7ca88707ca2975d36754a4fa9fd1d15081fc523ac1d"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\extra.py",
+          "bytes": 6882,
+          "sha256": "1888affc6f914edef4730c87bcb19849d5f10c9f65334fd329e728565a9980a3"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf.py",
+          "bytes": 2747394,
+          "sha256": "527bb3b4be763143666049efe255092d847a9a13e15a943fef63135bc6653186"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdfcpp64.dll",
+          "bytes": 26295808,
+          "sha256": "998184dce298f24a4c2b080a9173594c96c6f78796732bdd8e95ca0e557557cb"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\py.typed",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\pymupdf.py",
+          "bytes": 64,
+          "sha256": "4e6040168b78f7ddf96f6ce4b0ddb59e6702a979b55704e62c38b9b430596352"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\table.py",
+          "bytes": 109087,
+          "sha256": "c6523e32da763bd2b84e7b0cb3d221c9938ff1dc06c19a2d0d97d3635999d6ca"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\utils.py",
+          "bytes": 39718,
+          "sha256": "cc172067fe277068a3abdb9c8886efbfacaabc9b261f82ecb686ecd85fb7622d"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\classes.h",
+          "bytes": 770545,
+          "sha256": "4dbab31f95a0e12f783137b796a3780836d61d4ce6cdf17c4974532dc7d35149"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\classes2.h",
+          "bytes": 525997,
+          "sha256": "068c2655e386e842bd8a2b57211e55fc66cf5ad5c5a6c5281b5ad1152904394c"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\exceptions.h",
+          "bytes": 2197,
+          "sha256": "f8a94473f9470c5866fcbb28451452e7357d1b686ede9488cb80791ec7421512"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\extra.h",
+          "bytes": 8513,
+          "sha256": "d621e1c26ab9177b8a15800ad2aa8f435426a2de842104196a577c62b2d57722"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz.h",
+          "bytes": 2877,
+          "sha256": "3c851e3727717bd651128371da8e5e4276334159cfa59aa4f7a633467bedeb7b"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\functions.h",
+          "bytes": 579432,
+          "sha256": "7a09205f934db773be2438c637441ef5820a742a29a23c3504e14b9213b40620"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\html.h",
+          "bytes": 2074,
+          "sha256": "44972ea016ae9ce65cbeea8c647306bc27a9638adcfcb6de9e3fe33997fa503b"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\internal.h",
+          "bytes": 1391,
+          "sha256": "c4365a086fb77cc3cf08eefb385ff9a3e76b6760d6efa8c2c2b4965599284d33"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\memento.h",
+          "bytes": 17041,
+          "sha256": "312a318d0270fb6a7dc4f92fb8f9f95606983c2e648db0730629ef4ad64e7179"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf.h",
+          "bytes": 1692,
+          "sha256": "1b31e9a7ef52807a8ce361e52a778e3361644b616e0eb39ee44f9f3c10e646c8"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\ucdn.h",
+          "bytes": 14378,
+          "sha256": "872446ff16664050594bc1e6c2b4a95a35f5c1c9a65565430efa8c286235ca75"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\archive.h",
+          "bytes": 12458,
+          "sha256": "2eba82c2015535f41de90e94ad7389e8b252f26e7364e7e190b6b18227395061"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\band-writer.h",
+          "bytes": 3759,
+          "sha256": "44be4eca94818d624772bec2eea3d9912734a6c631a1f0ece0af379b3d44dfa9"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\barcode.h",
+          "bytes": 4245,
+          "sha256": "75f0e4ce540f571db2f5c9e2ee897f8d73a4002f42a66f7d8c39978d6e1f2cc1"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\bidi.h",
+          "bytes": 2530,
+          "sha256": "627146b07faf503c9434cdc6a2fa3efa75a036f2fb96d6d2c4e6fd47afa19b37"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\bitmap.h",
+          "bytes": 5350,
+          "sha256": "1a8fad7b399b82630b83a44951c50802f5581c69ba0c62af61fdda3857fba5cd"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\buffer.h",
+          "bytes": 8089,
+          "sha256": "dd14c15f836831fe8314e908d409bff6cf6506aecf282ad2535a921707070d56"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\color.h",
+          "bytes": 13251,
+          "sha256": "940820d1c64c2ddd63766b188f9b9798a7865e0bf951e13c46396bfa27fd6988"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\compress.h",
+          "bytes": 5188,
+          "sha256": "ab336a35dad5c56e1cf8b62a70727086081ce11e0082c0c207dc52b80a2ac7f7"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\compressed-buffer.h",
+          "bytes": 4643,
+          "sha256": "4cec63441089eac89ea77197b82077682a740625782a555f48980c653ef3f24b"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\config.h",
+          "bytes": 8245,
+          "sha256": "134195a6dec13aa8e217882cd78b3610c8966f465d393be4bd9a373dfad429b4"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\context.h",
+          "bytes": 31974,
+          "sha256": "d7fbe6da14ff6abcf00ad56f8626642ce708166e6454074f309786c0fd02c05d"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\crypt.h",
+          "bytes": 6750,
+          "sha256": "b450f276736931a98595c20ba397f05a742237563e6a5a14113a60b9dcaaa546"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\deskew.h",
+          "bytes": 1442,
+          "sha256": "537342f379f7ac930dfc93a121fe9f3983478f897489a9de9eb78c95625759f5"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\device.h",
+          "bytes": 25696,
+          "sha256": "6b12f488c9b69eee072d64aed9c5fb956ff39e5924117c077a423ada4d3f7bae"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\display-list.h",
+          "bytes": 4954,
+          "sha256": "c98b57de844757c0c50a38c16b210357e70b99db51156d921891fffa3c6f2e9a"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\document.h",
+          "bytes": 35716,
+          "sha256": "f51abb1e802db10be17b46402732f0ffb50adee2f2b809947399384260ea2d0a"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\export.h",
+          "bytes": 1689,
+          "sha256": "f93587a7b608eeb8396d83a060c3721b13951942c9dd2465c6d47314b0113d2c"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\filter.h",
+          "bytes": 8104,
+          "sha256": "173b32b75dac41c6661782e1fc283e55621d9e607571ef2bb71bd830b529731f"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\font.h",
+          "bytes": 25042,
+          "sha256": "d581849d2a51dd21b128b2edf37ec96818adbe68dc25fb1400651e278c7a607b"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\geometry.h",
+          "bytes": 24294,
+          "sha256": "cefc87522783de2dc65ba0c0e50c4718517f477c1816ead818d01d7ad3680c75"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\getopt.h",
+          "bytes": 4934,
+          "sha256": "27ea89de11d5be647d9f5994bfbc68bad50752f6c6bbce7f34c2ef135851e261"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\glyph-cache.h",
+          "bytes": 3417,
+          "sha256": "e45eeb4a37a3f6fc3e3410cb992774cddc29b14ea8923b850f11c1dada74c4c3"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\glyph.h",
+          "bytes": 2397,
+          "sha256": "8d28fe8eca52390351d1cfd58bdaad98758daa483a1b14890bf16ce1a138ecb4"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\hash.h",
+          "bytes": 4107,
+          "sha256": "dabd114f9476b54a75c4368624fda367ed52b8bef510140dee55cf1ca74ef72c"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\heap-imp.h",
+          "bytes": 4514,
+          "sha256": "29fd176fa89d50b117b2b56fcd53d3ce20514feb3ec185fe6916e0e5d60a3523"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\heap.h",
+          "bytes": 5171,
+          "sha256": "36392e523b8b51d6259c001dcae7a7e0c134af4b2b5fae45411a904ae07c549f"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\hyphen.h",
+          "bytes": 2018,
+          "sha256": "8cfdfbfc9fa1c40cbf10faed8b5239940d0177083431a1a8e586793f3717848f"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\image.h",
+          "bytes": 15513,
+          "sha256": "ec4fc7fb94e3ecbd52354fd4e3a5582194cd9db0078fbcc46713f891c8c4574e"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\json.h",
+          "bytes": 3263,
+          "sha256": "d399be259e5c589c8beec3b9b41038251f4837c2add27854fe6ba82385df3223"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\link.h",
+          "bytes": 4129,
+          "sha256": "ccc11438759247393d9dddaf9026920e400d24e346cd8915cc35946a6f766c35"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\log.h",
+          "bytes": 1961,
+          "sha256": "e319a159d830b81b45a9b7f5d8e5217ca8014f81cb10439d59e66a1e323e0917"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\options.h",
+          "bytes": 6705,
+          "sha256": "a7c9ea8c302b565e70e29623084a4d81395f370694a0e183d2741f160e616307"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\outline.h",
+          "bytes": 8148,
+          "sha256": "e85933f83ca4d1a91657169019160165d55a941f4d1b48961ce74e442bcfad34"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\output-svg.h",
+          "bytes": 2947,
+          "sha256": "ef60697e748e3e1fc6ce775099f15a86de36946c56335cf58b2f072bbef58919"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\output.h",
+          "bytes": 13780,
+          "sha256": "24e7b9a0dd4cbc99264cf19f399f6d7f6f1e8a0fd83a49918390ac1a6e415325"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\path.h",
+          "bytes": 14146,
+          "sha256": "1644bfa7df3549cf8028b3eba7f93d3473f18fa3116bd8190855c56c64a61bc5"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\pixmap.h",
+          "bytes": 16252,
+          "sha256": "a6cd7aafbd8b1bfae091e080a3b184a161eae449283540750c153703219477ca"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\pool.h",
+          "bytes": 3302,
+          "sha256": "e690110a2dff0393751f4cacdb3abacaa25124edb7db2c9cc8b5bac19ffd3d47"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\separation.h",
+          "bytes": 4603,
+          "sha256": "d8df4cb980c86ba8c3e67e11a4e8cfa962649f4e6f2a496a1839b511241cabdd"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\shade.h",
+          "bytes": 6211,
+          "sha256": "74f1e40ab5f10faadaec0d92441ab10d2e1aa09bf4f43e90d9d3557ab3c7f9cb"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\store.h",
+          "bytes": 14139,
+          "sha256": "bf3a29039908745131714a84f8602faf8f2b772de23b7532c5cc6296b1545588"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\story-writer.h",
+          "bytes": 6916,
+          "sha256": "1b7f9e778667b7c7e390f3e142f9cceb788d103861380574aa9eb15fac530d3e"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\story.h",
+          "bytes": 7681,
+          "sha256": "774d15d23dd1efb428a8a5e6a2f141d584e24c6b6a3eccd1256ac49e1100fdbe"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\stream.h",
+          "bytes": 16683,
+          "sha256": "c1c60ec456a96746a95a966324e74cbb6746b85a3be80e2217ea57942a8f68df"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\string-util.h",
+          "bytes": 12673,
+          "sha256": "62f5f52ddd6242f0f37bf303c20885abbfadb2cf7b197c63a2acbc0942b4d8e6"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\structured-text.h",
+          "bytes": 44671,
+          "sha256": "14f6425c468e8d4be79075ae347dd3907bdecf5971fb630d516e61c7d993b636"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\system.h",
+          "bytes": 15316,
+          "sha256": "073e469542ba3a84b3fad93bd5fab1464bb792aa82dea6b91558e5e355630be5"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\text.h",
+          "bytes": 6456,
+          "sha256": "174b56b21d13fe18246427dd68d712b0a81c254fbc17cd48154d023a4c1195c9"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\track-usage.h",
+          "bytes": 1707,
+          "sha256": "a25792ab5670596a8cb00ca4bc52aac5c4c60470d0a568e643845114bb1d072a"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\transition.h",
+          "bytes": 2188,
+          "sha256": "07951b7fd6e3fd65a8a9ad3922721d93defcf95460eab474ecfbb16ad7eee7ac"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\tree.h",
+          "bytes": 1983,
+          "sha256": "e36e427266db0748fd3c5b6ae12e13c0b9445af2d310c27dda685e5e8116585f"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\types.h",
+          "bytes": 1470,
+          "sha256": "3f458b09794660dc954ab76f8e546074b528647a6d13f582937e5892c59ed9fd"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\util.h",
+          "bytes": 12276,
+          "sha256": "6023a214810ad85d254e41362506b5c0f14ea1ef6f248a503bf012b8b95c1041"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\version.h",
+          "bytes": 1200,
+          "sha256": "e29279facac2566060ba013550bd6178fefc6c4d0eca49433044489396768502"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\write-pixmap.h",
+          "bytes": 16876,
+          "sha256": "82218ff6d619fa9d1746aefa952e66845af2d9fddc988cb14c988b92051aab1c"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\writer.h",
+          "bytes": 10455,
+          "sha256": "dab95772c6d1e3bd2a487b67fac36f14a580bef74b729864223d77de7bb7d953"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\fitz\\xml.h",
+          "bytes": 12937,
+          "sha256": "d80c67814bf1adfd4f52c6585bf6a1ff6f1112564dc0e177adf2dd0167578436"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\helpers\\mu-office-lib.h",
+          "bytes": 22192,
+          "sha256": "cb1bc9e41f747354eee6caaaf1de8ee1d21924ee3c641bd75a5bb913a6d54811"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\helpers\\mu-threads.h",
+          "bytes": 5774,
+          "sha256": "f594589fe460ff4d968c74eda602fa03d806b94f122169be18cd49417e09f210"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\helpers\\pkcs7-openssl.h",
+          "bytes": 2427,
+          "sha256": "8d06f568c3447200bc11a2a17d7e2623313b29cbc010d94affe8cc893a5e961e"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\annot.h",
+          "bytes": 35759,
+          "sha256": "0c0c3d9a22d2d361f2c0812f35ca7acbfffd9239a4dc6336ecc3bd9f9ab0bbed"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\clean.h",
+          "bytes": 2872,
+          "sha256": "c989642f135090ee63fce8e8db09152e7fa2d6faa50c72fa73e5d0032eebba16"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\cmap.h",
+          "bytes": 3954,
+          "sha256": "ba25bb58f39c235b67125053c4022d3889cd1c8727e6de89a3e6c288920ab7fe"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\crypt.h",
+          "bytes": 4548,
+          "sha256": "e546987708e80e0f65163d4ba773ec3368f6d3a8566a4dc38f192ee5feacbea6"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\document.h",
+          "bytes": 33002,
+          "sha256": "6a17c1f8d0fe2149e609094a20d0665bd2229d55f1fc575a361c1ce4226b23d4"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\event.h",
+          "bytes": 4777,
+          "sha256": "27fc16c1e10772f553073bb103b73f8cebf5a5fd9c08494ac02b243baf750ea6"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\font.h",
+          "bytes": 5391,
+          "sha256": "aefff8634d5e035ab3bf0f14a3a9892c3cf72d2eed9dc878779f6b6d0362d7d7"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\form.h",
+          "bytes": 15059,
+          "sha256": "91969646a2d9cead53f9be1d3e8cd8109023709572e9ef5556aa2cac5a57cdb2"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\image-rewriter.h",
+          "bytes": 3565,
+          "sha256": "d7999b657f43edcba6e4b8a527fc9301308a6f15b9513bb0f0f3590b1267361e"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\interpret.h",
+          "bytes": 20664,
+          "sha256": "2af5eb6ae564b09fbf4ca82baf7afdbe70c78538be5c695f25874ea8e4c92e0d"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\javascript.h",
+          "bytes": 1823,
+          "sha256": "342addf0d1bfaa23498a270456ef284f52189e9bd726570d8e525b3a840dc2e0"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\name-table.h",
+          "bytes": 20990,
+          "sha256": "3a23207fb4cb723c11d9c324f388cc5bc6df4cc0dff4354022b72e36a98d7f4f"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\object.h",
+          "bytes": 20933,
+          "sha256": "cebc8f81d07380a776c066fa91dce76252dbbabdb9127d8548dd73052463ebc8"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\page.h",
+          "bytes": 12356,
+          "sha256": "e60801c6f080fef1bffee4aadb11ddc5a9250f40a5a2ea7aab3812d3890aabde"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\parse.h",
+          "bytes": 2596,
+          "sha256": "9d7d82a04a4eec8ee98b9c7df5c30b1e1ca02d36494ae697e0fe05f77d0a6753"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\recolor.h",
+          "bytes": 1563,
+          "sha256": "284afd1764a75be4b7a7ddae9d3291b6526d84a2375e5918f7168e014b871930"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\resource.h",
+          "bytes": 6902,
+          "sha256": "427b22972c0398d5d0b6d7935351179e804504f0b21ed5c1f4e6afb9985ef45d"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\xref.h",
+          "bytes": 12131,
+          "sha256": "4d54ed3f01ca989426bb200b78d4ca8cb54ae930d4c6b870abc00871d8ef0585"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\include\\mupdf\\pdf\\zugferd.h",
+          "bytes": 1616,
+          "sha256": "99adf5e050ccdfb24576dab245830b8011bc171c339087911344e96cd5d44fcf"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\lib\\libmuthreads.lib",
+          "bytes": 24968,
+          "sha256": "556b5975a7c6d120c1e768a71280aa0a00740aa6be28105edeb661023338a4a9"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\mupdf-devel\\lib\\mupdfcpp64.lib",
+          "bytes": 4032678,
+          "sha256": "53551847c2eb0f7168a4cd1f61a8113422fbe37d7044446040923b4502253ea5"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\__init__.cpython-312.pyc",
+          "bytes": 1081246,
+          "sha256": "27a566fb7b3367bfb1929ce08b04d40793d319322a32501c40e916d81765d15f"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\_build.cpython-312.pyc",
+          "bytes": 738,
+          "sha256": "eb054cf6b61aa8731ee52fbca70655b9e107f5adf772c692890474ece6f31e4c"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\_table_headers.cpython-312.pyc",
+          "bytes": 54496,
+          "sha256": "7492bc643872aa9955ecabfa0a545d6283cebd82ef8b86997cb4b8785f0d4a6b"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\_table_refine.cpython-312.pyc",
+          "bytes": 47988,
+          "sha256": "c146014cfb870ae43050db3debc987086a42cc744935fe43c74ca422fb06d1f5"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\_table_spans.cpython-312.pyc",
+          "bytes": 30753,
+          "sha256": "f8a4d6e4aad62a9da2e11a72f99759b85b92b36350b96a637e5c4c864e0c9802"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\_wxcolors.cpython-312.pyc",
+          "bytes": 15694,
+          "sha256": "9978520eb5f28a52326885dfa684c64a33e44b6b4708aae1d93299270652a002"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\extra.cpython-312.pyc",
+          "bytes": 13264,
+          "sha256": "220f281e90935983908a859318f33e88089b8c092bc48a4311d2cfec4eede62a"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\mupdf.cpython-312.pyc",
+          "bytes": 3670608,
+          "sha256": "3e62e926eded6297755ee0635a6666da1f39397f13efd1b3c630e454d177055c"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\pymupdf.cpython-312.pyc",
+          "bytes": 203,
+          "sha256": "1482515db363843615c7bf704fe4ea7d4833d9bbd7dbed419d180913c7d01bef"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\table.cpython-312.pyc",
+          "bytes": 121581,
+          "sha256": "5a47ecabbfc4d703be8ee4bb3fb035d196e762a178605189d9392bb6277e0ff3"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf\\__pycache__\\utils.cpython-312.pyc",
+          "bytes": 46350,
+          "sha256": "a5b4e7c46b7ca06b990934991023135aad79a9371f0c5dea4150c34f95434b67"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf-1.28.2.dist-info\\COPYING",
+          "bytes": 64,
+          "sha256": "40e60697600535eabfb5ae05f72829d88cfe8d02dd4792f5a754f6f51dabe55b"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf-1.28.2.dist-info\\entry_points.txt",
+          "bytes": 51,
+          "sha256": "f4d707fc25641d5b8b3711354d86dfc17c0295590c70cf3dd133132770b97c30"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf-1.28.2.dist-info\\INSTALLER",
+          "bytes": 2,
+          "sha256": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf-1.28.2.dist-info\\METADATA",
+          "bytes": 26483,
+          "sha256": "5c1fc460889bd3ff8d213e6c0f29154a8cd3576505f4844d7c3e089fa45eed40"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf-1.28.2.dist-info\\README.md",
+          "bytes": 25223,
+          "sha256": "d0d17bed851133430744866941a1707542d1aeb072bbab681deec1e49498663c"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf-1.28.2.dist-info\\RECORD",
+          "bytes": 11952,
+          "sha256": "128b938df0d5619f4b60d2b5b82f4f1ed040e15b78d4ae908ddf01c5739e1a6c"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf-1.28.2.dist-info\\REQUESTED",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\pymupdf-1.28.2.dist-info\\WHEEL",
+          "bytes": 85,
+          "sha256": "50d3a8365836c950c31389b47166585f10c0b69085073bc27928af534fcae7a1"
+        },
+        {
+          "relative": "dist\\w07-env\\Lib\\site-packages\\__pycache__\\_virtualenv.cpython-312.pyc",
+          "bytes": 4732,
+          "sha256": "0bbb61cc321109466d41b5af59b274b05b7f851aca2ad832ffc35e4973b2c43d"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\activate",
+          "bytes": 4104,
+          "sha256": "8ea5770727b6dc7eea71a75ded34aad5c62efc020b4446c11807dbb6c18ba19e"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\activate_this.py",
+          "bytes": 2378,
+          "sha256": "372e90ff227f1040a114cc4c33f1ae5f8ee0db129803e1e4d083ad63a9751b0a"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\activate.bat",
+          "bytes": 2684,
+          "sha256": "e15212c96a956bfbab428a11dbfa02ac357f58f180e25a50deceff4f2ddb4513"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\activate.csh",
+          "bytes": 2634,
+          "sha256": "d597b69a2c5b2c97adfa44f6a5b736f840a22f76099f22d04985ac34100d5b4b"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\activate.fish",
+          "bytes": 4345,
+          "sha256": "02150699f659c9af3b2224fcd69d771a04a26af70f5364f8300a6a79290dfa81"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\activate.nu",
+          "bytes": 3960,
+          "sha256": "e9da3cada27fb5671bb41878151ef75a4f4fc925daed0a71a985c865b2dc5215"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\activate.ps1",
+          "bytes": 2768,
+          "sha256": "833c0e2a294912ebba755e264a757818591fed7dd938a284dbeac9a5ba0cace9"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\activate.xsh",
+          "bytes": 3843,
+          "sha256": "34e6cf86e35b1dd3a583ce55409f1c19a0ea6699c968f7e9842ed89ea073210b"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\deactivate.bat",
+          "bytes": 1730,
+          "sha256": "13ea86073a9ee43a66e3549312599dd47ff315758b4ca5a0406faf041fb82300"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\pydoc.bat",
+          "bytes": 1219,
+          "sha256": "09f9608d478fa48a9e49af8f413cfeaab47773effd185433088b7688ce75890e"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\pymupdf.exe",
+          "bytes": 46080,
+          "sha256": "5f88e834051ce4e99e09258477d180c24202cf09c2f52b9350c31437bc985f2b"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\python.exe",
+          "bytes": 277808,
+          "sha256": "2204195cec25879507d958a8b6949add67091244b8b4da9cf3672f993548fa49"
+        },
+        {
+          "relative": "dist\\w07-env\\Scripts\\pythonw.exe",
+          "bytes": 265520,
+          "sha256": "cd4da365ffeb4702055b80487485f0f4509e34c1e991181c293b031d62e2323e"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\mobile-tools\\HiSuite-14.exe",
+      "relative": "dist\\mobile-tools\\HiSuite-14.exe",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\mobile-tools\\HiSuite-14.exe",
+      "isDirectory": false,
+      "bytes": 63854728.0,
+      "files": [
+        {
+          "relative": "dist\\mobile-tools\\HiSuite-14.exe",
+          "bytes": 63854728,
+          "sha256": "38cd75e8e9c07360f8caa3f2c79a1601d1bfafa260295363a31c3494329fc49b"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\mobile-tools\\platform-tools.zip",
+      "relative": "dist\\mobile-tools\\platform-tools.zip",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\mobile-tools\\platform-tools.zip",
+      "isDirectory": false,
+      "bytes": 8044989.0,
+      "files": [
+        {
+          "relative": "dist\\mobile-tools\\platform-tools.zip",
+          "bytes": 8044989,
+          "sha256": "45f4d63113e895ebde0c90f194099a4676b6ac653bd28d54314a9e022bbc1a99"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\adjustable-media",
+      "relative": "dist\\adjustable-media",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\adjustable-media",
+      "isDirectory": true,
+      "bytes": 475572.0,
+      "files": [
+        {
+          "relative": "dist\\adjustable-media\\main.js",
+          "bytes": 446015,
+          "sha256": "d278038306ae4ef86c1a6a92d1a812cb06b0f7f89f963708b651b98e6e5e2e3a"
+        },
+        {
+          "relative": "dist\\adjustable-media\\manifest.json",
+          "bytes": 405,
+          "sha256": "bea3e98e211feb5a9490448f7bfa0082cebc8413a0fc8a053175ba2165e26aac"
+        },
+        {
+          "relative": "dist\\adjustable-media\\styles.css",
+          "bytes": 29152,
+          "sha256": "8d193444561d519f0a8d8306e16e0d814d856f702e4665457d0342e980338eee"
+        }
+      ]
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w01-probe",
+      "relative": "dist\\w01-probe",
+      "staged": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-20261009\\dist\\w01-probe",
+      "isDirectory": true,
+      "bytes": 476584.0,
+      "files": [
+        {
+          "relative": "dist\\w01-probe\\main.js",
+          "bytes": 476584,
+          "sha256": "ef28b819d97992195390192ce391c784ecc1c6c627664460a3ca2d456705ad06"
+        }
+      ]
+    }
+  ],
+  "stagedHashesMatch": true,
+  "sourceAbsent": true,
+  "recycleBinMatch": true,
+  "recycleBinItem": "E:\\$RECYCLE.BIN\\S-1-5-21-1334747561-1239154481-3842915903-1001\\$R3FMPN6.artifact-cleanup-20261009"
+}

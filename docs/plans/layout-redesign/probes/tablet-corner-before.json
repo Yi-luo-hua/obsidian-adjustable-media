@@ -1,0 +1,348 @@
+{
+  "result": {
+    "file": "01 显示与媒体.md",
+    "mode": "source",
+    "viewport": [
+      743,
+      736
+    ],
+    "editing": false,
+    "source": "# 显示与媒体\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":190,\"widths\":[0.855,1.145]}]} -->\n![[attachments/square.png]] ![[attachments/landscape.png]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":200,\"width\":1}]} -->\n![[attachments/clip.mp4]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"type\":\"text\",\"cols\":2} -->\n手机端分栏文字。中文与 English text 应完整显示。\n\n$$\nx^2+y^2=z^2\n$$\n\n第二段文字包含 **粗体** 和列表。\n- 第一项\n- 第二项\n\n<!-- /vml -->\n",
+    "corners": [
+      {
+        "rect": {
+          "x": 705.2000122070312,
+          "y": 392.01251220703125,
+          "width": 16,
+          "height": 16,
+          "top": 392.01251220703125,
+          "right": 721.2000122070312,
+          "bottom": 408.01251220703125,
+          "left": 705.2000122070312
+        },
+        "frame": {
+          "x": 24,
+          "y": 188.8125,
+          "width": 690.4000244140625,
+          "height": 212.40000915527344,
+          "top": 188.8125,
+          "right": 714.4000244140625,
+          "bottom": 401.21250915527344,
+          "left": 24
+        },
+        "wrapper": {
+          "x": 24,
+          "y": 188.8125,
+          "width": 690.4000244140625,
+          "height": 212.40000915527344,
+          "top": 188.8125,
+          "right": 714.4000244140625,
+          "bottom": 401.21250915527344,
+          "left": 24
+        },
+        "contain": "paint",
+        "points": [
+          {
+            "x": 707.2000122070312,
+            "y": 394.01251220703125,
+            "target": "vml-handle vml-frame__handle vml-frame__handle--corner"
+          },
+          {
+            "x": 713.2000122070312,
+            "y": 400.01251220703125,
+            "target": "vml-handle vml-frame__handle vml-frame__handle--corner"
+          },
+          {
+            "x": 719.2000122070312,
+            "y": 406.01251220703125,
+            "target": "cm-scroller"
+          },
+          {
+            "x": 721.2000122070312,
+            "y": 416.01251220703125,
+            "target": "cm-scroller"
+          }
+        ]
+      },
+      {
+        "rect": {
+          "x": 705.2000122070312,
+          "y": 1384.6937255859375,
+          "width": 16,
+          "height": 16,
+          "top": 1384.6937255859375,
+          "right": 721.2000122070312,
+          "bottom": 1400.6937255859375,
+          "left": 705.2000122070312
+        },
+        "frame": {
+          "x": 24,
+          "y": 417.2124938964844,
+          "width": 690.4000244140625,
+          "height": 976.6812744140625,
+          "top": 417.2124938964844,
+          "right": 714.4000244140625,
+          "bottom": 1393.8937683105469,
+          "left": 24
+        },
+        "wrapper": {
+          "x": 24,
+          "y": 417.2124938964844,
+          "width": 690.4000244140625,
+          "height": 976.6812744140625,
+          "top": 417.2124938964844,
+          "right": 714.4000244140625,
+          "bottom": 1393.8937683105469,
+          "left": 24
+        },
+        "contain": "paint",
+        "points": [
+          {
+            "x": 707.2000122070312,
+            "y": 1386.6937255859375
+          },
+          {
+            "x": 713.2000122070312,
+            "y": 1392.6937255859375
+          },
+          {
+            "x": 719.2000122070312,
+            "y": 1398.6937255859375
+          },
+          {
+            "x": 721.2000122070312,
+            "y": 1408.6937255859375
+          }
+        ]
+      }
+    ],
+    "manualEvents": [
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "vml-handle vml-frame__handle vml-frame__handle--corner is-active",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "contextmenu",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "vml-handle vml-frame__handle vml-frame__handle--corner is-active mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointerup",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "vml-handle vml-frame__handle vml-frame__handle--corner is-active",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-content cm-lineWrapping",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointercancel",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-content cm-lineWrapping mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchend",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-content cm-lineWrapping mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "HyperMD-header HyperMD-header-1 cm-line",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointerup",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchend",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "click",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-active HyperMD-header HyperMD-header-1 cm-line",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointercancel",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-active HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchend",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-active HyperMD-header HyperMD-header-1 cm-line",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-active HyperMD-header HyperMD-header-1 cm-line",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointerup",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-active HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchend",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-active HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "click",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-active HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-line",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointerup",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchend",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "click",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "HyperMD-header HyperMD-header-1 cm-line",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointerup",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "touchend",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "click",
+        "trusted": true,
+        "file": "01 显示与媒体.md",
+        "target": "HyperMD-header HyperMD-header-1 cm-line mobile-tap",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      }
+    ]
+  },
+  "errors": []
+}

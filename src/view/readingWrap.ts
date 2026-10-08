@@ -1,4 +1,5 @@
 import type { App } from "obsidian";
+import { ConvergenceBudget } from "../layout/convergenceBudget.ts";
 
 import type { WrapSide } from "../format/v2.ts";
 import { planProxy, type FloatSize, type ProxyPlan } from "../layout/wrapGaps.ts";
@@ -78,6 +79,12 @@ const asked = new WeakMap<HTMLElement, string>();
  * and how wide the page was then: until Obsidian has measured one, it counts at that height.
  */
 const remeasuring = new WeakMap<HTMLElement, { height: number; width: number }>();
+const budgets = new WeakMap<HTMLElement, ConvergenceBudget>();
+
+/** An over-budget section remains pending even when its host calls it computed. */
+export function readingMeasurementsReady(section: HTMLElement): boolean { return !budgets.get(section)?.blocked; }
+
+export function resetReadingMeasurements(section: HTMLElement): void { budgets.delete(section); }
 /** A table's native scroll box must not contain the float that stands beside the table. */
 const tableHosts = new WeakMap<HTMLElement, { box: HTMLElement }>();
 let nextId = 0;
@@ -146,6 +153,7 @@ export function refreshReadingWrap(app: App, section: HTMLElement): void {
     if (float) float.size = null;
     asked.delete(item.el);
     remeasuring.delete(item.el);
+    resetReadingMeasurements(item.el);
   }
   keepWrapsBeside(app, section);
 }
@@ -153,7 +161,10 @@ export function refreshReadingWrap(app: App, section: HTMLElement): void {
 /** Resource events invalidate only the float that owns the media and its dependent stand-ins. */
 export function refreshReadingMedia(section: HTMLElement, media: HTMLElement): void {
   const float = floats.get(section);
-  if (float?.layout.contains(media)) replan(float);
+  if (float?.layout.contains(media)) {
+    for (const host of float.hosts) resetReadingMeasurements(host);
+    replan(float);
+  }
 }
 
 class Keeper {
@@ -331,6 +342,9 @@ function settle(app: App, reading: ReadingSections): void {
     }
     const key = `${Math.round(section.height)}:${height}`;
     if (asked.get(section.el) !== key) {
+      const budget = budgets.get(section.el) ?? new ConvergenceBudget();
+      budgets.set(section.el, budget);
+      if (!budget.take(reading.sizer.clientWidth)) continue;
       asked.set(section.el, key);
       stale.push(index);
     }

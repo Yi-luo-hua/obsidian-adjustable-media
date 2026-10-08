@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-09",
+  "workspace": "E:\\TOOLS\\obsidian-adjustable-media",
+  "staging": "E:\\TOOLS\\obsidian-adjustable-media\\.artifact-cleanup-extra-20261009",
+  "fileCount": 9,
+  "bytes": 15525.0,
+  "moves": [
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\build-tablet-reading-diagnostic.mjs",
+      "relative": "dist\\build-tablet-reading-diagnostic.mjs",
+      "bytes": 1867,
+      "sha256": "4a0e4cc6f4e2f459fa660925b6862412bd0a6c8454ffa2f63f502ea880297a04"
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\mobile-disable.js.txt",
+      "relative": "dist\\mobile-disable.js.txt",
+      "bytes": 111,
+      "sha256": "f10d5f5239969aeb660c137845bcd48ef112028fe37f369d04b15f8a32cdcaa7"
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\mobile-enable.js.txt",
+      "relative": "dist\\mobile-enable.js.txt",
+      "bytes": 110,
+      "sha256": "6215645549067320213524d1729b77bb423f5325b0d8ac91ec7d4688b8f63d8a"
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\reading-first-section-before.log",
+      "relative": "dist\\reading-first-section-before.log",
+      "bytes": 2978,
+      "sha256": "db05173c25478331b14ee49465e5ee86a02eeb093d084586afc3e52a6ba992bd"
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\reading-new-file-before.log",
+      "relative": "dist\\reading-new-file-before.log",
+      "bytes": 3724,
+      "sha256": "dd3d760546e1a0f991d597f149da99ab97d3705d45063fe96e85c65dc7091bf7"
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\reading-provisional-before.log",
+      "relative": "dist\\reading-provisional-before.log",
+      "bytes": 3170,
+      "sha256": "8c5c1f3925e1350c75108b172466a800d11737baaaf8cc9ca8e4c71e38b145c6"
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w07-pr-body.md",
+      "relative": "dist\\w07-pr-body.md",
+      "bytes": 1657,
+      "sha256": "0136154dc66d6ac2451e5864ade7db16da66fe3e4fd2a00ab5d80afb3035dfa1"
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w07-progress-index.patch",
+      "relative": "dist\\w07-progress-index.patch",
+      "bytes": 853,
+      "sha256": "332eeab2899684de7873b6112a53d1b57892dec8534e4640a19e19d6f34919a2"
+    },
+    {
+      "original": "E:\\TOOLS\\obsidian-adjustable-media\\dist\\w10-restoration-kit.cjs",
+      "relative": "dist\\w10-restoration-kit.cjs",
+      "bytes": 1055,
+      "sha256": "73b057e89627213acfc66b994ffa57742544d00de165dc80e7c59a2f6ad8b873"
+    }
+  ],
+  "stagedHashesMatch": true,
+  "sourceAbsent": true,
+  "recycleBinMatch": true,
+  "recycleBinItem": "E:\\$RECYCLE.BIN\\S-1-5-21-1334747561-1239154481-3842915903-1001\\$R7KOM7D.artifact-cleanup-extra-20261009"
+}

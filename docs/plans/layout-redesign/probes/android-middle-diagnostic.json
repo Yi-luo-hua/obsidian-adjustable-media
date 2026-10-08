@@ -1,0 +1,176 @@
+{
+  "result": {
+    "viewport": {
+      "from": 1889,
+      "to": 2786
+    },
+    "guard": true,
+    "anchors": [
+      {
+        "from": 0,
+        "key": "block:21:1"
+      }
+    ],
+    "sizes": [],
+    "pending": [],
+    "budget": {
+      "rounds": 1,
+      "blocked": false
+    },
+    "ready": false,
+    "proxies": 0,
+    "layouts": 0,
+    "trace": [
+      {
+        "id": 2,
+        "method": "measure",
+        "at": 788605.1999999881,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "read",
+        "at": 788609.5,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "update": false,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "write",
+        "at": 788610,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "pending": false
+      },
+      {
+        "id": 2,
+        "method": "measure",
+        "at": 788614.3000000119,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "read",
+        "at": 788626.3999999762,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "update": false,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "measure",
+        "at": 788626.6999999881,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "write",
+        "at": 788627.3999999762,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "read",
+        "at": 788630.5,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "update": false,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "write",
+        "at": 788630.8000000119,
+        "epoch": 1,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "pending": false
+      },
+      {
+        "id": 2,
+        "method": "measure",
+        "at": 788708.5,
+        "epoch": 2,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "read",
+        "at": 788723.5,
+        "epoch": 2,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "update": false,
+        "pending": true
+      },
+      {
+        "id": 2,
+        "method": "write",
+        "at": 788723.8000000119,
+        "epoch": 2,
+        "viewport": {
+          "from": 1889,
+          "to": 2786
+        },
+        "docLength": 7296,
+        "pending": false
+      }
+    ],
+    "phase": "measuring"
+  },
+  "errors": []
+}

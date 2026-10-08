@@ -1,0 +1,27 @@
+(async()=>{
+  if(app.vault.getName()!=='vml-test-vault')throw new Error('Test vault required');
+  const fs=require('fs'),crypto=require('crypto'),base=app.vault.adapter.getBasePath(),root='E:/TOOLS/obsidian-adjustable-media/';
+  const hash=value=>crypto.createHash('sha256').update(value).digest('hex'),wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const original=Object.fromEntries(app.vault.getMarkdownFiles().map(f=>[f.path,hash(fs.readFileSync(base+'/'+f.path))]));
+  const path='W01 production middle transient.md';if(app.vault.getAbstractFileByPath(path))throw new Error('Probe file exists');
+  const source='<!-- vml {"v":2,"type":"text","wrap":"right","width":0.4} -->\n'+Array.from({length:240},(_,i)=>'Side note '+i+'  \n').join('')+'<!-- /vml -->\n'+Array.from({length:220},(_,i)=>'Body '+i+'\n\n').join('');
+  const file=await app.vault.create(path,source),previous=app.workspace.activeLeaf,leaves=[];
+  const diagnostic=JSON.parse(fs.readFileSync(root+'docs/plans/layout-redesign/probes/w01-first-middle.json','utf8'));
+  const result={buildHash:hash(fs.readFileSync(base+'/.obsidian/plugins/adjustable-media/main.js')),repositoryHash:hash(fs.readFileSync(root+'main.js')),samples:[]};
+  try{
+    for(const mode of ['source','preview']){
+      const leaf=app.workspace.getLeaf(true);leaves.push(leaf);
+      await leaf.openFile(file,{state:{mode},eState:{line:source.split('\n').findIndex(l=>l==='Body 90')},active:false});app.workspace.setActiveLeaf(leaf,{focus:false});await wait(900);
+      const container=mode==='source'?leaf.view.editor.cm.dom:leaf.view.previewMode.containerEl;
+      const sizes=[...container.querySelectorAll('.vml-layout')].map(el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};}).filter(r=>r.width>0);
+      const expected=diagnostic.samples.find(s=>s.mode===mode).layoutSizes;
+      result.samples.push({mode,layoutSizes:sizes,diagnosticSizes:expected,geometryMatches:sizes.length===expected.length&&sizes.every((r,i)=>Math.abs(r.width-expected[i].width)<=2&&Math.abs(r.height-expected[i].height)<=2),standIns:container.querySelectorAll(mode==='source'?'.vml-wrap-proxy':'.vml-rv-proxy').length});
+    }
+    result.passed=result.buildHash===result.repositoryHash&&result.samples.every(s=>s.geometryMatches&&s.standIns>0);
+  }catch(error){result.error=String(error.stack??error);}
+  finally{
+    for(const leaf of leaves.reverse())leaf.detach();if(previous)app.workspace.setActiveLeaf(previous,{focus:false});await wait(200);await app.vault.trash(file,true);
+    result.originalNotesUnchanged=Object.entries(original).every(([p,h])=>hash(fs.readFileSync(base+'/'+p))===h);
+    fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w01-production-smoke.json',JSON.stringify(result,null,2));window.w01ProductionResult=result;
+  }
+})();

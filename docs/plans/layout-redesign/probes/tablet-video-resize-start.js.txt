@@ -1,0 +1,24 @@
+(async()=>{
+ const path='07 视频缩放测试.md',source='# 视频缩放测试\n\n<!-- vml {"v":2,"width":0.45,"rows":[{"height":150,"width":1}]} -->\n![[attachments/clip.mp4]]\n<!-- /vml -->\n\n块外文字保持原样。\n';
+ if(document.querySelector('.vml-text-editor'))throw new Error('Finish existing text editing first');
+ document.querySelector('.mobile-image-viewer')?.click();
+ if(app.vault.getAbstractFileByPath(path))throw new Error('Video fixture already exists');
+ const leaf=app.workspace.activeLeaf,previous=leaf.getViewState(),userFile=leaf.view.file.path,userSource=await app.vault.read(leaf.view.file);
+ await app.vault.create(path,source);
+ await leaf.setViewState({type:'markdown',state:{file:path,mode:'source',source:false},active:true});await new Promise(r=>setTimeout(r,600));
+ const cm=leaf.view.editor.cm;cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.contentDOM.blur();await new Promise(r=>setTimeout(r,300));
+ let video=cm.dom.querySelector('video');video.muted=true;video.loop=true;await video.play();await new Promise(r=>setTimeout(r,250));
+ const root=video.closest('.vml-layout'),handle=root.querySelector('.vml-frame__handle--corner');handle.scrollIntoView({block:'center'});await new Promise(r=>setTimeout(r,250));
+ const b=handle.getBoundingClientRect(),x=b.x+b.width/2,y=b.y+b.height/2;
+ if(document.elementFromPoint(x,y)?.closest('.vml-frame__handle--corner')!==handle)throw new Error('Visible corner required');
+ const events=[],stops=[];
+ for(const name of ['loadstart','emptied','pause','loadedmetadata','play']){const fn=e=>events.push({name,at:performance.now(),old:e.target===video});cm.dom.addEventListener(name,fn,true);stops.push(()=>cm.dom.removeEventListener(name,fn,true));}
+ const samples=[],start=performance.now();let removed=0;
+ const observer=new MutationObserver(rows=>{for(const r of rows)for(const n of r.removedNodes)if(n===video||n.contains?.(video))removed++;});observer.observe(cm.dom,{childList:true,subtree:true});stops.push(()=>observer.disconnect());
+ const timer=setInterval(()=>{const e=cm.dom.querySelector('video'),r=e?.getBoundingClientRect();samples.push({at:performance.now()-start,same:e===video,width:r?.width,height:r?.height,ready:e?.readyState,time:e?.currentTime,paused:e?.paused});},16);stops.push(()=>clearInterval(timer));
+ window.__tabletVideoResize={path,source,previous,userFile,userSource,video,root,events,samples,stops,getRemoved:()=>removed};
+ const actions=[{method:'Input.dispatchTouchEvent',params:{type:'touchStart',touchPoints:[{x,y}]}}];
+ for(let i=1;i<=10;i++)actions.push({method:'Input.dispatchTouchEvent',params:{type:'touchMove',touchPoints:[{x:x-40*i/10,y:y-20*i/10}]}},{method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,16))',awaitPromise:true}});
+ actions.push({method:'Input.dispatchTouchEvent',params:{type:'touchEnd',touchPoints:[]}},{method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,2800))',awaitPromise:true}});
+ return {ready:video.readyState,playing:!video.paused,x,y,actions};
+})()

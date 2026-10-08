@@ -1,0 +1,15 @@
+(async()=>{
+ const leaf=app.workspace.activeLeaf,results=[];
+ document.querySelector('.mobile-image-viewer')?.click();
+ app.workspace.leftSplit.collapse();app.workspace.rightSplit.collapse();
+ const original=await app.vault.read(app.vault.getAbstractFileByPath('05 窄屏与宽表格.md'));
+ for(let i=0;i<8;i++){
+  await leaf.setViewState({type:'markdown',state:{file:'03 文字输入.md',mode:'source',source:false},active:true});
+  await new Promise(r=>setTimeout(r,150));
+  await leaf.setViewState({type:'markdown',state:{file:'05 窄屏与宽表格.md',mode:'preview'},active:true});
+  await new Promise(r=>setTimeout(r,700));
+  const v=leaf.view;
+  results.push({file:v.file.path,mode:v.getMode(),layouts:v.previewMode.containerEl.querySelectorAll('.vml-layout').length,hostMatches:v.getViewData()===original,width:innerWidth});
+ }
+ return {passed:results.every(x=>x.layouts===2&&x.hostMatches),results,unchanged:await app.vault.read(app.vault.getAbstractFileByPath('05 窄屏与宽表格.md'))===original};
+})()

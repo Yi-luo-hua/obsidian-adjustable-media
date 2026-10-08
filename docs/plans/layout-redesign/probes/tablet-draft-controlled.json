@@ -1,0 +1,11 @@
+{
+  "result": {
+    "closed": true,
+    "unchanged": true,
+    "changes": [],
+    "before": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4,\"rows\":[{\"width\":1}]} -->\n只在这栏末尾输入“手机中文测试”。平板中文测试平板中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "saved": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4,\"rows\":[{\"width\":1}]} -->\n只在这栏末尾输入“手机中文测试”。平板中文测试平板中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "passed": true
+  },
+  "errors": []
+}

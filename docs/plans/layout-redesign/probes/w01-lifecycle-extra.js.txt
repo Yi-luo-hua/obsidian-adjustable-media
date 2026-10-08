@@ -1,0 +1,80 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs'), crypto = require('crypto'), remote = require('@electron/remote');
+  const root = 'E:/TOOLS/obsidian-adjustable-media/', base = app.vault.adapter.getBasePath(), trace = window.__w01Trace;
+  const hash = value => crypto.createHash('sha256').update(value).digest('hex');
+  const originals = Object.fromEntries(app.vault.getMarkdownFiles().map(f => [f.path, hash(fs.readFileSync(base + '/' + f.path))]));
+  const source = '# W01 extra\n\n<!-- vml {"v":2,"type":"text"} -->\nOriginal A\n<!-- /vml -->\n\nOutside\n';
+  const path = 'W01 extra transient.md', renamed = 'W01 extra renamed transient.md';
+  if (app.vault.getAbstractFileByPath(path) || app.vault.getAbstractFileByPath(renamed)) throw new Error('Probe file exists');
+  const file = await app.vault.create(path, source), leaves = [], previous = app.workspace.activeLeaf, restores = [];
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const assert = (value, message) => { if (!value) throw new Error(message); };
+  const result = { buildHash: hash(fs.readFileSync(base + '/.obsidian/plugins/adjustable-media/main.js')), samples: [] };
+  window.w01ExtraResult = null;
+  const current = view => trace.projections.filter(p => !p.w01Disposed && p.w01Owner === (view.getMode() === 'source' ? view.editor : view)).at(-1);
+  const settled = async (name, views) => {
+    for (let i = 0; i < 100 && views.some(v => current(v)?.phase !== 'settled'); i++) await wait(40);
+    const sample = { name, states: views.map(v => ({ phase: current(v)?.phase, snapshot: current(v)?.desired?.id, revision: current(v)?.desired?.revision, coverage: current(v)?.coverage, measuredCoverage: current(v)?.measuredCoverage, required: current(v)?.required, epoch: current(v)?.environmentEpoch })) };
+    result.samples.push(sample); assert(sample.states.every(s => s.phase === 'settled'), name + ' did not settle'); return sample;
+  };
+  try {
+    for (const mode of ['source', 'preview', 'preview']) {
+      const leaf = app.workspace.getLeaf('split'); leaves.push(leaf);
+      await leaf.setViewState({ type: 'markdown', state: { file: path, mode } });
+    }
+    const [sourceView, readerA, readerB] = leaves.map(l => l.view);
+    sourceView.editor.setCursor({ line: 6, ch: 0 }); await wait(200); await settled('three panes open', [sourceView, readerA, readerB]);
+    sourceView.editor.replaceRange(' Updated', { line: 3, ch: 'Original A'.length }); await wait(250); await settled('source text updated', [sourceView, readerA, readerB]);
+    const updated = sourceView.editor.getValue(), beforeUndoId = current(sourceView).desired.id;
+    sourceView.editor.undo(); await wait(250); await settled('native undo', [sourceView, readerA, readerB]);
+    assert(sourceView.editor.getValue() === source && current(sourceView).desired.id !== beforeUndoId, 'Undo did not restore exact source with a new event');
+    sourceView.editor.redo(); await wait(250); await settled('native redo', [sourceView, readerA, readerB]);
+    assert(sourceView.editor.getValue() === updated, 'Redo did not restore exact updated text');
+    // Capture the actual registered layout adapter, then give it an empty section text in its owning pane.
+    const Renderer = readerA.previewMode.renderer.constructor, register = Renderer.registerPostProcessor, registrations = [];
+    Renderer.registerPostProcessor = function(fn, ...args) { registrations.push(fn); return register.call(this, fn, ...args); };
+    try { await app.plugins.disablePlugin('adjustable-media'); await app.plugins.enablePlugin('adjustable-media'); }
+    finally { Renderer.registerPostProcessor = register; }
+    assert(registrations.length === 2, 'Unexpected postprocessor registrations'); await wait(300);
+    const processor = registrations[0], alternative = updated.replace('Original A Updated', 'Alternate B');
+    const getData = readerB.getViewData; readerB.getViewData = () => alternative; restores.push(() => { readerB.getViewData = getData; });
+    app.workspace.trigger('editor-change', { getValue: () => alternative }, readerB);
+    const section = readerB.previewMode.containerEl.createDiv({ cls: 'w01-empty-section' }), children = [];
+    const context = { sourcePath: file.path, docId: 'w01-empty-owned-section', getSectionInfo: () => ({ text: '', lineStart: 2, lineEnd: 2 }), addChild: child => { children.push(child); child.load(); } };
+    processor(section, context); await wait(100);
+    result.emptySectionText = { text: section.textContent, ownPaneFallback: section.textContent.includes('Alternate B'), firstPaneIgnored: !section.textContent.includes('Original A') };
+    assert(result.emptySectionText.ownPaneFallback && result.emptySectionText.firstPaneIgnored, 'Empty section used another pane source');
+    children.forEach(child => child.unload()); section.remove(); readerB.getViewData = getData;
+    app.workspace.trigger('editor-change', sourceView.editor, sourceView); await wait(300); await settled('own sources restored after injected divergence', [sourceView, readerA, readerB]);
+    await app.fileManager.renameFile(file, renamed); await wait(300); await settled('file rename', [sourceView, readerA, readerB]);
+    assert(leaves.every(l => l.view.file.path === renamed), 'Rename left an old path');
+    const pop = app.workspace.getLeaf('window'); leaves.push(pop);
+    await pop.setViewState({ type: 'markdown', state: { file: renamed, mode: 'source' } }); await wait(300);
+    pop.view.editor.setCursor({ line: 6, ch: 0 }); await settled('pop-out window open', [pop.view]);
+    const popProjection = current(pop.view), popToken = popProjection.token(), popWindow = pop.view.containerEl.win;
+    result.popup = { ownDocument: pop.view.containerEl.doc !== document, width: pop.view.editor.cm.contentDOM.clientWidth, tokenBeforeClose: { ...popToken, pane: undefined } };
+    assert(result.popup.ownDocument, 'Popup probe did not open another document');
+    pop.detach(); await wait(250);
+    result.popup.disposed = popProjection.w01Disposed === true; result.popup.oldCallbackAccepted = popProjection.accepts(popToken);
+    assert(result.popup.disposed && !result.popup.oldCallbackAccepted, 'Closing popup did not release its projection');
+    const active = trace.projections.filter(p => !p.w01Disposed), tokens = active.map(p => [p, p.token()]);
+    const before = { started: trace.envStarted, stopped: trace.envStopped, active: trace.environments.size };
+    await app.plugins.disablePlugin('adjustable-media'); await wait(100);
+    result.unload = { oldCallbacksRejected: tokens.every(([p, t]) => !t || !p.accepts(t)), remainingEnvironments: trace.environments.size };
+    assert(result.unload.oldCallbacksRejected && result.unload.remainingEnvironments === 0, 'Plugin unload leaked an environment or accepted old callbacks');
+    await app.plugins.enablePlugin('adjustable-media'); await wait(250); await settled('plugin reload', [sourceView, readerA, readerB]);
+    result.reload = { before, after: { started: trace.envStarted, stopped: trace.envStopped, active: trace.environments.size } };
+    result.passed = true;
+  } catch (error) { result.error = String(error.stack ?? error); }
+  finally {
+    for (const restore of restores.reverse()) restore();
+    if (!app.plugins.plugins['adjustable-media']) await app.plugins.enablePlugin('adjustable-media');
+    for (const leaf of leaves.reverse()) if (leaf.view.containerEl.isConnected) leaf.detach(); if (previous) app.workspace.setActiveLeaf(previous, { focus: false }); await wait(300);
+    await app.vault.trash(file, true);
+    result.originalNotesUnchanged = Object.entries(originals).every(([p, h]) => fs.existsSync(base + '/' + p) && hash(fs.readFileSync(base + '/' + p)) === h);
+    if(result.error) result.lastReadiness = trace.readiness.slice(-12);
+    fs.writeFileSync(root + 'docs/plans/layout-redesign/probes/w01-lifecycle-extra.json', JSON.stringify(result, null, 2));
+    window.w01ExtraResult = { passed: result.passed, error: result.error, samples: result.samples.length, originalNotesUnchanged: result.originalNotesUnchanged };
+  }
+})();

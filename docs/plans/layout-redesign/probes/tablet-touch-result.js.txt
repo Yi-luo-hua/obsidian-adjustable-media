@@ -1,0 +1,13 @@
+(async()=>{
+ const g=window.__tabletGesture,v=app.workspace.activeLeaf.view,cm=v.editor.cm,current=cm.state.doc.toString(),saved=await app.vault.read(v.file);
+ const result={...g,stops:undefined,sourceLines:cm.dom.querySelectorAll('.vml-source-line').length,layouts:cm.dom.querySelectorAll('.vml-layout').length,left:app.workspace.leftSplit.collapsed,right:app.workspace.rightSplit.collapsed,swipeAttribute:cm.dom.closest('.markdown-source-view').getAttribute('data-ignore-swipe'),afterWidths:[...cm.dom.querySelector('.vml-layout').querySelectorAll('.vml-item')].map(e=>e.getBoundingClientRect().width),source:current,savedMatches:saved===current,viewerOpened:!!document.querySelector('.mobile-image-viewer'),onlySettingsChanged:current.split('\n').filter(l=>!l.startsWith('<!-- vml')).join('\n')===g.original.split('\n').filter(l=>!l.startsWith('<!-- vml')).join('\n')};
+ result.actions=[{method:'Input.dispatchKeyEvent',params:{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27}},{method:'Input.dispatchKeyEvent',params:{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27}}];
+ g.stops.forEach(stop=>stop());
+ if(current!==g.original){
+  if(saved!==current||!result.onlySettingsChanged)throw new Error('Unexpected fixture source or pending save');
+  await app.workspace.activeLeaf.setViewState({type:'empty'});
+  await app.vault.process(app.vault.getAbstractFileByPath('01 显示与媒体.md'),text=>{if(text!==current)throw new Error('Fixture changed during restoration');return g.original;});
+  result.restored=await app.vault.read(app.vault.getAbstractFileByPath('01 显示与媒体.md'))===g.original;
+ }
+ return result;
+})()

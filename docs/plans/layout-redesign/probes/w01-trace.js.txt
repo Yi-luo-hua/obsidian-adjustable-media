@@ -1,0 +1,30 @@
+window.__w01Trace = {
+  projections: [], calls: [], readiness: [], guards: [], rounds: [], readingRounds: [], effects: 0, effectsTypes: [], envStarted: 0, envStopped: 0, environments: new Set(),
+  attachGuard(guard) {
+    this.guards.push(guard);
+    const id = this.guards.length, trace = this;
+    for (const method of ['measure', 'read', 'write']) {
+      const original = guard[method];
+      guard[method] = function(...args) {
+        const value = original.apply(this, args);
+        trace.rounds.push({ id, method, at: performance.now(), epoch: this.epoch, viewport: {...this.view.viewport}, docLength: this.view.state.doc.length, update: method === 'read' ? value !== null : undefined, pending: this.pendingUpdate });
+        return value;
+      };
+    }
+  },
+  attachProjection(projection) {
+    this.projections.push(projection);
+    for (const method of ['request', 'observeHost', 'environmentChanged', 'viewportChanged', 'installed', 'measured', 'measurementPending', 'clear', 'dispose']) {
+      const original = projection[method], trace = this;
+      projection[method] = function(...args) {
+        if (method === 'request') this.w01Owner = args[0].origin.branch;
+        if (method === 'dispose') this.w01Disposed = true;
+        const value = original.apply(this, args);
+        trace.calls.push({ method, snapshot: this.desired?.id, environmentEpoch: this.environmentEpoch, viewportRevision: this.viewportRevision, phase: this.phase, at: performance.now(), accepted: value });
+        return value;
+      };
+    }
+  },
+  environmentStarted(el) { this.envStarted++; this.environments.add(el); },
+  environmentStopped(el) { this.envStopped++; this.environments.delete(el); },
+};

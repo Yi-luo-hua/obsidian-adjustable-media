@@ -1,0 +1,9 @@
+(async()=>{
+ const g=window.__tabletVideoResize,v=app.workspace.activeLeaf.view,current=v.editor.cm.state.doc.toString(),video=v.editor.cm.dom.querySelector('.vml-wrap-proxy__live video');
+ g.stops.forEach(stop=>stop());
+ const result={sameVideo:video===g.video,sameRoot:video.closest('.vml-layout')===g.root,removed:g.getRemoved(),events:g.events,samples:g.samples,history:g.history,playing:!video.paused,ready:video.readyState,source:current,settingsOnly:current.split('\n').filter(l=>!l.startsWith('<!-- vml')).join('\n')===g.source.split('\n').filter(l=>!l.startsWith('<!-- vml')).join('\n'),saved:await app.vault.read(v.file)===current};
+ video.pause();await app.workspace.activeLeaf.setViewState(g.previous);
+ if(result.saved&&result.settingsOnly){await app.vault.trash(app.vault.getAbstractFileByPath(g.path),true);result.fixtureRemoved=!app.vault.getAbstractFileByPath(g.path);}
+ result.userNoteUnchanged=await app.vault.read(app.vault.getAbstractFileByPath(g.userFile))===g.userSource;
+ return result;
+})()

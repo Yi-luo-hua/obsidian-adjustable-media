@@ -1,0 +1,12 @@
+(async()=>{
+  const v=app.workspace.activeLeaf.view,cm=v.editor.cm,rows=[];
+  if(v.file.path!=='02 长浮动.md')throw new Error('Long float required');
+  for(let i=0;i<30;i++){
+    const env=cm.state.values.find(x=>x?.environmentSpec),guard=cm.plugins.map(p=>p.value).find(p=>p?.source?.anchors&&p?.sizes);
+    rows.push({scroll:cm.scrollDOM.scrollTop,epoch:env?.environmentEpoch,proxies:cm.dom.querySelectorAll('.vml-wrap-proxy').length,detached:cm.scrollDOM.querySelectorAll('.vml-wrap-measure').length,ready:guard?.measurementsReady()});
+    await new Promise(r=>setTimeout(r,80));
+  }
+  const sample=await app.plugins.plugins['mobile-acceptance'].capture(false);
+  const result={at:new Date().toISOString(),sample,rows,unchanged:cm.state.doc.toString()===window.__tabletOriginals[v.file.path]&&cm.state.doc.toString()===await app.vault.read(v.file)};
+  window.__tabletRotation??=[];window.__tabletRotation.push(result);return result;
+})();

@@ -1,6 +1,6 @@
 # W07 宿主段落分块验收
 
-日期：2026-10-08。基线 `7fcd086`；分支 `codex/host-paragraph-boundaries`。**W07 实现与既定验收矩阵完成，待独立 PR 合入**。P2 完整生命周期、P3 规划器和组格式仍按原队列推进，版本仍为 0.7.1。
+日期：2026-10-08。验收基线 `7fcd086`；实施分支 `codex/host-paragraph-boundaries`。**W07 已随 [PR #20](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/20) 合入 `main`（`ce4124a`，未发布）**。本文保留原有既定矩阵的构建与实测证据；审查后修复提交 `d2287f7` 的 369 项测试和新增 15 个宿主场景见 [12 修复记录](12-paragraph-spacing-review-fixes.md)，不将其视为重跑了本文全部矩阵。P2 完整生命周期、P3 规划器和组格式仍按原队列推进，版本仍为 0.7.1。
 
 最终生产 `main.js` 与测试库安装文件 SHA-256：`be6f2a2265eec5250c2ef87f3fa7fff9d45b6d849499d4b0a857c93852ca486b`。以下最终验收数据均记录该构建；[10](10-host-paragraph-boundary-record.md) 保留首批历史数据。
 

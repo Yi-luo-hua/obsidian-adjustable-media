@@ -1,0 +1,82 @@
+$ErrorActionPreference = 'Stop'
+$repoRoot = (Resolve-Path -LiteralPath 'E:\TOOLS\obsidian-adjustable-media').Path
+$distRoot = (Resolve-Path -LiteralPath (Join-Path $repoRoot 'dist')).Path
+$recordPath = Join-Path $repoRoot 'docs\plans\layout-redesign\probes\artifact-cleanup-20261009.json'
+$stagingRoot = Join-Path $repoRoot '.artifact-cleanup-20261009'
+if (Test-Path -LiteralPath $stagingRoot) { throw 'Cleanup staging already exists' }
+if (Test-Path -LiteralPath $recordPath) { throw 'Cleanup record already exists' }
+
+# Preserve named evidence and restore material referenced by repository documents or scripts.
+$textFiles = @(rg --files docs scripts tests src -g '*.md' -g '*.json' -g '*.txt' -g '*.ts' -g '*.mjs' -g '*.ps1')
+$referenceText = ($textFiles | ForEach-Object { Get-Content -LiteralPath $_ -Raw }) -join "`n"
+$temporaryFiles = @(Get-ChildItem -LiteralPath $distRoot -File | Where-Object {
+  ($_.Name -match '^(android-|tablet-|play-|video-|corner-|touch-|resume-check|final-check|w01-check|w02-.*check|w07-.*check|w08-check|w10-.*(?:check|cli)|update-.*\.(cjs|patch)|desktop-restoration-hashes)' -and !$referenceText.Contains($_.Name))
+})
+$targets = @($temporaryFiles.FullName) + @(
+  (Join-Path $distRoot 'w07-env'),
+  (Join-Path $distRoot 'mobile-tools\HiSuite-14.exe'),
+  (Join-Path $distRoot 'mobile-tools\platform-tools.zip'),
+  (Join-Path $distRoot 'adjustable-media'),
+  (Join-Path $distRoot 'w01-probe')
+)
+$moves = @()
+foreach ($target in $targets) {
+  $item = Get-Item -LiteralPath $target
+  $resolved = $item.FullName
+  if (!$resolved.StartsWith($distRoot + '\', [StringComparison]::OrdinalIgnoreCase)) { throw "Outside dist: $resolved" }
+  if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw "Linked target: $resolved" }
+  $files = if ($item.PSIsContainer) { @(Get-ChildItem -LiteralPath $resolved -Recurse -File -Force) } else { @($item) }
+  if (@($files | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }).Count) { throw "Linked content: $resolved" }
+  $relative = [IO.Path]::GetRelativePath($repoRoot, $resolved)
+  $moves += [PSCustomObject]@{
+    original = $resolved
+    relative = $relative
+    staged = Join-Path $stagingRoot $relative
+    isDirectory = $item.PSIsContainer
+    bytes = ($files | Measure-Object Length -Sum).Sum
+    files = @($files | ForEach-Object {
+      [PSCustomObject]@{ relative = [IO.Path]::GetRelativePath($repoRoot, $_.FullName); bytes = $_.Length; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLower() }
+    })
+  }
+}
+$record = [PSCustomObject]@{
+  date = '2026-10-09'
+  workspace = $repoRoot
+  staging = $stagingRoot
+  disposition = 'Windows Recycle Bin; recoverable, no permanent disk-space claim'
+  itemCount = $moves.Count
+  fileCount = ($moves | ForEach-Object { $_.files.Count } | Measure-Object -Sum).Sum
+  bytes = ($moves | Measure-Object bytes -Sum).Sum
+  moves = $moves
+  stagedHashesMatch = $false
+  sourceAbsent = $false
+  recycleBinMatch = $false
+  recycleBinItem = $null
+}
+function Save-Record {
+  [IO.File]::WriteAllText($recordPath, ($record | ConvertTo-Json -Depth 8), [Text.UTF8Encoding]::new($false))
+}
+Save-Record
+New-Item -ItemType Directory -Path $stagingRoot | Out-Null
+foreach ($move in $moves) {
+  $parent = Split-Path -Parent $move.staged
+  if (!(Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+  Move-Item -LiteralPath $move.original -Destination $move.staged
+}
+foreach ($move in $moves) { foreach ($file in $move.files) {
+  if ((Get-FileHash -LiteralPath (Join-Path $stagingRoot $file.relative)).Hash.ToLower() -ne $file.sha256) { throw "Staging hash mismatch: $($file.relative)" }
+} }
+$record.stagedHashesMatch = $true
+Save-Record
+$resolvedStaging = (Resolve-Path -LiteralPath $stagingRoot).Path
+if ($resolvedStaging -ne (Join-Path $repoRoot '.artifact-cleanup-20261009')) { throw 'Unexpected recycle target' }
+Add-Type -AssemblyName Microsoft.VisualBasic
+[Microsoft.VisualBasic.FileIO.FileSystem]::DeleteDirectory($resolvedStaging, [Microsoft.VisualBasic.FileIO.UIOption]::OnlyErrorDialogs, [Microsoft.VisualBasic.FileIO.RecycleOption]::SendToRecycleBin)
+$record.sourceAbsent = !(Test-Path -LiteralPath $stagingRoot) -and @($moves | Where-Object { Test-Path -LiteralPath $_.original }).Count -eq 0
+$shell = New-Object -ComObject Shell.Application
+$recycleItems = @($shell.Namespace(10).Items() | Where-Object { $_.Name -eq '.artifact-cleanup-20261009' -and $_.ExtendedProperty('System.Recycle.DeletedFrom') -eq $repoRoot })
+$record.recycleBinMatch = $recycleItems.Count -eq 1
+if ($record.recycleBinMatch) { $record.recycleBinItem = $recycleItems[0].Path }
+Save-Record
+if (!$record.sourceAbsent -or !$record.recycleBinMatch) { throw 'Recycle verification incomplete; inspect cleanup record' }
+$record | Select-Object itemCount,fileCount,bytes,stagedHashesMatch,sourceAbsent,recycleBinMatch | ConvertTo-Json

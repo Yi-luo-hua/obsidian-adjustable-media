@@ -1,0 +1,5 @@
+(async()=>{
+  await new Promise(r=>setTimeout(r,2500));const v=app.workspace.activeLeaf.view,cm=v.editor.cm,state=window.__tabletControlledDraft;
+  state.restore();const saved=await app.vault.read(v.file),result={closed:!cm.dom.querySelector('.vml-text-editor'),unchanged:cm.state.doc.toString()===state.before&&saved===state.before,changes:state.changes,before:state.before,saved};
+  result.passed=result.closed&&result.unchanged&&result.changes.length===0;return result;
+})();

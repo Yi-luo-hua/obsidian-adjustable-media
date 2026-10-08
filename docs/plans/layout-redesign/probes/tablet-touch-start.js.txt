@@ -1,0 +1,36 @@
+(async()=>{
+ const kind='tap',leaf=app.workspace.activeLeaf;
+ document.querySelector('.mobile-image-viewer')?.click();
+ if(document.querySelector('.modal-container'))throw new Error('Close the preceding modal before the gesture');
+ app.workspace.leftSplit.collapse();app.workspace.rightSplit.collapse();
+ await leaf.setViewState({type:'empty'});
+ await leaf.setViewState({type:'markdown',state:{file:'01 显示与媒体.md',mode:'source',source:false},active:true});
+ await new Promise(r=>setTimeout(r,600));
+ const v=leaf.view,cm=v.editor.cm;cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.scrollDOM.scrollTop=0;
+ await new Promise(r=>setTimeout(r,350));
+ const root=cm.dom.querySelector('.vml-layout'),rect=root.getBoundingClientRect(),pane=cm.dom.closest('.markdown-source-view');
+ const original=cm.state.doc.toString(),events=[],stops=[];
+ window.__tabletGesture?.stops?.forEach(stop=>stop());
+ for(const name of ['touchstart','touchend','touchcancel','pointermove','pointerup','pointercancel','click']){
+  const fn=e=>events.push({type:name,trusted:e.isTrusted,ignored:pane.dataset.ignoreSwipe??null,sourceLines:v.containerEl.querySelectorAll('.vml-source-line').length,left:app.workspace.leftSplit.collapsed,right:app.workspace.rightSplit.collapsed});
+  document.addEventListener(name,fn,true);stops.push(()=>document.removeEventListener(name,fn,true));
+ }
+ const grip=root.querySelector('.vml-frame__move'),g=grip.getBoundingClientRect();
+ const hit=(x,y)=>document.elementFromPoint(x,y)?.className??null;
+ const gripVisible=[g.top+2,g.top+g.height/2,g.bottom-2].every(y=>document.elementFromPoint(g.x+g.width/2,y)?.closest('.vml-frame__move')===grip);
+ let x=rect.right-59,y=rect.top+32,dx=0;
+ if(kind==='column'){const b=root.querySelector('.vml-item__col-handle').getBoundingClientRect();x=b.x+b.width/2;y=b.y+b.height/2;dx=50;}
+ if(kind==='frame'){const b=root.querySelector('.vml-frame__handle--right').getBoundingClientRect();x=b.x+b.width/2;y=b.y+b.height/2;dx=-45;}
+ if(kind==='margin-left'){x=2;y=rect.top+80;dx=250;}
+ if(kind==='margin-right'){x=innerWidth-10;y=rect.top+80;dx=-250;}
+ if(kind==='outside-left'){x=2;y=rect.top-35;dx=250;}
+ if(kind==='outside-right'){x=innerWidth-10;y=rect.top-35;dx=-250;}
+ if(kind==='grip'){x=g.x+g.width/2;y=g.y+g.height/2;dx=0;}
+ if(['column','frame','grip'].includes(kind)&&!document.elementFromPoint(x,y)?.closest('.vml-handle'))throw new Error('Handle is not the actual touch target');
+ if(!gripVisible)throw new Error('Grip is clipped or a modal overlays the fixture');
+ const actions=[{method:'Input.dispatchTouchEvent',params:{type:'touchStart',touchPoints:[{x,y}]}}];
+ if(dx)for(let i=1;i<=8;i++)actions.push({method:'Input.dispatchTouchEvent',params:{type:'touchMove',touchPoints:[{x:x+dx*i/8,y}]}},{method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,12))',awaitPromise:true}});
+ actions.push({method:'Input.dispatchTouchEvent',params:{type:'touchEnd',touchPoints:[]}},{method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,2700))',awaitPromise:true}});
+ window.__tabletGesture={kind,original,events,stops,rect,gripVisible,x,y,hit:hit(x,y),beforeWidths:[...root.querySelectorAll('.vml-item')].map(e=>e.getBoundingClientRect().width)};
+ return {kind,x,y,hit:hit(x,y),gripVisible,actions};
+})()

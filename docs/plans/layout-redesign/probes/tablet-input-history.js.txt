@@ -1,0 +1,13 @@
+(async()=>{
+  const leaf=app.workspace.activeLeaf,file=leaf.view.file,wait=ms=>new Promise(r=>setTimeout(r,ms)),after=await app.vault.read(file);
+  const expectedSingle=window.__tabletInput.initial.replace('只在这栏末尾输入“手机中文测试”。','只在这栏末尾输入“手机中文测试”。平板中文测试');
+  const result={after,checks:[]};window.__tabletInputCommitted=after;
+  leaf.view.editor.cm.focus();await wait(100);
+  const saved=async text=>{const start=performance.now();for(let i=0;i<60;i++){if(await app.vault.read(file)===text)return performance.now()-start;await wait(100);}return null;};
+  leaf.view.editor.undo();result.undoBuffer=leaf.view.editor.cm.state.doc.toString();result.undoSaveWait=await saved(result.undoBuffer);result.undo=await app.vault.read(file);result.checks.push({name:'one native undo removes only the paste',passed:result.undoBuffer===expectedSingle&&result.undo===expectedSingle});
+  leaf.view.editor.redo();result.redoBuffer=leaf.view.editor.cm.state.doc.toString();result.redoSaveWait=await saved(result.redoBuffer);result.redo=await app.vault.read(file);result.checks.push({name:'one native redo restores exact paste',passed:result.undoBuffer!==after&&result.redoBuffer===after&&result.redo===after});
+  await leaf.openFile(app.vault.getAbstractFileByPath('00 从这里开始.md'));await leaf.openFile(file,{state:{mode:'source'},active:true});await wait(500);
+  const cm=leaf.view.editor.cm;cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.scrollDOM.scrollTop=0;
+  result.reopen=await app.vault.read(file);result.checks.push({name:'save and reopen preserves exact input',passed:cm.state.doc.toString()===after&&result.reopen===after});
+  result.passed=result.checks.every(c=>c.passed);result.column=cm.dom.querySelector('.vml-layout__text--left')?.getBoundingClientRect().toJSON();return result;
+})();

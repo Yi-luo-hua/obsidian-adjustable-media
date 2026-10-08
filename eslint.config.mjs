@@ -10,6 +10,7 @@ export default defineConfig([
       parserOptions: {
         projectService: {
           allowDefaultProject: ["eslint.config.mjs", "esbuild.config.mjs", "scripts/*.mjs"],
+          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 12,
         },
       },
     },
@@ -17,7 +18,7 @@ export default defineConfig([
   {
     // Build scripts run in Node, not in Obsidian, and report progress on the console.
     files: ["esbuild.config.mjs", "scripts/**/*.mjs"],
-    rules: { "obsidianmd/rule-custom-message": "off" },
+    rules: { "obsidianmd/rule-custom-message": "off", "no-restricted-globals": "off" },
   },
   {
     // node:test keeps track of the promise that test() returns.

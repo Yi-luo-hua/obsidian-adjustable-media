@@ -1,0 +1,15 @@
+(async()=>{
+ document.querySelector('.mobile-image-viewer')?.click();
+ if(document.querySelector('.vml-text-editor'))throw new Error('Existing text editing must finish before the isolated test');
+ window.__tabletManual?.stops?.forEach(stop=>stop());
+ const path='06 角落触摸测试.md',source='# 角落触摸测试\n\n<!-- vml {"v":2,"rows":[{"height":120}]} -->\n![[attachments/square.png]] ![[attachments/landscape.png]]\n<!-- /vml -->\n<!-- vml {"v":2,"type":"text"} -->\n下一行文字，角落附近不应打开输入。\n正常区域仍应能进入文字编辑。\n<!-- /vml -->\n\n块外正文仍应正常编辑。\n';
+ if(app.vault.getAbstractFileByPath(path))throw new Error('Corner fixture already exists');
+ const previous=app.workspace.activeLeaf.getViewState(),file=await app.vault.create(path,source),leaf=app.workspace.activeLeaf;
+ await leaf.setViewState({type:'markdown',state:{file:path,mode:'source',source:false},active:true});
+ await new Promise(r=>setTimeout(r,500));
+ const cm=leaf.view.editor.cm;cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.scrollDOM.scrollTop=0;
+ await new Promise(r=>setTimeout(r,250));
+ const roots=[...cm.dom.querySelectorAll('.vml-layout')],corner=roots[0].querySelector('.vml-frame__handle--corner'),b=roots[0].getBoundingClientRect(),text=roots[1].querySelector('.vml-layout__text').getBoundingClientRect();
+ window.__tabletCorner={file:path,source,previous};
+ return {source,viewport:[innerWidth,innerHeight],corner:corner.getBoundingClientRect().toJSON(),frame:b.toJSON(),nextText:text.toJSON(),nextTextPoint:{x:Math.min(b.right-16,text.right-8),y:text.top+3}};
+})()

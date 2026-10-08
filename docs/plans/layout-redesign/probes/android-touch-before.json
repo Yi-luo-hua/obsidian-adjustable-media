@@ -1,0 +1,115 @@
+{
+  "result": {
+    "file": "04 触摸测试.md",
+    "initialScroll": 0,
+    "sample": {
+      "at": "2026-10-08T11:26:23.339Z",
+      "file": "04 触摸测试.md",
+      "mode": "source",
+      "viewport": {
+        "width": 363,
+        "height": 823,
+        "ratio": 3.375,
+        "visual": {
+          "width": 363.2592468261719,
+          "height": 823.111083984375,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 24,
+            "y": 231.86111450195312,
+            "width": 310.5185241699219,
+            "height": 202.9629669189453
+          },
+          "block": "block:206",
+          "editing": false,
+          "overflow": 8,
+          "media": [
+            {
+              "type": "IMG",
+              "rect": {
+                "x": 35.481483459472656,
+                "y": 243.34259033203125,
+                "width": 116.48148345947266,
+                "height": 180
+              },
+              "width": 1000,
+              "height": 1000,
+              "ready": true
+            },
+            {
+              "type": "IMG",
+              "rect": {
+                "x": 159.9629669189453,
+                "y": 243.34259033203125,
+                "width": 163.07408142089844,
+                "height": 180
+              },
+              "width": 1600,
+              "height": 900,
+              "ready": true
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 24,
+            "y": 450.8240661621094,
+            "width": 310.5185241699219,
+            "height": 433.754638671875
+          },
+          "block": "block:207",
+          "editing": false,
+          "overflow": 8,
+          "media": [
+            {
+              "type": "VIDEO",
+              "rect": {
+                "x": 35.481483459472656,
+                "y": 462.3055725097656,
+                "width": 287.5555725097656,
+                "height": 410.7916564941406
+              },
+              "width": 896,
+              "height": 1280,
+              "ready": 4
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 24,
+            "y": 900.5787353515625,
+            "width": 310.5185241699219,
+            "height": 154.21759033203125
+          },
+          "block": "block:208",
+          "editing": false,
+          "overflow": 7,
+          "media": []
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 374,
+          "head": 374
+        }
+      ],
+      "formulaCount": 1
+    }
+  },
+  "errors": []
+}

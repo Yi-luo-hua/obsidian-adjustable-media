@@ -1,0 +1,18 @@
+[
+  {
+    "file": "main.js",
+    "passed": true
+  },
+  {
+    "file": "styles.css",
+    "passed": true
+  },
+  {
+    "file": "manifest.json",
+    "passed": true
+  },
+  {
+    "file": "data.json",
+    "passed": true
+  }
+]

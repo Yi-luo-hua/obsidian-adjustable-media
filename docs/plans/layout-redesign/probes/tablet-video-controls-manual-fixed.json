@@ -1,0 +1,292 @@
+{
+  "result": {
+    "file": "01 显示与媒体.md",
+    "initial": 418,
+    "selection": 8,
+    "focus": "vml-item vml-item--weighted",
+    "toolbar": false,
+    "sameVideo": false,
+    "ready": 4,
+    "paused": true,
+    "time": 0.336058,
+    "saved": true,
+    "settingsOnly": false,
+    "source": "# 显示与媒体\n\n<!-- vml {\"v\":2,\"width\":0.784,\"rows\":[{\"height\":200,\"width\":0.985}]} -->\n![[attachments/clip.mp4]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":203,\"widths\":[0.855,1.145]}]} -->\n![[attachments/square.png]] ![[attachments/landscape.png]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"type\":\"text\",\"cols\":2} -->\n手机端分栏文字。中文与 English text 应完整显示。\n\n$$\nx^2+y^2=z^2\n$$\n\n第二段文字包含 **粗体** 和列表。\n- 第一项\n- 第二项\n\n<!-- /vml -->\n",
+    "events": [
+      {
+        "name": "pointerdown",
+        "at": 18730894.699999988,
+        "target": "VIDEO",
+        "cls": "vml-item__media",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18731907.799999982,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18732889.099999994,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18733816.5,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18734280.900000006,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18735382.599999994,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18735773.400000006,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18740943,
+        "target": "DIV",
+        "cls": "vml-layout vml-layout--sized vml-layout--interactive",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18741692.699999988,
+        "target": "DIV",
+        "cls": "vml-handle vml-frame__handle vml-frame__handle--right",
+        "selection": 418,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18746703.099999994,
+        "target": "DIV",
+        "cls": "vml-handle vml-frame__handle vml-frame__handle--right",
+        "selection": 422,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18748408.5,
+        "target": "VIDEO",
+        "cls": "vml-item__media",
+        "selection": 408,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18749111.5,
+        "target": "VIDEO",
+        "cls": "vml-item__media",
+        "selection": 408,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "focusin",
+        "at": 18749623.900000006,
+        "target": "VIDEO",
+        "cls": "vml-item__media mobile-tap",
+        "selection": 408,
+        "focus": "vml-item__media mobile-tap"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18750579.199999988,
+        "target": "VIDEO",
+        "cls": "vml-item__media",
+        "selection": 408,
+        "focus": "vml-item__media"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18751337.900000006,
+        "target": "DIV",
+        "cls": "vml-handle vml-frame__move",
+        "selection": 408,
+        "focus": "vml-item__media"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18752877.099999994,
+        "target": "DIV",
+        "cls": "cm-line",
+        "selection": 408,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      },
+      {
+        "name": "focusin",
+        "at": 18752944.299999982,
+        "target": "DIV",
+        "cls": "cm-content cm-lineWrapping",
+        "selection": 408,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "click",
+        "at": 18752953.400000006,
+        "target": "DIV",
+        "cls": "cm-line",
+        "selection": 408,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18755056.5,
+        "target": "DIV",
+        "cls": "vml-row vml-row--single",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18755919.599999994,
+        "target": "DIV",
+        "cls": "vml-handle vml-frame__handle vml-frame__handle--right",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "focusin",
+        "at": 18758287.599999994,
+        "target": "DIV",
+        "cls": "cm-content cm-lineWrapping",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18762480.5,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "click",
+        "at": 18762534.099999994,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below mobile-tap",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "focusin",
+        "at": 18762642.099999994,
+        "target": "DIV",
+        "cls": "cm-content cm-lineWrapping",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18763078.400000006,
+        "target": "DIV",
+        "cls": "mobile-toolbar",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18764441,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18766081.799999982,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18766707.699999988,
+        "target": "IMG",
+        "cls": "vml-item__media",
+        "selection": 8,
+        "focus": "cm-content cm-lineWrapping"
+      },
+      {
+        "name": "focusin",
+        "at": 18766708.900000006,
+        "target": "DIV",
+        "cls": "vml-item vml-item--weighted",
+        "selection": 8,
+        "focus": "vml-item vml-item--weighted"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18768561.5,
+        "target": "DIV",
+        "cls": "vml-handle vml-frame__handle vml-frame__handle--right",
+        "selection": 8,
+        "focus": "vml-item vml-item--weighted"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18770484.400000006,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 8,
+        "focus": "vml-item vml-item--weighted"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18781558.5,
+        "target": "DIV",
+        "cls": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+        "selection": 8,
+        "focus": "vml-item vml-item--weighted"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18782717.900000006,
+        "target": "DIV",
+        "cls": "vml-handle vml-frame__handle vml-frame__handle--corner",
+        "selection": 8,
+        "focus": "vml-item vml-item--weighted"
+      },
+      {
+        "name": "pointerdown",
+        "at": 18783970.599999994,
+        "target": "DIV",
+        "cls": "vml-handle vml-frame__handle vml-frame__handle--corner",
+        "selection": 8,
+        "focus": "vml-item vml-item--weighted"
+      }
+    ],
+    "user": "没问题了：手指播放、暂停、播放后缩放均正常"
+  },
+  "errors": []
+}

@@ -1,0 +1,21 @@
+{
+  "report": "真机报告-1791460953851.json",
+  "inputRestored": true,
+  "touchFixtureRemoved": true,
+  "keepHighlight": true,
+  "buildHash": "b06981d9c95f07c8d4e014b6f4ceac8f402f1e87a616d87b42c399e7cd0153fc",
+  "repositoryHash": "b06981d9c95f07c8d4e014b6f4ceac8f402f1e87a616d87b42c399e7cd0153fc",
+  "inputHash": "a5dd81c6e7dcc7e1c0565fbf533f0b4a436d805d71b50e7b7bf1195f6d93a618",
+  "originalInputHash": "a5dd81c6e7dcc7e1c0565fbf533f0b4a436d805d71b50e7b7bf1195f6d93a618",
+  "readOnlyInvariants": [
+    {
+      "path": "01 显示与媒体.md",
+      "exact": true
+    },
+    {
+      "path": "02 长浮动.md",
+      "exact": true
+    }
+  ],
+  "exactHashes": true
+}

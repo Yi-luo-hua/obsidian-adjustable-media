@@ -1,0 +1,175 @@
+{
+  "result": {
+    "at": "2026-10-08T13:13:47.697Z",
+    "saved": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "buffer": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "initial": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "unchanged": false,
+    "editorOpen": false,
+    "events": [
+      {
+        "name": "input",
+        "trusted": true,
+        "data": "平板中文",
+        "inputType": "insertText",
+        "text": "只在这栏末尾输入“手机中文测试”。平板中文",
+        "at": 731634.6999999881,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "input",
+        "trusted": true,
+        "data": "测试",
+        "inputType": "insertText",
+        "text": "只在这栏末尾输入“手机中文测试”。平板中文测试",
+        "at": 733643.799999997,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中文\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "input",
+        "trusted": true,
+        "data": null,
+        "inputType": "deleteContentBackward",
+        "text": "只在这栏末尾输入“手机中文测试”。平板中文测",
+        "at": 743457.099999994,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "input",
+        "trusted": true,
+        "data": null,
+        "inputType": "deleteContentBackward",
+        "text": "只在这栏末尾输入“手机中文测试”。平板中文",
+        "at": 743633.599999994,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中文测\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "input",
+        "trusted": true,
+        "data": null,
+        "inputType": "deleteContentBackward",
+        "text": "只在这栏末尾输入“手机中文测试”。平板中",
+        "at": 743822.299999997,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中文\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "input",
+        "trusted": true,
+        "data": null,
+        "inputType": "deleteContentBackward",
+        "text": "只在这栏末尾输入“手机中文测试”。平板",
+        "at": 744005.3999999911,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "input",
+        "trusted": true,
+        "data": null,
+        "inputType": "deleteContentBackward",
+        "text": "只在这栏末尾输入“手机中文测试”。平",
+        "at": 744163.3999999911,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "input",
+        "trusted": true,
+        "data": null,
+        "inputType": "deleteContentBackward",
+        "text": "只在这栏末尾输入“手机中文测试”。",
+        "at": 744340.5,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "input",
+        "trusted": true,
+        "data": "平板中文测试",
+        "inputType": "insertText",
+        "text": "只在这栏末尾输入“手机中文测试”。平板中文测试",
+        "at": 903812.799999997,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "click",
+        "trusted": true,
+        "text": "完成",
+        "at": 906246.799999997,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "name": "focusout",
+        "trusted": true,
+        "text": "只在这栏末尾输入“手机中文测试”。平板中文测试",
+        "at": 906247.1999999881,
+        "main": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。平板中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      }
+    ],
+    "sample": {
+      "at": "2026-10-08T13:13:47.697Z",
+      "vault": "adjustable-media-tablet-test",
+      "file": "03 文字输入.md",
+      "mode": "source",
+      "bodyClasses": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-phone",
+      "documentOverflow": 0,
+      "pane": {
+        "width": 556,
+        "overflow": 0
+      },
+      "viewport": {
+        "width": 556,
+        "height": 736,
+        "ratio": 2.5,
+        "visual": {
+          "width": 556,
+          "height": 736,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 24,
+            "y": 188.0124969482422,
+            "width": 503.20001220703125,
+            "height": 214.71875
+          },
+          "block": "block:702",
+          "editing": false,
+          "overflow": 0,
+          "media": [
+            {
+              "type": "IMG",
+              "rect": {
+                "x": 179.44375610351562,
+                "y": 199.21250915527344,
+                "width": 192.31875610351562,
+                "height": 192.31875610351562
+              },
+              "width": 1000,
+              "height": 1000,
+              "ready": true
+            }
+          ]
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 126,
+          "head": 126
+        }
+      ],
+      "formulaCount": 0,
+      "inputActions": []
+    }
+  },
+  "errors": []
+}

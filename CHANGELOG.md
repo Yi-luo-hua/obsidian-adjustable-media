@@ -11,6 +11,16 @@
 - In a PDF, a table next to a floating layout shrinks to fit beside it, as in reading view, instead of dropping below the layout at full width.
 - In a note with layouts, live preview spaces the note's text like reading view and the PDF: a blank line takes the height of a paragraph break instead of a whole line, extra blank lines take no room while the cursor is elsewhere, and a paragraph break is added where reading view separates blocks written without a blank line (text right after a heading, a list or quote right after text). Layouts get the same spacing as in reading view. The text beside a floating layout is now the same while editing as in reading view and the PDF.
 
+### Local candidate on codex/android-layout-stability
+
+These changes are not merged or released. The formal plugin remains desktop-only; Android testing covers the scenarios recorded in [project status](docs/STATUS.md).
+
+- Add **Keep layout borders highlighted**, enabled by default. Turning it off ties ordinary border highlighting to the editing cursor without changing layout geometry.
+- Mobile text columns provide **Done** and **Discard draft** buttons that stay reachable with the keyboard open. Wide tables scroll within their own column.
+- Ordinary layout taps no longer hit an invisible source button. Source editing is an explicit menu action; sidebar swipes are reserved for horizontal bands without a layout. Mobile grips fit inside the frame, with a larger corner control and a nearby text-input exclusion area.
+- Resizing a video updates the existing player instead of rebuilding it. Native player controls keep their input events, and mobile layout writes no longer focus the note's unrelated cursor or open its input toolbar.
+- Fix reading-view layout initialization after switching notes and avoid rebuilding layouts for transient mobile navigation, keyboard and toolbar state.
+
 ## 0.7.1 - 2026-10-05
 
 - **Add text on the left/right** is no longer offered for a floating layout. Text beside media stops a layout from floating, so the editor used to close after the first letter typed and the layout jumped; choose **No text wrap** first.

@@ -1,0 +1,235 @@
+{
+  "result": {
+    "sample": {
+      "at": "2026-10-08T13:28:22.837Z",
+      "vault": "adjustable-media-tablet-test",
+      "file": "05 窄屏与宽表格.md",
+      "mode": "preview",
+      "bodyClasses": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-phone keyboard-animating",
+      "documentOverflow": 0,
+      "pane": {
+        "width": 556,
+        "overflow": 0
+      },
+      "viewport": {
+        "width": 556,
+        "height": 736,
+        "ratio": 2.5,
+        "visual": {
+          "width": 556,
+          "height": 736,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 24,
+            "y": 164.1125030517578,
+            "width": 503.20001220703125,
+            "height": 340
+          },
+          "editing": false,
+          "overflow": 0,
+          "media": []
+        },
+        {
+          "rect": {
+            "x": 24,
+            "y": 528.1124877929688,
+            "width": 503.20001220703125,
+            "height": 290.3999938964844
+          },
+          "editing": false,
+          "overflow": 0,
+          "media": []
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 0,
+          "head": 0
+        }
+      ],
+      "formulaCount": 0,
+      "inputActions": []
+    },
+    "tables": [
+      {
+        "rect": {
+          "x": 35.20000076293945,
+          "y": 175.3125,
+          "width": 480.8000183105469,
+          "height": 85.5999984741211,
+          "top": 175.3125,
+          "right": 516.0000190734863,
+          "bottom": 260.9124984741211,
+          "left": 35.20000076293945
+        },
+        "client": 481,
+        "scroll": 1772,
+        "left": 0,
+        "columns": 12,
+        "display": "block",
+        "overflow": "auto"
+      }
+    ],
+    "documentScroll": 0,
+    "root": {
+      "connected": true,
+      "children": 1,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 556,
+        "height": 736,
+        "top": 0,
+        "right": 556,
+        "bottom": 736,
+        "left": 0
+      },
+      "scroll": 0
+    },
+    "hostTextLength": 1255,
+    "sections": [
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 1
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 1
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      },
+      {
+        "computed": true,
+        "rendered": true,
+        "shown": true,
+        "connected": true,
+        "layouts": 0
+      }
+    ],
+    "unchanged": true
+  },
+  "errors": []
+}

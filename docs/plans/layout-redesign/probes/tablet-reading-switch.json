@@ -1,0 +1,65 @@
+{
+  "result": {
+    "passed": true,
+    "results": [
+      {
+        "file": "05 窄屏与宽表格.md",
+        "mode": "preview",
+        "layouts": 2,
+        "hostMatches": true,
+        "width": 370
+      },
+      {
+        "file": "05 窄屏与宽表格.md",
+        "mode": "preview",
+        "layouts": 2,
+        "hostMatches": true,
+        "width": 370
+      },
+      {
+        "file": "05 窄屏与宽表格.md",
+        "mode": "preview",
+        "layouts": 2,
+        "hostMatches": true,
+        "width": 370
+      },
+      {
+        "file": "05 窄屏与宽表格.md",
+        "mode": "preview",
+        "layouts": 2,
+        "hostMatches": true,
+        "width": 370
+      },
+      {
+        "file": "05 窄屏与宽表格.md",
+        "mode": "preview",
+        "layouts": 2,
+        "hostMatches": true,
+        "width": 370
+      },
+      {
+        "file": "05 窄屏与宽表格.md",
+        "mode": "preview",
+        "layouts": 2,
+        "hostMatches": true,
+        "width": 370
+      },
+      {
+        "file": "05 窄屏与宽表格.md",
+        "mode": "preview",
+        "layouts": 2,
+        "hostMatches": true,
+        "width": 370
+      },
+      {
+        "file": "05 窄屏与宽表格.md",
+        "mode": "preview",
+        "layouts": 2,
+        "hostMatches": true,
+        "width": 370
+      }
+    ],
+    "unchanged": true
+  },
+  "errors": []
+}

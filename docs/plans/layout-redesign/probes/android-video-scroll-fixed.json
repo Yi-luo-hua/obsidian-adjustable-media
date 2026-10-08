@@ -1,0 +1,2475 @@
+{
+  "result": [
+    {
+      "at": 4566750.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4566781.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4566811.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4566841.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4566871.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4566901.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4566931.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4566962.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4566991.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567021.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567051.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567081,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567111.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567141.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567171.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567201.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567231.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567261,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567291.699999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567321.699999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567351,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567381.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567410.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567441.5,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567471.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567501.5,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567531.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567561.5,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567591.699999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567620.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567650.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567680.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567711,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567741.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567771.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567800.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567830.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567860.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567891,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567921,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567951.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4567981.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568011,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568041.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568071.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568101,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568130.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568161.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568191.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568221.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568251.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568281.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568311.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568341.5,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568371.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568456.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568460.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568491,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568520.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568603.300000012,
+      "scroll": 58.074073791503906,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568610.800000012,
+      "scroll": 58.074073791503906,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568641,
+      "scroll": 58.074073791503906,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568672,
+      "scroll": 58.074073791503906,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568701.5,
+      "scroll": 58.074073791503906,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568738.899999976,
+      "scroll": 158.22222900390625,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568760.899999976,
+      "scroll": 170.6666717529297,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568790.800000012,
+      "scroll": 187.25926208496094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568825.800000012,
+      "scroll": 208.29629516601562,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568850.800000012,
+      "scroll": 216.59259033203125,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568881.300000012,
+      "scroll": 235.25926208496094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568910.699999988,
+      "scroll": 244.74073791503906,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568942.300000012,
+      "scroll": 256,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4568976.300000012,
+      "scroll": 262.5185241699219,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569002.600000024,
+      "scroll": 265.77777099609375,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569034.899999976,
+      "scroll": 269.3333435058594,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569066.5,
+      "scroll": 271.7037048339844,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569090.800000012,
+      "scroll": 272.2962951660156,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569121,
+      "scroll": 273.4814758300781,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569150.800000012,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569181,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569210.899999976,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569240.800000012,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569271.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569301.199999988,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569331,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569361,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569391.199999988,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569421.800000012,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569451.199999988,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569481.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569511.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569541.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569570.800000012,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569601,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569631.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569661.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569691.300000012,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569721,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569751.300000012,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569781.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569811.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569841.300000012,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569871.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569901.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569931,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569960.899999976,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4569991.300000012,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570021.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570050.899999976,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570080.899999976,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570111.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570141.5,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570171.899999976,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570201.199999988,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570231.100000024,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570261.199999988,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570291.199999988,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570321.199999988,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570350.899999976,
+      "scroll": 274.0740661621094,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-hidden-nav",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570459.699999988,
+      "scroll": 264,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570470.699999988,
+      "scroll": 264,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570501.600000024,
+      "scroll": 151.70370483398438,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570532.800000012,
+      "scroll": 123.55555725097656,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570561.600000024,
+      "scroll": 102.51851654052734,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570594.199999988,
+      "scroll": 74.37036895751953,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570620.699999988,
+      "scroll": 53.33333206176758,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570650.800000012,
+      "scroll": 25.185184478759766,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570685.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570710.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570741,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570770.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570800.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570832.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570860.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header keyboard-animating",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570890.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570920.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570950.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4570980.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571011.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571041,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571071.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571101,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571131,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571161,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571191,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571221,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571251.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571280.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571310.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571341,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571370.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571401.600000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571432.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571461.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571491.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571521.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571551.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571581.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571611.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571641.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571671,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571701.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571731.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571762.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571792.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571821.600000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571851,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571881.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571911,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571941.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4571971.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572001.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572032.5,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572061.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572091.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572121.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572151.699999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572181.100000024,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572212,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572241.800000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572271.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572301,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572331.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572360.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572391.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572421.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572451.899999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572481.399999976,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572511.199999988,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    },
+    {
+      "at": 4572541.300000012,
+      "scroll": 0,
+      "spec": "[311,\"\\\"??\\\", \\\"??\\\", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, \\\"Segoe UI\\\", \\\"Google Sans Flex\\\", Roboto, \\\"Inter Variable\\\", Inter, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", sans-serif\",\"16px\",\"24px\",\"400\",\"normal\",\"ltr\",3.375,\"auto-full-screen is-android is-floating-nav is-mobile is-phone mod-linux obsidian-app show-inline-title show-ribbon show-view-header styled-scrollbars theme-light\",\"\",0]",
+      "epoch": 0,
+      "classes": "mod-linux is-mobile is-android is-phone obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header",
+      "video": {
+        "id": 1,
+        "ready": 4,
+        "width": 287.5555725097656,
+        "height": 410.7916564941406
+      }
+    }
+  ],
+  "errors": []
+}

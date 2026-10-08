@@ -1,6 +1,6 @@
 # 布局、拖动与视图同步改进实施方案
 
-状态：P0a 数据契约、P1 与 P2 协调／缓存基础已随 0.7.0 发布（[PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12)）；完整 P2 和 P3–P6 尚未开始。W07 的宿主段落分块实现与验收已完成，待独立 PR 合入（[11 验收记录](11-host-paragraph-boundary-acceptance.md)）。更新日期：2026-10-08。当前状态与任务队列见 [09 进度与任务队列](09-progress-and-next-steps.md)。
+更新日期：2026-10-09。P0a 数据契约、P1 与 P2 协调／缓存基础已随 0.7.0 发布；W07 已随 [PR #20](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/20) 合入 `main`（`ce4124a`，未发布）。W08 已本地验收，W01 Windows 已列生命周期门槛通过，W09 Android 基线及平板已列输入／显示场景通过；最新视频播放／暂停／角落缩放经用户手指复核通过，最新自动检查 407 项（[20–24 记录索引](25-documentation-and-artifact-cleanup.md)）。W02 仅实现源码候选，几何与预算未验收；P3–P6、统一触摸规划器、完整 W10／W11 和 R1／R2 仍待推进，iOS 按用户要求暂缓。当前增量本地提交至 `codex/android-layout-stability`，未合并／发布，正式 manifest 仍仅桌面端。当前状态与任务队列见 [09](09-progress-and-next-steps.md)。
 
 规划的研究基线是 `main` 的 `34f5896`（0.6.1），见 [研究报告](../../research/LAYOUT_CONFLICTS.md)；其纯函数、独立浏览器证据与 Obsidian 实测范围分别记录，不互相替代。此后的代码变化以 09 第 1 节为准。
 
@@ -19,9 +19,23 @@
 | [二次核验与修订](06-plan-verification.md) | 八项实施缺口、源码反例、修订位置与剩余验证门槛 |
 | [07 首批实施记录](07-execution-record.md) | P1 基础批次的代码与宿主证据 |
 | [08 每窗格基础实施记录](08-pane-foundation-record.md) | 当前同步／缓存基础、双窗与延迟证据、剩余门槛 |
-| [09 进度与任务队列](09-progress-and-next-steps.md) | 当前状态、待办任务（W01–W07）、进入／退出条件与执行约定 |
-| [10 宿主段落分块首批记录](10-host-paragraph-boundary-record.md) | W07 的实现、宿主边界与热态性能证据，以及尚未执行的验收项 |
+| [09 进度与任务队列](09-progress-and-next-steps.md) | 当前状态、待办任务（W01–W11）、进入／退出条件与执行约定 |
+| [10 宿主段落分块首批记录](10-host-paragraph-boundary-record.md) | W07 首批实现与热态性能的历史证据；后续验收见 11 |
 | [11 宿主段落分块验收](11-host-paragraph-boundary-acceptance.md) | W07 最终构建的列表内部、真实输入、启动／索引队列和三视图验收 |
+| [12 段落间距审查修复](12-paragraph-spacing-review-fixes.md) | Setext H1 与引用定义的修复、15 个宿主回归场景与最终检查 |
+| [13 边框高亮与手机适配](13-highlight-and-mobile-plan.md) | 新选项的光标语义、手机平台验证／显示输入／触摸操作及执行顺序 |
+| [14 边框高亮实施记录](14-highlight-execution-record.md) | W08 默认开启、真实输入与设置／PDF 验收 |
+| [15 手机平台源码审计](15-mobile-platform-audit.md) | W09 能力风险、待真机矩阵与后续步骤 |
+| [16 桌面生命周期记录](16-lifecycle-execution-record.md) | W01 测量通知、旧令牌与首次中段修复，实际验证范围 |
+| [17 首轮暂停记录](17-w01-and-android-continuation.md) | W01 补测与 Android 首轮问题的历史快照 |
+| [18 Android 与 W01 续测验收](18-android-and-w01-acceptance.md) | 最终构建、剩余桌面门槛、手机输入与滚动修复、恢复及未覆盖范围 |
+| [19 W10、W02 与平板续作](19-w10-w02-and-tablet-continuation.md) | 移动输入按钮、实际 edits 的源码候选、平板分屏矩阵与用户延期测试的恢复点 |
+| [20 平板真机验收](20-tablet-acceptance.md) | Huawei 11.5S 原生输入、旋转、宽表格、软键盘操作栏与剩余矩阵 |
+| [21 移动触摸修复](21-mobile-touch-interaction-fixes.md) | 普通点击误展开源码、布局横向带侧栏冲突、把手裁切及阅读切换修复 |
+| [22 角落把手与输入禁区](22-mobile-corner-input-guard.md) | 右下角完整触摸按钮、邻近文字输入禁区、拖动结束误点击与真机取消回归 |
+| [23 视频缩放保留播放器](23-video-resize-player-preservation.md) | 尺寸写回后原位更新、连续缩放／历史／浮动替身播放连续性 |
+| [24 移动视频控件与焦点](24-mobile-video-controls-focus.md) | 原生控件事件隔离、尺寸写回不唤起输入栏、最新真机回归 |
+| [25 文档与产物整理](25-documentation-and-artifact-cleanup.md) | 最新验收范围、剩余门槛、可恢复清理与保留产物 |
 
 两项代价较高的推荐决策单独记录为 proposed ADR：[布局关系分层](../../adr/0001-explicit-layout-relations.md)、[分组格式的版本边界](../../adr/0002-versioned-flat-groups.md)。ADR 通过相应原型门槛后才转为 accepted。
 
@@ -66,7 +80,7 @@ R1、R2 是两个可分别交付的增量：R1 对既有笔记改进规划与同
 
 ## 文档与实现边界
 
-- 快照、依赖、入口与每窗格协调／缓存基础已发布；完整生命周期、最终规划和组格式仍属于后续工作，格式仍为 V2，未迁移笔记。
+- 快照、依赖、入口与每窗格协调／缓存基础已发布；W01 Windows 已列生命周期门槛通过，候选契约、最终规划和组格式仍属于后续工作，格式仍为 V2，未迁移笔记。
 - [DESIGN.md](../../DESIGN.md) 描述当前实现。工作包验收合入时才逐项更新其存储格式、职责和行为记录。
 - 较大实现改动在独立分支进行，不重置或混入无关改动。
 - 合并、发布按项目既有规则及具体任务授权办理；每个工作包的完成证明需包含自动检查和对应宿主实测。

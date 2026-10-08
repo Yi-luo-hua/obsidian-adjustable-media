@@ -1,0 +1,36 @@
+(async()=>{
+  if(app.vault.getName()!=='adjustable-media-mobile-test')throw new Error('Dedicated test vault required');
+  const helper=app.plugins.plugins['mobile-acceptance'],wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const result={at:new Date().toISOString(),userAgent:navigator.userAgent,viewport:{width:innerWidth,height:innerHeight,ratio:devicePixelRatio},samples:[],checks:[]};
+  const original=Object.fromEntries(await Promise.all(app.vault.getMarkdownFiles().map(async f=>[f.path,await app.vault.read(f)])));
+  const leaf=app.workspace.getLeaf(false);
+  for(const mode of ['preview','source']){
+    await leaf.setViewState({type:'markdown',state:{file:'01 显示与媒体.md',mode,source:false},active:true});await wait(1200);
+    leaf.view.previewMode.renderer?.containerEl?.scrollTo(0,0);leaf.view.previewMode.containerEl.scrollTop=0;await wait(350);
+    const v=leaf.view;if(mode==='source'){v.editor.cm.dispatch({selection:{anchor:v.editor.cm.state.doc.length}});v.editor.cm.scrollDOM.scrollTop=0;await wait(350);}
+    result.samples.push(await helper.capture(false));
+  }
+  const cache=app.metadataCache;
+  result.metadataInterface=typeof cache.computeMetadataAsync;
+  if(typeof cache.computeMetadataAsync==='function'){
+    const text='Native buffer probe\n\n<!-- vml -->\n![[attachments/square.png]]\n<!-- /vml -->';
+    const metadata=await cache.computeMetadataAsync(new TextEncoder().encode(text).buffer);
+    result.metadata={sections:metadata?.sections?.map(s=>({type:s.type,position:s.position})),parsed:!!metadata?.sections};
+  }
+  const compute=cache.computeMetadataAsync;
+  try{
+    for(const scenario of ['missing','rejected']){
+      cache.computeMetadataAsync=scenario==='missing'?undefined:()=>Promise.reject(new Error('W09 deliberate unavailable worker'));
+      await leaf.setViewState({type:'empty'});await leaf.openFile(app.vault.getAbstractFileByPath('01 显示与媒体.md'),{state:{mode:'source'},active:true});await wait(700);
+      leaf.view.editor.cm.dispatch({selection:{anchor:leaf.view.editor.cm.state.doc.length}});leaf.view.editor.cm.scrollDOM.scrollTop=0;await wait(350);
+      result.samples.push({scenario,...await helper.capture(false)});
+    }
+  }finally{cache.computeMetadataAsync=compute;}
+  await leaf.setViewState({type:'empty'});await leaf.openFile(app.vault.getAbstractFileByPath('02 长浮动.md'),{state:{mode:'source',source:false},eState:{line:183},active:true});await wait(1200);
+  leaf.view.editor.cm.scrollDOM.scrollTop=2200;await wait(500);
+  result.samples.push({scenario:'first long-float middle',...await helper.capture(false)});
+  result.standIns=leaf.view.containerEl.querySelectorAll('.vml-wrap-proxy').length;
+  result.originalsUnchanged=(await Promise.all(Object.entries(original).map(async([p,t])=>(await app.vault.read(app.vault.getAbstractFileByPath(p)))===t))).every(Boolean);
+  result.checks.push({name:'native bundle loaded',passed:!!app.plugins.plugins['adjustable-media']},{name:'worker accepts exact buffer',passed:result.metadata?.parsed===true},{name:'visible positive geometry',passed:result.samples.every(s=>s.layouts.some(l=>l.rect.width>0&&l.rect.height>0))},{name:'read-only source preserved',passed:result.originalsUnchanged},{name:'first-middle stand-in actually present',passed:result.standIns>0});
+  window.androidBaseline=result;return result;
+})();

@@ -1,0 +1,76 @@
+{
+  "result": {
+    "closed": true,
+    "bufferUnchanged": false,
+    "savedUnchanged": false,
+    "renderedText": "只在这栏末尾输入“手机中文测试”。平板中文测试平板中文测试",
+    "sample": {
+      "at": "2026-10-08T13:33:32.370Z",
+      "vault": "adjustable-media-tablet-test",
+      "file": "03 文字输入.md",
+      "mode": "source",
+      "bodyClasses": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-phone keyboard-animating",
+      "documentOverflow": 0,
+      "pane": {
+        "width": 556,
+        "overflow": 0
+      },
+      "viewport": {
+        "width": 556,
+        "height": 736,
+        "ratio": 2.5,
+        "visual": {
+          "width": 556,
+          "height": 736,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 24,
+            "y": 89.2125015258789,
+            "width": 503.20001220703125,
+            "height": 214.71875
+          },
+          "block": "block:799",
+          "editing": false,
+          "overflow": 0,
+          "media": [
+            {
+              "type": "IMG",
+              "rect": {
+                "x": 179.44375610351562,
+                "y": 100.4124984741211,
+                "width": 192.31875610351562,
+                "height": 192.31875610351562
+              },
+              "width": 1000,
+              "height": 1000,
+              "ready": true
+            }
+          ]
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 152,
+          "head": 152
+        }
+      ],
+      "formulaCount": 0,
+      "inputActions": []
+    }
+  },
+  "errors": []
+}

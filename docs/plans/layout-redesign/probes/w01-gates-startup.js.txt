@@ -1,0 +1,14 @@
+const {Plugin,apiVersion}=require('obsidian');
+module.exports=class W01GatesStartup extends Plugin{
+  onload(){
+    if(this.app.vault.getName()!=='vml-test-vault')throw new Error('Test vault required');
+    const fs=require('fs'),remote=require('@electron/remote'),root='E:/TOOLS/obsidian-adjustable-media/';
+    remote.getCurrentWebContents().setBackgroundThrottling(false);
+    eval(fs.readFileSync(root+'docs/plans/layout-redesign/probes/w01-trace.js.txt','utf8'));
+    window.__w01Startup={mathJaxPresent:!!window.MathJax,at:performance.now(),apiVersion};
+    this.app.workspace.onLayoutReady(()=>{
+      window.app=this.app;
+      eval(fs.readFileSync(root+'docs/plans/layout-redesign/probes/w01-remaining-gates.js.txt','utf8'));
+    });
+  }
+};

@@ -1,0 +1,217 @@
+{
+  "result": {
+    "viewport": [
+      370,
+      736
+    ],
+    "class": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-phone",
+    "source": "# 显示与媒体\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":196,\"widths\":[1,1.4]}]} -->\n![[attachments/square.png]] ![[attachments/landscape.png]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":200}]} -->\n![[attachments/clip.mp4]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"type\":\"text\",\"cols\":2} -->\n手机端分栏文字。中文与 English text 应完整显示。\n\n$$\nx^2+y^2=z^2\n$$\n\n第二段文字包含 **粗体** 和列表。\n- 第一项\n- 第二项\n\n<!-- /vml -->\n",
+    "layouts": [
+      {
+        "rect": {
+          "x": 24,
+          "y": 188.0124969482422,
+          "width": 317.20001220703125,
+          "height": 218.40000915527344
+        },
+        "source": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            },
+            "opacity": "0",
+            "hit": "cm-scroller"
+          }
+        ],
+        "handle": [
+          {
+            "rect": {
+              "x": 158.60000610351562,
+              "y": 191.21250915527344,
+              "width": 48,
+              "height": 24
+            },
+            "parents": [
+              {
+                "class": "vml-layout vml-layout--interactive",
+                "rect": {
+                  "x": 24,
+                  "y": 188.0124969482422,
+                  "width": 317.20001220703125,
+                  "height": 218.40000915527344
+                },
+                "contain": "none",
+                "overflow": "visible",
+                "clip": "none"
+              },
+              {
+                "class": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+                "rect": {
+                  "x": 24,
+                  "y": 188.0124969482422,
+                  "width": 317.20001220703125,
+                  "height": 218.40000915527344
+                },
+                "contain": "paint",
+                "overflow": "visible",
+                "clip": "none"
+              },
+              {
+                "class": "cm-content cm-lineWrapping",
+                "rect": {
+                  "x": 24,
+                  "y": 116.95000457763672,
+                  "width": 317.20001220703125,
+                  "height": 1290.5062255859375
+                },
+                "contain": "none",
+                "overflow": "visible",
+                "clip": "none"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rect": {
+          "x": 24,
+          "y": 422.4125061035156,
+          "width": 317.20001220703125,
+          "height": 443.5375061035156
+        },
+        "source": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            },
+            "opacity": "0",
+            "hit": "cm-scroller"
+          }
+        ],
+        "handle": [
+          {
+            "rect": {
+              "x": 158.60000610351562,
+              "y": 425.6125183105469,
+              "width": 48,
+              "height": 24
+            },
+            "parents": [
+              {
+                "class": "vml-layout vml-layout--interactive",
+                "rect": {
+                  "x": 24,
+                  "y": 422.4125061035156,
+                  "width": 317.20001220703125,
+                  "height": 443.5375061035156
+                },
+                "contain": "none",
+                "overflow": "visible",
+                "clip": "none"
+              },
+              {
+                "class": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+                "rect": {
+                  "x": 24,
+                  "y": 422.4125061035156,
+                  "width": 317.20001220703125,
+                  "height": 443.5375061035156
+                },
+                "contain": "paint",
+                "overflow": "visible",
+                "clip": "none"
+              },
+              {
+                "class": "cm-content cm-lineWrapping",
+                "rect": {
+                  "x": 24,
+                  "y": 116.95000457763672,
+                  "width": 317.20001220703125,
+                  "height": 1290.5062255859375
+                },
+                "contain": "none",
+                "overflow": "visible",
+                "clip": "none"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rect": {
+          "x": 24,
+          "y": 881.9500122070312,
+          "width": 317.20001220703125,
+          "height": 141.50625610351562
+        },
+        "source": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            },
+            "opacity": "0",
+            "hit": "cm-scroller"
+          }
+        ],
+        "handle": [
+          {
+            "rect": {
+              "x": 158.60000610351562,
+              "y": 885.1500244140625,
+              "width": 48,
+              "height": 24
+            },
+            "parents": [
+              {
+                "class": "vml-layout vml-layout--text-only vml-layout--multicol vml-layout--interactive",
+                "rect": {
+                  "x": 24,
+                  "y": 881.9500122070312,
+                  "width": 317.20001220703125,
+                  "height": 141.50625610351562
+                },
+                "contain": "none",
+                "overflow": "visible",
+                "clip": "none"
+              },
+              {
+                "class": "vml-live-preview vml-live-preview--blank-above vml-live-preview--blank-below",
+                "rect": {
+                  "x": 24,
+                  "y": 881.9500122070312,
+                  "width": 317.20001220703125,
+                  "height": 141.50625610351562
+                },
+                "contain": "paint",
+                "overflow": "visible",
+                "clip": "none"
+              },
+              {
+                "class": "cm-content cm-lineWrapping",
+                "rect": {
+                  "x": 24,
+                  "y": 116.95000457763672,
+                  "width": 317.20001220703125,
+                  "height": 1290.5062255859375
+                },
+                "contain": "none",
+                "overflow": "visible",
+                "clip": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "errors": []
+}

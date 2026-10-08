@@ -1,0 +1,6 @@
+(()=>{
+  window.__tabletViewportTrace?.stop?.();const rows=[],start=performance.now();
+  const sample=()=>{const v=app.workspace.activeLeaf.view,root=v.getMode()==='preview'?v.previewMode.containerEl:v.editor.cm.dom;rows.push({at:performance.now()-start,width:innerWidth,height:innerHeight,file:v.file.path,mode:v.getMode(),paneWidth:root.clientWidth,paneHeight:root.clientHeight,layouts:root.querySelectorAll('.vml-layout').length,connected:root.isConnected,visible:document.visibilityState});};
+  sample();const interval=setInterval(sample,100),timeout=setTimeout(()=>clearInterval(interval),120000);
+  window.__tabletViewportTrace={rows,stop:()=>{clearInterval(interval);clearTimeout(timeout);}};return{recording:true};
+})();

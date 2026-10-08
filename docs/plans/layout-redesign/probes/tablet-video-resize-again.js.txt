@@ -1,0 +1,11 @@
+(async()=>{
+ const g=window.__tabletVideoResize,v=app.workspace.activeLeaf.view,cm=v.editor.cm;
+ g.firstSource=cm.state.doc.toString();g.firstWidth=cm.dom.querySelector('video').getBoundingClientRect().width;
+ const handle=cm.dom.querySelector('.vml-frame__handle--corner');handle.scrollIntoView({block:'center'});await new Promise(r=>setTimeout(r,100));
+ const b=handle.getBoundingClientRect(),x=b.x+b.width/2,y=b.y+b.height/2;
+ if(document.elementFromPoint(x,y)?.closest('.vml-frame__handle--corner')!==handle)throw new Error('Visible second handle required');
+ const actions=[{method:'Input.dispatchTouchEvent',params:{type:'touchStart',touchPoints:[{x,y}]}}];
+ for(let i=1;i<=8;i++)actions.push({method:'Input.dispatchTouchEvent',params:{type:'touchMove',touchPoints:[{x:x-25*i/8,y:y-15*i/8}]}},{method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,16))',awaitPromise:true}});
+ actions.push({method:'Input.dispatchTouchEvent',params:{type:'touchEnd',touchPoints:[]}},{method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,2500))',awaitPromise:true}});
+ return {actions,firstWidth:g.firstWidth,firstSource:g.firstSource};
+})()

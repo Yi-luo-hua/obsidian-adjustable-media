@@ -5,6 +5,40 @@ import { PaneMeasurements, ViewProjection, setBounded } from "../src/layout/view
 
 const origin = { file: {}, branch: {}, path: "note.md" };
 
+test("a newly pending measurement withdraws prior readiness without fabricating an environment change", () => {
+  const pane = new ViewProjection(), snapshot = documentSnapshot("hello", origin);
+  pane.request(snapshot); pane.observeHost(snapshot.text); pane.viewportChanged([{ from: 0, to: 5 }]);
+  const old = pane.token()!;
+  pane.installed(old, pane.required); pane.measured(old, pane.required);
+  assert.equal(pane.phase, "settled");
+  assert.equal(pane.measurementPending(old), true);
+  assert.equal(pane.phase, "measuring");
+  assert.equal(pane.environmentEpoch, 0);
+  assert.equal(pane.measuredRevision, null);
+  pane.environmentChanged();
+  assert.equal(pane.measurementPending(old), false);
+});
+
+test("clearing the last layout invalidates old callbacks and lets the same pane project a later document", () => {
+  const pane = new ViewProjection(), first = documentSnapshot("layout", origin);
+  pane.request(first); pane.observeHost(first.text);
+  pane.viewportChanged([{ from: 0, to: first.text.length }]);
+  const old = pane.token()!;
+  pane.installed(old, pane.required); pane.measured(old, pane.required);
+  pane.clear();
+  assert.equal(pane.desired, null);
+  assert.equal(pane.hostRevision, null);
+  assert.equal(pane.renderedRevision, null);
+  assert.equal(pane.measuredRevision, null);
+  assert.equal(pane.accepts(old), false);
+  assert.equal(pane.installed(old, [{ from: 0, to: 6 }]), false);
+  assert.equal(pane.measured(old, [{ from: 0, to: 6 }]), false);
+  assert.deepEqual(pane.required, []);
+  const next = documentSnapshot("new layout", origin, first);
+  pane.request(next); pane.observeHost(next.text);
+  assert.equal(pane.accepts(pane.token()!), true);
+});
+
 test("a render request and host match do not confirm installation or measurement", () => {
   const pane = new ViewProjection();
   pane.request(documentSnapshot("hello", origin));

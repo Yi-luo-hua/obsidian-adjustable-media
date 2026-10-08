@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-08T17:46:44.905Z",
+  "hashes": {
+    "main.js": "4489ce31a4a71665a1cbf71abe869379440bcf065c234a6533837e2ae9b9b5b7",
+    "styles.css": "b2012bec744d6250b7fc336b247cc1c77f92deb8203c3294307cc7c8b1a5f914"
+  },
+  "checks": {
+    "fixed": {
+      "sameVideo": true,
+      "sameRoot": true,
+      "removed": 0,
+      "playing": true,
+      "saved": true,
+      "settingsOnly": true,
+      "userNoteUnchanged": true,
+      "allSamplesSame": true,
+      "allSamplesPlaying": true,
+      "mediaEvents": 0
+    },
+    "history": {
+      "sameVideo": true,
+      "sameRoot": true,
+      "removed": 0,
+      "playing": true,
+      "saved": true,
+      "settingsOnly": true,
+      "userNoteUnchanged": true,
+      "allSamplesSame": true,
+      "allSamplesPlaying": true,
+      "mediaEvents": 0,
+      "history": {
+        "secondSmaller": true,
+        "firstWidth": 248.2312469482422,
+        "secondWidth": 223.38125610351562,
+        "undoMatchesFirst": true,
+        "redoMatchesSecond": true,
+        "undoSaved": true,
+        "redoSaved": true,
+        "sameOnUndo": true,
+        "sameOnRedo": true
+      }
+    },
+    "proxy": {
+      "sameVideo": true,
+      "sameRoot": true,
+      "removed": 0,
+      "playing": true,
+      "saved": true,
+      "settingsOnly": true,
+      "userNoteUnchanged": true,
+      "allSamplesSame": true,
+      "allSamplesPlaying": true,
+      "mediaEvents": 0
+    }
+  },
+  "passed": true
+}

@@ -1,0 +1,5 @@
+(async()=>{
+  await app.workspace.activeLeaf.setViewState({type:'markdown',state:{file:'05 窄屏与宽表格.md',mode:'preview'},active:true});await new Promise(r=>setTimeout(r,500));
+  app.workspace.activeLeaf.view.previewMode.containerEl.scrollTop=0;
+  return await app.plugins.plugins['mobile-acceptance'].capture(false);
+})();

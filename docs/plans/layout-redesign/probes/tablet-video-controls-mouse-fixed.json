@@ -1,0 +1,59 @@
+{
+  "result": {
+    "selection": 128,
+    "initial": 128,
+    "focus": "vml-item__media mobile-tap",
+    "toolbar": false,
+    "playing": false,
+    "time": 2.160767,
+    "sameVideo": true,
+    "sourceUnchanged": true,
+    "events": [
+      {
+        "name": "pointerdown",
+        "target": "VIDEO",
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet",
+        "phase": 1
+      },
+      {
+        "name": "mousedown",
+        "target": "VIDEO",
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet",
+        "phase": 1
+      },
+      {
+        "name": "focusin",
+        "target": "VIDEO",
+        "selection": 128,
+        "focus": "vml-item__media mobile-tap",
+        "phase": 1
+      },
+      {
+        "node": "content",
+        "name": "focusin",
+        "target": "VIDEO",
+        "prevented": false,
+        "selection": 128,
+        "focus": "vml-item__media mobile-tap"
+      },
+      {
+        "node": "document",
+        "name": "focusin",
+        "target": "VIDEO",
+        "prevented": false,
+        "selection": 128,
+        "focus": "vml-item__media mobile-tap"
+      },
+      {
+        "name": "click",
+        "target": "VIDEO",
+        "selection": 128,
+        "focus": "vml-item__media mobile-tap",
+        "phase": 1
+      }
+    ]
+  },
+  "errors": []
+}

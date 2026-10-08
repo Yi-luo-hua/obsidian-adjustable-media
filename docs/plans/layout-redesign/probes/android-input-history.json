@@ -1,0 +1,82 @@
+{
+  "result": {
+    "checks": [
+      {
+        "name": "one native undo restores exact original",
+        "passed": true
+      },
+      {
+        "name": "one native redo restores exact input",
+        "passed": true
+      },
+      {
+        "name": "save/reopen preserves input",
+        "passed": true
+      }
+    ],
+    "after": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "undo": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "redo": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "reopen": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。手机中文测试\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n",
+    "sample": {
+      "at": "2026-10-08T10:51:29.894Z",
+      "file": "03 文字输入.md",
+      "mode": "source",
+      "viewport": {
+        "width": 363,
+        "height": 823,
+        "ratio": 3.375,
+        "visual": {
+          "width": 363.2592468261719,
+          "height": 823.111083984375,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 24,
+            "y": 231.86111450195312,
+            "width": 310.5185241699219,
+            "height": 190.9629669189453
+          },
+          "block": "block:668",
+          "editing": false,
+          "overflow": 0,
+          "media": [
+            {
+              "type": "IMG",
+              "rect": {
+                "x": 121.75,
+                "y": 243.34259033203125,
+                "width": 115.01851654052734,
+                "height": 115.01851654052734
+              },
+              "width": 1000,
+              "height": 1000,
+              "ready": true
+            }
+          ]
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 126,
+          "head": 126
+        }
+      ],
+      "formulaCount": 0
+    }
+  },
+  "errors": []
+}

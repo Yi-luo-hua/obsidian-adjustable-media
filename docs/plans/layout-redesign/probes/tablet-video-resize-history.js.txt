@@ -1,0 +1,10 @@
+(async()=>{
+ const g=window.__tabletVideoResize,v=app.workspace.activeLeaf.view,cm=v.editor.cm;
+ g.secondSource=cm.state.doc.toString();const secondWidth=cm.dom.querySelector('video').getBoundingClientRect().width;
+ const saved=async text=>{for(let i=0;i<60;i++){if(await app.vault.read(v.file)===text)return true;await new Promise(r=>setTimeout(r,100));}return false;};
+ cm.focus();v.editor.undo();const undo=cm.state.doc.toString();const undoSaved=await saved(undo);await new Promise(r=>setTimeout(r,150));
+ const sameOnUndo=cm.dom.querySelector('video')===g.video;
+ v.editor.redo();const redo=cm.state.doc.toString();const redoSaved=await saved(redo);await new Promise(r=>setTimeout(r,150));
+ g.history={secondSmaller:secondWidth<g.firstWidth-15,firstWidth:g.firstWidth,secondWidth,undoMatchesFirst:undo===g.firstSource,redoMatchesSecond:redo===g.secondSource,undoSaved,redoSaved,sameOnUndo,sameOnRedo:cm.dom.querySelector('video')===g.video};
+ return g.history;
+})()

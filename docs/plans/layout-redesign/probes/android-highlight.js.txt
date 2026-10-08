@@ -1,0 +1,15 @@
+(async()=>{
+  const p=app.plugins.plugins['adjustable-media'],leaf=app.workspace.activeLeaf;
+  if(app.vault.getName()!=='adjustable-media-mobile-test')throw new Error('Dedicated vault required');
+  window.__androidTouch?.stops.forEach(stop=>stop());
+  await leaf.setViewState({type:'markdown',state:{file:'03 文字输入.md',mode:'source',source:false},active:true});
+  await new Promise(r=>setTimeout(r,600));
+  const cm=leaf.view.editor.cm;cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.scrollDOM.scrollTop=0;
+  await new Promise(r=>setTimeout(r,200));
+  const source=cm.state.doc.toString(),saved=p.settings.keepLayoutHighlight;
+  const sample=()=>[...cm.dom.querySelectorAll('.vml-layout')].map(el=>({rect:el.getBoundingClientRect().toJSON(),border:getComputedStyle(el).borderTopColor,shadow:getComputedStyle(el).boxShadow,active:!!el.closest('.vml-cursor-in-block')}));
+  const before=sample();p.settings.keepLayoutHighlight=false;await p.saveSettings();await new Promise(r=>setTimeout(r,150));
+  window.__androidHighlight={source,saved,before,off:sample()};
+  const column=cm.dom.querySelector('.vml-layout__text--left');
+  return{...window.__androidHighlight,column:column?.getBoundingClientRect().toJSON(),columns:[...cm.dom.querySelectorAll('[data-vml-block-id] .vml-layout__text')].map(el=>({text:el.textContent,rect:el.getBoundingClientRect().toJSON()}))};
+})();

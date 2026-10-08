@@ -1,0 +1,53 @@
+{
+  "result": {
+    "sample": {
+      "at": "2026-10-08T10:57:53.624Z",
+      "file": "02 长浮动.md",
+      "mode": "source",
+      "viewport": {
+        "width": 363,
+        "height": 823,
+        "ratio": 3.375,
+        "visual": {
+          "width": 363.2592468261719,
+          "height": 823.111083984375,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 210.3148193359375,
+            "y": -2483.0556640625,
+            "width": 124.20370483398438,
+            "height": 3862.962890625
+          },
+          "block": "block:676",
+          "editing": false,
+          "overflow": 0,
+          "media": []
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 7296,
+          "head": 7296
+        }
+      ],
+      "formulaCount": 0
+    },
+    "proxies": 1,
+    "measurements": 0
+  },
+  "errors": []
+}

@@ -1,0 +1,5 @@
+(async()=>{
+  const v=app.workspace.activeLeaf.view,root=v.getMode()==='preview'?v.previewMode.containerEl:v.editor.cm.dom;
+  const tables=[...root.querySelectorAll('.vml-layout table')].map(el=>({rect:el.getBoundingClientRect().toJSON(),client:el.clientWidth,scroll:el.scrollWidth,left:el.scrollLeft,columns:el.querySelectorAll('th').length,display:getComputedStyle(el).display,overflow:getComputedStyle(el).overflowX}));
+  return{sample:await app.plugins.plugins['mobile-acceptance'].capture(false),tables,documentScroll:document.documentElement.scrollLeft,root:{connected:root.isConnected,children:root.children.length,rect:root.getBoundingClientRect().toJSON(),scroll:root.scrollTop},hostTextLength:v.getViewData().length,sections:v.previewMode.renderer?.sections?.map(s=>({from:s.lineStart,to:s.lineEnd,computed:s.computed,rendered:s.rendered,shown:s.shown,connected:s.el.isConnected,layouts:s.el.querySelectorAll('.vml-layout').length})),unchanged:await app.vault.read(v.file)===window.__tabletOriginals[v.file.path]};
+})();

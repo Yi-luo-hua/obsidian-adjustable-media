@@ -1,0 +1,47 @@
+(async () => {
+  if(app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs=require('fs'),crypto=require('crypto'),remote=require('@electron/remote');
+  const root='E:/TOOLS/obsidian-adjustable-media/',base=app.vault.adapter.getBasePath(),trace=window.__w01Trace;
+  const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
+  const originals=Object.fromEntries(app.vault.getMarkdownFiles().map(f=>[f.path,hash(fs.readFileSync(base+'/'+f.path))]));
+  const path='W01 first middle transient.md',wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  if(app.vault.getAbstractFileByPath(path))throw new Error('Probe file exists');
+  const source='<!-- vml {"v":2,"type":"text","wrap":"right","width":0.4} -->\n'+Array.from({length:240},(_,i)=>'Side note '+i+'  \n').join('')+'<!-- /vml -->\n'+Array.from({length:220},(_,i)=>'Body '+i+'\n\n').join('');
+  const file=await app.vault.create(path,source),previous=app.workspace.activeLeaf,leaves=[];
+  const targetLine=source.split('\n').findIndex(l=>l==='Body 90');
+  const result={buildHash:hash(fs.readFileSync(base+'/.obsidian/plugins/adjustable-media/main.js')),samples:[],scroll:[]};
+  try{
+    for(const mode of ['source','preview']){
+      const leaf=app.workspace.getLeaf(true);leaves.push(leaf);
+      await leaf.openFile(file,{state:{mode},eState:{line:targetLine},active:false});app.workspace.setActiveLeaf(leaf,{focus:false});
+      await wait(700);
+      const view=leaf.view,owner=mode==='source'?view.editor:view;
+      const projection=()=>trace.projections.filter(p=>!p.w01Disposed&&p.w01Owner===owner).at(-1);
+      const container=mode==='source'?view.editor.cm.dom:view.previewMode.containerEl;
+      const earlyPhase=projection()?.phase,start=performance.now();
+      for(let i=0;i<125&&projection()?.phase!=='settled';i++)await wait(40);
+      result.samples.push({mode,earlyPhase,waitMs:performance.now()-start,phase:projection()?.phase,coverage:projection()?.coverage,measuredCoverage:projection()?.measuredCoverage,required:projection()?.required,scrollTop:(mode==='source'?view.editor.cm.scrollDOM:container).scrollTop,standIns:container.querySelectorAll(mode==='source'?'.vml-wrap-proxy':'.vml-rv-proxy').length,layoutSizes:[...container.querySelectorAll('.vml-layout')].map(el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};}).filter(r=>r.width>0)});
+      if(mode==='source'){
+        const guard=trace.guards.find(g=>g.view===view.editor.cm);
+        result.guard={ready:guard?.measurementsReady(),pendingUpdate:guard?.pendingUpdate,pendingMedia:guard?[...guard.pendingMedia]:null,sizes:guard?[...guard.sizes.keys()]:null,anchors:guard?.source.anchors(guard.view.state).map(a=>({from:a.from,key:a.key})),viewport:guard?.view.viewport};
+      }
+      await remote.getCurrentWebContents().capturePage();await wait(40);fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w01-first-middle-'+mode+'.png',(await remote.getCurrentWebContents().capturePage()).toPNG());
+      if(mode==='source'){
+        const cm=view.editor.cm;
+        for(const step of [40,40,40,-40,-40,-40]){
+          const line=[...cm.contentDOM.querySelectorAll(':scope>.cm-line')].find(el=>el.textContent.startsWith('Body ')&&el.getBoundingClientRect().top>cm.scrollDOM.getBoundingClientRect().top+120);
+          if(!line)throw new Error('No visible body anchor to compare');
+          const top=line.getBoundingClientRect().top,scroll=cm.scrollDOM.scrollTop;
+          cm.scrollDOM.scrollTop+=step;await wait(120);
+          if(line.isConnected)result.scroll.push({step,actual:cm.scrollDOM.scrollTop-scroll,extra:line.getBoundingClientRect().top-top+(cm.scrollDOM.scrollTop-scroll)});
+        }
+      }
+    }
+    result.passed=result.samples.every(s=>s.phase==='settled')&&result.scroll.length>0&&result.scroll.every(s=>Math.abs(s.extra)<=2);
+  }catch(error){result.error=String(error.stack??error);}
+  finally{
+    for(const leaf of leaves.reverse())leaf.detach();if(previous)app.workspace.setActiveLeaf(previous,{focus:false});await wait(200);await app.vault.trash(file,true);
+    result.originalNotesUnchanged=Object.entries(originals).every(([p,h])=>hash(fs.readFileSync(base+'/'+p))===h);
+    fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w01-first-middle.json',JSON.stringify(result,null,2));window.w01FirstMiddleResult={passed:result.passed,error:result.error,samples:result.samples,scroll:result.scroll};
+  }
+})();

@@ -1,0 +1,114 @@
+{
+  "result": {
+    "kind": "normal-text",
+    "viewport": [
+      743,
+      736
+    ],
+    "corner": {
+      "x": 667.2000122070312,
+      "y": 323.2124938964844,
+      "width": 44,
+      "height": 44,
+      "top": 323.2124938964844,
+      "right": 711.2000122070312,
+      "bottom": 367.2124938964844,
+      "left": 667.2000122070312
+    },
+    "frame": {
+      "x": 24,
+      "y": 228.0124969482422,
+      "width": 690.4000244140625,
+      "height": 142.40000915527344,
+      "top": 228.0124969482422,
+      "right": 714.4000244140625,
+      "bottom": 370.4125061035156,
+      "left": 24
+    },
+    "points": [
+      {
+        "x": 689.2000122070312,
+        "y": 326.2124938964844,
+        "onHandle": true
+      },
+      {
+        "x": 689.2000122070312,
+        "y": 364.2124938964844,
+        "onHandle": true
+      },
+      {
+        "x": 670.2000122070312,
+        "y": 345.2124938964844,
+        "onHandle": true
+      },
+      {
+        "x": 708.2000122070312,
+        "y": 345.2124938964844,
+        "onHandle": true
+      }
+    ],
+    "x": 65.20000076293945,
+    "y": 425.6125183105469,
+    "hit": null,
+    "editing": true,
+    "sourceLines": 0,
+    "events": [
+      {
+        "type": "pointerdown",
+        "trusted": true,
+        "target": null,
+        "editing": false,
+        "sourceLines": 0
+      },
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "target": null,
+        "editing": false,
+        "sourceLines": 0
+      },
+      {
+        "type": "pointerup",
+        "trusted": true,
+        "target": null,
+        "editing": false,
+        "sourceLines": 0
+      },
+      {
+        "type": "touchend",
+        "trusted": true,
+        "target": null,
+        "editing": false,
+        "sourceLines": 0
+      },
+      {
+        "type": "focusin",
+        "trusted": true,
+        "target": "cm-content cm-lineWrapping",
+        "editing": false,
+        "sourceLines": 0
+      },
+      {
+        "type": "click",
+        "trusted": true,
+        "target": null,
+        "editing": false,
+        "sourceLines": 0
+      },
+      {
+        "type": "focusin",
+        "trusted": true,
+        "target": "cm-content cm-lineWrapping",
+        "editing": true,
+        "sourceLines": 0
+      }
+    ],
+    "source": "# 角落触摸测试\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":120}]} -->\n![[attachments/square.png]] ![[attachments/landscape.png]]\n<!-- /vml -->\n<!-- vml {\"v\":2,\"type\":\"text\"} -->\n下一行文字，角落附近不应打开输入。\n正常区域仍应能进入文字编辑。\n<!-- /vml -->\n\n块外正文仍应正常编辑。\n",
+    "unchanged": true,
+    "savedMatches": true,
+    "onlySettingsChanged": true,
+    "left": true,
+    "right": true
+  },
+  "errors": []
+}

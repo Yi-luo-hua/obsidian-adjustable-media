@@ -1,0 +1,51 @@
+(async()=>{
+  if(app.vault.getName()!=='vml-test-vault')throw new Error('Dedicated vault required');
+  const fs=require('fs'),crypto=require('crypto'),remote=require('@electron/remote');
+  const root='E:/TOOLS/obsidian-adjustable-media/',base=app.vault.adapter.getBasePath(),wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
+  const originals=Object.fromEntries(app.vault.getMarkdownFiles().map(f=>[f.path,hash(fs.readFileSync(base+'/'+f.path))]));
+  const path='W10 input actions transient.md',source='<!-- vml {"v":2,"width":0.4} -->\nEditable left\n![[attachments/square-1x1.png]]\nRight untouched\n<!-- /vml -->\n\nOutside untouched\n';
+  if(app.vault.getAbstractFileByPath(path))throw new Error('Probe exists');
+  const file=await app.vault.create(path,source),previous=app.workspace.activeLeaf,leaf=app.workspace.getLeaf(true),checks=[];
+  const result={buildHash:hash(fs.readFileSync(base+'/.obsidian/plugins/adjustable-media/main.js')),simulation:'Windows rendered auxiliary test. Visible mobile controls enabled on the test pane only; not Android acceptance.',checks};
+  const dbg=remote.getCurrentWebContents().debugger,attached=!dbg.isAttached(),events=[];
+  const record=e=>events.push({name:e.type,trusted:e.isTrusted});
+  let style;
+  const check=(name,passed)=>checks.push({name,passed});
+  const click=async el=>{if(!el)throw new Error('Click target missing');el.scrollIntoView({block:'center'});await wait(100);const r=el.getBoundingClientRect();await dbg.sendCommand('Input.dispatchMouseEvent',{type:'mousePressed',x:r.x+r.width/2,y:r.y+Math.min(r.height/2,18),button:'left',clickCount:1});await dbg.sendCommand('Input.dispatchMouseEvent',{type:'mouseReleased',x:r.x+r.width/2,y:r.y+Math.min(r.height/2,18),button:'left',clickCount:1});await wait(120);};
+  try{
+    if(attached)dbg.attach('1.3');await dbg.sendCommand('Emulation.setFocusEmulationEnabled',{enabled:true});
+    await leaf.openFile(file,{state:{mode:'source'},active:false});app.workspace.setActiveLeaf(leaf,{focus:false});await wait(450);
+    const cm=leaf.view.editor.cm;cm.dispatch({selection:{anchor:source.length}});cm.scrollDOM.scrollTop=0;await wait(150);
+    leaf.view.containerEl.addClass('w10-action-probe');style=document.createElement('style');style.textContent='.w10-action-probe .vml-text-editor__actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.w10-action-probe .vml-text-editor__actions button{min-height:44px;min-width:0;max-width:100%;height:auto;white-space:normal}';document.head.appendChild(style);
+    for(const name of ['click','compositionstart','compositionend','input'])cm.dom.addEventListener(name,record,true);
+    await click(cm.dom.querySelector('.vml-layout__text--left'));
+    const initialColumn=cm.constructor.findFromDOM(cm.dom.querySelector('.vml-text-editor .cm-editor'));
+    initialColumn.dispatch({selection:{anchor:initialColumn.state.doc.length}});
+    const button=()=>cm.dom.querySelector('.vml-text-editor__actions button');
+    result.initialButtons=[...cm.dom.querySelectorAll('.vml-text-editor__actions button')].map(el=>({text:el.textContent,disabled:el.disabled,rect:el.getBoundingClientRect().toJSON()}));
+    check('visible done and disabled discard',button()?.getBoundingClientRect().height>=43.99&&cm.dom.querySelectorAll('.vml-text-editor__actions button').length===2&&cm.dom.querySelectorAll('.vml-text-editor__actions button')[1].disabled);
+    await dbg.sendCommand('Input.imeSetComposition',{text:'测试',selectionStart:2,selectionEnd:2});await wait(80);
+    await click(button());
+    check('Done during composition keeps editor and source unchanged',!!cm.dom.querySelector('.vml-text-editor')&&cm.state.doc.toString()===source);
+    await dbg.sendCommand('Input.insertText',{text:'测试'});await wait(500);
+    const committed=cm.state.doc.toString();result.committed=committed;check('candidate confirmed only left text written',committed===source.replace('Editable left','Editable left测试'));
+    await click(button());check('Done closes confirmed editor',!cm.dom.querySelector('.vml-text-editor'));
+    await click(cm.dom.querySelector('.vml-layout__text--left'));
+    const inner=cm.dom.querySelector('.vml-text-editor .cm-editor'),column=cm.constructor.findFromDOM(inner);
+    column.dispatch({changes:{from:0,to:column.state.doc.length,insert:'```js'}});await wait(150);
+    check('invalid input leaves note untouched',cm.state.doc.toString()===committed&&!!cm.dom.querySelector('.vml-text-editor.is-invalid'));
+    await click(cm.dom.querySelectorAll('.vml-text-editor__actions button')[1]);
+    check('discard closes without writing',!cm.dom.querySelector('.vml-text-editor')&&cm.state.doc.toString()===committed);
+    await click(cm.dom.querySelector('.vml-layout__text--left'));
+    check('discarded draft not restored',cm.constructor.findFromDOM(cm.dom.querySelector('.vml-text-editor .cm-editor')).state.doc.toString()==='Editable left测试');
+    result.events=events;result.passed=checks.every(c=>c.passed);
+    fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w10-input-actions.png',(await remote.getCurrentWebContents().capturePage()).toPNG());
+  }catch(error){result.error=String(error.stack??error);result.passed=false;}
+  finally{
+    style?.remove();leaf.detach();if(previous)app.workspace.setActiveLeaf(previous,{focus:false});await wait(120);await app.vault.trash(file,true);
+    await dbg.sendCommand('Emulation.setFocusEmulationEnabled',{enabled:false});if(attached)dbg.detach();
+    result.originalNotesUnchanged=Object.entries(originals).every(([p,h])=>hash(fs.readFileSync(base+'/'+p))===h);
+    fs.writeFileSync(root+'docs/plans/layout-redesign/probes/w10-input-actions.json',JSON.stringify(result,null,2));
+  }
+})();

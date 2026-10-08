@@ -1,0 +1,137 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs'), crypto = require('crypto'), remote = require('@electron/remote');
+  const root = 'E:/TOOLS/obsidian-adjustable-media/', base = app.vault.adapter.getBasePath();
+  const hash = value => crypto.createHash('sha256').update(value).digest('hex');
+  const originals = Object.fromEntries(app.vault.getMarkdownFiles().map(f => [f.path, hash(fs.readFileSync(base + '/' + f.path))]));
+  const trace = window.__w01Trace;
+  if (!trace) throw new Error('Install trace before loading diagnostic build');
+  const path = 'W01 lifecycle transient.md', otherPath = 'W01 lifecycle other transient.md';
+  if (app.vault.getAbstractFileByPath(path) || app.vault.getAbstractFileByPath(otherPath)) throw new Error('Probe file exists');
+  const run = Date.now();
+  const source = '# W01 lifecycle\n\n<!-- vml {"v":2,"width":0.7,"rows":[{"width":0.3}]} -->\n![slow image](http://127.0.0.1:18708/image.png?delay=900&run=' + run + ')\n<!-- /vml -->\n\n<!-- vml {"v":2,"width":0.7,"rows":[{"width":0.3}]} -->\n![slow video](http://127.0.0.1:18708/video.mp4?delay=1200&run=' + run + ')\n<!-- /vml -->\n\n<!-- vml {"v":2,"type":"text","width":0.65} -->\n' + 'Text wraps differently at each width. '.repeat(14) + '\n\n$$\nx^2 + y^2 = z^2\n$$\n<!-- /vml -->\n\n## Folded content\n\n<!-- vml {"v":2,"type":"text","wrap":"right","width":0.4} -->\n' + Array.from({ length: 200 }, (_, i) => 'Float ' + i + '  \n').join('') + '<!-- /vml -->\n' + Array.from({ length: 180 }, (_, i) => 'Body ' + i + '\n\n').join('');
+  const file = await app.vault.create(path, source), other = await app.vault.create(otherPath, 'Another note\n');
+  const leaves = [], previous = app.workspace.activeLeaf, restores = [];
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const assert = (value, message) => { if (!value) throw new Error(message); };
+  const result = { diagnosticHash: hash(fs.readFileSync(base + '/.obsidian/plugins/adjustable-media/main.js')), productionHash: hash(fs.readFileSync(root + 'main.js')), hostVersion: remote.getCurrentWindow().getTitle().match(/Obsidian ([\d.]+)$/)?.[1], installerVersion: remote.app.getVersion(), samples: [], failures: [] };
+  window.w01LifecycleResult = null;
+  const style = document.createElement('style'); style.textContent = '.w01-width{width:var(--w01-width)!important;min-width:var(--w01-width)!important;max-width:var(--w01-width)!important}.w01-font{font-family:monospace!important;font-size:18px!important}'; document.head.appendChild(style);
+  const projections = view => trace.projections.filter(p => p.w01Owner === (view.getMode() === 'source' ? view.editor : view));
+  const current = view => projections(view).filter(p => !p.w01Disposed).at(-1);
+  const container = view => view.getMode() === 'source' ? view.editor.cm.dom : view.previewMode.containerEl;
+  const layouts = view => [...container(view).querySelectorAll('.vml-layout')].filter(el => el.getBoundingClientRect().width > 0);
+  const screenshot = async name => {
+    await remote.getCurrentWebContents().capturePage(); await wait(40);
+    fs.writeFileSync(root + 'docs/plans/layout-redesign/probes/w01-' + name + '.png', (await remote.getCurrentWebContents().capturePage()).toPNG());
+  };
+  const describe = view => { const p = current(view); return p ? { phase: p.phase, desired: p.desired?.id, sourceRevision: p.desired?.revision, host: p.hostRevision, rendered: p.renderedRevision, measured: p.measuredRevision, coverage: p.coverage, measuredCoverage: p.measuredCoverage, required: p.required, environmentEpoch: p.environmentEpoch, viewportRevision: p.viewportRevision, token: p.token() } : null; };
+  const sample = (name, views) => {
+    const entry = { name, states: views.map(describe), roots: views.map(v => layouts(v).map(el => { const r = el.getBoundingClientRect(); return { width: r.width, height: r.height, text: el.textContent.slice(0, 70), rendered: el.isConnected, media: [...el.querySelectorAll('img,video')].map(m => ({ kind: m.tagName, complete: m.complete, readyState: m.readyState, width: m.naturalWidth ?? m.videoWidth, height: m.naturalHeight ?? m.videoHeight })) }; })), sourceRequests: trace.calls.filter(c => c.method === 'request').length };
+    result.samples.push(entry); return entry;
+  };
+  const settle = async (name, views, budget = 4000) => {
+    const start = performance.now();
+    while (performance.now() - start < budget && views.some(v => current(v)?.phase !== 'settled')) await wait(35);
+    const entry = sample(name, views); entry.elapsedMs = performance.now() - start;
+    if (entry.states.some(s => s?.phase !== 'settled')) result.failures.push(name + ': state did not settle in observed budget');
+    return entry;
+  };
+  let dbg, attached;
+  try {
+    dbg = remote.getCurrentWebContents().debugger; attached = !dbg.isAttached(); if (attached) dbg.attach('1.3');
+    await dbg.sendCommand('Emulation.setFocusEmulationEnabled', { enabled: true });
+    for (const mode of ['source', 'preview']) {
+      const leaf = app.workspace.getLeaf('split'); leaves.push(leaf);
+      await leaf.setViewState({ type: 'markdown', state: { file: path, mode } }); app.workspace.setActiveLeaf(leaf, { focus: false });
+    }
+    const views = leaves.map(l => l.view), cm = views[0].editor.cm;
+    const dispatch = cm.dispatch;
+    cm.dispatch = function(...specs) {
+      for (const spec of specs) for (const effect of (Array.isArray(spec.effects) ? spec.effects : spec.effects ? [spec.effects] : [])) {
+        if (trace.effectsTypes.some(type => effect.is(type))) trace.effects++;
+      }
+      return dispatch.apply(this, specs);
+    }; restores.push(() => { cm.dispatch = dispatch; });
+    cm.dispatch({ selection: { anchor: source.length } }); cm.scrollDOM.scrollTop = 0;
+    await wait(100); sample('cold open / resources still delayed', views);
+    await settle('cold open / resources and MathJax ready', views, 6000);
+    for (const width of [397, 720, 1000]) {
+      for (const view of views) for (const el of view.getMode() === 'source' ? [view.editor.cm.contentDOM] : [view.previewMode.containerEl, view.previewMode.renderer.sizerEl]) { el.addClass('w01-width'); el.setCssProps({ '--w01-width': width + 'px' }); }
+      await wait(250); await settle('width ' + width, views);
+      if (width === 397) await screenshot('width-397');
+      assert(views.every(v => layouts(v).every(el => { const r = el.getBoundingClientRect(); return Number.isFinite(r.width) && Number.isFinite(r.height) && r.height > 0; })), 'Invalid layout dimensions');
+    }
+    for (const view of views) for (const el of view.getMode() === 'source' ? [view.editor.cm.contentDOM] : [view.previewMode.containerEl, view.previewMode.renderer.sizerEl]) el.addClass('w01-font');
+    await wait(200); await settle('font family and size changed', views);
+    const dark = document.body.hasClass('theme-dark'), light = document.body.hasClass('theme-light');
+    restores.push(() => { document.body.toggleClass('theme-dark', dark); document.body.toggleClass('theme-light', light); });
+    document.body.toggleClass('theme-dark', !dark); document.body.toggleClass('theme-light', dark); await wait(200); await settle('theme changed', views);
+    const startCalls = trace.calls.length, startEffects = trace.effects;
+    await wait(2200);
+    const effects = trace.effects - startEffects, requests = trace.calls.slice(startCalls).filter(c => ['request', 'environmentChanged'].includes(c.method));
+    result.stable = { milliseconds: 2200, layoutEffects: effects, newSourceOrEnvironmentRequests: requests.length };
+    if (effects || requests.length) result.failures.push('Stable interval still produced layout effects or requests');
+    app.workspace.setActiveLeaf(leaves[0], { focus: false });
+    cm.dispatch({ selection: { anchor: cm.state.doc.line(1).from }, userEvent: 'select' }); cm.focus();
+    app.commands.executeCommandById('editor:fold-all'); await wait(200); sample('fold all headings', views);
+    app.commands.executeCommandById('editor:unfold-all'); await wait(250); await settle('unfold headings', views);
+    // First open in the middle of a long float, then traverse both directions with its anchor absent.
+    const bodyLine = (() => { for (let i = 1; i <= cm.state.doc.lines; i++) if (cm.state.doc.line(i).text === 'Body 60') return cm.state.doc.line(i); })();
+    cm.dispatch({ selection: { anchor: bodyLine.from }, scrollIntoView: true, userEvent: 'select' }); await wait(300);
+    cm.scrollDOM.scrollTop += cm.coordsAtPos(bodyLine.from).top - cm.scrollDOM.getBoundingClientRect().top; await wait(250);
+    sample('long float middle / source anchor outside viewport', views);
+    await screenshot('long-float-middle');
+    result.standInPresent = cm.dom.querySelector('.vml-wrap-proxy') !== null;
+    assert(result.standInPresent, 'Long-float scenario did not actually exercise a stand-in');
+    for (const top of [1800, 1200, 600, 0, 1400]) { cm.scrollDOM.scrollTop = top; await wait(130); sample('scroll ' + top, [views[0]]); }
+    // Real Chinese composition in the note buffer: no obsolete host result may regress its version.
+    cm.dispatch({ selection: { anchor: cm.state.doc.length }, scrollIntoView: true, userEvent: 'select' }); cm.focus(); await wait(100);
+    const beforeIme = cm.state.doc.toString();
+    await dbg.sendCommand('Input.imeSetComposition', { text: '中文', selectionStart: 2, selectionEnd: 2 }); await wait(80);
+    sample('source Chinese composition', views);
+    await dbg.sendCommand('Input.insertText', { text: '中文' }); await wait(300); await settle('source composition committed', views);
+    assert(cm.state.doc.toString() === beforeIme + '中文', 'Source composition wrote unintended bytes');
+    // Delay a reader host longer than the old fixed retry window.
+    const reader = views[1], getData = reader.getViewData, delayedText = getData.call(reader); let delayed = true;
+    reader.getViewData = function() { return delayed ? delayedText : getData.call(this); }; restores.push(() => { reader.getViewData = getData; });
+    cm.dispatch({ changes: { from: cm.state.doc.length, insert: '\nLatest source' }, userEvent: 'input' });
+    await wait(1100); sample('reader host delayed 1100ms', views);
+    assert(current(reader).phase === 'waitingForHost', 'Delayed host falsely settled');
+    delayed = false; await wait(400); await settle('reader host caught up', views);
+    reader.getViewData = getData;
+    // A divergent second source is observed but is never replaced by the plugin.
+    const second = app.workspace.getLeaf('split'); leaves.push(second);
+    await second.setViewState({ type: 'markdown', state: { file: path, mode: 'source' } }); await wait(250);
+    const secondGet = second.view.editor.getValue, setData = second.view.setViewData; let overwritten = 0;
+    second.view.editor.getValue = () => 'Divergent unsaved text'; second.view.setViewData = function(...args) { overwritten++; return setData.apply(this, args); };
+    restores.push(() => { second.view.editor.getValue = secondGet; second.view.setViewData = setData; });
+    app.workspace.trigger('editor-change', views[0].editor, views[0]); await wait(250);
+    result.divergentBuffer = { overwritten, preserved: second.view.editor.getValue() === 'Divergent unsaved text' };
+    assert(overwritten === 0 && result.divergentBuffer.preserved, 'Plugin overwrote divergent buffer');
+    second.view.editor.getValue = secondGet; second.view.setViewData = setData;
+    const old = current(views[0]), token = old.token();
+    await leaves[0].setViewState({ type: 'markdown', state: { file: otherPath, mode: 'source' } }); await wait(200);
+    result.switchNote = { oldDisposed: old.w01Disposed, oldTokenAccepted: old.accepts(token), oldMeasuredAccepted: old.measured(token, old.required) };
+    if (old.accepts(token)) result.failures.push('Old note projection token remained valid after file switch');
+    await leaves[0].setViewState({ type: 'markdown', state: { file: path, mode: 'source' } }); await wait(250); await settle('hot reopen', [leaves[0].view]);
+    const reopened = leaves[0].view, reopenedCm = reopened.editor.cm, beforeRemove = reopenedCm.state.doc.toString();
+    const oldProjection = current(reopened), beforeRemoveToken = oldProjection.token();
+    reopenedCm.dispatch({ changes: { from: 0, to: reopenedCm.state.doc.length, insert: 'No remaining layouts' }, userEvent: 'input' }); await wait(150);
+    result.removeLastLayout = { oldTokenAccepted: oldProjection.accepts(beforeRemoveToken), desired: oldProjection.desired?.id };
+    if (result.removeLastLayout.oldTokenAccepted) result.failures.push('Removing last layout left an obsolete projection token valid');
+    reopenedCm.dispatch({ changes: { from: 0, to: reopenedCm.state.doc.length, insert: beforeRemove }, userEvent: 'input' }); await wait(200);
+    result.passed = result.failures.length === 0;
+  } catch (error) { result.error = String(error.stack ?? error); }
+  finally {
+    if (dbg) { await dbg.sendCommand('Emulation.setFocusEmulationEnabled', { enabled: false }); if (attached) dbg.detach(); }
+    for (const restore of restores.reverse()) restore(); style.remove();
+    for (const leaf of leaves.reverse()) leaf.detach(); if (previous) app.workspace.setActiveLeaf(previous, { focus: false }); await wait(300);
+    result.environmentCleanup = { started: trace.envStarted, stopped: trace.envStopped, remainingProbeEnvironments: [...trace.environments].filter(el => !el.isConnected).length };
+    result.closedProbeProjections = trace.projections.filter(p => p.w01Owner?.file === file || p.w01Owner?.getValue && p.w01Owner.getValue().includes('W01 lifecycle')).map(p => ({ disposed: p.w01Disposed, desired: p.desired?.id }));
+    await app.vault.trash(file, true); await app.vault.trash(other, true);
+    result.originalNotesUnchanged = Object.entries(originals).every(([p, h]) => fs.existsSync(base + '/' + p) && hash(fs.readFileSync(base + '/' + p)) === h);
+    fs.writeFileSync(root + 'docs/plans/layout-redesign/probes/w01-lifecycle.json', JSON.stringify(result, null, 2));
+    window.w01LifecycleResult = { passed: result.passed, error: result.error, failures: result.failures, samples: result.samples.length, originalNotesUnchanged: result.originalNotesUnchanged };
+  }
+})();

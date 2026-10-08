@@ -1,0 +1,109 @@
+{
+  "buildHash": "ff0e440cc258f2448feec85910fee7856f448e8a7f5b871b6b924360ad392c2a",
+  "simulation": "Windows rendered auxiliary test. Visible mobile controls enabled on the test pane only; not Android acceptance.",
+  "checks": [
+    {
+      "name": "visible done and disabled discard",
+      "passed": true
+    },
+    {
+      "name": "Done during composition keeps editor and source unchanged",
+      "passed": true
+    },
+    {
+      "name": "candidate confirmed only left text written",
+      "passed": true
+    },
+    {
+      "name": "Done closes confirmed editor",
+      "passed": true
+    },
+    {
+      "name": "invalid input leaves note untouched",
+      "passed": true
+    },
+    {
+      "name": "discard closes without writing",
+      "passed": true
+    },
+    {
+      "name": "discarded draft not restored",
+      "passed": true
+    }
+  ],
+  "initialButtons": [
+    {
+      "text": "完成",
+      "disabled": false,
+      "rect": {
+        "x": 403.48956298828125,
+        "y": 212.38714599609375,
+        "width": 49.999996185302734,
+        "height": 43.9930534362793,
+        "top": 212.38714599609375,
+        "right": 453.489559173584,
+        "bottom": 256.38019943237305,
+        "left": 403.48956298828125
+      }
+    },
+    {
+      "text": "放弃草稿",
+      "disabled": true,
+      "rect": {
+        "x": 459.4878234863281,
+        "y": 212.38714599609375,
+        "width": 75.99826049804688,
+        "height": 43.9930534362793,
+        "top": 212.38714599609375,
+        "right": 535.486083984375,
+        "bottom": 256.38019943237305,
+        "left": 459.4878234863281
+      }
+    }
+  ],
+  "committed": "<!-- vml {\"v\":2,\"width\":0.4} -->\nEditable left测试\n![[attachments/square-1x1.png]]\nRight untouched\n<!-- /vml -->\n\nOutside untouched\n",
+  "events": [
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "compositionstart",
+      "trusted": true
+    },
+    {
+      "name": "input",
+      "trusted": true
+    },
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "input",
+      "trusted": true
+    },
+    {
+      "name": "compositionend",
+      "trusted": false
+    },
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "click",
+      "trusted": true
+    },
+    {
+      "name": "click",
+      "trusted": true
+    }
+  ],
+  "passed": true,
+  "originalNotesUnchanged": true
+}

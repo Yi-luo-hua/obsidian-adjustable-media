@@ -1,0 +1,5077 @@
+{
+  "diagnosticHash": "46630ec693cdb87e7584f4baa1fd333d6d5b18831a9742c249cc454b613f4a1d",
+  "productionHash": "a5cee5549fac101dd73ba148fb992a0b631bb393d29c99adb93639d9266b68aa",
+  "hostVersion": "1.14.4",
+  "samples": [
+    {
+      "name": "cold open / resources still delayed",
+      "states": [
+        {
+          "phase": "measuring",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": null,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 4,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 1,
+            "viewportRevision": 4,
+            "sequence": 6
+          }
+        },
+        {
+          "phase": "measuring",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 73
+            },
+            {
+              "from": 149,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 220
+            },
+            {
+              "from": 297,
+              "to": 311
+            },
+            {
+              "from": 360,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 6,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 1,
+            "viewportRevision": 6,
+            "sequence": 8
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 179.5659637451172,
+            "height": 22.20486068725586,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": false,
+                "width": 0,
+                "height": 0
+              }
+            ]
+          },
+          {
+            "width": 179.5659637451172,
+            "height": 172.20484924316406,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 0,
+                "width": 0,
+                "height": 0
+              }
+            ]
+          },
+          {
+            "width": 166.73609924316406,
+            "height": 765.9982299804688,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 102.60416412353516,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 179.5659637451172,
+            "height": 22.20486068725586,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": false,
+                "width": 0,
+                "height": 0
+              }
+            ]
+          },
+          {
+            "width": 179.5659637451172,
+            "height": 172.20484924316406,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 0,
+                "width": 0,
+                "height": 0
+              }
+            ]
+          },
+          {
+            "width": 166.73609924316406,
+            "height": 765.9982299804688,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 102.60416412353516,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 56
+    },
+    {
+      "name": "cold open / resources and MathJax ready",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 8,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 1,
+            "viewportRevision": 8,
+            "sequence": 10
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 8,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 1,
+            "viewportRevision": 8,
+            "sequence": 10
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 179.5659637451172,
+            "height": 69.40103912353516,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 179.5659637451172,
+            "height": 89.6267318725586,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 166.73609924316406,
+            "height": 765.9982299804688,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 102.60416412353516,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 179.5659637451172,
+            "height": 69.40103912353516,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 179.5659637451172,
+            "height": 89.6267318725586,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 166.73609924316406,
+            "height": 765.9982299804688,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 102.60416412353516,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 62,
+      "elapsedMs": 1122.800000011921
+    },
+    {
+      "name": "width 397",
+      "states": [
+        {
+          "phase": "measuring",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": null,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 13,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 2,
+            "viewportRevision": 13,
+            "sequence": 16
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 9,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 1,
+            "viewportRevision": 9,
+            "sequence": 11
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 277.8905944824219,
+            "height": 98.8975601196289,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 277.8905944824219,
+            "height": 131.76214599609375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 258.0468444824219,
+            "height": 526.0676879882812,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 158.79339599609375,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 277.8905944824219,
+            "height": 98.8975601196289,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 277.8905944824219,
+            "height": 131.76214599609375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 258.0468444824219,
+            "height": 526.0676879882812,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 158.79339599609375,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 67,
+      "elapsedMs": 4029
+    },
+    {
+      "name": "width 720",
+      "states": [
+        {
+          "phase": "measuring",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": null,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "environmentEpoch": 3,
+          "viewportRevision": 18,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 3,
+            "viewportRevision": 18,
+            "sequence": 22
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 10,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 1,
+            "viewportRevision": 10,
+            "sequence": 12
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 503.9930114746094,
+            "height": 166.73609924316406,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 503.9930114746094,
+            "height": 228.67185974121094,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 467.9947509765625,
+            "height": 310.13018798828125,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 287.9947814941406,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 503.9930114746094,
+            "height": 166.73609924316406,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 503.9930114746094,
+            "height": 228.67185974121094,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 467.9947509765625,
+            "height": 310.13018798828125,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 287.9947814941406,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 72,
+      "elapsedMs": 4021.599999964237
+    },
+    {
+      "name": "width 1000",
+      "states": [
+        {
+          "phase": "measuring",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": null,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "environmentEpoch": 4,
+          "viewportRevision": 23,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 4,
+            "viewportRevision": 23,
+            "sequence": 28
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 11,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 1,
+            "viewportRevision": 11,
+            "sequence": 13
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 238.15103149414062,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 238.15103149414062,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 1941.649169921875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 77,
+      "elapsedMs": 4034.599999964237
+    },
+    {
+      "name": "font family and size changed",
+      "states": [
+        {
+          "phase": "measuring",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": null,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 29,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 5,
+            "viewportRevision": 29,
+            "sequence": 35
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 12,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 1,
+            "viewportRevision": 12,
+            "sequence": 14
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 83,
+      "elapsedMs": 4039.600000023842
+    },
+    {
+      "name": "theme changed",
+      "states": [
+        {
+          "phase": "measuring",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": null,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 2010
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 33,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 33,
+            "sequence": 40
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 13,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 2,
+            "viewportRevision": 13,
+            "sequence": 16
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 95,
+      "elapsedMs": 4013.300000011921
+    },
+    {
+      "name": "fold all headings",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 35,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 35,
+            "sequence": 42
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 13,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 2,
+            "viewportRevision": 13,
+            "sequence": 16
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 97
+    },
+    {
+      "name": "unfold headings",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 1910
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 39,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 39,
+            "sequence": 46
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 13,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 2,
+            "viewportRevision": 13,
+            "sequence": 16
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 101,
+      "elapsedMs": 1
+    },
+    {
+      "name": "long float middle / source anchor outside viewport",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "required": [
+            {
+              "from": 931,
+              "to": 2226
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 42,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 42,
+            "sequence": 49
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:708",
+          "sourceRevision": 1,
+          "host": "snapshot:708",
+          "rendered": "snapshot:708",
+          "measured": "snapshot:708",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            },
+            {
+              "from": 1985,
+              "to": 1993
+            },
+            {
+              "from": 1994,
+              "to": 2002
+            },
+            {
+              "from": 2003,
+              "to": 2011
+            },
+            {
+              "from": 2012,
+              "to": 2020
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 13,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:708",
+            "environmentEpoch": 2,
+            "viewportRevision": 13,
+            "sequence": 16
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 104
+    },
+    {
+      "name": "scroll 1800",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "required": [
+            {
+              "from": 931,
+              "to": 2226
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 42,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 42,
+            "sequence": 49
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 104
+    },
+    {
+      "name": "scroll 1200",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "required": [
+            {
+              "from": 931,
+              "to": 2226
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 42,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 42,
+            "sequence": 49
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 104
+    },
+    {
+      "name": "scroll 600",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 2037
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 45,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 45,
+            "sequence": 52
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 107
+    },
+    {
+      "name": "scroll 0",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 2037
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 45,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 45,
+            "sequence": 52
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 107
+    },
+    {
+      "name": "scroll 1400",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:482",
+          "sourceRevision": 1,
+          "host": "snapshot:482",
+          "rendered": "snapshot:482",
+          "measured": "snapshot:482",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 2786
+            }
+          ],
+          "required": [
+            {
+              "from": 312,
+              "to": 2200
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 46,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:482",
+            "environmentEpoch": 6,
+            "viewportRevision": 46,
+            "sequence": 53
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 108
+    },
+    {
+      "name": "source Chinese composition",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:711",
+          "sourceRevision": 2,
+          "host": "snapshot:711",
+          "rendered": "snapshot:711",
+          "measured": "snapshot:711",
+          "coverage": [
+            {
+              "from": 2533,
+              "to": 2788
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 2533,
+              "to": 2788
+            }
+          ],
+          "required": [
+            {
+              "from": 2533,
+              "to": 2788
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 53,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:711",
+            "environmentEpoch": 6,
+            "viewportRevision": 53,
+            "sequence": 61
+          }
+        },
+        {
+          "phase": "projecting",
+          "desired": "snapshot:824",
+          "sourceRevision": 2,
+          "host": "snapshot:824",
+          "rendered": "snapshot:824",
+          "measured": "snapshot:824",
+          "coverage": [],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 14,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:824",
+            "environmentEpoch": 2,
+            "viewportRevision": 14,
+            "sequence": 18
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 116
+    },
+    {
+      "name": "source composition committed",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:711",
+          "sourceRevision": 2,
+          "host": "snapshot:711",
+          "rendered": "snapshot:711",
+          "measured": "snapshot:711",
+          "coverage": [
+            {
+              "from": 2533,
+              "to": 2788
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 2533,
+              "to": 2788
+            }
+          ],
+          "required": [
+            {
+              "from": 2533,
+              "to": 2788
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 53,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:711",
+            "environmentEpoch": 6,
+            "viewportRevision": 53,
+            "sequence": 61
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:824",
+          "sourceRevision": 2,
+          "host": "snapshot:824",
+          "rendered": "snapshot:824",
+          "measured": "snapshot:824",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 22,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:824",
+            "environmentEpoch": 2,
+            "viewportRevision": 22,
+            "sequence": 26
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 116,
+      "elapsedMs": 1660.699999988079
+    },
+    {
+      "name": "reader host delayed 1100ms",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:825",
+          "sourceRevision": 3,
+          "host": "snapshot:825",
+          "rendered": "snapshot:825",
+          "measured": "snapshot:825",
+          "coverage": [
+            {
+              "from": 2533,
+              "to": 2802
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 2533,
+              "to": 2802
+            }
+          ],
+          "required": [
+            {
+              "from": 2533,
+              "to": 2802
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 55,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:825",
+            "environmentEpoch": 6,
+            "viewportRevision": 55,
+            "sequence": 64
+          }
+        },
+        {
+          "phase": "waitingForHost",
+          "desired": "snapshot:938",
+          "sourceRevision": 3,
+          "host": null,
+          "rendered": null,
+          "measured": null,
+          "coverage": [],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 22,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:938",
+            "environmentEpoch": 2,
+            "viewportRevision": 22,
+            "sequence": 27
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 119
+    },
+    {
+      "name": "reader host caught up",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:825",
+          "sourceRevision": 3,
+          "host": "snapshot:825",
+          "rendered": "snapshot:825",
+          "measured": "snapshot:825",
+          "coverage": [
+            {
+              "from": 2533,
+              "to": 2802
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 2533,
+              "to": 2802
+            }
+          ],
+          "required": [
+            {
+              "from": 2533,
+              "to": 2802
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 55,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:825",
+            "environmentEpoch": 6,
+            "viewportRevision": 55,
+            "sequence": 64
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:938",
+          "sourceRevision": 3,
+          "host": "snapshot:938",
+          "rendered": "snapshot:938",
+          "measured": "snapshot:938",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 1903
+            },
+            {
+              "from": 1904,
+              "to": 1911
+            },
+            {
+              "from": 1912,
+              "to": 1919
+            },
+            {
+              "from": 1920,
+              "to": 1927
+            },
+            {
+              "from": 1928,
+              "to": 1935
+            },
+            {
+              "from": 1936,
+              "to": 1943
+            },
+            {
+              "from": 1944,
+              "to": 1951
+            },
+            {
+              "from": 1952,
+              "to": 1959
+            },
+            {
+              "from": 1960,
+              "to": 1967
+            },
+            {
+              "from": 1968,
+              "to": 1975
+            },
+            {
+              "from": 1976,
+              "to": 1984
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 29,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:938",
+            "environmentEpoch": 2,
+            "viewportRevision": 29,
+            "sequence": 34
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 119,
+      "elapsedMs": 543.3000000119209
+    },
+    {
+      "name": "hot reopen",
+      "states": [
+        {
+          "phase": "measuring",
+          "desired": "snapshot:1165",
+          "sourceRevision": 1,
+          "host": "snapshot:1165",
+          "rendered": "snapshot:1165",
+          "measured": null,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 2011
+            }
+          ],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 2011
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 5,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1165",
+            "environmentEpoch": 1,
+            "viewportRevision": 5,
+            "sequence": 7
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 2182.621337890625,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 132,
+      "elapsedMs": 4016.399999976158
+    }
+  ],
+  "failures": [
+    "width 397: state did not settle in observed budget",
+    "width 720: state did not settle in observed budget",
+    "width 1000: state did not settle in observed budget",
+    "font family and size changed: state did not settle in observed budget",
+    "theme changed: state did not settle in observed budget",
+    "hot reopen: state did not settle in observed budget"
+  ],
+  "stable": {
+    "milliseconds": 2200,
+    "layoutEffects": 0,
+    "newSourceOrEnvironmentRequests": 0
+  },
+  "standInPresent": false,
+  "divergentBuffer": {
+    "overwritten": 0,
+    "preserved": true
+  },
+  "switchNote": {
+    "oldDisposed": true,
+    "oldTokenAccepted": false,
+    "oldMeasuredAccepted": false
+  },
+  "passed": false,
+  "environmentCleanup": {
+    "started": 10,
+    "stopped": 9,
+    "remainingProbeEnvironments": 0
+  },
+  "closedProbeProjections": [],
+  "originalNotesUnchanged": true,
+  "installerVersion": "1.13.7",
+  "hostVersionEvidence": "Test vault window title; same running app session"
+}

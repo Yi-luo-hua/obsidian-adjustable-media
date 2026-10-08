@@ -1,0 +1,11 @@
+(()=>{
+ const g=window.__tabletVideoControls,cm=g.leaf.view.editor.cm,video=cm.dom.querySelector('video');
+ if(!video)throw new Error('Video required');g.cm=cm;g.video=video;video.muted=true;video.loop=true;
+ g.events.length=0;cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.contentDOM.blur();g.initial=cm.state.selection.main.from;
+ const b=video.getBoundingClientRect(),x=b.x+b.width/2,y=b.y+b.height/2;
+ if(b.width<=0||y<0||y>=innerHeight)throw new Error('Visible video required');
+ return {rect:b.toJSON(),selection:g.initial,focus:document.activeElement.className,actions:[
+ {method:'Input.dispatchTouchEvent',params:{type:'touchStart',touchPoints:[{x,y}]}},
+ {method:'Input.dispatchTouchEvent',params:{type:'touchEnd',touchPoints:[]}},
+ {method:'Runtime.evaluate',params:{expression:'new Promise(r=>setTimeout(r,1200))',awaitPromise:true}}]};
+})()

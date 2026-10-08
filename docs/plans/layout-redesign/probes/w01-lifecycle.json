@@ -1,0 +1,5385 @@
+{
+  "diagnosticHash": "1ec5538f9956016d254dad0cc8d72507b547ee7c23bf5f0e9cfe32b2ca3ba606",
+  "productionHash": "914fa3337f857bdaa6bb8a8058d2e0221b59241dec06cfa15c2db8bd522fd039",
+  "hostVersion": "1.14.4",
+  "installerVersion": "1.13.7",
+  "samples": [
+    {
+      "name": "cold open / resources still delayed",
+      "states": [
+        {
+          "phase": "measuring",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": null,
+          "coverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 11,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 1,
+            "viewportRevision": 11,
+            "sequence": 13
+          }
+        },
+        {
+          "phase": "measuring",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 73
+            },
+            {
+              "from": 149,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 220
+            },
+            {
+              "from": 297,
+              "to": 311
+            },
+            {
+              "from": 360,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 4,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 1,
+            "viewportRevision": 4,
+            "sequence": 6
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 193.30728149414062,
+            "height": 22.20486068725586,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": false,
+                "width": 0,
+                "height": 0
+              }
+            ]
+          },
+          {
+            "width": 193.30728149414062,
+            "height": 172.20484924316406,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 0,
+                "width": 0,
+                "height": 0
+              }
+            ]
+          },
+          {
+            "width": 179.5052032470703,
+            "height": 765.9982299804688,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 110.4600601196289,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 193.30728149414062,
+            "height": 22.20486068725586,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": false,
+                "width": 0,
+                "height": 0
+              }
+            ]
+          },
+          {
+            "width": 193.30728149414062,
+            "height": 172.20484924316406,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 0,
+                "width": 0,
+                "height": 0
+              }
+            ]
+          },
+          {
+            "width": 179.49652099609375,
+            "height": 765.9982299804688,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 110.4600601196289,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 231
+    },
+    {
+      "name": "cold open / resources and MathJax ready",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 17,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 1,
+            "viewportRevision": 17,
+            "sequence": 19
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 15,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 1,
+            "viewportRevision": 15,
+            "sequence": 17
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 193.30728149414062,
+            "height": 73.52429962158203,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 193.30728149414062,
+            "height": 95.51214599609375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 179.5052032470703,
+            "height": 765.9982299804688,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 110.4600601196289,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 193.30728149414062,
+            "height": 73.52429962158203,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 193.30728149414062,
+            "height": 95.51214599609375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 179.49652099609375,
+            "height": 765.9982299804688,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 110.4600601196289,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 243,
+      "elapsedMs": 1058
+    },
+    {
+      "name": "width 397",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 29,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 2,
+            "viewportRevision": 29,
+            "sequence": 32
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            }
+          ],
+          "environmentEpoch": 2,
+          "viewportRevision": 16,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 2,
+            "viewportRevision": 16,
+            "sequence": 19
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 277.8905944824219,
+            "height": 98.8975601196289,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 277.8905944824219,
+            "height": 131.76214599609375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 258.0468444824219,
+            "height": 526.0676879882812,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 158.79339599609375,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 277.8905944824219,
+            "height": 98.8975601196289,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 277.8905944824219,
+            "height": 131.76214599609375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 258.0468444824219,
+            "height": 526.0676879882812,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 158.79339599609375,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 255,
+      "elapsedMs": 0.699999988079071
+    },
+    {
+      "name": "width 720",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "environmentEpoch": 3,
+          "viewportRevision": 42,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 3,
+            "viewportRevision": 42,
+            "sequence": 46
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "environmentEpoch": 3,
+          "viewportRevision": 17,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 3,
+            "viewportRevision": 17,
+            "sequence": 21
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 503.9930114746094,
+            "height": 166.73609924316406,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 503.9930114746094,
+            "height": 228.67185974121094,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 467.9947509765625,
+            "height": 310.13018798828125,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 287.9947814941406,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 503.9930114746094,
+            "height": 166.73609924316406,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 503.9930114746094,
+            "height": 228.67185974121094,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 467.9947509765625,
+            "height": 310.13018798828125,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 287.9947814941406,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 268,
+      "elapsedMs": 0.699999988079071
+    },
+    {
+      "name": "width 1000",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "environmentEpoch": 4,
+          "viewportRevision": 55,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 4,
+            "viewportRevision": 55,
+            "sequence": 60
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            }
+          ],
+          "environmentEpoch": 4,
+          "viewportRevision": 18,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 4,
+            "viewportRevision": 18,
+            "sequence": 23
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 238.15103149414062,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 238.15103149414062,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 4820.81591796875,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 281,
+      "elapsedMs": 0.699999988079071
+    },
+    {
+      "name": "font family and size changed",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 69,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 5,
+            "viewportRevision": 69,
+            "sequence": 75
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 4,
+          "viewportRevision": 19,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 4,
+            "viewportRevision": 19,
+            "sequence": 24
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 295,
+      "elapsedMs": 95.89999997615814
+    },
+    {
+      "name": "theme changed",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 79,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 79,
+            "sequence": 86
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 20,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 5,
+            "viewportRevision": 20,
+            "sequence": 26
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 323,
+      "elapsedMs": 0.30000001192092896
+    },
+    {
+      "name": "fold all headings",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 82,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 82,
+            "sequence": 89
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 20,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 5,
+            "viewportRevision": 20,
+            "sequence": 26
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 326
+    },
+    {
+      "name": "unfold headings",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3338
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3338
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 93,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 93,
+            "sequence": 100
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 20,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 5,
+            "viewportRevision": 20,
+            "sequence": 26
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 337,
+      "elapsedMs": 0.8999999761581421
+    },
+    {
+      "name": "long float middle / source anchor outside viewport",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 3738,
+              "to": 4096
+            }
+          ],
+          "required": [
+            {
+              "from": 3738,
+              "to": 4096
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 111,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 111,
+            "sequence": 118
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2087",
+          "sourceRevision": 1,
+          "host": "snapshot:2087",
+          "rendered": "snapshot:2087",
+          "measured": "snapshot:2087",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            },
+            {
+              "from": 3423,
+              "to": 3431
+            },
+            {
+              "from": 3432,
+              "to": 3440
+            },
+            {
+              "from": 3441,
+              "to": 3449
+            },
+            {
+              "from": 3450,
+              "to": 3458
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 20,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2087",
+            "environmentEpoch": 5,
+            "viewportRevision": 20,
+            "sequence": 26
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 355
+    },
+    {
+      "name": "scroll 1800",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 3347,
+              "to": 3646
+            }
+          ],
+          "required": [
+            {
+              "from": 3347,
+              "to": 3646
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 120,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 120,
+            "sequence": 127
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 364
+    },
+    {
+      "name": "scroll 1200",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 164,
+              "to": 3584
+            }
+          ],
+          "required": [
+            {
+              "from": 164,
+              "to": 3584
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 133,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 133,
+            "sequence": 140
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 377
+    },
+    {
+      "name": "scroll 600",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 164,
+              "to": 3584
+            }
+          ],
+          "required": [
+            {
+              "from": 164,
+              "to": 3584
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 133,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 133,
+            "sequence": 140
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 377
+    },
+    {
+      "name": "scroll 0",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3346
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3346
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 137,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 137,
+            "sequence": 144
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 381
+    },
+    {
+      "name": "scroll 1400",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:1701",
+          "sourceRevision": 1,
+          "host": "snapshot:1701",
+          "rendered": "snapshot:1701",
+          "measured": "snapshot:1701",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 5006
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 312,
+              "to": 3629
+            }
+          ],
+          "required": [
+            {
+              "from": 312,
+              "to": 3629
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 139,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:1701",
+            "environmentEpoch": 6,
+            "viewportRevision": 139,
+            "sequence": 146
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 383
+    },
+    {
+      "name": "source Chinese composition",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:2090",
+          "sourceRevision": 2,
+          "host": "snapshot:2090",
+          "rendered": "snapshot:2090",
+          "measured": "snapshot:2090",
+          "coverage": [
+            {
+              "from": 4715,
+              "to": 5008
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 4715,
+              "to": 5008
+            }
+          ],
+          "required": [
+            {
+              "from": 4715,
+              "to": 5008
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 148,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2090",
+            "environmentEpoch": 6,
+            "viewportRevision": 148,
+            "sequence": 156
+          }
+        },
+        {
+          "phase": "projecting",
+          "desired": "snapshot:2283",
+          "sourceRevision": 2,
+          "host": "snapshot:2283",
+          "rendered": "snapshot:2283",
+          "measured": "snapshot:2283",
+          "coverage": [],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 21,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2283",
+            "environmentEpoch": 5,
+            "viewportRevision": 21,
+            "sequence": 28
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 393
+    },
+    {
+      "name": "source composition committed",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:2090",
+          "sourceRevision": 2,
+          "host": "snapshot:2090",
+          "rendered": "snapshot:2090",
+          "measured": "snapshot:2090",
+          "coverage": [
+            {
+              "from": 4715,
+              "to": 5008
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 4715,
+              "to": 5008
+            }
+          ],
+          "required": [
+            {
+              "from": 4715,
+              "to": 5008
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 148,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2090",
+            "environmentEpoch": 6,
+            "viewportRevision": 148,
+            "sequence": 156
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2283",
+          "sourceRevision": 2,
+          "host": "snapshot:2283",
+          "rendered": "snapshot:2283",
+          "measured": "snapshot:2283",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 34,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2283",
+            "environmentEpoch": 5,
+            "viewportRevision": 34,
+            "sequence": 41
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 393,
+      "elapsedMs": 0.19999998807907104
+    },
+    {
+      "name": "reader host delayed 1100ms",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:2284",
+          "sourceRevision": 3,
+          "host": "snapshot:2284",
+          "rendered": "snapshot:2284",
+          "measured": "snapshot:2284",
+          "coverage": [
+            {
+              "from": 4715,
+              "to": 5022
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 4715,
+              "to": 5022
+            }
+          ],
+          "required": [
+            {
+              "from": 4715,
+              "to": 5022
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 151,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2284",
+            "environmentEpoch": 6,
+            "viewportRevision": 151,
+            "sequence": 160
+          }
+        },
+        {
+          "phase": "waitingForHost",
+          "desired": "snapshot:2477",
+          "sourceRevision": 3,
+          "host": null,
+          "rendered": null,
+          "measured": null,
+          "coverage": [],
+          "measuredCoverage": [],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 34,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2477",
+            "environmentEpoch": 5,
+            "viewportRevision": 34,
+            "sequence": 42
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 397
+    },
+    {
+      "name": "reader host caught up",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:2284",
+          "sourceRevision": 3,
+          "host": "snapshot:2284",
+          "rendered": "snapshot:2284",
+          "measured": "snapshot:2284",
+          "coverage": [
+            {
+              "from": 4715,
+              "to": 5022
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 4715,
+              "to": 5022
+            }
+          ],
+          "required": [
+            {
+              "from": 4715,
+              "to": 5022
+            }
+          ],
+          "environmentEpoch": 6,
+          "viewportRevision": 151,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2284",
+            "environmentEpoch": 6,
+            "viewportRevision": 151,
+            "sequence": 160
+          }
+        },
+        {
+          "phase": "settled",
+          "desired": "snapshot:2477",
+          "sourceRevision": 3,
+          "host": "snapshot:2477",
+          "rendered": "snapshot:2477",
+          "measured": "snapshot:2477",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 16
+            },
+            {
+              "from": 17,
+              "to": 163
+            },
+            {
+              "from": 164,
+              "to": 311
+            },
+            {
+              "from": 312,
+              "to": 893
+            },
+            {
+              "from": 894,
+              "to": 930
+            },
+            {
+              "from": 931,
+              "to": 949
+            },
+            {
+              "from": 950,
+              "to": 3323
+            },
+            {
+              "from": 3324,
+              "to": 3331
+            },
+            {
+              "from": 3332,
+              "to": 3339
+            },
+            {
+              "from": 3340,
+              "to": 3347
+            },
+            {
+              "from": 3348,
+              "to": 3355
+            },
+            {
+              "from": 3356,
+              "to": 3363
+            },
+            {
+              "from": 3364,
+              "to": 3371
+            },
+            {
+              "from": 3372,
+              "to": 3379
+            },
+            {
+              "from": 3380,
+              "to": 3387
+            },
+            {
+              "from": 3388,
+              "to": 3395
+            },
+            {
+              "from": 3396,
+              "to": 3404
+            },
+            {
+              "from": 3405,
+              "to": 3413
+            },
+            {
+              "from": 3414,
+              "to": 3422
+            }
+          ],
+          "environmentEpoch": 5,
+          "viewportRevision": 47,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2477",
+            "environmentEpoch": 5,
+            "viewportRevision": 47,
+            "sequence": 55
+          }
+        }
+      ],
+      "roots": [
+        [],
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 397,
+      "elapsedMs": 0.5999999642372131
+    },
+    {
+      "name": "hot reopen",
+      "states": [
+        {
+          "phase": "settled",
+          "desired": "snapshot:2864",
+          "sourceRevision": 1,
+          "host": "snapshot:2864",
+          "rendered": "snapshot:2864",
+          "measured": "snapshot:2864",
+          "coverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "measuredCoverage": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "required": [
+            {
+              "from": 0,
+              "to": 3439
+            }
+          ],
+          "environmentEpoch": 1,
+          "viewportRevision": 12,
+          "token": {
+            "pane": {},
+            "snapshotId": "snapshot:2864",
+            "environmentEpoch": 1,
+            "viewportRevision": 12,
+            "sequence": 14
+          }
+        }
+      ],
+      "roots": [
+        [
+          {
+            "width": 699.9999389648438,
+            "height": 225.53817749023438,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "IMG",
+                "complete": true,
+                "width": 1000,
+                "height": 1000
+              }
+            ]
+          },
+          {
+            "width": 699.9999389648438,
+            "height": 312.673583984375,
+            "text": "编辑源码",
+            "rendered": true,
+            "media": [
+              {
+                "kind": "VIDEO",
+                "readyState": 4,
+                "width": 896,
+                "height": 1280
+              }
+            ]
+          },
+          {
+            "width": 649.9999389648438,
+            "height": 293.24652099609375,
+            "text": "Text wraps differently at each width. Text wraps differently at each w",
+            "rendered": true,
+            "media": []
+          },
+          {
+            "width": 399.9999694824219,
+            "height": 5423.24609375,
+            "text": "Float 0\nFloat 1\nFloat 2\nFloat 3\nFloat 4\nFloat 5\nFloat 6\nFloat 7\nFloat ",
+            "rendered": true,
+            "media": []
+          }
+        ]
+      ],
+      "sourceRequests": 427,
+      "elapsedMs": 0.8999999761581421
+    }
+  ],
+  "failures": [],
+  "stable": {
+    "milliseconds": 2200,
+    "layoutEffects": 0,
+    "newSourceOrEnvironmentRequests": 0
+  },
+  "standInPresent": true,
+  "divergentBuffer": {
+    "overwritten": 0,
+    "preserved": true
+  },
+  "switchNote": {
+    "oldDisposed": true,
+    "oldTokenAccepted": false,
+    "oldMeasuredAccepted": false
+  },
+  "removeLastLayout": {
+    "oldTokenAccepted": false
+  },
+  "passed": true,
+  "environmentCleanup": {
+    "started": 12,
+    "stopped": 11,
+    "remainingProbeEnvironments": 0
+  },
+  "closedProbeProjections": [],
+  "originalNotesUnchanged": true
+}

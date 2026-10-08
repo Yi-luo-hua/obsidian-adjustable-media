@@ -1,0 +1,6 @@
+(async()=>{
+  const v=app.workspace.activeLeaf.view,cm=v.editor.cm,el=cm.dom.querySelector('.vml-text-editor .cm-editor');if(!el)throw new Error('Open text column required');
+  const before=cm.state.doc.toString(),column=cm.constructor.findFromDOM(el);window.__tabletDraftBaseline=before;
+  column.dispatch({changes:{from:0,to:column.state.doc.length,insert:'```js'}});await new Promise(r=>setTimeout(r,180));
+  return{unchanged:cm.state.doc.toString()===before&&await app.vault.read(v.file)===before,invalid:!!cm.dom.querySelector('.vml-text-editor.is-invalid'),sample:await app.plugins.plugins['mobile-acceptance'].capture(false)};
+})();

@@ -1,0 +1,132 @@
+{
+  "result": {
+    "kind": "column",
+    "original": "# 显示与媒体\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":196,\"widths\":[1,1.4]}]} -->\n![[attachments/square.png]] ![[attachments/landscape.png]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":200}]} -->\n![[attachments/clip.mp4]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"type\":\"text\",\"cols\":2} -->\n手机端分栏文字。中文与 English text 应完整显示。\n\n$$\nx^2+y^2=z^2\n$$\n\n第二段文字包含 **粗体** 和列表。\n- 第一项\n- 第二项\n\n<!-- /vml -->\n",
+    "events": [
+      {
+        "type": "touchstart",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointermove",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointermove",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointermove",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointermove",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointermove",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointermove",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointermove",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointermove",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      },
+      {
+        "type": "pointerup",
+        "trusted": true,
+        "ignored": "true",
+        "sourceLines": 0,
+        "left": true,
+        "right": true
+      }
+    ],
+    "rect": {},
+    "gripVisible": true,
+    "x": 158.6999969482422,
+    "y": 297.21250915527344,
+    "hit": "vml-handle vml-item__col-handle",
+    "beforeWidths": [
+      119.5,
+      167.3000030517578
+    ],
+    "sourceLines": 0,
+    "layouts": 3,
+    "left": true,
+    "right": true,
+    "swipeAttribute": "true",
+    "afterWidths": [
+      169.5,
+      117.30000305175781
+    ],
+    "source": "# 显示与媒体\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":196,\"widths\":[1.182,0.818]}]} -->\n![[attachments/square.png]] ![[attachments/landscape.png]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"rows\":[{\"height\":200}]} -->\n![[attachments/clip.mp4]]\n<!-- /vml -->\n\n<!-- vml {\"v\":2,\"type\":\"text\",\"cols\":2} -->\n手机端分栏文字。中文与 English text 应完整显示。\n\n$$\nx^2+y^2=z^2\n$$\n\n第二段文字包含 **粗体** 和列表。\n- 第一项\n- 第二项\n\n<!-- /vml -->\n",
+    "savedMatches": true,
+    "viewerOpened": false,
+    "onlySettingsChanged": true,
+    "actions": [
+      {
+        "method": "Input.dispatchKeyEvent",
+        "params": {
+          "type": "keyDown",
+          "key": "Escape",
+          "code": "Escape",
+          "windowsVirtualKeyCode": 27
+        }
+      },
+      {
+        "method": "Input.dispatchKeyEvent",
+        "params": {
+          "type": "keyUp",
+          "key": "Escape",
+          "code": "Escape",
+          "windowsVirtualKeyCode": 27
+        }
+      }
+    ],
+    "restored": true
+  },
+  "errors": []
+}

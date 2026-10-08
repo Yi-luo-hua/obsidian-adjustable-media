@@ -5,6 +5,7 @@ import { effectiveWidth, hasTextColumns, isTextOnly, rowOffset, type LayoutItem,
 import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { setBounded } from "../layout/viewProjection.ts";
 import { resolveMedia } from "./media.ts";
+import { isolateMediaControls } from "./mediaControls.ts";
 import { t } from "./messages.ts";
 
 export interface LayoutViewOptions {
@@ -119,10 +120,14 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
   renderTasks?.push(...tasks);
   if (tasks.length > 0) {
     pendingLayouts.add(root);
-    void Promise.all(tasks).then(() => pendingLayouts.delete(root), (error: unknown) => {
+    const finished = (): void => {
       pendingLayouts.delete(root);
+      root.dispatchEvent(new (root.win as Window & typeof window).Event("vml-layout-rendered", { bubbles: true }));
+    };
+    void Promise.all(tasks).then(finished, (error: unknown) => {
       failedLayouts.add(root);
       console.error("Adjustable Media: layout Markdown could not be rendered", error);
+      finished();
     });
   }
   return root;
@@ -167,6 +172,16 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
 
     const item = row.items[0];
     const itemEl = rowEl.querySelector<HTMLElement>(".vml-item");
+    if (row.items.length > 1) {
+      for (const el of Array.from(rowEl.querySelectorAll<HTMLElement>(".vml-item"))) {
+        const item = row.items[Number(el.dataset.index)];
+        if (!item) continue;
+        const media = el.querySelector<HTMLElement>(".vml-item__media");
+        const known = media ? mediaSizes.get(media.getAttribute("src") ?? "") : undefined;
+        el.toggleClass("vml-item--weighted", item.weight !== null);
+        el.setCssProps({ "--vml-grow": item.weight !== null ? String(item.weight) : known ? String(known.width / known.height) : "" });
+      }
+    }
     if (row.items.length !== 1 || !item || !itemEl) {
       continue;
     }
@@ -217,14 +232,15 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
         cls: "vml-item__media",
         attr: { alt: item.embed.alt || item.embed.target, draggable: "false", src: media.url, ...size },
       });
-      img.addEventListener("load", () => remember(itemEl, media.url, img.naturalWidth, img.naturalHeight, shareByRatio), { once: true });
+      img.addEventListener("load", () => remember(itemEl, media.url, img.naturalWidth, img.naturalHeight, !single), { once: true });
       el = img;
     } else {
       itemEl.addClass("vml-item--video");
       const video = itemEl.createEl("video", { cls: "vml-item__media", attr: { src: media.url, ...size } });
       video.controls = true;
+      isolateMediaControls(video);
       video.preload = "metadata";
-      video.addEventListener("loadedmetadata", () => remember(itemEl, media.url, video.videoWidth, video.videoHeight, shareByRatio), { once: true });
+      video.addEventListener("loadedmetadata", () => remember(itemEl, media.url, video.videoWidth, video.videoHeight, !single), { once: true });
       el = video;
     }
     if (known) {
@@ -243,10 +259,10 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
   }
 }
 
-function remember(itemEl: HTMLElement, url: string, width: number, height: number, shareByRatio: boolean): void {
+function remember(itemEl: HTMLElement, url: string, width: number, height: number, multi: boolean): void {
   if (width > 0 && height > 0) {
     setBounded(mediaSizes, url, { width, height }, MAX_MEDIA_SIZES);
-    if (shareByRatio) {
+    if (multi && !itemEl.hasClass("vml-item--weighted")) {
       itemEl.setCssProps({ "--vml-grow": String(width / height) });
     }
   }

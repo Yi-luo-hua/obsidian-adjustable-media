@@ -1,0 +1,52 @@
+{
+  "result": {
+    "samples": [
+      {
+        "mode": "preview",
+        "pane": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "display": "flex",
+        "layouts": [],
+        "buffer": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      },
+      {
+        "mode": "source",
+        "pane": {
+          "x": 0,
+          "y": 0,
+          "width": 556,
+          "height": 736,
+          "top": 0,
+          "right": 556,
+          "bottom": 736,
+          "left": 0
+        },
+        "display": "flex",
+        "layouts": [
+          {
+            "x": 24,
+            "y": 188.0124969482422,
+            "width": 503.20001220703125,
+            "height": 214.71875,
+            "top": 188.0124969482422,
+            "right": 527.2000122070312,
+            "bottom": 402.7312469482422,
+            "left": 24
+          }
+        ],
+        "buffer": "# 文字输入\n\n<!-- vml {\"v\":2,\"width\":0.4} -->\n只在这栏末尾输入“手机中文测试”。\n![[attachments/square.png]]\n右栏原文应保留。\n<!-- /vml -->\n\n块外原文应保留。\n"
+      }
+    ],
+    "sourceUnchanged": true,
+    "bothVisible": false
+  },
+  "errors": []
+}

@@ -1,0 +1,95 @@
+{
+  "result": {
+    "unchanged": true,
+    "invalid": true,
+    "sample": {
+      "at": "2026-10-08T13:30:18.014Z",
+      "vault": "adjustable-media-tablet-test",
+      "file": "03 文字输入.md",
+      "mode": "source",
+      "bodyClasses": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-phone",
+      "documentOverflow": 0,
+      "pane": {
+        "width": 556,
+        "overflow": 0
+      },
+      "viewport": {
+        "width": 556,
+        "height": 736,
+        "ratio": 2.5,
+        "visual": {
+          "width": 556,
+          "height": 736,
+          "offsetTop": 0
+        }
+      },
+      "visibility": "visible",
+      "capabilities": {
+        "resizeObserver": "function",
+        "mutationObserver": "function",
+        "fontFaceSet": true,
+        "computeMetadataAsync": "function",
+        "editorCM": true,
+        "rendererSections": true
+      },
+      "layouts": [
+        {
+          "rect": {
+            "x": 24,
+            "y": 188.0124969482422,
+            "width": 503.20001220703125,
+            "height": 216.1999969482422
+          },
+          "block": "block:799",
+          "editing": true,
+          "overflow": 0,
+          "media": [
+            {
+              "type": "IMG",
+              "rect": {
+                "x": 179.44375610351562,
+                "y": 199.21250915527344,
+                "width": 192.31875610351562,
+                "height": 192.31875610351562
+              },
+              "width": 1000,
+              "height": 1000,
+              "ready": true
+            }
+          ]
+        }
+      ],
+      "bufferMatchesSaved": true,
+      "selection": [
+        {
+          "anchor": 132,
+          "head": 132
+        }
+      ],
+      "formulaCount": 0,
+      "inputActions": [
+        {
+          "text": "完成",
+          "disabled": false,
+          "rect": {
+            "x": 35.20000076293945,
+            "y": 349.01251220703125,
+            "width": 41.97500228881836,
+            "height": 44
+          }
+        },
+        {
+          "text": "放弃草稿",
+          "disabled": false,
+          "rect": {
+            "x": 83.17500305175781,
+            "y": 349.01251220703125,
+            "width": 71.95000457763672,
+            "height": 44
+          }
+        }
+      ]
+    }
+  },
+  "errors": []
+}

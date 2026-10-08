@@ -1,0 +1,39 @@
+{
+  "buildHash": "ff0e440cc258f2448feec85910fee7856f448e8a7f5b871b6b924360ad392c2a",
+  "tests": 407,
+  "checks": [
+    {
+      "case": "play",
+      "passed": true
+    },
+    {
+      "case": "pause",
+      "passed": true
+    },
+    {
+      "case": "seek",
+      "passed": true
+    },
+    {
+      "case": "resize",
+      "passed": true
+    },
+    {
+      "case": "resize-blurred",
+      "passed": true
+    },
+    {
+      "case": "desktop-input",
+      "passed": true
+    }
+  ],
+  "automaticPassed": true,
+  "manual": "User confirmed no issue on original 01 page after playback/pause/resize. Subsequent mixed self-testing moved and resized blocks; final note preserved.",
+  "manualPassed": true,
+  "cleanup": {
+    "stayAwake": 0,
+    "forward18710Removed": true,
+    "observersStopped": true,
+    "desktopRestored": true
+  }
+}

@@ -1,0 +1,14 @@
+(async()=>{
+ const path='09 视频控件测试.md',source='# 视频控件测试\n\n<!-- vml {"v":2,"width":0.6,"rows":[{"height":200,"width":1}]} -->\n![[attachments/clip.mp4]]\n<!-- /vml -->\n\n块外文字保持原样。\n';
+ if(app.vault.getAbstractFileByPath(path))throw new Error('Fixture already exists');
+ const leaf=app.workspace.activeLeaf,previous=leaf.getViewState(),userFile=leaf.view.file.path,userSource=await app.vault.read(leaf.view.file);
+ await app.vault.create(path,source);await leaf.setViewState({type:'markdown',state:{file:path,mode:'source',source:false},active:true});await new Promise(r=>setTimeout(r,800));
+ const cm=leaf.view.editor.cm;cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.contentDOM.blur();await new Promise(r=>setTimeout(r,400));
+ cm.dom.querySelector('video').scrollIntoView({block:'center'});await new Promise(r=>setTimeout(r,400));
+ const video=cm.dom.querySelector('video');video.muted=true;video.loop=true;
+ const events=[],stops=[];
+ for(const node of [document,cm.contentDOM,video])for(const name of ['pointerdown','touchstart','touchend','mousedown','click','focusin']){
+ const fn=e=>events.push({node:node===document?'document':node===video?'video':'content',name,target:e.target.tagName,prevented:e.defaultPrevented,selection:cm.state.selection.main.from,focus:document.activeElement.className});node.addEventListener(name,fn,node===document);stops.push(()=>node.removeEventListener(name,fn,node===document));}
+ window.__tabletVideoControls={path,source,leaf,previous,userFile,userSource,video,cm,events,stops,initial:cm.state.selection.main.from};
+ return {rect:video.getBoundingClientRect().toJSON(),selection:cm.state.selection.main.from,focus:document.activeElement.className,paused:video.paused};
+})()

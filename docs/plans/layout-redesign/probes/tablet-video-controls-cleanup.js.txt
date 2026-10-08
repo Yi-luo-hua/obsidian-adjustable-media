@@ -1,0 +1,15 @@
+(async()=>{
+ const g=window.__tabletVideoControls,leaf=g.leaf,file=app.vault.getAbstractFileByPath(g.path);
+ if(leaf.view.file.path!==g.path||leaf.view.editor.cm.state.doc.toString()!==g.source||await app.vault.read(file)!==g.source)throw new Error('Control fixture changed; preserve it');
+ g.stops.forEach(stop=>stop());leaf.view.editor.cm.dom.querySelector('video')?.pause();
+ await leaf.setViewState(g.previous);await app.vault.trash(file,true);
+ const userUnchanged=await app.vault.read(app.vault.getAbstractFileByPath(g.userFile))===g.userSource;
+ if(!userUnchanged)throw new Error('User test note changed');
+ await new Promise(r=>setTimeout(r,600));const cm=leaf.view.editor.cm;
+ cm.dispatch({selection:{anchor:cm.state.doc.length}});cm.contentDOM.blur();await new Promise(r=>setTimeout(r,500));
+ cm.dom.querySelector('video')?.scrollIntoView({block:'center'});await new Promise(r=>setTimeout(r,350));
+ const v=cm.dom.querySelector('video');v.pause();const events=[],stops=[];
+ for(const name of ['pointerdown','click','focusin']){const fn=e=>events.push({name,at:performance.now(),target:e.target.tagName,cls:e.target.className,selection:cm.state.selection.main.from,focus:document.activeElement.className});document.addEventListener(name,fn,true);stops.push(()=>document.removeEventListener(name,fn,true));}
+ window.__tabletControlsManual={file:g.userFile,source:g.userSource,video:v,cm,events,stops,initial:cm.state.selection.main.from};delete window.__tabletVideoControls;
+ return {fixtureRemoved:!app.vault.getAbstractFileByPath(g.path),userUnchanged,file:leaf.view.file.path,selection:cm.state.selection.main.from,focus:document.activeElement.className,toolbar:document.body.hasClass('mod-toolbar-open'),rect:v.getBoundingClientRect().toJSON()};
+})()

@@ -1,0 +1,18 @@
+[
+  {
+    "file": "main.js",
+    "exact": true
+  },
+  {
+    "file": "styles.css",
+    "exact": true
+  },
+  {
+    "file": "manifest.json",
+    "exact": true
+  },
+  {
+    "file": "data.json",
+    "exact": true
+  }
+]

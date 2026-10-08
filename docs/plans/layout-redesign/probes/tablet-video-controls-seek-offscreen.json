@@ -1,0 +1,53 @@
+{
+  "result": {
+    "selection": 128,
+    "initial": 128,
+    "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet",
+    "toolbar": false,
+    "playing": false,
+    "time": 0,
+    "sameVideo": false,
+    "sourceUnchanged": true,
+    "events": [
+      {
+        "name": "pointerdown",
+        "target": "HTML",
+        "selection": 128,
+        "focus": "vml-item__media mobile-tap",
+        "phase": 1
+      },
+      {
+        "node": "document",
+        "name": "pointerdown",
+        "target": "HTML",
+        "prevented": false,
+        "selection": 128,
+        "focus": "vml-item__media mobile-tap"
+      },
+      {
+        "name": "touchstart",
+        "target": "HTML",
+        "selection": 128,
+        "focus": "vml-item__media mobile-tap",
+        "phase": 1
+      },
+      {
+        "node": "document",
+        "name": "touchstart",
+        "target": "HTML",
+        "prevented": false,
+        "selection": 128,
+        "focus": "vml-item__media mobile-tap"
+      },
+      {
+        "node": "document",
+        "name": "touchend",
+        "target": "HTML",
+        "prevented": false,
+        "selection": 128,
+        "focus": "mod-linux is-mobile is-android obsidian-app styled-scrollbars theme-light show-inline-title is-floating-nav auto-full-screen show-ribbon show-view-header is-tablet"
+      }
+    ]
+  },
+  "errors": []
+}

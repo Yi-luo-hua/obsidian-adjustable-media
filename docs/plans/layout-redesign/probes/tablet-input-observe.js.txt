@@ -1,0 +1,10 @@
+(()=>{
+  const v=app.workspace.activeLeaf.view;if(v.file.path!=='03 文字输入.md')throw new Error('Input fixture required');
+  const events=[],stops=[],initial=v.editor.cm.state.doc.toString();
+  window.__tabletInput?.stops?.forEach(stop=>stop());
+  for(const name of ['compositionstart','compositionupdate','compositionend','input','paste','focusout','click']){
+    const handler=e=>{if(!e.target.closest?.('.vml-layout__text--editing'))return;events.push({name,trusted:e.isTrusted,data:e.data,inputType:e.inputType,paste:e.clipboardData?.getData('text/plain'),text:e.target.textContent?.slice(0,100),at:performance.now(),main:v.editor.cm.state.doc.toString()});};
+    document.addEventListener(name,handler,true);stops.push(()=>document.removeEventListener(name,handler,true));
+  }
+  window.__tabletInput={initial,events,stops};return {initial,sample:app.plugins.plugins['mobile-acceptance'].capture(false)};
+})();

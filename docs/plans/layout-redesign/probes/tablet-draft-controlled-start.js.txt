@@ -1,0 +1,10 @@
+(async()=>{
+  const v=app.workspace.activeLeaf.view,cm=v.editor.cm,el=cm.dom.querySelector('.vml-text-editor .cm-editor');if(!el)throw new Error('Column editor required');
+  const before=cm.state.doc.toString(),dispatch=cm.dispatch,changes=[];
+  cm.dispatch=function(...specs){const prior=this.state.doc.toString(),result=dispatch.apply(this,specs);if(this.state.doc.toString()!==prior)changes.push({before:prior,after:this.state.doc.toString(),events:specs.map(s=>s.userEvent)});return result;};
+  window.__tabletControlledDraft={before,changes,restore:()=>{cm.dispatch=dispatch;}};
+  const column=cm.constructor.findFromDOM(el);column.dispatch({changes:{from:0,to:column.state.doc.length,insert:'```js'}});await new Promise(r=>setTimeout(r,150));
+  const button=cm.dom.querySelectorAll('.vml-text-editor__actions button')[1],rect=button.getBoundingClientRect(),point={x:rect.x+rect.width/2,y:rect.y+rect.height/2};
+  const hit=document.elementFromPoint(point.x,point.y);
+  return{point,button:button.textContent,targetMatches:hit===button||button.contains(hit),targetTag:hit?.tagName,unchanged:cm.state.doc.toString()===before};
+})();
