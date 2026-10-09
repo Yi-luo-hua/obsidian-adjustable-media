@@ -12,8 +12,10 @@
 ## 0.7.2 - 2026-10-09
 
 - Double-click a row divider to restore column widths to the media proportions.
+- Keep images fitted consistently after resetting column widths, so starting a small divider drag does not abruptly switch from cropping to fitting the whole image.
 - Dragging the frame's right edge keeps single images at their size; corner resizing still scales them.
 - Add Keep layout borders highlighted, enabled by default. Turn it off to highlight a layout on mouse hover or while its source or text column contains the editing caret.
+- Show offline release notes once after updating, with a View release notes command to open them again. First-time users continue to see the feature guide without a second automatic popup.
 
 Desktop only. The note format remains V2; no migration is needed.
 
