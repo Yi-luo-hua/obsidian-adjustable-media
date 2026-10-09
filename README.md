@@ -6,7 +6,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [Feature examples](docs/examples/Guide.en.md) · [功能示例](docs/examples/Guide.zh-CN.md). In Obsidian, run **Feature examples** for an offline preview and a button to create a working copy with its media. The guide opens once when first available, including for existing users upgrading to the release that adds it.
 
-The latest release is **0.7.1**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout progress and task queue](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
+The latest release is **0.7.2**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout progress and task queue](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
 
 ![Adjustable Media Preview](assets/demo.jpg)
 
