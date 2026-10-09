@@ -350,12 +350,9 @@
   border-radius: var(--radius-s);
   display: block;
   height: var(--vml-row-height);
-  object-fit: cover;
-  width: 100%;
-}
-
-.vml-item--weighted .vml-item__media {
+  /* Default and manual column widths use the same fit, so the first drag never changes image scale abruptly. */
   object-fit: contain;
+  width: 100%;
 }
 
 .vml-row--single .vml-item__media {
@@ -1227,6 +1224,15 @@ body.vml-is-dragging * {
 
 .vml-guide__start-btn {
   padding: 6px 18px;
+}
+
+.vml-update-modal {
+  width: 620px;
+  max-width: 90vw;
+}
+
+.vml-update__body h3 {
+  margin-top: 24px;
 }
 
 /* Preserve the transparent frame's geometry and hover handles when normal highlighting is off. */

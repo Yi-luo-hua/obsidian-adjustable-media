@@ -4,6 +4,10 @@ import type { V2Block } from "../format/v2.ts";
 
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
+  releaseNotesCommand: { zh: "查看更新说明", en: "View release notes" },
+  releaseNotesTitle: { zh: "{version} 更新说明", en: "What's new in {version}" },
+  releaseNotesAgain: { zh: "以后可从命令面板的「查看更新说明」重新打开。本版本仅自动显示一次。", en: "Open View release notes from the command palette to read this again. It appears automatically once per version." },
+  releaseNotesClose: { zh: "知道了", en: "Got it" },
   guideTitle: { zh: "Adjustable Media 功能介绍", en: "Adjustable Media overview" },
   guideCommandName: { zh: "功能示例", en: "Feature examples" },
   guideSubtitle: {

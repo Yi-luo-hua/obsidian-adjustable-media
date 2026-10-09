@@ -15,6 +15,7 @@ export interface VmlSettings {
   /** The display language of plugin menus and UI; auto follows Obsidian's. */
   uiLanguage: UiLanguageSetting;
   guideRevision: number;
+  lastSeenReleaseNotes: string;
 }
 
 export const DEFAULT_SETTINGS: VmlSettings = {
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: VmlSettings = {
   refLanguage: "auto",
   uiLanguage: "auto",
   guideRevision: 0,
+  lastSeenReleaseNotes: "",
 };
 
 const REF_LANGUAGES: readonly RefLanguageSetting[] = ["auto", "en", "zh"];
@@ -39,6 +41,7 @@ export function readSettings(saved: unknown): VmlSettings {
     refLanguage: refLanguage ?? DEFAULT_SETTINGS.refLanguage,
     uiLanguage: uiLanguage ?? DEFAULT_SETTINGS.uiLanguage,
     guideRevision: readGuideRevision(record.guideRevision),
+    lastSeenReleaseNotes: typeof record.lastSeenReleaseNotes === "string" ? record.lastSeenReleaseNotes : "",
   };
 }
 
