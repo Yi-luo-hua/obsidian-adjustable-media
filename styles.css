@@ -1228,3 +1228,22 @@ body.vml-is-dragging * {
 .vml-guide__start-btn {
   padding: 6px 18px;
 }
+
+/* Preserve the transparent frame's geometry and hover handles when normal highlighting is off. */
+.vml-cursor-highlights .vml-live-preview:not(.vml-cursor-in-block) .vml-layout:not(:hover):not(.vml-layout--drop-target) {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.vml-cursor-highlights .vml-cursor-in-block .vml-layout {
+  border-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
+  box-shadow:
+    0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.1),
+    0 0 14px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
+}
+
+/* Source expansion keeps its existing widgets; the actual source range gets an inset guide. */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-source-line--active {
+  box-shadow: inset 2px 0 var(--interactive-accent);
+  background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.06);
+}

@@ -299,3 +299,7 @@ $$
 
 - `npm run check`：类型检查、lint（官方审核用的 `eslint-plugin-obsidianmd` 规则）加 `node:test` 单元测试。纯模块的测试在 `tests/*.test.ts`，操作编辑器的逻辑用 `tests/support/memoryEditor.ts` 代替真实编辑器。
 - 界面和 Obsidian 集成的部分在测试库里实测，流程见 [AGENTS.md](../AGENTS.md)。会改动笔记的实测，先备份笔记，测完恢复并用哈希值核对。
+
+## 0.7.2 边框高亮选项
+
+`keepLayoutHighlight` 默认 true。关闭时，鼠标悬停实际布局范围（包括框内空白）或编辑焦点属于该块时显示完整边框与光晕；鼠标与编辑焦点均离开后隐藏。设置即时生效并持久保存，不重建正在编辑的文字栏，不改笔记或布局尺寸。源码展开沿用既有行为，源码范围提示不替代布局悬停边框。

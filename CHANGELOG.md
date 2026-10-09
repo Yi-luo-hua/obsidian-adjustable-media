@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.2 - 2026-10-09
+
+- Double-click a row divider to restore column widths to the media proportions.
+- Dragging the frame's right edge keeps single images at their size; corner resizing still scales them.
+- Add Keep layout borders highlighted, enabled by default. Turn it off to highlight a layout on mouse hover or while its source or text column contains the editing caret.
+
+Desktop only. The note format remains V2; no migration is needed.
+
 ## 0.7.1 - 2026-10-05
 
 - **Add text on the left/right** is no longer offered for a floating layout. Text beside media stops a layout from floating, so the editor used to close after the first letter typed and the layout jumped; choose **No text wrap** first.

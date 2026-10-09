@@ -1,3 +1,5 @@
+import * as highlightCursor from "../src/layout/cursorHighlight.ts";
+import * as highlightIdentity from "../src/layout/blockIdentity.ts";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as stateApi from "@codemirror/state";
@@ -32,7 +34,7 @@ test("an omitted editor file preserves layout identity, dimensions and originati
   const obsidian = { editorInfoField, editorLivePreviewField, MarkdownView, Component: class {} };
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
-    "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
@@ -92,7 +94,7 @@ test("a wrapped text box whose source shows still floats with its text drawn bes
   const refs = { index: { signature: "fig:a=1" }, language: "en" };
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
-    "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => refs }, "./interactions.ts": {},
@@ -100,7 +102,7 @@ test("a wrapped text box whose source shows still floats with its text drawn bes
     "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
     "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": {},
-  }, { createSpan: () => ({}) });
+  }, { createSpan: () => ({ dataset: {} }) });
   const doc = '<!-- vml {"v":2,"wrap":"right"} -->\nA side note, see @fig:a.\n<!-- /vml -->\nBody text.';
   // The cursor in the box shows its source.
   const state = stateApi.EditorState.create({ doc, selection: { anchor: 40 }, extensions: [editorInfoField, editorLivePreviewField, live.livePreviewExtension({})] });
@@ -131,7 +133,7 @@ test("a note without layouts is not parsed while typing, until a layout is writt
   const editorLivePreviewField = stateApi.StateField.define({ create: () => true, update: value => value });
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
-    "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
@@ -156,7 +158,7 @@ test("the first reading of a pane's environment draws nothing again; a later cha
   }
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension; setEnvironment: stateApi.StateEffectType<string> }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
-    "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan,
     "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref,

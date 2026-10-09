@@ -10,7 +10,7 @@ Restart Obsidian and enable Adjustable Media in Settings → Community plugins.
 
 ## Compatibility
 
-- Obsidian 1.5.0 or newer; tested with 1.13.7
+- Obsidian 1.5.0 or newer; targeted validation with 1.14.4
 - Desktop only
 - Plugin ID: `adjustable-media`
 

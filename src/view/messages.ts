@@ -345,6 +345,14 @@ const MESSAGES = {
     zh: "图表编号的语言",
     en: "Language of figure and table numbers",
   },
+  settingCursorHighlight: {
+    zh: "保持布局块边框高亮",
+    en: "Keep layout borders highlighted",
+  },
+  settingCursorHighlightDesc: {
+    zh: "默认开启，保持实时预览中的布局块边框高亮。关闭后，鼠标悬停在布局块内或编辑光标进入布局块源码、内部文字栏时高亮；离开后隐藏。不改变布局大小或笔记内容。",
+    en: "On by default: keep layout borders highlighted in live preview. When off, highlight while the mouse is over a layout or the editing caret is in its source or text column. Layout size and note content stay unchanged.",
+  },
   settingRefLanguageDesc: {
     zh: "图注、表注和引用（@fig:名字、@tbl:名字、@eq:名字）显示成“图 1”还是“Figure 1”。改动后重新打开笔记生效。",
     en: "Whether captions and references (@fig:name, @tbl:name, @eq:name) read \u201cFigure 1\u201d or \u201c图 1\u201d. Takes effect when a note is opened again.",

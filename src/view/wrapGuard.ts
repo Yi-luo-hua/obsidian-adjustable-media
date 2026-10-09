@@ -3,6 +3,7 @@ import { StateEffect, StateField, type EditorState, type Extension, type Range }
 import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 
 import type { V2Block } from "../format/v2.ts";
+import { blockIdentity } from "../layout/blockIdentity.ts";
 import { isEditable } from "../layout/edits.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { planGaps, planProxy, type FlowBox, type FloatSize, type Gap, type ProxyPlan } from "../layout/wrapGaps.ts";
@@ -130,6 +131,8 @@ class ProxyWidget extends WidgetType {
     });
     // The layout itself at the float's width, cut off above the line.
     const content = box.createDiv({ cls: "vml-live-preview vml-live-preview--wrap vml-wrap-proxy__content" });
+    const id = blockIdentity(this.anchor.block);
+    if (id !== undefined) content.dataset.vmlBlockId = id;
     const model = { ...modelFromBlock(this.anchor.block), width: null, wrap: null, skip: null, align: null };
     renderLayout(content, { app: this.app, sourcePath: this.sourcePath, model, editable: isEditable(this.anchor.block), warning: null });
     return el;

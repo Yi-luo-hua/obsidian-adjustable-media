@@ -3,6 +3,8 @@ import { Prec, StateEffect, StateField, type ChangeDesc, type EditorState, type 
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
 import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
+import { blockIdentity } from "../layout/blockIdentity.ts";
+import { cursorBlocks } from "../layout/cursorHighlight.ts";
 import { isEditable } from "../layout/edits.ts";
 import { documentSnapshot, editorDocumentOrigin, rememberDocumentSnapshot, snapshotForState, type BlockRef, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { changesMayAdd } from "../layout/changeScan.ts";
@@ -28,6 +30,41 @@ export const setEnvironment = StateEffect.define<string>();
 const PENDING_ENVIRONMENT = "pending";
 /** How every layout block opens; a note without it has no layouts. */
 const OPENING = "<!-- vml";
+
+const placedCursorField = StateField.define<boolean>({
+  create: () => false,
+  update: (value, tr) => value || tr.isUserEvent("select") || tr.isUserEvent("input"),
+});
+
+interface HighlightState { cursorOnly: boolean; focused: boolean; columnId: string | null }
+export const setLayoutHighlight = StateEffect.define<HighlightState>();
+const highlightField = StateField.define<HighlightState>({
+  create: () => ({ cursorOnly: false, focused: false, columnId: null }),
+  update(value, tr) {
+    for (const effect of tr.effects) if (effect.is(setLayoutHighlight)) return effect.value;
+    return value;
+  },
+  provide: self => EditorView.editorAttributes.from(self, (value): Record<string, string> => value.cursorOnly ? { class: "vml-cursor-highlights" } : {}),
+});
+const highlightRefreshers = new Set<() => void>();
+const widgetHighlighters = new WeakMap<EditorView, (el: HTMLElement) => void>();
+
+/** Update open panes without rebuilding their widgets or interrupting column composition. */
+export function refreshLayoutHighlights(): void { for (const refresh of highlightRefreshers) refresh(); }
+
+function markHighlightWidget(el: HTMLElement, view: EditorView, block: V2Block): void {
+  const id = blockIdentity(block);
+  if (id !== undefined) el.dataset.vmlBlockId = id;
+  widgetHighlighters.get(view)?.(el);
+}
+
+function highlightedBlocks(state: EditorState, placedCursor: boolean): Set<string> {
+  const highlight = state.field(highlightField);
+  const snapshot = snapshotForState(state);
+  return cursorBlocks(snapshot?.blocks.map(ref => ({ id: ref.id,
+    from: state.doc.line(ref.block.openLine + 1).from, to: state.doc.line(ref.block.closeLine + 1).to })) ?? [],
+  state.selection.ranges, placedCursor, highlight.focused, highlight.columnId);
+}
 
 interface Measurements {
   heights: PaneMeasurements<number>;
@@ -67,7 +104,7 @@ interface Parsed extends Measurements {
  * the layouts can then be dragged into them, and show a grab cursor. One showing a note with
  * wrapped layouts gets `vml-has-wraps`, which lets the note's lines wrap around them.
  */
-export function livePreviewExtension(app: App): Extension {
+export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolean = () => true): Extension {
   const field = StateField.define<LivePreviewState>({
     create: (state) => withDecorations(app, state, parse(app, state)),
     update(value, tr) {
@@ -96,7 +133,7 @@ export function livePreviewExtension(app: App): Extension {
       if (tr.docChanged || modeChanged || originChanged) {
         return withDecorations(app, tr.state, { ...parse(app, tr.state, value.snapshot, tr.changes), ...measurements });
       }
-      if (tr.selection || environment) {
+      if (tr.selection || environment || tr.effects.some(effect => effect.is(setLayoutHighlight))) {
         return withDecorations(app, tr.state, { ...value, ...measurements });
       }
       rememberDocumentSnapshot(tr.state, value.snapshot);
@@ -111,8 +148,55 @@ export function livePreviewExtension(app: App): Extension {
     ],
   });
   return [
+    highlightField,
+    placedCursorField,
     layoutHistory(),
     Prec.high(field),
+    ViewPlugin.define(view => {
+      let destroyed = false;
+      let queued = false;
+      const paint = (el: HTMLElement, active = highlightedBlocks(view.state, view.state.field(placedCursorField))): void => {
+        el.toggleClass("vml-cursor-in-block", active.has(el.dataset.vmlBlockId ?? ""));
+      };
+      widgetHighlighters.set(view, paint);
+      const refresh = (): void => {
+        if (queued || destroyed) return;
+        queued = true;
+        queueMicrotask(() => {
+          queued = false;
+          if (destroyed) return;
+          const doc = view.dom.doc;
+          const focused = doc.hasFocus() && view.dom.contains(doc.activeElement)
+            && app.workspace.activeEditor?.editor === view.state.field(editorInfoField, false)?.editor;
+          const column = focused ? doc.activeElement?.closest<HTMLElement>(".vml-text-editor") : null;
+          const columnId = column?.closest<HTMLElement>("[data-vml-block-id]")?.dataset.vmlBlockId ?? null;
+          const next = { cursorOnly: !keepLayoutHighlight(), focused, columnId };
+          const current = view.state.field(highlightField);
+          if (current.cursorOnly !== next.cursorOnly || current.focused !== focused || current.columnId !== columnId) {
+            view.dispatch({ effects: setLayoutHighlight.of(next) });
+          }
+          const active = highlightedBlocks(view.state, view.state.field(placedCursorField));
+          for (const el of Array.from(view.dom.querySelectorAll<HTMLElement>("[data-vml-block-id]"))) paint(el, active);
+        });
+      };
+      highlightRefreshers.add(refresh);
+      view.dom.doc.addEventListener("focusin", refresh);
+      view.dom.doc.addEventListener("focusout", refresh);
+      view.dom.win.addEventListener("focus", refresh);
+      view.dom.win.addEventListener("blur", refresh);
+      const leafChange = app.workspace.on("active-leaf-change", refresh);
+      refresh();
+      return { update: refresh, destroy() {
+        destroyed = true;
+        highlightRefreshers.delete(refresh);
+        widgetHighlighters.delete(view);
+        view.dom.doc.removeEventListener("focusin", refresh);
+        view.dom.doc.removeEventListener("focusout", refresh);
+        view.dom.win.removeEventListener("focus", refresh);
+        view.dom.win.removeEventListener("blur", refresh);
+        app.workspace.offref(leafChange);
+      } };
+    }),
     wrapGuard(app, {
       anchors: (state) => state.field(field, false)?.anchors ?? [],
       hasWraps: (state) => state.field(field, false)?.hasWraps ?? false,
@@ -181,6 +265,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
+  const active = state.field(highlightField).cursorOnly ? highlightedBlocks(state, state.field(placedCursorField)) : new Set<string>();
   let hasWraps = false;
 
   for (const [index, block] of blocks.entries()) {
@@ -210,7 +295,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     }
     // The source shows, with the media Obsidian draws in it as thumbnails.
     for (let line = block.openLine; line <= block.closeLine; line += 1) {
-      ranges.push(Decoration.line({ class: "vml-source-line" }).range(state.doc.line(line + 1).from));
+      ranges.push(Decoration.line({ class: active.has(ref.id) ? "vml-source-line vml-source-line--active" : "vml-source-line" }).range(state.doc.line(line + 1).from));
     }
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
@@ -324,12 +409,14 @@ class LayoutWidget extends WidgetType {
     if (blockWrap(this.block) === null) {
       this.watch(el, view);
     }
+    markHighlightWidget(el, view, this.block);
     return el;
   }
 
   // While one of its text columns is typed in, the layout keeps its element (textEditing.ts), and
   // its height goes on under the new text.
   override updateDOM(dom: HTMLElement, view: EditorView): boolean {
+    markHighlightWidget(dom, view, this.block);
     if (this.sourcePreview || !keepWhileEditing(dom, this.block)) {
       return false;
     }
@@ -384,6 +471,7 @@ function drawWidget(
   component.load();
   components.set(el, component);
   const root = renderLayout(el, { app, sourcePath, model, effectiveSkip, editable: isEditable(block), warning: blockWarning(block), component, refs });
+  markHighlightWidget(el, view, block);
   const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor };
   const host: TextEditHost = {
     el,
@@ -472,20 +560,21 @@ class RevealedWrapWidget extends WidgetType {
     this.effectiveSkip = effectiveSkip;
     // New numbers draw the layout again.
     const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
-    this.key = `${sourcePath}\n${effectiveSkip}\n${numbers}\n${block.lines.join("\n")}`;
+    this.key = `${blockIdentity(block)}\n${sourcePath}\n${effectiveSkip}\n${numbers}\n${block.lines.join("\n")}`;
   }
 
   override eq(other: RevealedWrapWidget): boolean {
     return other.key === this.key;
   }
 
-  toDOM(): HTMLElement {
+  toDOM(view: EditorView): HTMLElement {
     const el = createSpan({ cls: "vml-wrap-reveal vml-live-preview vml-live-preview--wrap" });
     const component = new Component();
     component.load();
     components.set(el, component);
     renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block),
       effectiveSkip: this.effectiveSkip, editable: false, warning: null, component, refs: this.refs });
+    markHighlightWidget(el, view, this.block);
     return el;
   }
 
