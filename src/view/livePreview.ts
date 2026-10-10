@@ -18,7 +18,7 @@ import { attachInteractions, type LayoutContext } from "./interactions.ts";
 import { layoutIsRendered, renderLayout } from "./layoutView.ts";
 import { layoutHistory } from "./layoutHistory.ts";
 import { blockWarning, t } from "./messages.ts";
-import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
+import { keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
 import { refreshWrapMedia, resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
 import { fileOfEditor } from "./obsidianInternals.ts";
@@ -512,10 +512,29 @@ function drawWidget(
  */
 function setUpText(view: EditorView, host: TextEditHost): void {
   const { block } = host.context;
+  host.root.addEventListener("mousedown", (event) => {
+    const target = eventElement(event);
+    // Padding, gaps and warnings are part of the layout frame, not the note's editable text.
+    if (event.button === 0 && target
+      && !target.closest(".vml-layout__text, .vml-item, .vml-handle, .vml-edit-source, a, button, input, textarea, select, video, audio")) {
+      event.preventDefault();
+    }
+  });
   for (const textEl of Array.from(host.root.querySelectorAll<HTMLElement>(":scope > .vml-layout__text"))) {
     const side: TextSide = textEl.dataset.side === "left" ? "left" : "right";
+    // Rendered text can own a native selection without focusing the outer note editor.
+    if (isEditable(block)) textEl.tabIndex = -1;
+    textEl.addEventListener("mousedown", (event) => {
+      // Keep the current column focused until click opens the next one. Letting the browser focus
+      // the outer editor here imports its DOM selection and reveals the target's source first.
+      if (isEditable(block) && event.button === 0 && !event.shiftKey
+        && !eventElement(event)?.closest("a, button, input, textarea, select, .vml-text-editor")
+        && host.el.doc.activeElement?.closest(".vml-text-editor")) {
+        event.preventDefault();
+      }
+    });
     textEl.addEventListener("click", (event) => {
-      if (isEditingText(host.el) || eventElement(event)?.closest("a")) {
+      if (eventElement(event)?.closest("a, button, input, textarea, select, .vml-text-editor")) {
         return;
       }
       if (!(host.el.doc.getSelection()?.isCollapsed ?? true)) {

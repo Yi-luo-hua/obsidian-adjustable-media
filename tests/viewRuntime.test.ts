@@ -3,6 +3,7 @@ import { test } from "node:test";
 import * as format from "../src/format/v2.ts";
 import * as model from "../src/layout/model.ts";
 import * as projections from "../src/layout/viewProjection.ts";
+import * as textColumns from "../src/markdown/textColumns.ts";
 import { mockedModule } from "./support/mockedModule.ts";
 
 test("media completion requests local measurements without changing the pane environment", async () => {
@@ -80,6 +81,7 @@ test("a rejected Markdown render leaves pending state without claiming a measure
   const rendering = new Promise<void>((_resolve, fail) => { reject = fail; });
   const module = await mockedModule<{ renderLayout(el: unknown, options: unknown): object; layoutRenderState(root: object): string; layoutIsRendered(root: object): boolean }>(new URL("../src/view/layoutView.ts", import.meta.url), {
     obsidian: { MarkdownRenderer: { render: () => rendering } }, "../format/v2.ts": format, "../layout/model.ts": model, "../layout/viewProjection.ts": projections,
+    "../markdown/textColumns.ts": textColumns,
     "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./messages.ts": {},
   }, { console: { error: (...args: unknown[]) => errors.push(args) } });
   const block = format.findV2Blocks(['<!-- vml {"v":2,"type":"text"} -->', 'Text', '<!-- /vml -->'])[0];

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.3 - 2026-10-10
+
+- Add manual text columns using a standalone, unindented +++ line inside text layouts. Each segment stays in its own equal-width column, with independent content height, up to four columns.
+- Add Insert column break in the command palette, with undo support. Layouts without markers keep automatic column balancing.
+- Share manual column rendering across live preview, reading view and PDF export; preserve code, math, comments and original embeds.
+- Fix clicks from a text editor into another layout revealing source instead of editing text. Switch between a layout's text columns through the normal write checks.
+- Keep the current text editing focus and selection when clicking frame padding, column warnings or empty space near a handle.
+- Create offline manual column examples from the release notes, in Chinese or English to match the interface language. Repeated creation uses a fresh folder without overwriting existing notes.
+
+Desktop only. This patch builds on the published 0.7.2 source and retains its highlight option, divider improvements and update notes.
+
 ## 0.7.2 - 2026-10-09
 
 - Double-click a row divider to restore column widths to the media proportions.

@@ -13,6 +13,8 @@ type Handler = (event: { isComposing?: boolean }) => boolean | void;
 
 interface Harness {
   type(text: string): void;
+  compose(text: string): void;
+  switchSide(side: format.TextSide): void;
   leave(): void;
   enter(): void;
   key(key: string, modifiers?: string[]): boolean | void;
@@ -83,7 +85,7 @@ async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
   const module = await mockedModule<{ startTextEdit(host: unknown, side: string, point: null): void; keepWhileEditing(el: unknown, block: unknown): boolean; stopTextEdit(el: unknown): void }>(new URL("../src/view/textEditing.ts", import.meta.url), {
     obsidian: { Notice, Scope }, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/model.ts": model,
     "../layout/viewProjection.ts": projections, "../layout/blockIdentity.ts": identity, "../layout/documentSnapshot.ts": snapshots,
-    "./columnEditor.ts": { createColumnEditor: (options: { text: string; onUpdate: typeof onUpdate }) => { text = options.text; onUpdate = options.onUpdate; return editor; } },
+    "./columnEditor.ts": { createColumnEditor: (options: { text: string; onUpdate: typeof onUpdate }) => { text = options.text; onUpdate = options.onUpdate; destroyed = false; return editor; } },
     "./interactions.ts": { commitEdits: (_app: unknown, _path: string, planned: edits.BlockEdit[]) => { written.push(planned[0]?.replacement ?? []); return Promise.resolve(true); } },
     "./linkSuggest.ts": { closeLinkSuggest: () => false },
     "./messages.ts": { t: (key: string) => key },
@@ -129,6 +131,8 @@ async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
     .find((handler) => handler.key === name && handler.modifiers.join() === modifiers.join())?.run({ isComposing: false });
   return {
     type(next) { text = next; onUpdate({ docChanged: true }); },
+    compose(next) { editor.composing = true; text = next; onUpdate({ docChanged: true }); },
+    switchSide(side) { module.startTextEdit(host, side, null); },
     leave() { content.doc.activeElement = null; listeners.get("focusout")?.(); },
     enter() { content.doc.activeElement = content; listeners.get("focusin")?.(); },
     key, notices, written, executed, scopes,
@@ -179,6 +183,28 @@ test("text that can be saved is written as typed, and leaving the editor draws t
   assert.equal(editor.destroyed(), true);
   assert.equal(editor.redraws, 1);
   assert.deepEqual(editor.notices, []);
+});
+
+test("switching columns finishes pending text before opening the other side", async () => {
+  const editor = await session(["<!-- vml -->", "Left text", "![[a.png]]", "Right text", "<!-- /vml -->"]);
+  editor.compose("Composed left text");
+  assert.deepEqual(editor.written, []);
+  editor.switchSide("right");
+  assert.deepEqual(editor.written, [["Composed left text"]]);
+  assert.equal(editor.editorText(), "Right text");
+  assert.equal(editor.redraws, 1);
+  assert.equal(editor.destroyed(), false);
+});
+
+test("switching columns does not discard text that cannot be written", async () => {
+  const editor = await session(["<!-- vml -->", "Left text", "![[a.png]]", "Right text", "<!-- /vml -->"]);
+  editor.type("```js");
+  editor.switchSide("right");
+  assert.deepEqual(editor.written, []);
+  assert.equal(editor.editorText(), "```js");
+  assert.equal(editor.destroyed(), false);
+  assert.equal(editor.redraws, 0);
+  assert.deepEqual(editor.notices, ["textKeptOpen"]);
 });
 
 test("unsaved text keeps the editor open when the focus leaves it", async () => {

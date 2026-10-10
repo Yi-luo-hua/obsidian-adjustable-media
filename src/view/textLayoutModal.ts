@@ -8,6 +8,8 @@ export interface TextLayoutOptions {
   layout: TextLayout;
   /** Whether the text may flow through columns: a layout of text alone. */
   columns: boolean;
+  /** Explicit source separators determine this count instead of the automatic setting. */
+  manualColumns?: number;
   /** Whether the layout's place across the note means anything: it does not float and is narrower than the note. */
   placeable: boolean;
 }
@@ -32,22 +34,23 @@ export class TextLayoutModal extends Modal {
 
     let gapSetting: Setting | null = null;
     if (this.options.columns) {
-      new Setting(this.contentEl).setName(t("textColumns")).addDropdown((dropdown) => {
+      const columnSetting = new Setting(this.contentEl).setName(t("textColumns")).addDropdown((dropdown) => {
         for (let cols = 1; cols <= MAX_TEXT_COLUMNS; cols += 1) {
           dropdown.addOption(String(cols), String(cols));
         }
-        dropdown.setValue(String(layout.cols)).onChange((value) => {
+        dropdown.setValue(String(this.options.manualColumns ?? layout.cols)).onChange((value) => {
           layout.cols = Number(value);
           gapSetting?.setDisabled(layout.cols === 1);
         });
       });
+      if (this.options.manualColumns) columnSetting.setDesc(t("manualColumnsDesc")).setDisabled(true);
       gapSetting = new Setting(this.contentEl).setName(t("textColumnGap")).addSlider((slider) => slider
         .setLimits(0, MAX_COLUMN_GAP, 0.25)
         .setValue(layout.gap ?? DEFAULT_COLUMN_GAP)
         .onChange((value) => {
           layout.gap = value;
         }));
-      gapSetting.setDisabled(layout.cols === 1);
+      gapSetting.setDisabled((this.options.manualColumns ?? layout.cols) === 1);
     }
 
     new Setting(this.contentEl).setName(t("textJustify")).addDropdown((dropdown) => {

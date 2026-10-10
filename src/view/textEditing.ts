@@ -86,7 +86,9 @@ function draftTargets(view: EditorView, sourcePath: string, side: TextSide, key:
 
 /** Starts typing the text on `side` right in the layout, with the caret where `point` is on the drawn text, or at its end. */
 export function startTextEdit(host: TextEditHost, side: TextSide, point: Point | null): void {
-  if (sessions.has(host.el)) {
+  const active = sessions.get(host.el);
+  if (active) {
+    active.switchColumn(side, point);
     return;
   }
   const source = textOf(host.context.block, side);
@@ -289,21 +291,34 @@ class TextEditSession {
    * Leaves the editor: what is left is written, and the layout is drawn again from the note. Text that
    * cannot be written keeps the editor open, its frame red, for the text to be fixed or given up with Esc.
    */
-  private end(): void {
+  private end(): TextEditHost | null {
     if (this.ended) {
-      return;
+      return null;
     }
     this.write(true);
     if (this.ended) {
-      return;
+      return null;
     }
     if (this.invalid) {
       this.popScope();
       new Notice(t("textKeptOpen"));
-      return;
+      return null;
     }
     this.finish();
-    this.host.redraw(this.block);
+    return this.host.redraw(this.block);
+  }
+
+  /** A click on the other rendered column finishes this one through its normal write checks. */
+  switchColumn(side: TextSide, point: Point | null): void {
+    if (side !== this.side) {
+      const next = this.end();
+      if (next) {
+        startTextEdit(next, side, point);
+        return;
+      }
+    }
+    this.editor.focus();
+    this.pushScope();
   }
 
   /**
@@ -408,23 +423,26 @@ function caretInSource(column: HTMLElement, point: Point, source: string): numbe
   if (!position || !column.contains(position.offsetNode)) {
     return source.length;
   }
+  const part = position.offsetNode.parentElement?.closest<HTMLElement>(".vml-text-column");
+  const sourceFrom = part ? Number(part.dataset.sourceFrom) : 0;
+  const sourceTo = part ? Number(part.dataset.sourceTo) : source.length;
   const range = column.doc.createRange();
-  range.setStart(column, 0);
+  range.setStart(part ?? column, 0);
   range.setEnd(position.offsetNode, position.offset);
   const before = range.toString().replace(/\s+/g, "");
   if (before === "") {
-    return 0;
+    return sourceFrom;
   }
   // The drawn text has no line breaks and collapses spaces: both sides are compared without whitespace.
-  const { text: compact, offsets } = withoutWhitespace(source);
+  const { text: compact, offsets } = withoutWhitespace(source.slice(sourceFrom, sourceTo));
   for (const size of CARET_CLUES) {
     const clue = before.slice(-size);
     const at = compact.indexOf(clue);
     if (clue.length === Math.min(size, before.length) && at >= 0 && compact.indexOf(clue, at + 1) < 0) {
-      return (offsets[at + clue.length - 1] ?? source.length - 1) + 1;
+      return sourceFrom + (offsets[at + clue.length - 1] ?? sourceTo - sourceFrom - 1) + 1;
     }
   }
-  return source.length;
+  return sourceTo;
 }
 
 /** `source` without whitespace, and where each of its characters is in `source`. */

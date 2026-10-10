@@ -10,6 +10,8 @@
 
 同时在 `CHANGELOG.md` 写好这一版的条目，标题写成 `## 0.1.0 - 2026-09-12` 的形式。Release 的说明由 `scripts/release-notes.mjs` 生成：先是这一条目，后面接 `docs/RELEASE_NOTES_TEMPLATE.md` 里的安装说明。可以用 `node scripts/release-notes.mjs` 预览。
 
+插件内的更新弹窗正文单独放在 `docs/releases/<版本>.zh-CN.md` 和 `<版本>.en.md`，由 `src/guide/releaseContent.ts` 打包；`releaseState.ts` 中的版本也需与本次更新一致。中文和英文应对应最终功能范围与用户确认的文案。0.7.3 的手动分栏样例在 `docs/examples/ManualColumns.zh-CN.md` 和 `ManualColumns.en.md`，更新弹窗按界面语言离线创建对应笔记。说明与样例随 `main.js` 分发，不增加发布附件。
+
 ## 2. 本地检查
 
 ```bash
@@ -21,6 +23,8 @@ npm run release
 ```
 
 `npm run release` 会做生产构建，并在 `dist/adjustable-media/` 里生成 `main.js`、`manifest.json`、`styles.css`。只放 Obsidian 会下载的这三个文件，多余的文件会被社区目录的审核标出来。
+
+本地发布包就绪、标签推送、GitHub 草稿创建和公开发布是不同状态。准备发布时，README 与项目状态应继续标明当前公开版本；正式发布后再更新公开版本及链接。验证按实际改动范围进行，移动端未复测不记为通过；普通桌面更新不要求重复全量设备矩阵。
 
 ## 3. 推送版本标签
 

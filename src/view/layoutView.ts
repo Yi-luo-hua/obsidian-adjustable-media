@@ -6,6 +6,7 @@ import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { setBounded } from "../layout/viewProjection.ts";
 import { resolveMedia } from "./media.ts";
 import { t } from "./messages.ts";
+import { splitTextColumns } from "../markdown/textColumns.ts";
 
 export interface LayoutViewOptions {
   app: App;
@@ -130,6 +131,19 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
 
 function renderText(root: HTMLElement, side: TextSide, markdown: string, options: LayoutViewOptions): void {
   const el = root.createDiv({ cls: `vml-layout__text vml-layout__text--${side} markdown-rendered`, attr: { "data-side": side } });
+  if (isTextOnly(options.model)) {
+    const { columns, overflow } = splitTextColumns(markdown);
+    if (overflow) root.createDiv({ cls: "vml-layout__warning", text: t("textColumnsOverflow") });
+    if (columns.length > 1) {
+      el.addClass("vml-layout__text--manual");
+      root.setCssProps({ "--vml-cols": String(columns.length), "--vml-gap": `${options.model.gap ?? DEFAULT_COLUMN_GAP}em` });
+      for (const column of columns) {
+        const part = el.createDiv({ cls: "vml-text-column markdown-rendered", attr: { "data-source-from": String(column.from), "data-source-to": String(column.to) } });
+        renderMarkdown(part, column.markdown, options);
+      }
+      return;
+    }
+  }
   renderMarkdown(el, markdown, options);
 }
 

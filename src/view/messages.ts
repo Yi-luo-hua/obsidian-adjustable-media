@@ -4,6 +4,10 @@ import type { V2Block } from "../format/v2.ts";
 
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
+  insertColumnBreak: { zh: "插入分栏标记", en: "Insert column break" },
+  manualColumnsDesc: { zh: "栏数由正文中的 +++ 分栏标记决定；移除标记后恢复自动分栏。", en: "The +++ markers set the column count. Remove them to restore automatic columns." },
+  columnBreakUnavailable: { zh: "请在文字布局块的正文位置插入分栏标记，最多四栏。", en: "Insert a column break in a text layout's body, up to four columns." },
+  textColumnsOverflow: { zh: "手动分栏超过四栏，已按自动分栏显示，原文保留。", en: "More than four manual columns: automatic layout is shown and the source is preserved." },
   releaseNotesCommand: { zh: "查看更新说明", en: "View release notes" },
   releaseNotesTitle: { zh: "{version} 更新说明", en: "What's new in {version}" },
   releaseNotesAgain: { zh: "以后可从命令面板的「查看更新说明」重新打开。本版本仅自动显示一次。", en: "Open View release notes from the command palette to read this again. It appears automatically once per version." },
@@ -16,6 +20,10 @@ const MESSAGES = {
   },
   guideLanguage: { zh: "语言", en: "Language" },
   guideCreate: { zh: "在库中创建使用指南", en: "Create guide in vault" },
+  manualColumnExampleCreate: { zh: "在库中创建手动分栏样例", en: "Create manual column examples in vault" },
+  manualColumnExampleName: { zh: "手动文字分栏使用样例", en: "Manual column examples" },
+  manualColumnExampleCreated: { zh: "手动分栏样例已创建并打开。", en: "Manual column examples created and opened." },
+  manualColumnExampleFailed: { zh: "手动分栏样例创建失败，请重试。", en: "Failed to create manual column examples. Please try again." },
   exampleFolderName: { zh: "Adjustable Media 指南", en: "Adjustable Media guide" },
   settingUiLanguage: { zh: "界面语言", en: "Interface language" },
   settingUiLanguageDesc: {

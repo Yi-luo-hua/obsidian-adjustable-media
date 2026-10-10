@@ -1,0 +1,79 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import * as stateApi from "@codemirror/state";
+import * as viewApi from "@codemirror/view";
+import * as format from "../src/format/v2.ts";
+import * as edits from "../src/layout/edits.ts";
+import * as snapshots from "../src/layout/documentSnapshot.ts";
+import * as floatOrder from "../src/layout/floatOrder.ts";
+import * as changeScan from "../src/layout/changeScan.ts";
+import * as projections from "../src/layout/viewProjection.ts";
+import * as model from "../src/layout/model.ts";
+import * as crossref from "../src/markdown/crossref.ts";
+import * as highlight from "../src/layout/cursorHighlight.ts";
+import * as identity from "../src/layout/blockIdentity.ts";
+import { mockedModule } from "./support/mockedModule.ts";
+
+test("rendered text retains an existing column's focus until click, without intercepting links or editor selections", async () => {
+  const info = stateApi.StateField.define({ create: () => ({ editor: {}, file: { path: "note.md" } }), update: value => value });
+  const preview = stateApi.StateField.define({ create: () => true, update: value => value });
+  let focusedColumn = true, collapsed = true;
+  const opened: string[] = [];
+  const handlers = new Map<string, (event: object) => void>();
+  const frameHandlers = new Map<string, (event: object) => void>();
+  const doc = { getSelection: () => ({ isCollapsed: collapsed }), activeElement: { closest: () => focusedColumn ? {} : null } };
+  const element = () => ({ doc, dataset: {}, empty() {}, toggleClass() {},
+    createEl: () => ({ addEventListener() {} }),
+    win: { ResizeObserver: class { observe() {} disconnect() {} } },
+  });
+  const column = { dataset: { side: "left" }, addEventListener: (name: string, run: (event: object) => void) => handlers.set(name, run) };
+  const root = { ...element(), querySelector: () => null, querySelectorAll: () => [column],
+    addEventListener: (name: string, run: (event: object) => void) => frameHandlers.set(name, run) };
+  const live = await mockedModule<{ livePreviewExtension(app: object): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
+    obsidian: { editorInfoField: info, editorLivePreviewField: preview, MarkdownView: class {}, Component: class { load() {} unload() {} } },
+    "@codemirror/state": stateApi, "@codemirror/view": viewApi,
+    "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/cursorHighlight.ts": highlight, "../layout/blockIdentity.ts": identity,
+    "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
+    "./blockDrag.ts": { setUpBlockMove() {} }, "./crossrefView.ts": { refContextOf: () => undefined },
+    "./interactions.ts": { attachInteractions() {} }, "./layoutHistory.ts": { layoutHistory: () => [] },
+    "./layoutView.ts": { renderLayout: () => root }, "./messages.ts": { t: (key: string) => key, blockWarning: () => null },
+    "./textEditing.ts": { startTextEdit: (_host: object, side: string) => opened.push(side) },
+    "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": { eventElement: (event: { target: object }) => event.target },
+  }, { createDiv: element });
+  const state = stateApi.EditorState.create({ doc: 'Intro\n\n<!-- vml {"v":2,"type":"text"} -->\nText\n<!-- /vml -->', extensions: [info, preview, live.livePreviewExtension({})] });
+  const widgets: viewApi.WidgetType[] = [];
+  for (const set of state.facet(viewApi.EditorView.decorations)) {
+    if (typeof set !== "function") set.between(0, state.doc.length, (_from, _to, decoration) => {
+      const { widget } = decoration.spec as { widget?: viewApi.WidgetType };
+      if (widget) widgets.push(widget);
+    });
+  }
+  assert.equal(widgets.length, 1);
+  widgets[0].toDOM({ state } as viewApi.EditorView);
+  const event = (interactive = false, shiftKey = false) => {
+    const result = { button: 0, shiftKey, clientX: 10, clientY: 20, prevented: false,
+      target: { closest: () => interactive ? {} : null }, preventDefault() { this.prevented = true; } };
+    return result;
+  };
+  const press = event(); handlers.get("mousedown")!(press); assert.equal(press.prevented, true);
+  for (const target of ["frame padding", "warning"]) {
+    const gap = event(); frameHandlers.get("mousedown")!(gap);
+    assert.equal(gap.prevented, true, target);
+  }
+  const frameControl = event(true); frameHandlers.get("mousedown")!(frameControl); assert.equal(frameControl.prevented, false);
+  const rightClick = { ...event(), button: 2 }; frameHandlers.get("mousedown")!(rightClick); assert.equal(rightClick.prevented, false);
+  focusedColumn = false;
+  const nativeSelection = event(); handlers.get("mousedown")!(nativeSelection); assert.equal(nativeSelection.prevented, false);
+  focusedColumn = true;
+  for (const untouched of [event(true), event(false, true)]) { handlers.get("mousedown")!(untouched); assert.equal(untouched.prevented, false); }
+  const link = event(true); handlers.get("click")!(link); assert.equal(link.prevented, false); assert.deepEqual(opened, []);
+  collapsed = false;
+  const selection = event(); handlers.get("click")!(selection); assert.equal(selection.prevented, false); assert.deepEqual(opened, []);
+  collapsed = true;
+  const switchSide = event(); handlers.get("click")!(switchSide);
+  assert.equal(switchSide.prevented, true);
+  assert.deepEqual(opened, ["left"]);
+});

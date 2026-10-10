@@ -41,6 +41,7 @@ import { MediaViewer, type ViewerImage } from "./mediaViewer.ts";
 import { reportWriteError, t, type MessageKey } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
 import { TextLayoutModal } from "./textLayoutModal.ts";
+import { splitTextColumns } from "../markdown/textColumns.ts";
 import { eventElement } from "./windows.ts";
 
 /** A layout drawn in live preview, as its interactions see it. Reading view only shows layouts. */
@@ -809,7 +810,8 @@ function placeable(model: LayoutModel): boolean {
 function addTextLayoutItem(menu: Menu, context: LayoutContext): void {
   menu.addItem((entry) => entry.setTitle(t("textLayout")).setIcon("type").setSection("vml-text-layout").onClick(() => {
     const options = { layout: textLayoutOf(context.model), columns: isTextOnly(context.model), placeable: placeable(context.model) };
-    new TextLayoutModal(context.app, options, (layout) => {
+    const count = options.columns ? splitTextColumns(context.model.text.left ?? "").columns.length : 1;
+    new TextLayoutModal(context.app, { ...options, manualColumns: count > 1 ? count : undefined }, (layout) => {
       void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setTextLayout(context.model, layout))], context);
     }).open();
   }));

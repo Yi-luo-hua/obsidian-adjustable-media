@@ -1,6 +1,8 @@
 # 布局、拖动与视图同步改进实施方案
 
-状态：已开始分批实施；P0a 数据契约、P1 与 P2 协调／缓存基础已落地并提交草稿 [PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12)，完整 P2 和 P3–P6 尚未完成。更新日期：2026-09-30。最新验证见 [每窗格基础实施记录](08-pane-foundation-record.md)，提交状态与后续顺序见 [09 进度与后续安排](09-progress-and-next-steps.md)。
+更新日期：2026-10-10。本页是布局改进方案的索引；下方基线、工作包与依赖保留原规划范围。P0a 数据契约、P1 与 P2 协调／缓存基础已通过 [PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12) 合并并纳入 0.7.0，基础交付不等于完整 R1／R2 验收。该批历史验证见 [08 每窗格记录](08-pane-foundation-record.md)，规划后续见 [09 进度与后续安排](09-progress-and-next-steps.md)。
+
+当前公开版本为 0.7.2；独立增量 0.7.3 手动文字分栏、点击修复与双语样例已完成本地发布准备，尚未公开发布。当前版本状态见 [项目状态](../../STATUS.md)，交付分类见 [28 分类与增量交付](28-incremental-delivery.md)，0.7.3 的范围、用户确认与验证见 [34 手动分栏](34-text-column-breaks.md)。它不表示最终布局规划器、移动适配或并列组已完成。
 
 基线：`main` 的 `34f5896`（0.6.1），另含研究时已有的 `src/layout/placement.ts`、`tests/layoutWrap.test.ts` 未提交补偿；现已原样单独提交，见 09。基线研究见 [研究报告](../../research/LAYOUT_CONFLICTS.md)，其纯函数、独立浏览器证据与 Obsidian 实测范围分别记录，不互相替代。
 
@@ -20,6 +22,8 @@
 | [07 首批实施记录](07-execution-record.md) | P1 基础批次的代码与宿主证据 |
 | [08 每窗格基础实施记录](08-pane-foundation-record.md) | 当前同步／缓存基础、双窗与延迟证据、剩余门槛 |
 | [09 进度与后续安排](09-progress-and-next-steps.md) | 本批交付状态、下一批任务、依赖、退出条件与 PR 拆分 |
+| [28 分类与增量交付](28-incremental-delivery.md) | 独立发布与其他工作线的范围、交付顺序和版本状态 |
+| [34 手动文字分栏](34-text-column-breaks.md) | 0.7.3 的手动内容边界、点击修复、双语样例与发布准备 |
 
 两项代价较高的推荐决策单独记录为 proposed ADR：[布局关系分层](../../adr/0001-explicit-layout-relations.md)、[分组格式的版本边界](../../adr/0002-versioned-flat-groups.md)。ADR 通过相应原型门槛后才转为 accepted。
 
@@ -64,7 +68,7 @@ R1、R2 是两个可分别交付的增量：R1 对既有笔记改进规划与同
 
 ## 文档与实现边界
 
-- 已实施快照、依赖、入口与每窗格协调／缓存基础；当前状态以 [实施记录](08-pane-foundation-record.md) 为准。完整生命周期、最终规划和组格式仍属于后续工作，尚未迁移笔记或发布新版本。
+- 已实施快照、依赖、入口与每窗格协调／缓存基础，并纳入 0.7.0。该批验证以 [实施记录](08-pane-foundation-record.md) 为准；后续独立版本以 [项目状态](../../STATUS.md) 和 [28](28-incremental-delivery.md) 为准，不能把独立功能发布视为完整生命周期、最终规划或组格式验收。
 - [DESIGN.md](../../DESIGN.md) 描述当前实现。工作包验收合入时才逐项更新其存储格式、职责和行为记录。
 - 较大实现改动在 `codex/` 独立分支进行。先核对现有未提交补偿是否纳入基线，不重置或混入无关改动。
 - 合并、发布按项目既有规则及具体任务授权办理；每个工作包的完成证明需包含自动检查和对应宿主实测。

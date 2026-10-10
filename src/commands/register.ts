@@ -5,8 +5,20 @@ import { isEditable, planUnwrap, planUnwrapAll, type LineChange } from "../layou
 import { writeBlockEdits } from "../layout/writeBack.ts";
 import { reportWriteError, t } from "../view/messages.ts";
 import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection, selectedLines } from "./plans.ts";
+import { planTextColumnBreak } from "./textColumnBreak.ts";
 
 export function registerCommands(plugin: Plugin): void {
+  plugin.addCommand({
+    id: "insert-column-break",
+    name: t("insertColumnBreak"),
+    editorCallback: (editor, view) => {
+      const edit = editor.somethingSelected() ? null : planTextColumnBreak(editor.getValue().split("\n"), editor.getCursor());
+      if (!edit || !view.file) { new Notice(t("columnBreakUnavailable")); return; }
+      void writeBlockEdits(plugin.app, view.file, [edit], { editor }).then(result => {
+        if (!result.ok) new Notice(t("writeNotFound"));
+      }).catch(reportWriteError);
+    },
+  });
   plugin.registerEvent(plugin.app.workspace.on("editor-menu", (menu, editor, view) => {
     if (!editor.somethingSelected()) {
       return;

@@ -80,6 +80,27 @@
   column-count: 1;
 }
 
+/* Explicit text segments stay in their own columns, regardless of their heights. */
+.vml-layout > .vml-layout__text--manual:not(.vml-layout__text--editing) {
+  align-items: start;
+  column-count: 1;
+  display: grid;
+  gap: var(--vml-gap, 2em);
+  grid-template-columns: repeat(var(--vml-cols), minmax(0, 1fr));
+}
+
+.vml-text-column {
+  min-width: 0;
+}
+
+.vml-text-column > :first-child {
+  margin-top: 0;
+}
+
+.vml-text-column > :last-child {
+  margin-bottom: 0;
+}
+
 .vml-layout--text-center > .vml-layout__text {
   text-align: center;
 }

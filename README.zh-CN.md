@@ -143,3 +143,11 @@ Adjustable Media 不创造新语法，笔记中仅保留标准嵌入与纯净的
 
 - 本项目基于 [MIT License](LICENSE) 开源。
 - 项目灵感与早期基础来源于 [Fall-Makito/visual-media-layout](https://github.com/Fall-Makito/visual-media-layout)，现已针对存储规范与底层写入链路完成全新重构。
+
+## 0.7.3 已完成发布准备：手动文字分栏
+
+在文字布局块内把 `+++` 顶格独占一行，即可结束当前栏并开始下一栏。最多四栏，等宽、顶部对齐，每栏保留自己的内容，也可以留出空栏。没有标记时保留自动分栏。点击文字进入编辑后可直接输入标记，编辑源码时可用「插入分栏标记」命令。代码、公式和注释中的标记不参与分栏；超过四栏会提示并回退为自动分栏，原文保持不变。
+
+本版同时修复文字编辑器之间切换、点击外框空隙时误展开源码的问题。更新说明中的按钮可按界面语言离线创建[中文样例](docs/examples/ManualColumns.zh-CN.md)或[英文样例](docs/examples/ManualColumns.en.md)，每次使用新目录，不覆盖已有笔记。
+
+用户最终确认、中英文 Windows／Obsidian 1.14.4 定向实测、327 项自动检查和发布构建均已完成。0.7.3 在 `codex/text-column-breaks` 本地准备，基于正式 0.7.2 并保留其功能；尚未推送标签或公开发布，当前最新公开版本仍为 0.7.2。验证范围见[项目状态](docs/STATUS.md)和[实施记录](docs/plans/layout-redesign/34-text-column-breaks.md)。本版保持桌面限定与 V2 格式。
