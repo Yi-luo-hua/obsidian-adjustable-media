@@ -10,17 +10,20 @@
 | `codex/pending-view-parity` | `7963b0f` 文档合流 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 本轮审查和 Windows 定向回归通过，待集成 |
 | `codex/pending-render-stability` | `bf8dcd8` 审查修复 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 416 项检查、构建与 Windows 定向回归通过，待集成 |
 | `codex/android-adaptation` | `a0bf98b` 旧 WebView 定位修复 | 接共用渲染分支；手机／平板触摸、输入、焦点与控件 | 429 项检查、构建及代码 CI 通过；nova 12／11.5S 本轮已列相关验收通过，待集成／交付 |
+| `codex/mobile-release-integration` | `2630ebb` 本地移动集成 | 保留已验收依赖链与 main 的历史；供后续移动适配大版本使用 | 429 项检查通过；等待 iPhone／iPad 基础真机验收，具体版本号未定 |
 | `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
 
 待合并分支按依赖堆叠：`text-column-breaks → pending-view-parity → pending-render-stability → android-adaptation`。这表示代码依赖，不表示已经合并或发布；评审每一层时以其上一层为比较基线。旧 `codex/android-layout-stability` 留作完整历史来源，不再作为新的混合开发入口。
 
 表中提交固定本轮内容基线，后续文档同步会继续推进各分支 HEAD；实时位置以 `git worktree list` 与对应远端分支为准。
 
-远端 main 为 `5bd34e7`，正式 0.7.2 标签为 `df37e08`；本地 main 仍为 `7fcd086`，落后远端 5 个提交，当前没有工作树检出 main。本次核对不改变这些分支或版本标签。
+远端 main 与已快进的本地 main 均为 `5bd34e7`，正式 0.7.2 标签为 `df37e08`；移动候选未推入 main。主目录继续检出 `codex/text-column-breaks`，版本标签与公开发布状态见 STATUS。
 
 ## 交付与集成规则
 
 0.7.3 可按自身验收范围交付；三视图、共用渲染和移动适配分别审查与集成，不把后续完整规划器／并列组装进同一个发布增量。Android 优先表示本轮工作优先级，不要求先公开发布三视图或渲染版本才允许做真机回归。
+
+用户最新确认：0.7.3 不追加内容，保持原定桌面版本；Android 本轮测试与 iPhone／iPad 验收一起，作为后续移动适配大版本交付。刚做的本地集成已保留为 `codex/mobile-release-integration`，主目录恢复为 0.7.3 基线，main 与 origin/main 均为 `5bd34e7`；移动候选尚未合入 main。
 
 bug 修复按主要职责归入对应工作线，设备验证范围单独记录；在平板发现的播放器保留属于共用渲染，移动写回焦点属于平台适配。文档、样例和诊断维护随对应功能交付。
 
@@ -39,7 +42,7 @@ W02／W03 的 33 个未提交文件已搬到原独立功能工作树，逐文件
 
 ## Android 本轮安排
 
-用户选择先完成 Android 手机／平板，再推进 iPhone／iPad。nova 12／11.5S 的新组合构建本轮已列相关验收通过，保存内容已核对，测试收尾完成，保留测试笔记的手动尺寸调整；新旧构建与已测／未测范围见 [Android 适配](mobile-adaptation.md)。本轮草稿按钮反馈确认为普通文字状态下预期禁用；正式平台支持声明、合入 main 和公开发布尚未进行。历史证据仍见 [摘要](archive/branch-validation.md#android-phone-and-tablet)。
+用户选择先完成 Android 手机／平板，再推进 iPhone／iPad，并在三类移动平台验收后统一交付后续移动大版本。nova 12／11.5S 的新组合构建本轮已列相关验收通过，保存内容已核对，测试收尾完成，保留测试笔记的手动尺寸调整；新旧构建与已测／未测范围见 [Android 适配](mobile-adaptation.md)。本轮草稿按钮反馈确认为普通文字状态下预期禁用；正式平台支持声明、合入 main 和公开发布尚未进行。历史证据仍见 [摘要](archive/branch-validation.md#android-phone-and-tablet)。
 
 ## 分支整理时的检查与提交
 
