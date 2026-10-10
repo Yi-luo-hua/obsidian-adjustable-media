@@ -1,18 +1,28 @@
 # 工作树分工与 Android 优先交付
 
-2026-10-10，按用户要求整理。当前公开版本仍为 0.7.2；0.7.3 已提交并推送到 `codex/text-column-breaks`，主目录检出该分支。本次不推送版本标签，不公开发布，不合并到 main。
+更新：2026-10-10。本页维护工作树、分支依赖与交付顺序；版本总状态见 [STATUS](../../STATUS.md)，工作包完成范围见 [09](09-progress-and-next-steps.md)。当前公开版本仍为 0.7.2；0.7.3 已提交推送并成为主目录基线，标签、公开发布和合入 main 尚未进行。
 
 ## 分支与范围
 
-| 分支 | 基线与职责 | 下一步 |
-| --- | --- | --- |
-| `codex/text-column-breaks` | 正式 0.7.2 + 0.7.3 手动分栏、点击修复及双语样例；主目录 | 保持可发布状态，其他增量独立审查 |
-| `codex/pending-view-parity` | 0.7.3 + 远端 main 的 #17–#20；保留 W08、更新说明、图片适配和手动分栏 | 待合并的三视图／既有拖动修复；不含 W02 原型 |
-| `codex/pending-render-stability` | 接三视图分支；W01 生命周期、离屏测量、渲染完成通知及尺寸变化保留播放器 | 共用渲染修复单独审查 |
-| `codex/android-adaptation` | 接共用渲染分支；Android 手机／平板的触摸、输入、焦点与控件适配 | 优先完成 Android 相关剩余验收 |
-| `codex/w02-candidate-measurement` | 原有候选测量及 W03 纯规划续作 | 保留未提交工作，不作为 Android 本轮交付依赖 |
+| 分支 | 核对时 HEAD | 基线与职责 | 下一步 |
+| --- | --- | --- | --- |
+| `codex/text-column-breaks` | `4c3eb7a`，已推送 | 正式 0.7.2 + 0.7.3 手动分栏、点击修复及双语样例；主目录 | 保持可发布状态，其他增量独立审查 |
+| `codex/pending-view-parity` | `be38d7f`，已推送 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 三视图／既有拖动修复待集成；不含 W02 原型 |
+| `codex/pending-render-stability` | `205408b`，已推送 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 共用渲染修复单独审查与相关宿主回归 |
+| `codex/android-adaptation` | `3b77a1e`，已推送 | 接共用渲染分支；手机／平板触摸、输入、焦点与控件 | Android 优先；真机验收按用户要求稍后进行 |
+| `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
 
 待合并分支按依赖堆叠：`text-column-breaks → pending-view-parity → pending-render-stability → android-adaptation`。这表示代码依赖，不表示已经合并或发布；评审每一层时以其上一层为比较基线。旧 `codex/android-layout-stability` 留作完整历史来源，不再作为新的混合开发入口。
+
+远端 main 为 `5bd34e7`，正式 0.7.2 标签为 `df37e08`；本地 main 仍为 `7fcd086`，落后远端 5 个提交，当前没有工作树检出 main。本次核对不改变这些分支或版本标签。
+
+## 交付与集成规则
+
+0.7.3 可按自身验收范围交付；三视图、共用渲染和移动适配分别审查与集成，不把后续完整规划器／并列组装进同一个发布增量。Android 优先表示本轮工作优先级，不要求先公开发布三视图或渲染版本才允许做真机回归。
+
+bug 修复按主要职责归入对应工作线，设备验证范围单独记录；在平板发现的播放器保留属于共用渲染，移动写回焦点属于平台适配。文档、样例和诊断维护随对应功能交付。
+
+下一次从 main 发布前，必须集成已经发布的 W08、更新弹窗与图片适配修复；本次三视图待合并分支已完成源码合流，但尚未合入 main。0.7.3 手动分栏与 W06 多块组区分，独立交付不等待组格式或全设备矩阵。
 
 ## 工作目录
 
@@ -25,20 +35,11 @@
 
 W02／W03 的 33 个未提交文件已搬到原独立功能工作树，逐文件 SHA-256 一致；恢复快照与原构建保存在主目录忽略目录 `dist/worktree-reorganization-20261010/`，恢复 stash 为 `276052785e29b2b26ead891092c9932bd63b3353`。`.claude/`、历史审查修改、笔记及设置没有混入新提交。
 
-## Android 本轮范围与优先级
+## Android 本轮安排
 
-用户选择先完成 Android 手机和平板，再推进 iPhone／iPad。沿用共用解析、渲染、写回及交互代码，仅保留已确认的平台适配；不等待 W02／W03 最终规划器。
+用户选择先完成 Android 手机／平板，再推进 iPhone／iPad，并明确真机验收稍后进行。具体场景与恢复顺序统一维护在 [Android 适配](mobile-adaptation.md)，旧构建证据见 [验收摘要](archive/branch-validation.md#android-phone-and-tablet)。上次分支整理检查时 ADB 没有连接设备；本次只整理文档，未复核设备或部署新构建。
 
-1. 在 nova 12 定向重跑平板上已修复的源码误触、侧栏冲突、顶部／角落把手、输入禁区、视频播放与缩放焦点；检查普通滚动不会误写。
-2. 在 11.5S 补全屏／分屏往返、旋转、前后台／系统中断、原生多窗格及相关手指操作。
-3. 核验中文组字、完成／放弃无效草稿、保存重开、取消零写入、原文守恒及一步原生撤销；兼容 0.7.3 手动分栏。
-4. 通过已列 Android 核心场景后再调整正式支持声明；现阶段 manifest 继续桌面限定。iPhone／iPad 未测，不能记为通过。
-
-本次设备检查：ADB 已启动，无连接设备。分支拆分后的自动检查与构建另记；历史真机证据来自 `f7c8880` 的 [18](https://github.com/Yi-luo-hua/obsidian-adjustable-media/blob/f7c8880/docs/plans/layout-redesign/18-android-and-w01-acceptance.md)、[20](https://github.com/Yi-luo-hua/obsidian-adjustable-media/blob/f7c8880/docs/plans/layout-redesign/20-tablet-acceptance.md) 及 [21–24](https://github.com/Yi-luo-hua/obsidian-adjustable-media/blob/f7c8880/docs/plans/layout-redesign/24-mobile-video-controls-focus.md)，不把它们当成新组合构建的真机验收。
-
-用户随后明确选择：本次先完成分支整理，真机验收稍后进行。未部署 Android 新构建，也未修改正式桌面限定。
-
-## 本次检查与提交
+## 分支整理时的检查与提交
 
 - 0.7.3 实现提交 `664198c` 已推送；类型检查、lint、327 项测试及发布构建通过，主目录再次生产构建通过。
 - 三视图分支 `40104f7` 已推送；类型检查、lint、401 项测试及生产构建通过。解决合流后的宿主解析／高亮冲突，补齐原回归测试的依赖；保留 0.7.3 点击与手动分栏用例。
@@ -47,3 +48,5 @@ W02／W03 的 33 个未提交文件已搬到原独立功能工作树，逐文件
 - W02／W03 的 33 个文件再次核对，哈希差异为 0。恢复 stash 保留；没有重置该开发线，也没有把它的未完成模块放入上述待合并分支。
 
 日常验证继续按 [AGENTS.md](../../../AGENTS.md) 的改动影响选择范围；W03／W04 的统一规划器触摸接入属于后续增量，不混入本轮 Android 基础适配。
+
+本次文档整理将旧 28 的交付分类／顺序并入本页，候选与发布过程并入 [独立功能归档](archive/independent-features.md)；没有新增代码验收、Git 提交或推送。
