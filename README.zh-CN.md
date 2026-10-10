@@ -150,4 +150,4 @@ Adjustable Media 不创造新语法，笔记中仅保留标准嵌入与纯净的
 
 本版同时修复文字编辑器之间切换、点击外框空隙时误展开源码的问题。更新说明中的按钮可按界面语言离线创建[中文样例](docs/examples/ManualColumns.zh-CN.md)或[英文样例](docs/examples/ManualColumns.en.md)，每次使用新目录，不覆盖已有笔记。
 
-用户最终确认、中英文 Windows／Obsidian 1.14.4 定向实测、327 项自动检查和发布构建均已完成。0.7.3 已在 `codex/text-column-breaks` 提交推送并完成发布准备，基于正式 0.7.2 并保留其功能；尚未推送标签或公开发布，当前最新公开版本仍为 0.7.2。验证范围见[项目状态](docs/STATUS.md)和[实施记录](docs/plans/layout-redesign/34-text-column-breaks.md)。本版保持桌面限定与 V2 格式。
+用户最终确认、中英文 Windows／Obsidian 1.14.4 定向实测、327 项自动检查和发布构建均已完成。0.7.3 已从 `codex/text-column-breaks` 推送标签，基于正式 0.7.2 并保留其功能；GitHub 发布草稿及三份带来源签名的附件已核对，尚未公开发布，当前最新公开版本仍为 0.7.2。验证范围见[项目状态](docs/STATUS.md)和[实施记录](docs/plans/layout-redesign/34-text-column-breaks.md)。本版保持桌面限定与 V2 格式；移动适配留到 Android、iPhone、iPad 验收后作为后续大版本交付。
