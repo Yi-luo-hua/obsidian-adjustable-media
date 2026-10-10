@@ -39,6 +39,7 @@ interface MediaSize {
 const mediaSizes = new Map<string, MediaSize>();
 /** Enough for every image of a long session's notes; the oldest go first. */
 const MAX_MEDIA_SIZES = 500;
+const diagramSizes = new Map<string, MediaSize>();
 const pendingLayouts = new WeakSet<HTMLElement>();
 const failedLayouts = new WeakSet<HTMLElement>();
 
@@ -148,13 +149,13 @@ function renderText(root: HTMLElement, side: TextSide, markdown: string, options
 }
 
 /** Draws Markdown with its numbers into `el`, captions and figures marked; without a component, nothing. */
-function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOptions, rendered?: () => void): boolean {
+function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOptions, rendered?: () => void | Promise<void>): boolean {
   const { component } = options;
   if (!component) {
     return false;
   }
   const task = MarkdownRenderer.render(options.app, numbered(markdown, options.refs), el, options.sourcePath, component)
-    .then(() => { markCaptions(el, markdown); rendered?.(); });
+    .then(() => { markCaptions(el, markdown); return rendered?.(); });
   options.renderTasks?.push(task);
   return true;
 }
@@ -222,16 +223,20 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
   const media = item.embed.kind === "mermaid" ? null : resolveMedia(options.app, item.embed, options.sourcePath);
   if (item.embed.kind === "mermaid") {
     itemEl.addClass("vml-item--mermaid");
-    const diagram = itemEl.createDiv({ cls: "vml-item__media vml-item__diagram markdown-rendered" });
+    const diagram = itemEl.createDiv({ cls: "vml-item__media vml-item__diagram vml-item__diagram--pending markdown-rendered" });
+    const sizeKey = `${options.sourcePath}\n${item.embed.raw}`;
+    const size = diagramSizes.get(sizeKey);
+    const applySize = (size: MediaSize): void => {
+      diagram.setCssProps({ "--vml-diagram-ratio": String(size.width / size.height) });
+      useSize(itemEl, diagram, size, shareByRatio);
+    };
+    if (size) applySize(size);
     // Obsidian's diagram processor requires lowercase; normalize only the rendering copy.
     const markdown = item.embed.raw.replace(/^([ \t]*(?:`{3,}|~{3,}))[ \t]*mermaid[ \t]*/i, "$1mermaid");
-    renderMarkdown(diagram, markdown, options, () => {
-      const box = diagram.querySelector<SVGSVGElement>(".mermaid > svg")?.viewBox.baseVal;
-      if (box && box.width > 0 && box.height > 0) {
-        diagram.setCssProps({ "--vml-diagram-ratio": String(box.width / box.height) });
-        useSize(itemEl, diagram, { width: box.width, height: box.height }, shareByRatio);
-      }
-    });
+    renderMarkdown(diagram, markdown, options, () => waitForDiagram(diagram, options.component!, (size) => {
+      setBounded(diagramSizes, sizeKey, size, MAX_MEDIA_SIZES);
+      applySize(size);
+    }));
   } else if (!media) {
     itemEl.createDiv({ cls: "vml-item__missing", text: t("missingMedia", { target: item.embed.target }) });
   } else {
@@ -267,6 +272,31 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
       captionEl.setText(item.caption);
     }
   }
+}
+
+/** Hidden widgets defer native Mermaid processing until insertion, beyond MarkdownRenderer.render. */
+function waitForDiagram(diagram: HTMLElement, component: Component, sized: (size: MediaSize) => void): Promise<void> {
+  return new Promise((resolve) => {
+    const observer = new (diagram.win as Window & typeof window).MutationObserver(check);
+    let finished = false;
+    function finish(): void {
+      if (finished) return;
+      finished = true;
+      observer.disconnect();
+      resolve();
+    }
+    function check(): void {
+      const box = diagram.querySelector<SVGSVGElement>(".mermaid > svg")?.viewBox.baseVal;
+      const failed = diagram.querySelector("code.language-mermaid")?.textContent?.startsWith("Error parsing Mermaid diagram!");
+      if (box && box.width > 0 && box.height > 0) sized({ width: box.width, height: box.height });
+      else if (!failed) return;
+      diagram.removeClass("vml-item__diagram--pending");
+      finish();
+    }
+    observer.observe(diagram, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["class", "viewBox"] });
+    component.register(finish);
+    check();
+  });
 }
 
 function remember(itemEl: HTMLElement, url: string, width: number, height: number, shareByRatio: boolean): void {

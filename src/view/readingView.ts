@@ -157,7 +157,8 @@ export function registerReadingView(plugin: Plugin): void {
     if (previous) stop(previous);
     const parsed = parse(view, view.getViewData());
     const reader: Reader = { view, file: view.file!, parsed, projection: new ViewProjection(), requested: null,
-      needsRender: false, markedWrapping: null, timer: 0, frame: 0, sections: new Map(), pendingSections: new Map(), stopEnvironment: () => {} };
+      needsRender: parsed.blocks.some(block => block.meta.version === 3) && view.previewMode.containerEl.querySelector(".vml-layout") !== null,
+      markedWrapping: null, timer: 0, frame: 0, sections: new Map(), pendingSections: new Map(), stopEnvironment: () => {} };
     reader.projection.request(parsed.snapshot);
     reader.projection.observeHost(view.getViewData());
     readers.set(view, reader);
@@ -171,12 +172,14 @@ export function registerReadingView(plugin: Plugin): void {
       for (const section of reader.sections.keys()) if (section.contains(media)) { refreshReadingMedia(section, media); break; }
       confirm(reader);
     });
-    const scroll = (): void => confirm(reader);
+    const scroll = (): void => { if (!alive(reader)) stop(reader); else confirm(reader); };
     const mutation = new (view.containerEl.win as Window & typeof window).MutationObserver(scroll);
-    mutation.observe(view.previewMode.containerEl, { childList: true, subtree: true });
+    mutation.observe(view.previewMode.containerEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style"] });
     view.previewMode.containerEl.addEventListener("scroll", scroll, true);
     const stopEnvironment = reader.stopEnvironment;
     reader.stopEnvironment = () => { stopEnvironment(); mutation.disconnect(); view.previewMode.containerEl.removeEventListener("scroll", scroll, true); };
+    // The host may retain an unchanged opening comment, including its previous whole V3 layout.
+    if (reader.needsRender) reader.timer = view.containerEl.win.setTimeout(() => wake(reader), 0);
     return reader;
   };
 

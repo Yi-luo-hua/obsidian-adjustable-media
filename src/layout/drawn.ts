@@ -10,7 +10,7 @@ import { layoutDependencies } from "./documentSnapshot.ts";
 export interface Drawn {
   /** The layout comment lines of the note, and the numbers of its figures, tables and equations. */
   comments: string;
-  /** Every line of each layout with text beside its media, in order; null for one not drawn yet. */
+  /** Every line of layouts drawn in their opening section (text columns or V3 items). */
   texts: Array<string | null>;
   /** Full body dependency while a float's influence has no proven end. */
   dependencies?: string;
@@ -20,7 +20,7 @@ export interface Drawn {
 export function drawnFrom(blocks: readonly V2Block[], numbers = "", lines: readonly string[] = []): Drawn {
   return {
     comments: [...(numbers === "" ? [] : [numbers]), ...blocks.map((block) => `${block.lines[0] ?? ""}\n${block.lines[block.lines.length - 1] ?? ""}`)].join("\n"),
-    texts: blocks.filter(hasSideText).map((block) => block.lines.join("\n")),
+    texts: blocks.filter(block => hasSideText(block) || block.meta.version === 3).map((block) => block.lines.join("\n")),
     dependencies: layoutDependencies(lines, blocks),
   };
 }

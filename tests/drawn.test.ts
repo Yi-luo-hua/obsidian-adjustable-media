@@ -38,6 +38,16 @@ function replace(lines: readonly string[], index: number, line: string): string[
   return lines.map((current, at) => (at === index ? line : current));
 }
 
+test("changing a V3 diagram body invalidates the retained opening-section layout", () => {
+  const lines = ['<!-- vml {"v":3,"kind":"media"} -->', "```mermaid", "flowchart LR", "A-->B", "```", "<!-- /vml -->"];
+  const before = state(lines);
+  const after = state(replace(lines, 3, "A-->C"));
+  assert.equal(before.comments, after.comments);
+  const drawn = recordDrawn(undefined, before, 0);
+  assert.equal(isStale(drawn, after), true);
+  assert.equal(isStale(recordDrawn(drawn, after, 0), after), false);
+});
+
 test("drawn layouts show the comments of every layout and every line of those with text", () => {
   const drawn = state(note);
   assert.equal(drawn.comments, ['<!-- vml {"v":2,"width":0.5} -->', "<!-- /vml -->", "<!-- vml -->", "<!-- /vml -->", "<!-- vml -->", "<!-- /vml -->"].join("\n"));

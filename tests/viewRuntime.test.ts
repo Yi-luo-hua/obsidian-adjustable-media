@@ -93,3 +93,62 @@ test("a rejected Markdown render leaves pending state without claiming a measure
   assert.equal(module.layoutIsRendered(root), false);
   assert.equal(errors.length, 1);
 });
+
+test("Mermaid waits for deferred native drawing, stops on disposal, and exposes completed errors", async () => {
+  const elements: ElementStub[] = [];
+  const observers: ObserverStub[] = [];
+  class ObserverStub {
+    callback: () => void;
+    disconnected = false;
+    constructor(callback: () => void) { this.callback = callback; observers.push(this); }
+    observe(): void {} disconnect(): void { this.disconnected = true; }
+  }
+  class ElementStub {
+    classes: Set<string>;
+    props: Record<string, string> = {};
+    svg: { viewBox: { baseVal: { width: number; height: number } } } | null = null;
+    error: string | null = null;
+    win = { MutationObserver: ObserverStub };
+    constructor(cls = "") { this.classes = new Set(cls.split(" ")); elements.push(this); }
+    createDiv(options?: { cls?: string }) { return new ElementStub(options?.cls); }
+    toggleClass(): void {} addClass(cls: string): void { this.classes.add(cls); }
+    removeClass(cls: string): void { this.classes.delete(cls); }
+    setCssProps(props: Record<string, string>): void { Object.assign(this.props, props); }
+    querySelectorAll() { return []; }
+    querySelector(selector: string) { return selector === ".mermaid > svg" ? this.svg : this.error === null ? null : { textContent: this.error }; }
+  }
+  const module = await mockedModule<{ renderLayout(el: unknown, options: unknown): object; layoutRenderState(root: object): string }>(new URL("../src/view/layoutView.ts", import.meta.url), {
+    obsidian: { MarkdownRenderer: { render: () => Promise.resolve() } }, "../format/v2.ts": format, "../layout/model.ts": model,
+    "../layout/viewProjection.ts": projections, "../markdown/textColumns.ts": textColumns,
+    "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./messages.ts": {},
+  });
+  const create = (name: string) => {
+    const cleanup: Array<() => void> = [];
+    const block = format.findV2Blocks(['<!-- vml {"v":3,"kind":"media"} -->', "```mermaid", `flowchart LR\nA-->${name}`, "```", "<!-- /vml -->"])[0];
+    const root = module.renderLayout(new ElementStub(), { app: {}, sourcePath: "note.md", model: model.modelFromBlock(block), editable: false,
+      warning: null, component: { register: (stop: () => void) => cleanup.push(stop) } });
+    return { root, diagram: [...elements].reverse().find(el => el.classes.has("vml-item__diagram"))!, cleanup };
+  };
+  const rendered = create("B");
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(module.layoutRenderState(rendered.root), "pending");
+  assert.equal(rendered.diagram.classes.has("vml-item__diagram--pending"), true);
+  rendered.diagram.svg = { viewBox: { baseVal: { width: 400, height: 100 } } };
+  observers.at(-1)!.callback();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(module.layoutRenderState(rendered.root), "rendered");
+  assert.equal(rendered.diagram.props["--vml-natural-width"], "400px");
+  assert.equal(rendered.diagram.classes.has("vml-item__diagram--pending"), false);
+  const disposed = create("C");
+  await new Promise(resolve => setImmediate(resolve));
+  disposed.cleanup.forEach(stop => stop());
+  assert.equal(observers.at(-1)!.disconnected, true);
+  assert.equal(disposed.diagram.props["--vml-natural-width"], undefined);
+  const failed = create("D");
+  await new Promise(resolve => setImmediate(resolve));
+  failed.diagram.error = "Error parsing Mermaid diagram!\n\nParse error";
+  observers.at(-1)!.callback();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(module.layoutRenderState(failed.root), "rendered");
+  assert.equal(failed.diagram.classes.has("vml-item__diagram--pending"), false);
+});

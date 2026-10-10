@@ -103,6 +103,22 @@
   aspect-ratio: var(--vml-diagram-ratio, auto);
 }
 
+/* Obsidian inserts a code element before its deferred diagram renderer runs. */
+.vml-item__diagram--pending pre:has(> code.language-mermaid) {
+  visibility: hidden;
+  position: absolute;
+  pointer-events: none;
+}
+
+.vml-row--single .vml-item__diagram--pending {
+  aspect-ratio: var(--vml-diagram-ratio, 2);
+  min-height: 1px;
+}
+
+.vml-row--single .vml-item:not(.vml-item--sized) .vml-item__diagram--pending {
+  width: var(--vml-natural-width, 300px);
+}
+
 .vml-item__diagram > .mermaid {
   width: 100%;
   height: 100%;
