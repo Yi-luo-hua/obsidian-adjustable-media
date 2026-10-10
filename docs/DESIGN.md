@@ -2,7 +2,7 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-实现范围（2026-10-10）：本工作树为 codex/pending-render-stability，包含三视图修复与共用生命周期／播放器保留。公开版本仍为 0.7.2；本分支的修复尚未合入 main 或公开发布。下文保留本分支实际实现及历史宿主说明，主目录 0.7.3、其他待合并分支与 W02／W03 原型的范围见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md) 和 [36](plans/layout-redesign/36-worktree-and-android-priority.md)。
+实现范围（2026-10-10）：本工作树为 codex/pending-render-stability，包含三视图修复与共用生命周期／播放器保留。公开版本为 0.7.3（桌面版，标签源码 da4aea9）；本分支的修复尚未合入 main 或公开发布。下文保留本分支实际实现及历史宿主说明，主目录 0.7.3、其他待合并分支与 W02／W03 原型的范围见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md) 和 [36](plans/layout-redesign/36-worktree-and-android-priority.md)。
 
 ## 1. 存储格式
 
