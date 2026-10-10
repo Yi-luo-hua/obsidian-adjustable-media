@@ -858,6 +858,13 @@ function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
   });
 }
 
+/** Replace size handles with captured dimensions; media/menu listeners retain their shared context. */
+export function refreshSizingHandles(root: HTMLElement, context: LayoutContext): void {
+  for (const handle of Array.from(root.querySelectorAll(".vml-row__height-handle, .vml-item__col-handle, .vml-item__width-handle, .vml-frame__handle"))) handle.remove();
+  for (const row of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) setUpRow(row, Number(row.dataset.row), context);
+  setUpFrame(root, context);
+}
+
 function contentWidth(el: HTMLElement): number {
   const style = getComputedStyle(el);
   return el.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);

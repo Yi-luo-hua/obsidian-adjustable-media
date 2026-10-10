@@ -7,6 +7,8 @@ import * as columns from "../src/markdown/textColumns.ts";
 import { mockedModule } from "./support/mockedModule.ts";
 
 class Element {
+  win = { Event };
+  dispatchEvent(_event: Event): boolean { return true; }
   children: Element[] = [];
   classes = new Set<string>();
   props: Record<string, string> = {};
@@ -30,7 +32,7 @@ test("all views render exact manual segments separately and wait for every colum
   const module = await mockedModule<{ renderLayout(el: unknown, options: unknown): Element; layoutRenderState(el: Element): string }>(new URL("../src/view/layoutView.ts", import.meta.url), {
     obsidian: { MarkdownRenderer: { render: (_app: unknown, text: string, element: Element) => { rendered.push({ text, element }); return new Promise<void>(resolve => finish.push(resolve)); } } },
     "../format/v2.ts": format, "../layout/model.ts": model, "../layout/viewProjection.ts": projection, "../markdown/textColumns.ts": columns,
-    "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./messages.ts": { t: (key: string) => key },
+    "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./mediaControls.ts": {}, "./messages.ts": { t: (key: string) => key },
   });
   const lines = ['<!-- vml {"v":2,"type":"text","cols":4,"gap":1} -->', 'First', '', '+++', '', 'Second ![[a.png|120]]', '<!-- /vml -->'];
   const original = lines.join("\n");

@@ -11,7 +11,7 @@ import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { blockWarning } from "./messages.ts";
 import { sectionNoteText } from "./noteText.ts";
 import { readingSectionsOfView, readingViewOfSection } from "./obsidianInternals.ts";
-import { keepWrapped, keepWrapsBeside, refreshReadingMedia, refreshReadingWrap } from "./readingWrap.ts";
+import { keepWrapped, keepWrapsBeside, refreshReadingMedia, refreshReadingWrap, readingMeasurementsReady, resetReadingMeasurements } from "./readingWrap.ts";
 import { renderPrintLayouts } from "./printView.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
 
@@ -34,6 +34,8 @@ interface Reader {
   file: TFile;
   projection: ViewProjection;
   parsed: Parsed;
+  /** An editor/vault event requested this source; host loading must never override it. */
+  sourceRequested: boolean;
   requested: string | null;
   needsRender: boolean;
   markedWrapping: boolean | null;
@@ -127,8 +129,9 @@ export function registerReadingView(plugin: Plugin): void {
         const media = Array.from(el.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"));
         const ready = media.every(item => item.instanceOf(HTMLImageElement) ? item.complete : item.readyState > 0)
           && Array.from(el.querySelectorAll<HTMLElement>(".vml-layout")).every(layoutIsRendered);
-        if (visible && section?.computed && section.rendered && section.shown !== false && ready) measured.push(record.range);
+        if (visible && section?.computed && section.rendered && section.shown !== false && ready && readingMeasurementsReady(el)) measured.push(record.range);
       }
+      reader.projection.measurementPending(token);
       reader.projection.measured(token, measured);
     });
   };
@@ -156,7 +159,7 @@ export function registerReadingView(plugin: Plugin): void {
     if (previous?.file === view.file) return previous;
     if (previous) stop(previous);
     const parsed = parse(view, view.getViewData());
-    const reader: Reader = { view, file: view.file!, parsed, projection: new ViewProjection(), requested: null,
+    const reader: Reader = { view, file: view.file!, parsed, sourceRequested: false, projection: new ViewProjection(), requested: null,
       needsRender: false, markedWrapping: null, timer: 0, frame: 0, sections: new Map(), pendingSections: new Map(), stopEnvironment: () => {} };
     reader.projection.request(parsed.snapshot);
     reader.projection.observeHost(view.getViewData());
@@ -170,19 +173,24 @@ export function registerReadingView(plugin: Plugin): void {
     }, media => {
       for (const section of reader.sections.keys()) if (section.contains(media)) { refreshReadingMedia(section, media); break; }
       confirm(reader);
-    });
+    }, () => confirm(reader));
     const scroll = (): void => confirm(reader);
     const mutation = new (view.containerEl.win as Window & typeof window).MutationObserver(scroll);
     mutation.observe(view.previewMode.containerEl, { childList: true, subtree: true });
     view.previewMode.containerEl.addEventListener("scroll", scroll, true);
     const stopEnvironment = reader.stopEnvironment;
     reader.stopEnvironment = () => { stopEnvironment(); mutation.disconnect(); view.previewMode.containerEl.removeEventListener("scroll", scroll, true); };
+    // During file-open the view's file can already be new while its buffer/sections are still old.
+    // Reconcile the exact file through the same generation and divergent-buffer checks as disk events.
+    diskChanged(reader.file);
     return reader;
   };
 
   const desire = (reader: Reader, text: string): void => {
+    reader.sourceRequested = true;
     if (text === reader.parsed.snapshot.text && reader.file.path === reader.parsed.snapshot.origin.path) { wake(reader); return; }
     const next = parse(reader.view, text, reader.parsed.snapshot);
+    for (const el of reader.sections.keys()) resetReadingMeasurements(el);
     reader.needsRender ||= isStale(reader.parsed.drawn, next.drawn)
       || reader.parsed.snapshot.origin.path !== next.snapshot.origin.path;
     reader.parsed = next;
@@ -241,6 +249,11 @@ export function registerReadingView(plugin: Plugin): void {
       const text = sectionNoteText(plugin.app, ctx, info, el);
       if (!text.includes("<!-- vml") && !readers.has(view)) return true;
       const reader = getReader(view);
+      if (!reader.sourceRequested && text === view.getViewData()) {
+        // Only this pane's matching section confirms initial data. A requested source from an
+        // editor/vault event must never be replaced by a late host section.
+        desire(reader, text);
+      }
       if (text !== view.getViewData() || text !== reader.parsed.snapshot.text) {
         if (waitingReader?.pendingSections.get(el) === process) waitingReader.pendingSections.delete(el);
         waitingReader = reader;
@@ -300,7 +313,20 @@ export function registerReadingView(plugin: Plugin): void {
   plugin.registerEvent(plugin.app.vault.on("rename", file => { for (const reader of readers.values()) if (reader.file === file) desire(reader, reader.view.getViewData()); }));
   plugin.registerEvent(plugin.app.vault.on("delete", file => { for (const reader of readers.values()) if (reader.file === file) stop(reader); }));
   const layoutChanged = (): void => {
-    for (const reader of readers.values()) { if (!alive(reader)) stop(reader); else wake(reader); }
+    // A MarkdownView is reused for another file. Retire its old reader before testing whether
+    // the new file already has one; the completed file-open may be the host's final event.
+    for (const reader of readers.values()) if (!alive(reader)) stop(reader);
+    // On mobile a mode switch may process sections before the pane reports preview mode.
+    // Once the host announces the completed layout, establish its reader and install those sections.
+    for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
+      const view = leaf.view;
+      if (view instanceof MarkdownView && view.file && view.getMode() === "preview" && !readers.has(view)
+        && view.getViewData().includes("<!-- vml")) {
+        const reader = getReader(view);
+        reader.needsRender = reader.parsed.blocks.some(isDrawable);
+      }
+    }
+    for (const reader of readers.values()) wake(reader);
   };
   plugin.registerEvent(plugin.app.workspace.on("layout-change", layoutChanged));
   plugin.registerEvent(plugin.app.workspace.on("file-open", layoutChanged));

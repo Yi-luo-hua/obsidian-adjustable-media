@@ -10,17 +10,17 @@ import { documentSnapshot, editorDocumentOrigin, rememberDocumentSnapshot, snaps
 import { changesMayAdd } from "../layout/changeScan.ts";
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
-import { modelFromBlock } from "../layout/model.ts";
+import { modelFromBlock, onlySizingDiffers } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
 import { hostParagraphBreaks, paragraphBreaks, type MarkdownSection, type ParagraphBreak } from "../markdown/paragraphBreaks.ts";
 import { ParagraphParser } from "../markdown/paragraphParser.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
-import { attachInteractions, type LayoutContext } from "./interactions.ts";
-import { layoutIsRendered, renderLayout } from "./layoutView.ts";
+import { attachInteractions, refreshSizingHandles, type LayoutContext } from "./interactions.ts";
+import { applySizing, layoutIsRendered, renderLayout } from "./layoutView.ts";
 import { layoutHistory } from "./layoutHistory.ts";
 import { blockWarning, t } from "./messages.ts";
-import { keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
+import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
 import { refreshWrapMedia, resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
 import { fileOfEditor, parseBufferSections } from "./obsidianInternals.ts";
@@ -47,6 +47,7 @@ const highlightField = StateField.define<HighlightState>({
 });
 const highlightRefreshers = new Set<() => void>();
 const widgetHighlighters = new WeakMap<EditorView, (el: HTMLElement) => void>();
+const projectionMeasures = new WeakMap<EditorView, () => void>();
 
 /** Update open panes without rebuilding their widgets or interrupting column composition. */
 export function refreshLayoutHighlights(): void { for (const refresh of highlightRefreshers) refresh(); }
@@ -165,6 +166,10 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
       }),
     ],
   });
+  const standInPlace = (view: EditorView, anchor: WrapAnchor, path: string): string => {
+    const pane = view.state.field(field);
+    return `${path}\n${pane.heights.key(anchor.id ?? anchor.key, 0, `${anchor.numbers}\n${anchor.skip}`, "proxy")}`;
+  };
   return [
     highlightField,
     layoutHistory(),
@@ -220,13 +225,28 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
       environmentEpoch: (state) => state.field(field, false)?.environmentEpoch ?? 0,
       drawStandIn: (el, view, anchor, sourcePath) => {
         drawWidget(el, view, app, anchor.block, sourcePath, currentRefs(view), null, undefined, anchor.from);
+        sizingPlaces.set(el, standInPlace(view, anchor, sourcePath));
+      },
+      drawMeasurement: (el, view, anchor, sourcePath) => {
+        const component = new Component(); component.load(); components.set(el, component);
+        renderLayout(el, { app, sourcePath, model: modelFromBlock(anchor.block), effectiveSkip: anchor.skip,
+          editable: false, warning: null, component, refs: currentRefs(view) });
       },
       keepStandIn: (el, block) => keepWhileEditing(el, block),
+      resizeStandIn: (el, anchor, path) => {
+        const host = widgetHosts.get(el);
+        if (!host || sizingPlaces.get(el) !== standInPlace(host.view, anchor, path) || !updateSizingWidget(el, anchor.block)) return false;
+        host.context.position = () => anchor.from;
+        return true;
+      },
       releaseStandIn: (el) => {
         stopTextEdit(el);
         components.get(el)?.unload();
         components.delete(el);
+        widgetHosts.delete(el);
+        sizingPlaces.delete(el);
       },
+      measurementsChanged: view => projectionMeasures.get(view)?.(),
     }),
     ViewPlugin.define(view => {
       const projection = new ViewProjection();
@@ -243,7 +263,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
       let epoch = -1;
       const measure = (): void => {
         const value = view.state.field(field);
-        if (!value.snapshot) return;
+        if (!value.snapshot) { projection.clear(); return; }
         projection.request(value.snapshot);
         projection.observeHost(view.state.doc.toString());
         if (epoch !== value.environmentEpoch) { epoch = value.environmentEpoch; projection.environmentChanged(); }
@@ -257,22 +277,26 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
             && Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".vml-layout")).every(layoutIsRendered);
           return { coverage, measured: ready && view.contentDOM.clientWidth > 0 && view.contentDOM.doc.fonts.status === "loaded" };
         }, write: result => {
-          if (result && projection.installed(token, result.coverage) && result.measured && wrapMeasurementsReady(view)) projection.measured(token, result.coverage);
+          if (!result || !projection.installed(token, result.coverage)) return;
+          if (result.measured && wrapMeasurementsReady(view)) projection.measured(token, result.coverage);
+          else projection.measurementPending(token);
         } });
       };
+      projectionMeasures.set(view, measure);
       const stop = watchEnvironment(view.contentDOM, spec => {
         const current = view.state.field(field).environmentSpec;
         if (destroyed || spec === current) return;
         // Wrap gaps measured before the first reading belong to this same environment.
         const effects = current === PENDING_ENVIRONMENT ? [setEnvironment.of(spec)] : [setEnvironment.of(spec), resetWrapGaps.of(null)];
         queueMicrotask(() => { if (!destroyed) view.dispatch({ effects }); });
-      }, () => { refreshWrapMedia(view); measure(); });
+      }, () => { refreshWrapMedia(view); measure(); }, () => { refreshWrapMedia(view); measure(); });
       measure();
       parseParagraphs();
       return { update(update) {
-        if (update.startState.field(field).snapshot !== update.state.field(field).snapshot) parseParagraphs();
-        if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure();
-      }, destroy() { destroyed = true; paragraphs.dispose(); stop(); projection.dispose(); } };
+        const sourceChanged = update.startState.field(field).snapshot !== update.state.field(field).snapshot;
+        if (sourceChanged) parseParagraphs();
+        if (sourceChanged || update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure();
+      }, destroy() { destroyed = true; projectionMeasures.delete(view); paragraphs.dispose(); stop(); projection.dispose(); } };
     }),
   ];
 }
@@ -419,6 +443,21 @@ function applyBlankEdges(el: HTMLElement, edges: BlankEdges): void {
 
 /** What each widget element was drawn for, apart from the blank lines around it. */
 const drawnFor = new WeakMap<HTMLElement, string>();
+const sizingPlaces = new WeakMap<HTMLElement, string>();
+const widgetHosts = new WeakMap<HTMLElement, TextEditHost>();
+
+/** Keep media connected and their playback intact when only the layout's sizing changes. */
+function updateSizingWidget(el: HTMLElement, block: V2Block): boolean {
+  const host = widgetHosts.get(el);
+  if (!host || isEditingText(el) || !isEditable(block) || !isEditable(host.context.block)) return false;
+  const next = modelFromBlock(block);
+  if (!onlySizingDiffers(host.context.model, next)) return false;
+  host.context.block = block;
+  host.context.model = next;
+  applySizing(host.root, next);
+  refreshSizingHandles(host.root, host.context);
+  return true;
+}
 
 /**
  * The heights layouts were drawn at, by runtime instance and content revision, for
@@ -511,7 +550,9 @@ class LayoutWidget extends WidgetType {
     }
     markHighlightWidget(el, view, this.block);
     applyBlankEdges(el, this.edges);
+    markHighlightWidget(el, view, this.block);
     drawnFor.set(el, this.drawnKey);
+    sizingPlaces.set(el, `${this.sourcePath}\n${this.placeKey}`);
     return el;
   }
 
@@ -522,6 +563,12 @@ class LayoutWidget extends WidgetType {
     markHighlightWidget(dom, view, this.block);
     if (drawnFor.get(dom) === this.drawnKey) {
       applyBlankEdges(dom, this.edges);
+      return true;
+    }
+    if (!this.sourcePreview && sizingPlaces.get(dom) === `${this.sourcePath}\n${this.placeKey}` && updateSizingWidget(dom, this.block)) {
+      applyBlankEdges(dom, this.edges);
+      drawnFor.set(dom, this.drawnKey);
+      this.watch(dom, view);
       return true;
     }
     if (this.sourcePreview || !keepWhileEditing(dom, this.block)) {
@@ -539,6 +586,8 @@ class LayoutWidget extends WidgetType {
     stopTextEdit(dom);
     components.get(dom)?.unload();
     components.delete(dom);
+    widgetHosts.delete(dom);
+    sizingPlaces.delete(dom);
   }
 
   override ignoreEvent(): boolean {
@@ -615,12 +664,13 @@ function drawWidget(
     view.dispatch({ selection: { anchor: position() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
     view.focus();
   });
+  widgetHosts.set(el, host);
   return host;
 }
 
 /**
- * A click on the text beside a layout's media types it right in the layout (textEditing.ts); in a
- * block the plugin cannot write to, it shows the block's source there instead. Links in the text are
+ * A click on editable text beside a layout's media types it right in the layout (textEditing.ts).
+ * Read-only columns stay selectable; source editing is an explicit menu action. Links in the text are
  * Obsidian's and open as anywhere else, and selecting some of the text to copy it changes nothing.
  */
 function setUpText(view: EditorView, host: TextEditHost): void {

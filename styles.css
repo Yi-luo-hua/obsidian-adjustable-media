@@ -1343,3 +1343,21 @@ body.vml-is-dragging * {
   box-shadow: inset 2px 0 var(--interactive-accent);
   background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.06);
 }
+
+.vml-wrap-measure.cm-content {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  contain: layout;
+  top: 0;
+  left: 0;
+  padding: 0 !important;
+  min-height: 0 !important;
+  width: var(--vml-measure-width);
+  font-family: var(--vml-measure-font);
+  font-size: var(--vml-measure-size);
+  line-height: var(--vml-measure-line);
+  font-weight: var(--vml-measure-weight);
+  letter-spacing: var(--vml-measure-spacing);
+  direction: var(--vml-measure-direction);
+}

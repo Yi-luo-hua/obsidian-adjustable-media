@@ -84,11 +84,24 @@ export class ViewProjection {
     return true;
   }
 
-  dispose(): void {
-    this.disposed = true;
+  measurementPending(token: ProjectionToken): boolean {
+    if (!this.accepts(token)) return false;
+    this.measuredRevision = null;
+    this.measuredCoverage = [];
+    return true;
+  }
+
+  /** The pane still exists, but its current note/mode has no layout projection. */
+  clear(): void {
     this.sequence++;
     this.desired = null;
+    this.hostRevision = this.renderedRevision = this.measuredRevision = null;
     this.coverage = this.measuredCoverage = this.required = [];
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    this.clear();
   }
 }
 
