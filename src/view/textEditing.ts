@@ -442,9 +442,16 @@ function columnOf(host: TextEditHost, side: TextSide): HTMLElement | null {
  * drawn before it, found exactly once in the source. Otherwise at the end.
  */
 function caretInSource(column: HTMLElement, point: Point, source: string): number {
-  // Chromium 128 and later; before that the caret simply goes to the end.
-  const lookup = column.doc as unknown as { caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null };
-  const position = lookup.caretPositionFromPoint?.(point.x, point.y);
+  // Newer browsers expose a caret position; older Android WebViews expose a collapsed range.
+  const lookup = column.doc as unknown as {
+    caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
+    caretRangeFromPoint?: (x: number, y: number) => Range | null;
+  };
+  let position = lookup.caretPositionFromPoint?.(point.x, point.y);
+  if (!position) {
+    const caret = lookup.caretRangeFromPoint?.(point.x, point.y);
+    if (caret) position = { offsetNode: caret.startContainer, offset: caret.startOffset };
+  }
   if (!position || !column.contains(position.offsetNode)) {
     return source.length;
   }
