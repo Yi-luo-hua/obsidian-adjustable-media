@@ -10,6 +10,8 @@ import * as changeScan from "../src/layout/changeScan.ts";
 import * as projections from "../src/layout/viewProjection.ts";
 import * as model from "../src/layout/model.ts";
 import * as crossref from "../src/markdown/crossref.ts";
+import * as paragraphBreaks from "../src/markdown/paragraphBreaks.ts";
+import * as paragraphParser from "../src/markdown/paragraphParser.ts";
 import * as highlight from "../src/layout/cursorHighlight.ts";
 import * as identity from "../src/layout/blockIdentity.ts";
 import { mockedModule } from "./support/mockedModule.ts";
@@ -36,6 +38,7 @@ test("rendered text retains an existing column's focus until click, without inte
     "../layout/cursorHighlight.ts": highlight, "../layout/blockIdentity.ts": identity,
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
+    "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": { setUpBlockMove() {} }, "./crossrefView.ts": { refContextOf: () => undefined },
     "./interactions.ts": { attachInteractions() {} }, "./layoutHistory.ts": { layoutHistory: () => [] },
     "./layoutView.ts": { renderLayout: () => root }, "./messages.ts": { t: (key: string) => key, blockWarning: () => null },

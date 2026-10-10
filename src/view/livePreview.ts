@@ -1,5 +1,5 @@
 import { Component, editorInfoField, editorLivePreviewField, type App } from "obsidian";
-import { Prec, StateEffect, StateField, type ChangeDesc, type EditorState, type Extension, type Range } from "@codemirror/state";
+import { Prec, StateEffect, StateField, type ChangeDesc, type EditorState, type Extension, type Range, type SelectionRange, type Transaction } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
 import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
@@ -12,6 +12,8 @@ import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
+import { hostParagraphBreaks, paragraphBreaks, type MarkdownSection, type ParagraphBreak } from "../markdown/paragraphBreaks.ts";
+import { ParagraphParser } from "../markdown/paragraphParser.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { attachInteractions, type LayoutContext } from "./interactions.ts";
@@ -21,20 +23,17 @@ import { blockWarning, t } from "./messages.ts";
 import { keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
 import { refreshWrapMedia, resetWrapGaps, wrapGuard, wrapMeasurementsReady, type WrapAnchor } from "./wrapGuard.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
-import { fileOfEditor } from "./obsidianInternals.ts";
+import { fileOfEditor, parseBufferSections } from "./obsidianInternals.ts";
 import { eventElement } from "./windows.ts";
 
 /** The pane's environment as viewEnvironment.ts reads it: width, fonts and page classes that change layout. */
 export const setEnvironment = StateEffect.define<string>();
+/** Results are owned by an exact pane snapshot, including its buffer and source revision. */
+export const setParagraphSections = StateEffect.define<{ snapshot: DocumentSnapshot; sections: MarkdownSection[] }>();
 /** The environment of a pane before its first reading (viewEnvironment.ts). */
 const PENDING_ENVIRONMENT = "pending";
 /** How every layout block opens; a note without it has no layouts. */
 const OPENING = "<!-- vml";
-
-const placedCursorField = StateField.define<boolean>({
-  create: () => false,
-  update: (value, tr) => value || tr.isUserEvent("select") || tr.isUserEvent("input"),
-});
 
 interface HighlightState { cursorOnly: boolean; focused: boolean; columnId: string | null }
 export const setLayoutHighlight = StateEffect.define<HighlightState>();
@@ -73,11 +72,14 @@ interface Measurements {
 }
 
 interface LivePreviewState extends Measurements {
+  buffer: object | undefined;
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
   /** Each block's spacer skip, found once per parse: cursor moves redraw decorations, not these. */
   skips: Array<number | null>;
+  /** Lines drawn with reading view's paragraph spacing (paragraphBreaks), found once per parse. */
+  breaks: ParagraphBreak[];
   decorations: DecorationSet;
   /** Wrapped layouts drawn as widgets. */
   anchors: WrapAnchor[];
@@ -85,13 +87,20 @@ interface LivePreviewState extends Measurements {
   hasWraps: boolean;
   /** The note's numbered figures, tables and equations, if it has any labels or references. */
   refs: RefContext | undefined;
+  /**
+   * Whether the user put the cursor where it is: clicked, pressed a key or typed. A note opens with
+   * its cursor at its very start, where it touches a layout written first; that cursor shows no source.
+   */
+  placedCursor: boolean;
 }
 
 interface Parsed extends Measurements {
+  buffer: object | undefined;
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
   skips: Array<number | null>;
+  breaks: ParagraphBreak[];
   refs: RefContext | undefined;
 }
 
@@ -106,12 +115,13 @@ interface Parsed extends Measurements {
  */
 export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolean = () => true): Extension {
   const field = StateField.define<LivePreviewState>({
-    create: (state) => withDecorations(app, state, parse(app, state)),
+    create: (state) => withDecorations(app, state, parse(app, state), false),
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
       const info = tr.state.field(editorInfoField, false);
       const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, value.snapshot?.origin);
-      const originChanged = value.snapshot !== null && (value.snapshot.origin.file !== origin.file || value.snapshot.origin.path !== origin.path);
+      const bufferChanged = value.snapshot !== null && value.buffer !== info?.editor;
+      const originChanged = value.snapshot !== null && (value.snapshot.origin.file !== origin.file || value.snapshot.origin.path !== origin.path || bufferChanged);
       const environment = tr.effects.find(effect => effect.is(setEnvironment));
       let measurements: Measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch, environmentSpec: value.environmentSpec };
       if (environment) {
@@ -130,11 +140,19 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
         rememberDocumentSnapshot(tr.state, null);
         return value;
       }
+      // Another note in the editor opens with a cursor nobody put there; one set by code (Obsidian
+      // restoring where a note was left) was not put by the user either.
+      const placedCursor = originChanged ? false : tr.selection ? userPlaced(tr) : value.placedCursor || (tr.docChanged && userPlaced(tr));
       if (tr.docChanged || modeChanged || originChanged) {
-        return withDecorations(app, tr.state, { ...parse(app, tr.state, value.snapshot, tr.changes), ...measurements });
+        return withDecorations(app, tr.state, { ...parse(app, tr.state, bufferChanged ? null : value.snapshot, tr.changes), ...measurements }, placedCursor);
       }
-      if (tr.selection || environment || tr.effects.some(effect => effect.is(setLayoutHighlight))) {
-        return withDecorations(app, tr.state, { ...value, ...measurements });
+      const paragraphs = tr.effects.find(effect => effect.is(setParagraphSections));
+      if (paragraphs?.is(setParagraphSections) && paragraphs.value.snapshot === value.snapshot) {
+        return withDecorations(app, tr.state, { ...value, ...measurements,
+          breaks: hostParagraphBreaks(value.lines, breakBlocks(value.blocks), paragraphs.value.sections) }, placedCursor);
+      }
+      if (tr.selection || environment || placedCursor !== value.placedCursor || tr.effects.some(effect => effect.is(setLayoutHighlight))) {
+        return withDecorations(app, tr.state, { ...value, ...measurements }, placedCursor);
       }
       rememberDocumentSnapshot(tr.state, value.snapshot);
       return value;
@@ -149,13 +167,12 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
   });
   return [
     highlightField,
-    placedCursorField,
     layoutHistory(),
     Prec.high(field),
     ViewPlugin.define(view => {
       let destroyed = false;
       let queued = false;
-      const paint = (el: HTMLElement, active = highlightedBlocks(view.state, view.state.field(placedCursorField))): void => {
+      const paint = (el: HTMLElement, active = highlightedBlocks(view.state, view.state.field(field).placedCursor)): void => {
         el.toggleClass("vml-cursor-in-block", active.has(el.dataset.vmlBlockId ?? ""));
       };
       widgetHighlighters.set(view, paint);
@@ -175,7 +192,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
           if (current.cursorOnly !== next.cursorOnly || current.focused !== focused || current.columnId !== columnId) {
             view.dispatch({ effects: setLayoutHighlight.of(next) });
           }
-          const active = highlightedBlocks(view.state, view.state.field(placedCursorField));
+          const active = highlightedBlocks(view.state, view.state.field(field).placedCursor);
           for (const el of Array.from(view.dom.querySelectorAll<HTMLElement>("[data-vml-block-id]"))) paint(el, active);
         });
       };
@@ -197,13 +214,31 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
         app.workspace.offref(leafChange);
       } };
     }),
-    wrapGuard(app, {
+    wrapGuard({
       anchors: (state) => state.field(field, false)?.anchors ?? [],
       hasWraps: (state) => state.field(field, false)?.hasWraps ?? false,
       environmentEpoch: (state) => state.field(field, false)?.environmentEpoch ?? 0,
+      drawStandIn: (el, view, anchor, sourcePath) => {
+        drawWidget(el, view, app, anchor.block, sourcePath, currentRefs(view), null, undefined, anchor.from);
+      },
+      keepStandIn: (el, block) => keepWhileEditing(el, block),
+      releaseStandIn: (el) => {
+        stopTextEdit(el);
+        components.get(el)?.unload();
+        components.delete(el);
+      },
     }),
     ViewPlugin.define(view => {
       const projection = new ViewProjection();
+      const paragraphs = new ParagraphParser<DocumentSnapshot, MarkdownSection[] | null>(
+        snapshot => parseBufferSections(app, snapshot.text, snapshot.lines.length),
+        (snapshot, sections) => {
+          if (sections && view.state.field(field).snapshot === snapshot) view.dispatch({ effects: setParagraphSections.of({ snapshot, sections }) });
+        }, view.contentDOM.win);
+      const parseParagraphs = (): void => {
+        const value = view.state.field(field);
+        paragraphs.request(value.blocks.some(isDrawable) ? value.snapshot : null);
+      };
       let destroyed = false;
       let epoch = -1;
       const measure = (): void => {
@@ -233,39 +268,60 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
         queueMicrotask(() => { if (!destroyed) view.dispatch({ effects }); });
       }, () => { refreshWrapMedia(view); measure(); });
       measure();
-      return { update(update) { if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure(); },
-        destroy() { destroyed = true; stop(); projection.dispose(); } };
+      parseParagraphs();
+      return { update(update) {
+        if (update.startState.field(field).snapshot !== update.state.field(field).snapshot) parseParagraphs();
+        if (update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some(tr => tr.effects.some(effect => effect.is(setEnvironment)))) measure();
+      }, destroy() { destroyed = true; paragraphs.dispose(); stop(); projection.dispose(); } };
     }),
   ];
 }
 
 function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
   const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: PENDING_ENVIRONMENT };
+  const buffer = state.field(editorInfoField, false)?.editor;
   if (!state.field(editorLivePreviewField, false)) {
-    return { blocks: [], lines: [], skips: [], refs: undefined, snapshot: null, ...measurements };
+    return { buffer, blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
   }
   // Runs on every change of a note with layouts; one without them is only read in full when a change
   // may have written an opening comment (the field's update).
   const text = state.doc.toString();
   if (!text.includes(OPENING)) {
-    return { blocks: [], lines: [], skips: [], refs: undefined, snapshot: null, ...measurements };
+    return { buffer, blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
   const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, previous?.origin);
   const snapshot = documentSnapshot(text, origin, previous ?? undefined, changes);
   const blocks = snapshot.blocks.map(ref => ref.block);
   const lines = [...snapshot.lines];
-  return { snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks),
+  return { buffer, snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks),
+    breaks: blocks.some(isDrawable)
+      ? paragraphBreaks(lines, breakBlocks(blocks))
+      : [],
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
 }
 
-function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePreviewState {
-  const { blocks, refs, snapshot, skips } = parsed;
+function breakBlocks(blocks: readonly V2Block[]): Array<V2Block & { floats: boolean }> {
+  return blocks.map(block => ({ ...block, floats: isDrawable(block) && blockWrap(block) !== null }));
+}
+
+/** Whether a transaction comes from the user's pointer, keys or typing. */
+function userPlaced(tr: Transaction): boolean {
+  return ["select", "input", "delete", "move", "undo", "redo"].some((event) => tr.isUserEvent(event));
+}
+
+function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCursor: boolean): LivePreviewState {
+  const { blocks, lines, refs, snapshot, skips } = parsed;
+  // The numbering the layouts are drawn with, as their own widgets' keys hold it.
+  const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
   rememberDocumentSnapshot(state, snapshot);
   const ranges: Array<Range<Decoration>> = [];
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
-  const active = state.field(highlightField).cursorOnly ? highlightedBlocks(state, state.field(placedCursorField)) : new Set<string>();
+  const active = state.field(highlightField).cursorOnly ? highlightedBlocks(state, placedCursor) : new Set<string>();
+  // A cursor nobody put at the start of the note touches nothing there.
+  const touches = (range: SelectionRange, from: number, to: number): boolean => range.from <= to && range.to >= from
+    && (placedCursor || !range.empty || range.head > 0);
   let hasWraps = false;
 
   for (const [index, block] of blocks.entries()) {
@@ -274,16 +330,16 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     }
     const from = state.doc.line(block.openLine + 1).from;
     const to = state.doc.line(block.closeLine + 1).to;
-    const revealed = state.selection.ranges.some((range) => range.from <= to && range.to >= from);
+    const revealed = state.selection.ranges.some((range) => touches(range, from, to));
     const wraps = blockWrap(block) !== null;
     const effectiveSkip = skips[index] ?? null;
     const ref = snapshot!.blocks[index];
     const key = `${ref.id}:${ref.contentRevision}`;
     hasWraps ||= wraps;
     if (!revealed) {
-      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed) }).range(from, to));
+      ranges.push(Decoration.replace({ block: true, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed, false, blankEdges(lines, block)) }).range(from, to));
       if (wraps) {
-        anchors.push({ from, to, key, block });
+        anchors.push({ from, to, key, id: ref.id, skip: effectiveSkip ?? 0, numbers, block });
       }
       continue;
     }
@@ -291,7 +347,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     // Keep a text/media layout at its original position while its source opens below it. Replacing
     // the columns with normal Markdown would move the image below all of the left column's text.
     if (hasTextColumns(block)) {
-      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed, true) }).range(from));
+      ranges.push(Decoration.widget({ block: true, side: -1, widget: new LayoutWidget(app, ref, sourcePath, refs, effectiveSkip, parsed, true, { above: blankEdges(lines, block).above, below: false }) }).range(from));
     }
     // The source shows, with the media Obsidian draws in it as thumbnails.
     for (let line = block.openLine; line <= block.closeLine; line += 1) {
@@ -300,12 +356,13 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
     if (wraps) {
       // The layout floats beside its source, so the text around it keeps its wrap.
       ranges.push(Decoration.widget({ widget: new RevealedWrapWidget(app, block, sourcePath, refs, effectiveSkip), side: -1 }).range(from));
-      anchors.push({ from, to: from, key: `${key}:source`, block });
+      anchors.push({ from, to: from, key: `${key}:source`, skip: effectiveSkip ?? 0, numbers, block });
     }
   }
 
   // Blank lines between two floating layouts written one after the other would push the later one a
   // line down: they take no room while the cursor is elsewhere.
+  const floatGaps = new Set<number>();
   for (let index = 1; index < blocks.length; index += 1) {
     const before = blocks[index - 1];
     const after = blocks[index];
@@ -313,19 +370,55 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed): LivePrev
       continue;
     }
     const gap = state.doc.sliceString(state.doc.line(before.closeLine + 1).to, state.doc.line(after.openLine + 1).from);
-    if (gap.trim() !== "" || state.selection.ranges.some((range) => range.from <= state.doc.line(after.closeLine + 1).to && range.to >= state.doc.line(before.openLine + 1).from)) {
+    if (gap.trim() !== "" || state.selection.ranges.some((range) => touches(range, state.doc.line(before.openLine + 1).from, state.doc.line(after.closeLine + 1).to))) {
       continue;
     }
     for (let line = before.closeLine + 1; line < after.openLine; line += 1) {
       ranges.push(Decoration.line({ class: "vml-float-gap" }).range(state.doc.line(line + 1).from));
+      floatGaps.add(line);
     }
   }
 
-  return { ...parsed, decorations: Decoration.set(ranges, true), anchors, hasWraps };
+  // The note's text keeps reading view's paragraph spacing, which is what it lies on there and in the
+  // PDF (paragraphBreaks); a blank line more takes no room while the cursor is elsewhere.
+  for (const { line, kind } of parsed.breaks) {
+    if (floatGaps.has(line) || line >= state.doc.lines) {
+      continue;
+    }
+    const { from, to } = state.doc.line(line + 1);
+    const hidden = kind === "extra" && !state.selection.ranges.some((range) => range.from <= to && range.to >= from);
+    const cls = kind === "after" ? "vml-break-after" : hidden ? "vml-break vml-break--extra" : "vml-break";
+    ranges.push(Decoration.line({ class: cls }).range(from));
+  }
+
+  return { ...parsed, decorations: Decoration.set(ranges, true), anchors, hasWraps, placedCursor };
 }
 
 /** What Obsidian draws for the text beside a layout's media lives as long as the widget's element. */
 const components = new WeakMap<HTMLElement, Component>();
+
+/** Whether a blank line lies right above and right below a block. */
+interface BlankEdges {
+  above: boolean;
+  below: boolean;
+}
+
+function blankEdges(lines: readonly string[], block: V2Block): BlankEdges {
+  return { above: lines[block.openLine - 1]?.trim() === "", below: lines[block.closeLine + 1]?.trim() === "" };
+}
+
+/**
+ * In reading view a layout's margin and the paragraph's beside it collapse into one paragraph break.
+ * In live preview the layout's spacing is padding of its widget (see styles.css), so it leaves out
+ * the side where a blank line already makes that break.
+ */
+function applyBlankEdges(el: HTMLElement, edges: BlankEdges): void {
+  el.toggleClass("vml-live-preview--blank-above", edges.above);
+  el.toggleClass("vml-live-preview--blank-below", edges.below);
+}
+
+/** What each widget element was drawn for, apart from the blank lines around it. */
+const drawnFor = new WeakMap<HTMLElement, string>();
 
 /**
  * The heights layouts were drawn at, by runtime instance and content revision, for
@@ -359,10 +452,12 @@ class LayoutWidget extends WidgetType {
   private readonly ref: BlockRef;
   private readonly heightKey: string;
   private readonly cacheEpoch: number;
+  private readonly edges: BlankEdges;
 
   constructor(app: App, ref: BlockRef, sourcePath: string, refs: RefContext | undefined,
-    effectiveSkip: number | null, measurements: Measurements, sourcePreview = false) {
+    effectiveSkip: number | null, measurements: Measurements, sourcePreview = false, edges: BlankEdges = { above: false, below: false }) {
     super();
+    this.edges = edges;
     const block = ref.block;
     this.app = app;
     this.block = block;
@@ -384,7 +479,12 @@ class LayoutWidget extends WidgetType {
   }
 
   override eq(other: LayoutWidget): boolean {
-    return other.key === this.key && other.block.openLine === this.block.openLine && other.sourcePreview === this.sourcePreview;
+    return other.key === this.key && other.block.openLine === this.block.openLine && other.sourcePreview === this.sourcePreview
+      && other.edges.above === this.edges.above && other.edges.below === this.edges.below;
+  }
+
+  private get drawnKey(): string {
+    return `${this.sourcePreview}\n${this.block.openLine}\n${this.key}`;
   }
 
   // A wrapped layout's widget is a zero-height anchor; the layout floats out of it.
@@ -410,16 +510,25 @@ class LayoutWidget extends WidgetType {
       this.watch(el, view);
     }
     markHighlightWidget(el, view, this.block);
+    applyBlankEdges(el, this.edges);
+    drawnFor.set(el, this.drawnKey);
     return el;
   }
 
   // While one of its text columns is typed in, the layout keeps its element (textEditing.ts), and
-  // its height goes on under the new text.
+  // its height goes on under the new text. A blank line typed or removed beside it changes only its
+  // spacing.
   override updateDOM(dom: HTMLElement, view: EditorView): boolean {
     markHighlightWidget(dom, view, this.block);
+    if (drawnFor.get(dom) === this.drawnKey) {
+      applyBlankEdges(dom, this.edges);
+      return true;
+    }
     if (this.sourcePreview || !keepWhileEditing(dom, this.block)) {
       return false;
     }
+    applyBlankEdges(dom, this.edges);
+    drawnFor.set(dom, this.drawnKey);
     this.watch(dom, view);
     return true;
   }
@@ -446,7 +555,8 @@ class LayoutWidget extends WidgetType {
 
 /**
  * Draws a layout's widget into `el`, in place of what was there. With `side`, that side shows a text
- * column even without text, for its first line to be typed in.
+ * column even without text, for its first line to be typed in. A stand-in for a float whose anchor is
+ * not drawn (wrapGuard.ts) gives where the block starts, `standIn`: its element is elsewhere.
  */
 function drawWidget(
   el: HTMLElement,
@@ -457,6 +567,7 @@ function drawWidget(
   refs: RefContext | undefined,
   effectiveSkip: number | null,
   side?: TextSide,
+  standIn?: number,
 ): TextEditHost {
   components.get(el)?.unload();
   el.empty();
@@ -472,7 +583,9 @@ function drawWidget(
   components.set(el, component);
   const root = renderLayout(el, { app, sourcePath, model, effectiveSkip, editable: isEditable(block), warning: blockWarning(block), component, refs });
   markHighlightWidget(el, view, block);
-  const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor };
+  // Resolved when asked: the block may have moved since the widget was drawn.
+  const position = (): number => standIn ?? view.posAtDOM(el);
+  const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor, position };
   const host: TextEditHost = {
     el,
     root,
@@ -482,7 +595,7 @@ function drawWidget(
     editor: view.state.field(editorInfoField, false)?.editor,
     view,
     // Drawn again from the note as it is now, numbers included.
-    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), effectiveSkip, editing),
+    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), effectiveSkip, editing, standIn),
   };
   if (isEditable(block)) {
     context.editText = (editing) => startTextEdit(host, editing, null);
@@ -498,8 +611,8 @@ function drawWidget(
   const button = buttonHost.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
   button.addEventListener("click", (event) => {
     event.preventDefault();
-    // Resolve the position at click time; the block may have moved since the widget was drawn.
-    view.dispatch({ selection: { anchor: view.posAtDOM(el) } });
+    // A stand-in's block lies above what is drawn.
+    view.dispatch({ selection: { anchor: position() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
     view.focus();
   });
   return host;
@@ -547,10 +660,9 @@ function setUpText(view: EditorView, host: TextEditHost): void {
       }
       const text = side === "left" ? block.leftText : block.rightText;
       if (text) {
-        // Resolved at click time: the block may have moved since the widget was drawn.
         const { doc } = view.state;
-        const open = doc.lineAt(view.posAtDOM(host.el)).number;
-        view.dispatch({ selection: { anchor: doc.line(Math.min(doc.lines, open + text.to - block.openLine)).to } });
+        const open = doc.lineAt(host.context.position?.() ?? view.posAtDOM(host.el)).number;
+        view.dispatch({ selection: { anchor: doc.line(Math.min(doc.lines, open + text.to - block.openLine)).to }, scrollIntoView: host.el.closest(".vml-wrap-proxy") !== null });
         view.focus();
       }
     });

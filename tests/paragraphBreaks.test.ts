@@ -1,0 +1,167 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+import { hostParagraphBreaks, paragraphBreaks, type BreakBlock, type MarkdownSection, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
+
+const lines = (breaks: ParagraphBreak[]): string[] => breaks.map((item) => `${item.line}:${item.kind}`);
+
+// Captured from Obsidian 1.14.4's worker and verified against its reading renderer (W07 probe).
+const hostCases = JSON.parse(readFileSync(new URL("./fixtures/paragraphSections.json", import.meta.url), "utf8")) as
+  Array<{ name: string; lines: string[]; sections: MarkdownSection[]; expected: string[] }>;
+for (const fixture of hostCases) {
+  test(`host paragraph boundaries: ${fixture.name}`, () => {
+    assert.deepEqual(lines(hostParagraphBreaks(fixture.lines, [], fixture.sections)), fixture.expected);
+  });
+}
+
+// Worker sections captured in Obsidian 1.14.4 for the PR #20 spacing regressions.
+const spacingCases = JSON.parse(readFileSync(new URL("./fixtures/paragraphSpacingRegressions.json", import.meta.url), "utf8")) as
+  Array<{ name: string; lines: string[]; sections: MarkdownSection[]; blocks: BreakBlock[]; expected: string[] }>;
+for (const fixture of spacingCases) {
+  test(`host paragraph spacing: ${fixture.name}`, () => {
+    assert.deepEqual(lines(hostParagraphBreaks(fixture.lines, fixture.blocks, fixture.sections)), fixture.expected);
+  });
+}
+
+test("host boundaries leave code/math/comment contents alone and exclude layouts", () => {
+  const text = ["<!-- vml -->", "inside", "", "more", "<!-- /vml -->", "Body", "", "$$", "", "$$", "", "End"];
+  const sections: MarkdownSection[] = [
+    { type: "html", from: 0, to: 0 }, { type: "paragraph", from: 1, to: 1 }, { type: "paragraph", from: 3, to: 3 },
+    { type: "html", from: 4, to: 4 }, { type: "paragraph", from: 5, to: 5 },
+    { type: "math", from: 7, to: 9 }, { type: "paragraph", from: 11, to: 11 },
+  ];
+  assert.deepEqual(lines(hostParagraphBreaks(text, [{ openLine: 0, closeLine: 4, floats: true }], sections)), ["6:blank", "10:blank"]);
+});
+
+test("a floating anchor does not add a paragraph break to code, math or a comment beside it", () => {
+  for (const type of ["code", "math", "html", "comment", "yaml"]) {
+    const text = ["protected", "<!-- vml -->", "inside", "<!-- /vml -->", "Body"];
+    const sections: MarkdownSection[] = [{ type, from: 0, to: 0 }, { type: "html", from: 1, to: 1 },
+      { type: "paragraph", from: 2, to: 2 }, { type: "html", from: 3, to: 3 }, { type: "paragraph", from: 4, to: 4 }];
+    assert.deepEqual(hostParagraphBreaks(text, [{ openLine: 1, closeLine: 3, floats: true }], sections), [], type);
+    assert.deepEqual(hostParagraphBreaks(text, [{ openLine: 1, closeLine: 3, floats: true }],
+      [{ ...sections[0], type: "paragraph" }, ...sections.slice(1, 4), { ...sections[4], type }]), [], type);
+  }
+});
+
+test("blank lines between paragraphs become breaks; more blank lines in a run are extra", () => {
+  assert.deepEqual(lines(paragraphBreaks(["One.", "", "Two.", "", "", "", "Three."], [])),
+    ["1:blank", "3:blank", "4:extra", "5:extra"]);
+});
+
+test("a heading keeps the spacing above it, and a first-level one below it too", () => {
+  const text = ["Text.", "", "## Heading", "", "", "Text.", "", "# Title", "", "Text.", "", "#Tag is text", "", "   ### Indented"];
+  assert.deepEqual(lines(paragraphBreaks(text, [])), ["3:blank", "4:extra", "10:blank"]);
+});
+
+test("a heading followed right away by text gets the break below it", () => {
+  const text = ["## Heading", "Text.", "# Title", "Text.", "### Next", "#### Sub", "- item", "## Last", "<!-- vml -->", "x", "<!-- /vml -->"];
+  assert.deepEqual(lines(paragraphBreaks(text, [{ openLine: 8, closeLine: 10, floats: false }])), ["0:after", "5:after"]);
+});
+
+test("text right above and below a float is parted by a break below the text above", () => {
+  const text = ["Above.", "<!-- vml -->", "![[a.png]]", "<!-- /vml -->", "Below.", "", "<!-- vml -->", "![[b.png]]", "<!-- /vml -->", "Below."];
+  assert.deepEqual(lines(paragraphBreaks(text, [{ openLine: 1, closeLine: 3, floats: true }, { openLine: 6, closeLine: 8, floats: true }])),
+    ["0:after", "5:blank"]);
+  // Not when the layout does not float, nor when a blank line or another layout is beside it.
+  assert.deepEqual(lines(paragraphBreaks(text.slice(0, 5), [{ openLine: 1, closeLine: 3, floats: false }])), []);
+  const stacked = ["Above.", "<!-- vml -->", "![[a.png]]", "<!-- /vml -->", "<!-- vml -->", "![[b.png]]", "<!-- /vml -->", "Below."];
+  assert.deepEqual(lines(paragraphBreaks(stacked, [{ openLine: 1, closeLine: 3, floats: true }, { openLine: 4, closeLine: 6, floats: true }])),
+    []);
+});
+
+test("blank lines in code, math, comments, frontmatter and layouts are left alone", () => {
+  const text = ["---", "a: 1", "", "---", "", "```", "x", "", "```", "", "$$", "", "$$", "",
+    "<!-- vml -->", "Text", "", "More", "<!-- /vml -->", "", "End."];
+  const breaks = paragraphBreaks(text, [{ openLine: 14, closeLine: 18, floats: false }]);
+  assert.deepEqual(breaks.map((item) => item.line), [4, 9, 13, 19]);
+});
+
+test("a list or quote right below another block is parted from it by a break", () => {
+  const text = ["Text:", "- a", "- [ ] task", "  1. nested", "continued", "1. ordered", "2) other", "> quote",
+    "lazy text", "- list", "", "Para", "2. not a list", "1. a list", "", "## Head", "- item"];
+  assert.deepEqual(lines(paragraphBreaks(text, [])), ["0:after", "4:after", "5:after", "6:after", "8:after",
+    "10:blank", "12:after", "15:after"]);
+});
+
+test("blank lines inside an indented code block stay as they are", () => {
+  const text = ["Text.", "", "    code one", "", "", "    code two", "", "After."];
+  assert.deepEqual(lines(paragraphBreaks(text, [])), ["1:blank", "6:blank"]);
+});
+
+test("a list item is nested only when indented as far as the text of the item above", () => {
+  assert.deepEqual(lines(paragraphBreaks(["- a", " * b"], [])), ["0:after"]);
+  assert.deepEqual(lines(paragraphBreaks(["1. a", "  - b"], [])), ["0:after"]);
+  assert.deepEqual(lines(paragraphBreaks(["1. a", "   - b"], [])), []);
+  assert.deepEqual(lines(paragraphBreaks(["- a", "  - b", "- c"], [])), []);
+  assert.deepEqual(lines(paragraphBreaks(["-   a", "    * b"], [])), []);
+});
+
+test("a long list switching kinds on every line takes linear time", () => {
+  const text = Array.from({ length: 20000 }, (_, index) => (index % 2 === 0 ? "- item" : "+ item"));
+  const start = performance.now();
+  const breaks = paragraphBreaks(text, []);
+  assert.equal(breaks.length, 19999);
+  assert.ok(performance.now() - start < 300, `took ${performance.now() - start}ms`);
+});
+
+test("text indented in a list item is text, and code there is indented past the item's text", () => {
+  // Three paragraphs of one item, in a plain list and in a nested one.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "    para a", "", "    para b"], [])), ["1:blank", "3:blank"]);
+  assert.deepEqual(lines(paragraphBreaks(["- a", "  - b", "", "      para a", "", "      para b"], [])), ["2:blank", "4:blank"]);
+  // Code in an item: four columns past where the item's text starts.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "      code one", "", "      code two", "", "After."], [])), ["1:blank", "5:blank"]);
+  // Once the list ends, four columns are code again; right below a paragraph line they are not.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "Text.", "", "    code one", "", "    code two"], [])), ["1:blank", "3:blank"]);
+  assert.deepEqual(lines(paragraphBreaks(["Text.", "    more text", "", "    code"], [])), ["2:blank"]);
+});
+
+
+test("a heading or a rule ends a list, and indented code may start right below one", () => {
+  // The heading ends the list: the code below is code at the margin, its blank lines left alone.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "## Heading", "", "    code one", "", "", "    code two"], [])), ["2:blank"]);
+  // Code right below a heading needs no blank line before it.
+  assert.deepEqual(lines(paragraphBreaks(["## Heading", "    code one", "", "", "    code two", "", "After."], [])), ["0:after", "5:blank"]);
+  // So does a rule, which also ends the list.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "***", "", "    code one", "", "    code two"], [])), ["2:blank"]);
+  // A heading in a list item ends no list; code below it is indented past the item's text.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "  ## In item", "      code one", "", "      code two"], [])), ["1:after"]);
+});
+
+test("indented code may start right below a quote, as Obsidian draws it", () => {
+  assert.deepEqual(lines(paragraphBreaks(["> quote", "    code one", "", "", "    code two", "", "After."], [])), ["5:blank"]);
+  // In a list item too, indented past the item's text; the quote is parted from the item's text.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "  > quote", "      code one", "", "      code two"], [])), ["0:after"]);
+});
+
+test("fenced code at the margin ends a list, and fenced code in an item keeps it", () => {
+  // At the margin: a list, the fence, and indented code at the margin, its blank lines left alone.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "```", "x", "```", "    code one", "", "", "    code two"], [])), []);
+  // In the item: indented code there is indented past the item's text, text only as far is text.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "", "      code one", "", "      code two"], [])),
+    ["1:blank", "5:blank"]);
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "", "    para one", "", "    para two"], [])),
+    ["1:blank", "5:blank", "7:blank"]);
+});
+
+test("a fence right after another one is judged by its own opening line", () => {
+  // The first fence is in the item, the second at the margin ends the list: the indented code after
+  // it is code at the margin, its blank lines left alone.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "```", "y", "```", "    code one", "", "", "    code two"], [])),
+    ["1:blank"]);
+  // Two fences in the item keep it.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "  ```", "  y", "  ```", "    para one", "", "    para two"], [])),
+    ["1:blank", "9:blank"]);
+});
+
+test("math or an HTML comment at the margin stays in the list item; a %% comment ends it, as a fence does", () => {
+  // After a fence in the item: the paragraphs below are the item's text, the blank lines breaks.
+  for (const construct of [["$$", "y", "$$"], ["<!--", "c", "-->"]]) {
+    assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", ...construct, "    para one", "", "", "    para two"], [])),
+      ["1:blank", "9:blank", "10:extra"], construct[0]);
+  }
+  // Obsidian ends the list at a %% comment: the lines below are code at the margin.
+  assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "%%", "c", "%%", "    code one", "", "", "    code two"], [])),
+    ["1:blank"]);
+});

@@ -1,0 +1,638 @@
+[
+  {
+    "name": "mixed bullets",
+    "lines": [
+      "- a",
+      " * b"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "list",
+        "from": 1,
+        "to": 1
+      }
+    ],
+    "expected": [
+      "0:after"
+    ]
+  },
+  {
+    "name": "ordered indent",
+    "lines": [
+      "1. a",
+      "  - b"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "list",
+        "from": 1,
+        "to": 1
+      }
+    ],
+    "expected": [
+      "0:after"
+    ]
+  },
+  {
+    "name": "nested list",
+    "lines": [
+      "1. a",
+      "   - b"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 1
+      }
+    ],
+    "expected": []
+  },
+  {
+    "name": "paragraph list quote",
+    "lines": [
+      "Text:",
+      "- a",
+      "> quote"
+    ],
+    "sections": [
+      {
+        "type": "paragraph",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "list",
+        "from": 1,
+        "to": 2
+      }
+    ],
+    "expected": [
+      "0:after",
+      "1:after"
+    ]
+  },
+  {
+    "name": "lazy quote",
+    "lines": [
+      "> quote",
+      "continued"
+    ],
+    "sections": [
+      {
+        "type": "blockquote",
+        "from": 0,
+        "to": 1
+      }
+    ],
+    "expected": []
+  },
+  {
+    "name": "lazy list",
+    "lines": [
+      "- a",
+      "continued"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 1
+      }
+    ],
+    "expected": []
+  },
+  {
+    "name": "quote then code",
+    "lines": [
+      "> quote",
+      "    code one",
+      "",
+      "",
+      "    code two",
+      "",
+      "After."
+    ],
+    "sections": [
+      {
+        "type": "blockquote",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "code",
+        "from": 1,
+        "to": 4
+      },
+      {
+        "type": "paragraph",
+        "from": 6,
+        "to": 6
+      }
+    ],
+    "expected": [
+      "0:after",
+      "5:blank"
+    ]
+  },
+  {
+    "name": "list paragraphs",
+    "lines": [
+      "- a",
+      "",
+      "    para a",
+      "",
+      "    para b"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 4
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "3:blank"
+    ]
+  },
+  {
+    "name": "list code",
+    "lines": [
+      "- a",
+      "",
+      "      code one",
+      "",
+      "      code two",
+      "",
+      "After."
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 4
+      },
+      {
+        "type": "paragraph",
+        "from": 6,
+        "to": 6
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "5:blank"
+    ]
+  },
+  {
+    "name": "nested paragraphs",
+    "lines": [
+      "- a",
+      "  - b",
+      "",
+      "      para a",
+      "",
+      "      para b"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 5
+      }
+    ],
+    "expected": [
+      "2:blank",
+      "4:blank"
+    ]
+  },
+  {
+    "name": "heading ends list",
+    "lines": [
+      "- a",
+      "## Heading",
+      "",
+      "    code one",
+      "",
+      "",
+      "    code two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "heading",
+        "from": 1,
+        "to": 1
+      },
+      {
+        "type": "code",
+        "from": 3,
+        "to": 6
+      }
+    ],
+    "expected": [
+      "2:blank"
+    ]
+  },
+  {
+    "name": "rule ends list",
+    "lines": [
+      "- a",
+      "***",
+      "",
+      "    code one",
+      "",
+      "    code two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "thematicBreak",
+        "from": 1,
+        "to": 1
+      },
+      {
+        "type": "code",
+        "from": 3,
+        "to": 5
+      }
+    ],
+    "expected": [
+      "0:after",
+      "2:blank"
+    ]
+  },
+  {
+    "name": "heading in list",
+    "lines": [
+      "- a",
+      "  ## In item",
+      "      code one",
+      "",
+      "      code two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 4
+      }
+    ],
+    "expected": [
+      "1:after"
+    ]
+  },
+  {
+    "name": "quote in list",
+    "lines": [
+      "- a",
+      "  > quote",
+      "      code one",
+      "",
+      "      code two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 4
+      }
+    ],
+    "expected": [
+      "0:after",
+      "1:after"
+    ]
+  },
+  {
+    "name": "fence ends list",
+    "lines": [
+      "- a",
+      "```",
+      "x",
+      "```",
+      "    code one",
+      "",
+      "",
+      "    code two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "code",
+        "from": 1,
+        "to": 3
+      },
+      {
+        "type": "code",
+        "from": 4,
+        "to": 7
+      }
+    ],
+    "expected": [
+      "0:after",
+      "3:after"
+    ]
+  },
+  {
+    "name": "fence in list code",
+    "lines": [
+      "- a",
+      "",
+      "  ```",
+      "  x",
+      "  ```",
+      "",
+      "      code one",
+      "",
+      "      code two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 8
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "5:blank"
+    ]
+  },
+  {
+    "name": "fence in list paragraphs",
+    "lines": [
+      "- a",
+      "",
+      "  ```",
+      "  x",
+      "  ```",
+      "",
+      "    para one",
+      "",
+      "    para two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 8
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "5:blank",
+      "7:blank"
+    ]
+  },
+  {
+    "name": "second fence ends list",
+    "lines": [
+      "- a",
+      "",
+      "  ```",
+      "  x",
+      "  ```",
+      "```",
+      "y",
+      "```",
+      "    code one",
+      "",
+      "",
+      "    code two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 4
+      },
+      {
+        "type": "code",
+        "from": 5,
+        "to": 7
+      },
+      {
+        "type": "code",
+        "from": 8,
+        "to": 11
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "4:after",
+      "7:after"
+    ]
+  },
+  {
+    "name": "two item fences",
+    "lines": [
+      "- a",
+      "",
+      "  ```",
+      "  x",
+      "  ```",
+      "  ```",
+      "  y",
+      "  ```",
+      "    para one",
+      "",
+      "    para two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 10
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "9:blank"
+    ]
+  },
+  {
+    "name": "math stays in list",
+    "lines": [
+      "- a",
+      "",
+      "  ```",
+      "  x",
+      "  ```",
+      "$$",
+      "y",
+      "$$",
+      "    para one",
+      "",
+      "",
+      "    para two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 11
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "9:blank",
+      "10:extra"
+    ]
+  },
+  {
+    "name": "html stays in list",
+    "lines": [
+      "- a",
+      "",
+      "  ```",
+      "  x",
+      "  ```",
+      "<!--",
+      "c",
+      "-->",
+      "    para one",
+      "",
+      "",
+      "    para two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 11
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "9:blank",
+      "10:extra"
+    ]
+  },
+  {
+    "name": "percent ends list",
+    "lines": [
+      "- a",
+      "",
+      "  ```",
+      "  x",
+      "  ```",
+      "%%",
+      "c",
+      "%%",
+      "    code one",
+      "",
+      "",
+      "    code two"
+    ],
+    "sections": [
+      {
+        "type": "list",
+        "from": 0,
+        "to": 4
+      },
+      {
+        "type": "comment",
+        "from": 5,
+        "to": 7
+      },
+      {
+        "type": "code",
+        "from": 8,
+        "to": 11
+      }
+    ],
+    "expected": [
+      "1:blank"
+    ]
+  },
+  {
+    "name": "headings",
+    "lines": [
+      "## Heading",
+      "Text.",
+      "# Title",
+      "Text."
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "paragraph",
+        "from": 1,
+        "to": 1
+      },
+      {
+        "type": "heading",
+        "from": 2,
+        "to": 2
+      },
+      {
+        "type": "paragraph",
+        "from": 3,
+        "to": 3
+      }
+    ],
+    "expected": [
+      "0:after"
+    ]
+  },
+  {
+    "name": "indented code",
+    "lines": [
+      "Text.",
+      "",
+      "    code one",
+      "",
+      "",
+      "    code two",
+      "",
+      "After."
+    ],
+    "sections": [
+      {
+        "type": "paragraph",
+        "from": 0,
+        "to": 0
+      },
+      {
+        "type": "code",
+        "from": 2,
+        "to": 5
+      },
+      {
+        "type": "paragraph",
+        "from": 7,
+        "to": 7
+      }
+    ],
+    "expected": [
+      "1:blank",
+      "6:blank"
+    ]
+  }
+]

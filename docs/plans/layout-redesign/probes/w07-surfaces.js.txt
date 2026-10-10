@@ -1,0 +1,75 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs'), crypto = require('crypto'), remote = require('@electron/remote');
+  const base = app.vault.adapter.getBasePath();
+  const root = 'E:/TOOLS/obsidian-adjustable-media/docs/plans/layout-redesign/probes/';
+  const phase = window.__w07Phase;
+  const evidence = window.__w07EvidencePrefix || 'w07';
+  if (!['baseline','current'].includes(phase)) throw new Error('Set phase');
+  const hash = data => crypto.createHash('sha256').update(data).digest('hex');
+  const notes = Object.fromEntries(app.vault.getMarkdownFiles().map(f => [f.path, hash(fs.readFileSync(base + '/' + f.path))]));
+  const previous = app.workspace.activeLeaf;
+  const win = remote.getCurrentWindow();
+  const windowBounds = win.getBounds();
+  win.setBounds(remote.screen.getDisplayMatching(windowBounds).workArea);
+  const leaf = app.workspace.getLeaf(true);
+  const style = document.createElement('style');
+  style.textContent = '.w07-surface{--file-line-width:678px;--font-text:Microsoft YaHei UI;--font-print:Microsoft YaHei UI}.w07-surface .cm-sizer,.w07-surface .markdown-preview-sizer{width:678px!important;max-width:678px!important;margin-inline:auto!important}.w07-surface .cm-sizer{padding-inline:0!important;box-sizing:border-box!important}';
+  document.head.appendChild(style);
+  style.textContent += '.w07-surface .cm-content{width:678px!important;min-width:678px!important;max-width:678px!important;margin-inline:0!important;padding-inline:0!important;box-sizing:border-box!important}';
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const result = { phase, buildHash: hash(fs.readFileSync(base + '/.obsidian/plugins/adjustable-media/main.js')), surfaces: [] };
+  try {
+    for (const path of ['wrap-test.md','wrap-multi.md','text-test.md','text-block-test.md']) {
+      for (const mode of ['preview','source']) {
+        await leaf.setViewState({ type: 'markdown', state: { file: path, mode } });
+        app.workspace.setActiveLeaf(leaf, { focus: false });
+        leaf.view.containerEl.classList.add('w07-surface');
+        if (mode === 'source') leaf.view.editor.setCursor({ line: 0, ch: 0 });
+        await wait(600);
+        const cm = mode === 'source' ? leaf.view.editor.cm : null;
+        const scroll = cm ? cm.scrollDOM : leaf.view.containerEl.querySelector('.markdown-preview-view');
+        const layouts = new Map();
+        const breaks = new Map();
+        const textLines = new Map();
+        // CodeMirror replaces estimated widget heights as the scan reaches them. Keep following
+        // the measured end instead of stopping at the note's initial estimated scroll height.
+        for (let top = 0; top <= scroll.scrollHeight - scroll.clientHeight + 300; top += 300) {
+          scroll.scrollTop = Math.min(top, scroll.scrollHeight - scroll.clientHeight);
+          await wait(90);
+          const sizer = leaf.view.containerEl.querySelector(cm ? '.cm-sizer' : '.markdown-preview-sizer');
+          const sizerRect = sizer.getBoundingClientRect();
+          for (const el of leaf.view.containerEl.querySelectorAll('.vml-layout')) {
+            const rect = el.getBoundingClientRect();
+            if (!rect.width || el.closest('.vml-wrap-proxy,.vml-rv-proxy')) continue;
+            const line = cm ? cm.state.doc.lineAt(cm.posAtDOM(el)).number - 1 : leaf.view.previewMode.renderer.sections.find(s => s.el.contains(el)).start.line;
+            const key = line + ':' + el.textContent.slice(0, 100);
+            layouts.set(key, { key, x: rect.x - sizerRect.x, y: rect.y - sizerRect.y, width: rect.width, height: rect.height });
+          }
+          if (cm) {
+            for (const el of cm.contentDOM.querySelectorAll('.cm-line')) {
+              const line = cm.state.doc.lineAt(cm.posAtDOM(el)).number;
+              const rect = el.getBoundingClientRect();
+              textLines.set(line, { line, text: el.textContent.slice(0, 100), x: rect.x - sizerRect.x, height: rect.height });
+              if (el.classList.contains('vml-break') || el.classList.contains('vml-break-after')) breaks.set(line, el.className.match(/vml-break[^ ]*/g));
+            }
+          }
+        }
+        scroll.scrollTop = Math.max(0, Math.min(...[...layouts.values()].map(l => l.y)) - 80);
+        await wait(150);
+        await remote.getCurrentWebContents().capturePage();
+        const picture = await remote.getCurrentWebContents().capturePage();
+        fs.writeFileSync(root + evidence + '-678-' + phase + '-' + path.replace('.md','') + '-' + mode + '.png', picture.toPNG());
+        result.surfaces.push({ path, mode, width: leaf.view.containerEl.querySelector(cm ? '.cm-content' : '.markdown-preview-sizer').getBoundingClientRect().width,
+          layouts: [...layouts.values()], breaks: [...breaks], textLines: [...textLines.values()] });
+      }
+    }
+  } finally {
+    style.remove(); leaf.detach();
+    win.setBounds(windowBounds);
+    if (previous) app.workspace.setActiveLeaf(previous, { focus: false });
+    result.notesUnchanged = Object.entries(notes).every(([path, before]) => hash(fs.readFileSync(base + '/' + path)) === before);
+    fs.writeFileSync(root + evidence + '-678-' + phase + '-surfaces.json', JSON.stringify(result, null, 2));
+    window.__w07Surfaces = { phase, count: result.surfaces.length, notesUnchanged: result.notesUnchanged };
+  }
+})().catch(error => { window.__w07Surfaces = { error: String(error), stack: error.stack }; console.error(error); });

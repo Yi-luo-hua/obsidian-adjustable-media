@@ -1,0 +1,78 @@
+(async () => {
+  if (app.vault.getName() !== 'vml-test-vault') throw new Error('Test vault required');
+  const fs = require('fs'), crypto = require('crypto');
+  const root = 'E:/TOOLS/obsidian-adjustable-media/', base = app.vault.adapter.getBasePath();
+  const hash = data => crypto.createHash('sha256').update(data).digest('hex');
+  const before = Object.fromEntries(app.vault.getMarkdownFiles().map(f => [f.path, hash(fs.readFileSync(base + '/' + f.path))]));
+  const prefix = '<!-- vml {"v":2,"type":"text"} -->\nProbe\n<!-- /vml -->\n\n';
+  const path = 'W07 geometry transient.md';
+  if (app.vault.getAbstractFileByPath(path)) throw new Error('Probe file exists');
+  const file = await app.vault.create(path,prefix), previous = app.workspace.activeLeaf;
+  const source = app.workspace.getLeaf(true);
+  let reading;
+  const wait = ms => new Promise(resolve => setTimeout(resolve,ms));
+  const style = document.createElement('style');
+  style.textContent = '.w07-geometry{--font-text:Microsoft YaHei UI;--file-line-width:678px}.w07-geometry .cm-sizer,.w07-geometry .markdown-preview-sizer{width:678px!important;max-width:678px!important;margin-inline:auto!important}.w07-geometry .cm-sizer{padding-inline:0!important;box-sizing:border-box!important}';
+  document.head.appendChild(style);
+  style.textContent += '.w07-geometry .cm-content{width:678px!important;min-width:678px!important;max-width:678px!important;margin-inline:0!important;padding-inline:0!important;box-sizing:border-box!important}';
+  const textTop = (container, text) => {
+    const walker = document.createTreeWalker(container,NodeFilter.SHOW_TEXT);
+    for (let node; (node=walker.nextNode());) {
+      if (node.parentElement.closest('.mod-ui,.vml-layout,.copy-code-button')) continue;
+      const index = node.textContent.indexOf(text);
+      if (index < 0) continue;
+      const range = document.createRange(); range.setStart(node,index); range.setEnd(node,index + text.length);
+      const rect = range.getBoundingClientRect();
+      if (rect.width && rect.height) return { top: rect.top, height: rect.height };
+    }
+    return null;
+  };
+  const result = { buildHash: hash(fs.readFileSync(base + '/.obsidian/plugins/adjustable-media/main.js')), cases: [] };
+  try {
+    await source.setViewState({type:'markdown',state:{file:path,mode:'source'}});
+    reading = app.workspace.getLeaf(true);
+    if (reading === source) throw new Error('Separate initialized leaves required');
+    await reading.setViewState({type:'markdown',state:{file:path,mode:'preview'}});
+    source.view.containerEl.classList.add('w07-geometry'); reading.view.containerEl.classList.add('w07-geometry');
+    const fixtures = JSON.parse(fs.readFileSync(root+'tests/fixtures/paragraphSections.json','utf8'));
+    for (const fixture of fixtures) {
+      const lines = fixture.lines.map(line => line.replace(/\ba\b/g,'alpha').replace(/\bb\b/g,'beta'));
+      const text = prefix+lines.join('\n')+'\n\nW07 END SENTINEL';
+      await app.vault.process(file,()=>text);
+      // Reopen each owned leaf so both read the exact fixture, without waiting for saved indexing.
+      await source.setViewState({type:'markdown',state:{file:path,mode:'source'}});
+      await reading.setViewState({type:'markdown',state:{file:path,mode:'preview'}});
+      source.view.editor.setValue(text); source.view.editor.setCursor({line:0,ch:0});
+      for (let n=0;n<50 && reading.view.previewMode.renderer.text!==text;n++) await wait(20);
+      const row = { name: fixture.name, lines, positions: [] };
+      for (const [leaf,mode] of [[reading,'reading'],[source,'source']]) {
+        app.workspace.setActiveLeaf(leaf,{focus:false}); await wait(220);
+        const container = leaf.view.containerEl.querySelector(mode==='source'?'.cm-content':'.markdown-preview-sizer');
+        row[mode+'Width']=container.getBoundingClientRect().width;
+        const tokens = [...new Set(lines.map(line=>line.trim().replace(/^(?:[-*+]\s+|\d+[.)]\s+|>\s*|#{1,6}\s+)/,'')))]
+          .filter(token=>token && !['```','$$','<!--','-->','%%','***'].includes(token));
+        const positions = tokens.map(token=>({token, ...textTop(container,token)}));
+        const first = positions.find(p=>typeof p.top==='number')?.top;
+        row[mode] = positions.map(p=>({...p, y: typeof p.top==='number'?p.top-first:null}));
+        row[mode+'End'] = textTop(container,'W07 END SENTINEL')?.top-first;
+        const elements = mode==='source' ? [...container.querySelectorAll('.cm-line')] : [...container.querySelectorAll('p,li,pre,blockquote,h1,h2,h3,hr')];
+        row[mode+'Metrics'] = elements.filter(el=>!el.closest('.mod-ui,.vml-layout')).map(el=>{
+          const css=getComputedStyle(el);
+          return {text:el.textContent.slice(0,80),tag:el.tagName,classes:el.className,height:el.getBoundingClientRect().height,
+            paddingTop:css.paddingTop,paddingBottom:css.paddingBottom,marginTop:css.marginTop,marginBottom:css.marginBottom,
+            lineHeight:css.lineHeight,fontSize:css.fontSize,listSpacing:css.getPropertyValue('--list-spacing')};
+        });
+      }
+      row.deltas = row.source.filter(p=>p.y!==null).map(p=>({token:p.token,delta:p.y-(row.reading.find(q=>q.token===p.token)?.y??NaN)}));
+      result.cases.push(row);
+    }
+  } finally {
+    source.detach();reading?.detach();style.remove();await wait(500);
+    await app.vault.process(file,()=>prefix);
+    result.probeRestored=hash(fs.readFileSync(base+'/'+path))===hash(prefix);
+    await app.vault.trash(file,true);if(previous)app.workspace.setActiveLeaf(previous,{focus:false});
+    result.notesUnchanged=Object.entries(before).every(([p,h])=>hash(fs.readFileSync(base+'/'+p))===h);
+    fs.writeFileSync(root+'docs/plans/layout-redesign/probes/'+(window.__w07EvidencePrefix || 'w07-final')+'-geometry-metrics.json',JSON.stringify(result,null,2));
+    window.__w07Geometry={cases:result.cases.length,notesUnchanged:result.notesUnchanged};
+  }
+})().catch(error=>{window.__w07Geometry={error:String(error),stack:error.stack};console.error(error)});

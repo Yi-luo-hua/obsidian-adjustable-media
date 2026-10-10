@@ -280,9 +280,43 @@
  * CodeMirror measures a widget by its box and ignores margins, so a layout's spacing is padding of
  * its widget. As a margin it could reach out of a widget whose painting is not contained
  * (see .vml-has-wraps below), and every line after it would be placed too high.
+ *
+ * In reading view the layout's margin collapses with the paragraph's beside it into one paragraph
+ * break. So does the widget's padding here: a paragraph break against text, none on a side where a
+ * blank line (.vml-break) already makes it.
  */
 .vml-live-preview:not(.vml-live-preview--wrap) {
-  padding: 0.75em 0;
+  padding: var(--p-spacing, 1rem) 0;
+}
+
+.vml-live-preview.vml-live-preview--blank-above:not(.vml-live-preview--wrap) {
+  padding-top: 0;
+}
+
+.vml-live-preview.vml-live-preview--blank-below:not(.vml-live-preview--wrap) {
+  padding-bottom: 0;
+}
+
+/*
+ * In a note with layouts the text keeps reading view's paragraph spacing (paragraphBreaks.ts), so it,
+ * and what of it sits beside a float, lies where reading view and the PDF put it. A blank line is as
+ * high as the break; a blank line more takes no room while the cursor is elsewhere: reading view
+ * makes one break of them all.
+ */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break {
+  line-height: var(--p-spacing, 1rem);
+}
+
+/* A line that reading view parts from the next block by a paragraph break, where no blank line does. */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break-after {
+  padding-bottom: var(--p-spacing, 1rem);
+}
+
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break--extra {
+  height: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+  padding-top: 0;
 }
 
 .vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout {
@@ -839,10 +873,12 @@ body.vml-is-dragging * {
 }
 
 /*
- * Live preview. A wrapped layout's widget is a zero-height anchor the layout floats out of. Obsidian
- * contains the painting of every block widget, which would keep the float inside.
+ * Live preview. A wrapped layout's widget is a zero-height anchor the layout floats out of, and so is
+ * the widget holding stand-ins for floats whose anchors are not drawn. Obsidian contains the painting
+ * of every block widget, which would keep the float inside.
  */
-.markdown-source-view.mod-cm6 .cm-content > .vml-live-preview--wrap[contenteditable="false"] {
+.markdown-source-view.mod-cm6 .cm-content > .vml-live-preview--wrap[contenteditable="false"],
+.markdown-source-view.mod-cm6 .cm-content > .vml-wrap-proxy[contenteditable="false"] {
   contain: none !important;
 }
 
@@ -894,10 +930,25 @@ body.vml-is-dragging * {
     break-inside: auto;
   }
 
-  /* Screen tables can scroll horizontally; every column must fit on paper. */
+  /*
+   * A float that does not fit on the page moves to the next one with the text it is anchored to
+   * (keepFloatsWithAnchors): alone, it would leave that text behind at full width.
+   */
+  .vml-print-float {
+    break-inside: avoid;
+  }
+
+  .vml-print-keep-with-next {
+    break-after: avoid;
+  }
+
+  /*
+   * Screen tables can scroll horizontally; on paper every column must fit. Cells break anywhere, so a
+   * table shrinks to the room it has, beside a float too, as in reading view: at full width it would
+   * drop below the float.
+   */
   .vml-print-content table {
-    width: 100%;
-    table-layout: fixed;
+    max-width: 100%;
   }
 
   .vml-print-content :is(th, td) {
@@ -908,7 +959,6 @@ body.vml-is-dragging * {
 
   .vml-print-content table:has(tr > :nth-child(9)) {
     font-size: 0.75em;
-    table-layout: auto;
   }
 
   .vml-print-content table:has(tr > :nth-child(9)) :is(th, td) {
@@ -950,6 +1000,25 @@ body.vml-is-dragging * {
 /* A spacer in front of an element pushed below a float, so CodeMirror measures the push. */
 .vml-wrap-gap {
   height: var(--vml-gap-height, 0);
+}
+
+/*
+ * Live preview: a stand-in for a float whose anchor lies above the part of the note the editor has
+ * drawn is the layout itself, with its own top margin. One that starts above the first drawn line is
+ * pulled up over it and cut off there; its handles and glow still reach out on the other sides. Only
+ * then: the grip sits across the top edge, and a cut there would take off its upper half.
+ */
+.vml-wrap-proxy__live > .vml-layout {
+  margin-top: var(--vml-proxy-margin-top, 0px);
+}
+
+.vml-wrap-proxy--cut > .vml-wrap-proxy__live > .vml-layout {
+  clip-path: polygon(
+    -100px var(--vml-proxy-shift, 0px),
+    calc(100% + 100px) var(--vml-proxy-shift, 0px),
+    calc(100% + 100px) calc(100% + 100px),
+    -100px calc(100% + 100px)
+  );
 }
 
 /* Stand-in for a float whose anchor lies above the part of the note the editor has drawn. */

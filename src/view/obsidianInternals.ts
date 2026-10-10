@@ -1,4 +1,19 @@
 import { MarkdownView, type App, type Editor, type Hotkey, type TFile } from "obsidian";
+import { metadataSections, type MarkdownSection } from "../markdown/paragraphBreaks.ts";
+
+/** Parse this exact buffer, never the metadata cache of a possibly different saved version. */
+export async function parseBufferSections(app: App, text: string, lineCount: number): Promise<MarkdownSection[] | null> {
+  const cache = app.metadataCache as unknown as { computeMetadataAsync?: (buffer: ArrayBuffer) => Promise<unknown> };
+  if (typeof cache.computeMetadataAsync !== "function") return null;
+  try {
+    // Obsidian transfers this buffer to its worker; allocate a new one for every request.
+    const encoded = new TextEncoder().encode(text);
+    const metadata = await cache.computeMetadataAsync(encoded.buffer);
+    return metadataSections(metadata, lineCount);
+  } catch {
+    return null;
+  }
+}
 
 /**
  * What the plugin reads of Obsidian through interfaces its API does not document, each with a

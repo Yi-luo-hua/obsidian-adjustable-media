@@ -1,0 +1,313 @@
+{
+  "date": "2026-10-08",
+  "version": "1.14.4",
+  "installerVersion": "1.13.7",
+  "vault": "vml-test-vault",
+  "baselineBuildHash": "be6f2a2265eec5250c2ef87f3fa7fff9d45b6d849499d4b0a857c93852ca486b",
+  "fixedBuildHash": "50095b0cb93e1dd0d9cab32af53888fd46e5bb4fd353385e7a4ae950321b10b3",
+  "fixedBuildMatchesRepo": true,
+  "fixtureRestored": true,
+  "originalNotesUnchanged": true,
+  "testVaultPluginRestored": true,
+  "cases": [
+    {
+      "name": "setext h1",
+      "expected": [],
+      "before": [
+        "1:after"
+      ],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "setext h1 blank",
+      "expected": [],
+      "before": [
+        "2:blank"
+      ],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "setext h2",
+      "expected": [
+        "1:after"
+      ],
+      "before": [
+        "1:after"
+      ],
+      "after": [
+        "1:after"
+      ],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "before setext",
+      "expected": [],
+      "before": [
+        "0:after",
+        "2:after"
+      ],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "before setext blank",
+      "expected": [],
+      "before": [
+        "1:blank",
+        "3:after"
+      ],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "multiline h1",
+      "expected": [],
+      "before": [],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "indented setext",
+      "expected": [],
+      "before": [],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "definition after h2",
+      "expected": [
+        "0:after"
+      ],
+      "before": [
+        "0:after",
+        "1:after"
+      ],
+      "after": [
+        "0:after"
+      ],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "definitions after h2",
+      "expected": [
+        "0:after"
+      ],
+      "before": [
+        "0:after",
+        "1:after",
+        "2:after"
+      ],
+      "after": [
+        "0:after"
+      ],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "definition before heading",
+      "expected": [
+        "2:after"
+      ],
+      "before": [
+        "2:after"
+      ],
+      "after": [
+        "2:after"
+      ],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "definition then body",
+      "expected": [],
+      "before": [
+        "0:after"
+      ],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "definition after h1",
+      "expected": [],
+      "before": [
+        "1:after"
+      ],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "multiline definition",
+      "expected": [
+        "0:after"
+      ],
+      "before": [
+        "0:after",
+        "2:after"
+      ],
+      "after": [
+        "0:after"
+      ],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "definition above float",
+      "expected": [],
+      "before": [
+        "0:after"
+      ],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    },
+    {
+      "name": "definition below float",
+      "expected": [],
+      "before": [
+        "0:after"
+      ],
+      "after": [],
+      "passed": true,
+      "readingTextMatches": true,
+      "visible": true
+    }
+  ],
+  "measurements": [
+    {
+      "name": "setext h1",
+      "before": [
+        {
+          "line": 0,
+          "text": "Title",
+          "kind": null,
+          "top": 263.3072814941406,
+          "height": 48.168399810791016,
+          "paddingBottom": "0px"
+        },
+        {
+          "line": 1,
+          "text": "===",
+          "kind": "after",
+          "top": 311.4756774902344,
+          "height": 39.99131774902344,
+          "paddingBottom": "16px"
+        },
+        {
+          "line": 2,
+          "text": "Text",
+          "kind": null,
+          "top": 351.46697998046875,
+          "height": 23.993053436279297,
+          "paddingBottom": "0px"
+        }
+      ],
+      "after": [
+        {
+          "line": 0,
+          "text": "Title",
+          "kind": null,
+          "top": 271.30206298828125,
+          "height": 48.168399810791016,
+          "paddingBottom": "0px"
+        },
+        {
+          "line": 1,
+          "text": "===",
+          "kind": null,
+          "top": 319.470458984375,
+          "height": 23.993053436279297,
+          "paddingBottom": "0px"
+        },
+        {
+          "line": 2,
+          "text": "Text",
+          "kind": null,
+          "top": 343.4635314941406,
+          "height": 23.993053436279297,
+          "paddingBottom": "0px"
+        }
+      ]
+    },
+    {
+      "name": "definition after h2",
+      "before": [
+        {
+          "line": 0,
+          "text": "H",
+          "kind": "after",
+          "top": 271.30206298828125,
+          "height": 61.1805534362793,
+          "paddingBottom": "16px"
+        },
+        {
+          "line": 1,
+          "text": "ref https://example.com",
+          "kind": "after",
+          "top": 332.48260498046875,
+          "height": 36.996524810791016,
+          "paddingBottom": "16px"
+        },
+        {
+          "line": 2,
+          "text": "Text",
+          "kind": null,
+          "top": 369.4791564941406,
+          "height": 23.993053436279297,
+          "paddingBottom": "0px"
+        }
+      ],
+      "after": [
+        {
+          "line": 0,
+          "text": "H",
+          "kind": "after",
+          "top": 271.30206298828125,
+          "height": 61.1805534362793,
+          "paddingBottom": "16px"
+        },
+        {
+          "line": 1,
+          "text": "ref https://example.com",
+          "kind": null,
+          "top": 332.48260498046875,
+          "height": 20.998262405395508,
+          "paddingBottom": "0px"
+        },
+        {
+          "line": 2,
+          "text": "Text",
+          "kind": null,
+          "top": 353.48089599609375,
+          "height": 23.993053436279297,
+          "paddingBottom": "0px"
+        }
+      ]
+    }
+  ]
+}

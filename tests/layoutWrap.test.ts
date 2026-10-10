@@ -15,8 +15,8 @@ import {
   setWrap,
   type LayoutModel,
 } from "../src/layout/model.ts";
-import { blockForMove, blockGaps, isSamePlace, orderAdjacentFloat, pickGap, planPlacement } from "../src/layout/placement.ts";
-import { planGaps, planProxy, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
+import { blockForMove, blockGaps, moveGaps, isSamePlace, orderAdjacentFloat, pickGap, placeAboveEarlierFloats, planPlacement } from "../src/layout/placement.ts";
+import { carryFloat, liveProxy, mapPlaced, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize } from "../src/layout/wrapGaps.ts";
 import { MemoryEditor } from "./support/memoryEditor.ts";
 
 function block(lines: readonly string[], index = 0): V2Block {
@@ -219,6 +219,50 @@ test("a moved block keeps its body, and paragraphs keep one blank line between t
   ]);
 });
 
+test("dragged, a block may also go into a run of blank lines between two blocks, but in front of its first", () => {
+  const blanks = [
+    "第一段", "", "", "", "第二段", "", // 0-5: lines 2 and 3 lead to a paragraph
+    "- 列表一", "", "", "- 列表二", "", "", // 6-11: the list goes on after 8; 11 leads to indented code
+    "    缩进代码", "", "末段", "", "", // 12-16: 16 leads to the end
+  ];
+  const plain = blockGaps(blanks);
+  assert.deepEqual(moveGaps(blanks).filter((line) => !plain.includes(line)), [2, 3, 16]);
+  // Only the moves gain them: the gaps that anchor document snapshots stay as they were.
+  assert.equal(plain.includes(2), false);
+});
+
+test("a wrapped block dropped into a run of blank lines goes right there, and leaves the other lines blank", () => {
+  const lines = ["第一段", "", ...LAYOUT, "", "第二段", "", "", "", "", "", "末段"];
+  assert.deepEqual(apply(lines, planPlacement(lines, block(lines), { line: 9, wrap: "left", skip: 0 })), [
+    // In front of line 9: lines 7 and 8 above it, 9 to 11 below.
+    "第一段", "", "第二段", "", "", WRAPPED_LEFT, "![[a.png]]", "<!-- /vml -->", "", "", "", "末段",
+  ]);
+});
+
+test("a float dropped above one written earlier that starts lower goes in front of it", () => {
+  // Reported in 笔记.md: a text box 21 lines down; the image dropped beside text above it was
+  // pushed down to the text box's top, 192px below where it was dropped.
+  const box = '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":10} -->';
+  const image = '<!-- vml {"v":2,"width":0.4,"wrap":"right"} -->';
+  const lines = [box, "![[t.png]]", "<!-- /vml -->", "", "段一", "", "段二", "", image, "![[a.png]]", "<!-- /vml -->", "段三"];
+  const lineTop = (line: number): number => line * 24;
+  const moved = block(lines, 1);
+  // The box starts at line 10 (240px): beside "段一" (96px) the image goes in front of it, 4 lines down.
+  const placed = placeAboveEarlierFloats(lines, moved, { line: 4, wrap: "right", skip: 0 }, 96, lineTop, 24);
+  assert.deepEqual(placed, { line: 0, wrap: "right", skip: 4 });
+  assert.deepEqual(apply(lines, planPlacement(lines, moved, placed)).slice(0, 7), [
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":4} -->', "![[a.png]]", "<!-- /vml -->", box, "![[t.png]]", "<!-- /vml -->", "",
+  ]);
+  // Below the box, or not wrapped, nothing is in the way.
+  assert.deepEqual(placeAboveEarlierFloats(lines, moved, { line: 6, wrap: "right", skip: 2 }, 288, lineTop, 24), { line: 6, wrap: "right", skip: 2 });
+  assert.deepEqual(placeAboveEarlierFloats(lines, moved, { line: 4, wrap: null, skip: 0 }, 96, lineTop, 24), { line: 4, wrap: null, skip: 0 });
+
+  // Right after the box, sharing its anchor, the image stays at its place for orderAdjacentFloat.
+  const adjacent = [box, "![[t.png]]", "<!-- /vml -->", "", image, "![[a.png]]", "<!-- /vml -->", "段一", "", "段二"];
+  assert.deepEqual(placeAboveEarlierFloats(adjacent, block(adjacent, 1), { line: 9, wrap: "right", skip: 0 }, 144, lineTop, 24),
+    { line: 4, wrap: "right", skip: 2 });
+});
+
 test("a block that wraps text sits right on top of that text", () => {
   assert.deepEqual(apply(note, planPlacement(note, block(note), { line: 8, wrap: "left", skip: 0 })), [
     "第一段", "", "第二段", "", WRAPPED_LEFT, "![[a.png]]", "<!-- /vml -->", "第三段",
@@ -397,7 +441,8 @@ test("dragging the later float above its neighbor leaves that neighbor at its ol
   assert.ok(edits);
   const result = apply(lines, edits);
   assert.deepEqual(result.slice(0, 5), [
-    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[b.png]]', '<!-- /vml -->',
+    // Both move down the line the blank line between them takes once they no longer share it.
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":3} -->', '![[b.png]]', '<!-- /vml -->',
     '<!-- vml {"v":2,"wrap":"left","skip":5} -->', '![[a.png]]',
   ]);
   assert.equal(visualWrapSkip(result, findV2Blocks(result), 1), 5);
@@ -413,7 +458,7 @@ test("moving the left float up across the right text block offsets its shifted a
   assert.ok(edits);
   const result = apply(lines, edits);
   assert.deepEqual(result.slice(0, 5), [
-    '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":18} -->', '![[a.png]]', '<!-- /vml -->',
+    '<!-- vml {"v":2,"width":0.4,"wrap":"left","skip":19} -->', '![[a.png]]', '<!-- /vml -->',
     '<!-- vml {"v":2,"wrap":"right","skip":20,"type":"text"} -->', '旁注',
   ]);
 });
@@ -451,12 +496,13 @@ test("dragging a float above one that shares its anchor keeps both neighbors' he
   const result = apply(lines, edits);
   assert.deepEqual(result, [
     '<!-- vml {"v":2,"wrap":"right","skip":5} -->', '![[a.png]]', '<!-- /vml -->', '',
-    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":2} -->', '![[c.png]]', '<!-- /vml -->',
+    '<!-- vml {"v":2,"width":0.4,"wrap":"right","skip":3} -->', '![[c.png]]', '<!-- /vml -->',
     '<!-- vml {"v":2,"wrap":"left","skip":6} -->', '![[b.png]]', '<!-- /vml -->', '', 'body',
   ]);
-  // The dragged float lands at 2; the crossed neighbor's saved skip compensates for its shifted anchor.
+  // The blank line now between b and the body takes its height again: the body moves down a line, and
+  // the dragged float (3) and the crossed neighbor (6) with it, so both stay beside the same text.
   const moved = findV2Blocks(result);
-  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(result, moved, at)), [5, 2, 6]);
+  assert.deepEqual([0, 1, 2].map((at) => visualWrapSkip(result, moved, at)), [5, 3, 6]);
 
   // One transaction; a changed opening line for the crossed neighbor aborts the whole write.
   const editor = new MemoryEditor(lines.join('\n'));
@@ -495,6 +541,29 @@ test("block widgets at the same document position do not multiply wrap gaps", ()
   ]), [{ pos: 1012, height: 24 }]);
 });
 
+test("spacers are planned for the viewport's run only, with the floats drawn above it", () => {
+  // The cursor's line, drawn apart at the top of the note, holds a float reaching 541px down.
+  const cursorLine = [box(0, 0, 0, 0, { floatBottom: 541 })];
+  const viewport = [box(1337, 900, 24, 900), box(1400, 924, 24, 924)];
+  assert.deepEqual(viewportRun([cursorLine, viewport], 1337), [box(0, 0, 0, 0, { floatBottom: 541, standIn: true }), ...viewport]);
+  // Below the viewport, it adds nothing; with nothing drawn at the viewport, there is nothing to plan.
+  assert.deepEqual(viewportRun([viewport, [box(3000, 2000, 24, 2000)]], 1337), viewport);
+  assert.deepEqual(viewportRun([cursorLine], 1337), []);
+});
+
+test("the stand-ins' host in front of the first line drawn only carries floats", () => {
+  // It shares the position of the line after it. As an element, that line would look like a second
+  // child of one widget, and the line's spacer would be dropped, then planned again, and so on.
+  const host = box(50, 100, 0, 100, { standIn: true, floatBottom: 180 });
+  const spacer = box(50, 100, 80, 100, { spacer: true });
+  const pushed = box(50, 180, 24, 100);
+  assert.deepEqual(planGaps([host, spacer, pushed]), [{ pos: 50, height: 80 }]);
+  assert.deepEqual(planGaps([{ ...host, standIn: false }, spacer, pushed]), []);
+  // Its floats push what comes after it like any other float.
+  const tall = { ...host, floatBottom: 400 };
+  assert.deepEqual(planGaps([tall, box(50, 100, 24, 100), box(60, 400, 30, 124)]), [{ pos: 60, height: 276 }]);
+});
+
 const size: FloatSize = { side: "left", layoutTop: 4, layoutHeight: 400, width: 280, margin: 24, marginBottom: 8 };
 
 test("a stand-in covers the part of a float below the first line drawn", () => {
@@ -502,4 +571,66 @@ test("a stand-in covers the part of a float below the first line drawn", () => {
   assert.equal(planProxy(1000, size, 1500), null);
   // A layout that starts further down leaves the lines above it their full width.
   assert.deepEqual(planProxy(1000, { ...size, layoutTop: 72 }, 1040), { sandbag: 32, height: 408, shift: 0 });
+});
+
+test("a live stand-in keeps its top margin, so its float starts where the real one does", () => {
+  // Measured in 笔记.md: without its 4px margin the text box's float started 4px low, and a list item
+  // ending 2px into it no longer narrowed: the note moved by 96px as the stand-in came and went.
+  assert.deepEqual(liveProxy({ sandbag: 96, height: 422, shift: 0 }, 4), { sandbag: 92, height: 422, shift: 0, marginTop: 4 });
+  // Its margin starts above the line: it keeps what is below it.
+  assert.deepEqual(liveProxy({ sandbag: 3, height: 422, shift: 0 }, 4), { sandbag: 0, height: 422, shift: 0, marginTop: 3 });
+  // Cut off above the line, it is pulled up over it.
+  assert.deepEqual(liveProxy({ sandbag: 0, height: 300, shift: 50 }, 4), { sandbag: 0, height: 300, shift: 50, marginTop: -50 });
+});
+
+test("stand-ins in front of one line each start below the ones drawn before them", () => {
+  // Measured in 笔记.md: an image 18 lines down, then a text box sharing its anchor 22 lines down.
+  // The text box's sandbag starts where the image does, so it only holds the four lines below it.
+  const image = { sandbag: 432, height: 153, shift: 0 };
+  const box = { sandbag: 528, height: 414, shift: 0 };
+  assert.deepEqual(stackProxies([image, box]), [image, { ...box, sandbag: 96 }]);
+  // One that would start higher than a stand-in before it cannot: it starts there, with no sandbag.
+  assert.deepEqual(stackProxies([box, image]), [box, { ...image, sandbag: 0 }]);
+  // A layout drawn apart above the line (the cursor's) starting 432px below it comes first too.
+  assert.deepEqual(stackProxies([box], 432), [{ ...box, sandbag: 96 }]);
+  // One cut off above the line has no sandbag to share.
+  const cut = { sandbag: 0, height: 120, shift: 40 };
+  assert.deepEqual(stackProxies([cut, image]), [cut, image]);
+});
+
+test("a stand-in keeps its place beside the line it starts beside, not below its anchor", () => {
+  // Measured in 笔记.md: the float starts 532px below its anchor, 18px below the top of the line beside
+  // it. With the cursor's heading drawn apart, 18px lower, that line is now at 496, not 514.
+  const measured: FloatSize = { ...size, layoutTop: 532, refPos: 1200, refOffset: 18 };
+  assert.equal(standInAnchorTop(measured, 0, 496) + measured.layoutTop, 514);
+  // Not measured beside a line, or that line unknown: from its anchor as before.
+  assert.equal(standInAnchorTop({ ...size, layoutTop: 532 }, 0, 496), 0);
+  assert.equal(standInAnchorTop(measured, 0, null), 0);
+  // Moved by its skip in a stand-in, it moves against that line by as much.
+  const carried = carryFloat({ from: 0, skip: 22, size: measured }, 0, "left", 20, 24);
+  assert.equal(carried?.refOffset, 18 - 48);
+});
+
+test("a measured float moves with the text typed above it, anchor and line beside it alike", () => {
+  // Found in review: after text typed above the anchor, an edit in the stand-in found no earlier
+  // revision at the anchor's new place, and the stand-in went.
+  const placed = { from: 100, skip: 10, size: { ...size, refPos: 400, refOffset: 6 } };
+  const moved = mapPlaced(placed, (pos) => pos + 12);
+  assert.equal(moved.from, 112);
+  assert.equal(moved.size.refPos, 412);
+  assert.ok(carryFloat(moved, 112, "left", 12, 24));
+  assert.equal(carryFloat(placed, 112, "left", 12, 24), null);
+});
+
+test("an edit made in a stand-in starts where the last measured revision did, moved by its skip", () => {
+  // Measured from 笔记.md: a right float 40 lines below its anchor, dragged in place to the left, 34 lines down.
+  const placed = { from: 417, skip: 40, size: { ...size, side: "right" as const, layoutTop: 963.7 } };
+  const carried = carryFloat(placed, 417, "left", 34, 24);
+  assert.equal(carried?.side, "left");
+  assert.ok(Math.abs((carried?.layoutTop ?? 0) - (963.7 - 6 * 24)) < 0.001);
+  assert.equal(carried?.layoutHeight, size.layoutHeight);
+  assert.deepEqual(carryFloat(placed, 417, "right", 40, 24), placed.size);
+  // It never starts above its anchor, and once the anchor has moved nothing is known.
+  assert.equal(carryFloat(placed, 417, "right", 0, 30)?.layoutTop, 0);
+  assert.equal(carryFloat(placed, 500, "right", 40, 24), null);
 });

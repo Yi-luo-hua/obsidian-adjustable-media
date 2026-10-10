@@ -12,6 +12,8 @@ import * as floats from "../src/layout/floatOrder.ts";
 import * as projections from "../src/layout/viewProjection.ts";
 import * as model from "../src/layout/model.ts";
 import * as crossref from "../src/markdown/crossref.ts";
+import * as paragraphBreaks from "../src/markdown/paragraphBreaks.ts";
+import * as paragraphParser from "../src/markdown/paragraphParser.ts";
 import { mockedModule } from "./support/mockedModule.ts";
 
 test("source hints follow caret heads and pane focus while toggles preserve widget identity and source", async () => {
@@ -26,6 +28,7 @@ test("source hints follow caret heads and pane focus while toggles preserve widg
     "../layout/blockIdentity.ts": identity, "../layout/cursorHighlight.ts": cursor, "../layout/changeScan.ts": scan,
     "../layout/floatOrder.ts": floats, "../layout/viewProjection.ts": projections, "../layout/model.ts": model,
     "../markdown/crossref.ts": crossref,
+    "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": {}, "./interactions.ts": {}, "./layoutView.ts": {},
     "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {}, "./textEditing.ts": {},
     "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {}, "./obsidianInternals.ts": {}, "./windows.ts": {},
