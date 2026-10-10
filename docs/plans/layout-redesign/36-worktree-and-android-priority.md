@@ -9,7 +9,7 @@
 | `codex/text-column-breaks` | `c1572bd` 文档整理 | 正式 0.7.2 + 0.7.3 手动分栏、点击修复及双语样例；主目录 | 保持可发布状态，标签／公开发布待安排 |
 | `codex/pending-view-parity` | `7963b0f` 文档合流 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 本轮审查和 Windows 定向回归通过，待集成 |
 | `codex/pending-render-stability` | `bf8dcd8` 审查修复 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 416 项检查、构建与 Windows 定向回归通过，待集成 |
-| `codex/android-adaptation` | `c1d0427` 渲染修复合流 | 接共用渲染分支；手机／平板触摸、输入、焦点与控件 | 427 项检查与构建通过；Android 真机验收延期 |
+| `codex/android-adaptation` | `a0bf98b` 旧 WebView 定位修复 | 接共用渲染分支；手机／平板触摸、输入、焦点与控件 | 429 项检查、构建及代码 CI 通过；nova 12 验收进行中，平板待测 |
 | `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
 
 待合并分支按依赖堆叠：`text-column-breaks → pending-view-parity → pending-render-stability → android-adaptation`。这表示代码依赖，不表示已经合并或发布；评审每一层时以其上一层为比较基线。旧 `codex/android-layout-stability` 留作完整历史来源，不再作为新的混合开发入口。
@@ -39,7 +39,7 @@ W02／W03 的 33 个未提交文件已搬到原独立功能工作树，逐文件
 
 ## Android 本轮安排
 
-用户选择先完成 Android 手机／平板，再推进 iPhone／iPad，并明确真机验收稍后进行。具体场景与恢复顺序统一维护在 [Android 适配](mobile-adaptation.md)，旧构建证据见 [验收摘要](archive/branch-validation.md#android-phone-and-tablet)。上次分支整理检查时 ADB 没有连接设备；本轮进行了桌面审查／定向回归，未复核 Android 设备或部署手机／平板构建。
+用户选择先完成 Android 手机／平板，再推进 iPhone／iPad；此前延期的真机验收现已恢复。nova 12 已连接并安装本轮构建，保留原测试笔记的手动调整；新旧构建与已测／待测范围见 [Android 适配](mobile-adaptation.md)。11.5S 尚未完成新组合构建验收，历史证据仍见 [摘要](archive/branch-validation.md#android-phone-and-tablet)。
 
 ## 分支整理时的检查与提交
 
