@@ -1,8 +1,10 @@
 # 08 每窗格同步与测量基础实施记录
 
+归档说明（2026-10-10）：本页保留原批次证据；当前状态与任务见 [09](../09-progress-and-next-steps.md)，历史验收不扩大为新组合构建验收。
+
 日期：2026-09-30。分支：`codex/layout-redesign-r1`。本批接续 [P1 基础记录](07-execution-record.md)，实现 P2 的协调与缓存基础，并完成定向宿主验证。P2 的完整生命周期矩阵、P0a 候选可实现性和 P3 拖动规划仍未全部通过；完整 R1 尚未交付。
 
-本文保留实现批次的构建与宿主证据；后续提交／PR 状态和执行顺序统一见 [09 进度与后续安排](09-progress-and-next-steps.md)。
+本文保留实现批次的构建与宿主证据；后续提交／PR 状态和执行顺序统一见 [09 进度与后续安排](../09-progress-and-next-steps.md)。
 
 ## 1. 实际改造
 
@@ -22,13 +24,13 @@
 
 Node 24 下 `npm run check` 的类型检查、官方 lint 与 **222 项测试全部通过**；`npm run build` 通过。最终生产构建 SHA-256 为 `2f50a378e82636f744d9aae00eb7dc227378be5ab90c3bf67c336bded804f16d`，以下五份宿主记录均核对相同加载哈希。宿主为 Obsidian 1.13.7，库为 `vml-test-vault`。
 
-- [双窗关系记录](probes/p2-host.json)：块间空行变正文后，两阅读窗格各重绘一次，在编辑事件后约 154／164ms 发起，早于约 2 秒后的保存和索引事件。未知 V3 单块移除仍保留原文。
-- [窗格与延迟记录](probes/p2-sync.json)：受控 720px／397px 容器中，65% 宽的文字块分别约 468px／258px，高度约 286.13px／526.06px；两种视图在各自相同宽度下吻合。第二阅读窗格的 getViewData 注入旧源报告至 950ms，期间重绘为 `[1,0]`；解除后为 `[1,1]`。这验证延后宿主接口，不声称复现真实宿主内部延迟机制。
+- [双窗关系记录](../probes/p2-host.json)：块间空行变正文后，两阅读窗格各重绘一次，在编辑事件后约 154／164ms 发起，早于约 2 秒后的保存和索引事件。未知 V3 单块移除仍保留原文。
+- [窗格与延迟记录](../probes/p2-sync.json)：受控 720px／397px 容器中，65% 宽的文字块分别约 468px／258px，高度约 286.13px／526.06px；两种视图在各自相同宽度下吻合。第二阅读窗格的 getViewData 注入旧源报告至 950ms，期间重绘为 `[1,0]`；解除后为 `[1,1]`。这验证延后宿主接口，不声称复现真实宿主内部延迟机制。
 - 同一记录中，注入另一源窗格的分歧读回及旧 metadata，setViewData 调用为零，阅读窗格未回退。撤销恢复旧文本、四窗格 rename 正常；稳定后 2.1 秒新增重绘为 `[0,0]`，被观察源窗格内部 effect 为 0。真实独立未保存缓冲矩阵仍待验收。
-- [命令回归](probes/p2-commands.json) 和 [重复实例写入回归](probes/p2-instance-write.json)：继承 P1 的未知格式零写入、普通操作一步事务／撤销及第二个重复实例正确定位结果；既有笔记哈希不变。该菜单探针采用程序化事件与 DOM 点击，没有代替真实指针拖动。
-- [正常窗格表面记录](probes/p2-surface.json)：约 1014px 的实际窗格中，文字块宽约 609.96px、高约 166.16px，两种模式一致；左右浮动各宽约 375.36px、高约 46.20px。已检查 [阅读截图](probes/p2-preview.png) 和 [实时预览截图](probes/p2-source.png)，没有缺失栏内文字。两种模式的正文间距和顶端位置仍有差异，本批没有将其误报为像素一致。
+- [命令回归](../probes/p2-commands.json) 和 [重复实例写入回归](../probes/p2-instance-write.json)：继承 P1 的未知格式零写入、普通操作一步事务／撤销及第二个重复实例正确定位结果；既有笔记哈希不变。该菜单探针采用程序化事件与 DOM 点击，没有代替真实指针拖动。
+- [正常窗格表面记录](../probes/p2-surface.json)：约 1014px 的实际窗格中，文字块宽约 609.96px、高约 166.16px，两种模式一致；左右浮动各宽约 375.36px、高约 46.20px。已检查 [阅读截图](../probes/p2-preview.png) 和 [实时预览截图](../probes/p2-source.png)，没有缺失栏内文字。两种模式的正文间距和顶端位置仍有差异，本批没有将其误报为像素一致。
 
-可复跑脚本为 [延迟／宽度／撤销探针](probes/p2-sync.js.txt)、[正常窗格与截图探针](probes/p2-surface.js.txt)，以及 P1 的命令／实例脚本和 P0a 宿主脚本。只在测试库执行，先部署并核对构建哈希。
+可复跑脚本为 [延迟／宽度／撤销探针](../probes/p2-sync.js.txt)、[正常窗格与截图探针](../probes/p2-surface.js.txt)，以及 P1 的命令／实例脚本和 P0a 宿主脚本。只在测试库执行，先部署并核对构建哈希。
 
 测试完成后，运行前已有的 40 个 Markdown 文件哈希全部保持不变，测试插件 main.js、manifest.json、styles.css 已恢复并核对。恢复的测试插件 main.js 哈希为 `cecad58d56cb6018579d60b7886c6b7a12bd0a542c3fe10d99ffbe04a58b3c7a`，因此未来实测必须重新部署当前构建。临时笔记移入测试库垃圾箱；`dev:errors` 未捕获到本批最终构建错误。
 
@@ -55,16 +57,16 @@ P3 仍须建立完整相关集合、碰撞与正文余宽规则，再接入菜�
 - **Major-3 剩余部分**：普通无布局笔记在建立 Reader 前返回；移除最后布局后释放 Reader，清掉残留环绕 class。确认帧一次读取所属窗格的 section 列表，以元素映射和批量 coverage 更新代替逐 section 搜索与 `getBoundingClientRect`。全 section 的环绕 class 仅在 wrapped 状态变化时更新，新 section 单独设置。
 - **Minor**：块移动写回已传入生产 `readSet`，当前旧拖动规划器保守校验整份捕获源（完整相关集合仍属 P3）。快照只做一次上下文扫描，并复用已解析块；实例范围和正文关系用索引匹配。Markdown 渲染拒绝时删除 pending，保留 failed 状态、不误认测量完成。命令四个写入／异步入口、图片菜单、自动转换和交互写回均处理 Promise 拒绝。图片／视频加载仅请求局部测量，字体、主题、宽度等真实环境变化才清空窗格缓存。
 - 新增命令、实际 live preview／writeBack 适配器、环境资源和渲染失败回归；阅读测试增加 200 section 的每帧单次查找、稳定 class 和最后浮动移除检查。Node 24 下最终 `npm run check` 的类型检查、lint 与 **237 项测试全部通过**，`npm run build` 通过。
-- [宿主结果](probes/pr12-review-fixes.json) 对应生产构建 `7a38984734c83c2c2cb7d9e89410770f1b9ce566c4b53e2be220bf4b7f737542`。Obsidian 1.13.7 实测 `fence-inside`／`fence-only`／`math-inside` 都原文保留、一次文档事务、一步撤销。仅注入缺失字段读回、保留真实窗格归属后，连续三次编辑的块身份与缓存不变，菜单环绕写回一次；普通阅读笔记新增 subtree 观察器和 capture scroll 均为 0。第 4 节的零多余重绘与延迟 section 恢复也用最终构建复验通过。此菜单使用程序化事件和 DOM 点击，不代替真实指针拖动。
-- 可复跑的 [命令／字段探针](probes/pr12-review-major.js.txt) 和 [阅读探针](probes/pr12-review-reading.js.txt) 只在测试库执行。实际宿主的 info 值就是 MarkdownView；探针用独立字段值屏蔽 file，不删除窗格自身的 file。已检查最终截图，原有笔记哈希未变，测试插件四个文件已恢复并核对，`dev:errors` 无捕获错误。
-- [性能结果](probes/pr12-review-performance.json) 和 [比较脚本](probes/pr12-review-performance.js.txt) 使用 10k 行、200 块、预热 10 次后 100 个样本。相对审查 HEAD `6568a3e`，快照中位耗时 **11.79 → 3.58ms**，p95 **14.09 → 4.74ms**。纯解析参考为 2.24／2.79ms；这不是 main 的宿主按键基准，不宣称已与 main 等速。原 P1 性能证据未被覆盖。
+- [宿主结果](../probes/pr12-review-fixes.json) 对应生产构建 `7a38984734c83c2c2cb7d9e89410770f1b9ce566c4b53e2be220bf4b7f737542`。Obsidian 1.13.7 实测 `fence-inside`／`fence-only`／`math-inside` 都原文保留、一次文档事务、一步撤销。仅注入缺失字段读回、保留真实窗格归属后，连续三次编辑的块身份与缓存不变，菜单环绕写回一次；普通阅读笔记新增 subtree 观察器和 capture scroll 均为 0。第 4 节的零多余重绘与延迟 section 恢复也用最终构建复验通过。此菜单使用程序化事件和 DOM 点击，不代替真实指针拖动。
+- 可复跑的 [命令／字段探针](../probes/pr12-review-major.js.txt) 和 [阅读探针](../probes/pr12-review-reading.js.txt) 只在测试库执行。实际宿主的 info 值就是 MarkdownView；探针用独立字段值屏蔽 file，不删除窗格自身的 file。已检查最终截图，原有笔记哈希未变，测试插件四个文件已恢复并核对，`dev:errors` 无捕获错误。
+- [性能结果](../probes/pr12-review-performance.json) 和 [比较脚本](../probes/pr12-review-performance.js.txt) 使用 10k 行、200 块、预热 10 次后 100 个样本。相对审查 HEAD `6568a3e`，快照中位耗时 **11.79 → 3.58ms**，p95 **14.09 → 4.74ms**。纯解析参考为 2.24／2.79ms；这不是 main 的宿主按键基准，不宣称已与 main 等速。原 P1 性能证据未被覆盖。
 
-本批修复实施验证时尚未提交、推送、合并或发布；后续交付状态见 [09 进度与后续安排](09-progress-and-next-steps.md)。完整 P2 生命周期与 P3 门槛沿用第 3 节。
+本批修复实施验证时尚未提交、推送、合并或发布；后续交付状态见 [09 进度与后续安排](../09-progress-and-next-steps.md)。完整 P2 生命周期与 P3 门槛沿用第 3 节。
 
 ## 6. PR #12 复用段落确认修复（2026-10-01）
 
 正文更新会产生新快照，但 Obsidian 不重复处理未变的媒体段。旧段的 snapshotId 因此一直落后，实际阅读适配器回归复现状态从 settled 变为持续 projecting。本次保存段的原文、context、绘制依赖和来源路径；宿主匹配后重新读取该段的 getSectionInfo，只有全文来源、段落原文、布局依赖和路径都匹配才更新安装版本与源范围。媒体段另校验所属块设置、行序号与有效 skip，变化时要求宿主重新安装，防止删除前一媒体行或移入另一块后继续采用旧行的高度或图注。测量由当前确认帧重新检查。记录对象保持原有生命周期，销毁时照常清理。路径变化要求重新渲染。
 
 - 新增 10 项实际阅读适配器回归，验证正文编辑／恢复、插入前文后的重复段定位、EOF 段、延迟宿主、媒体原文及设置变更、浮动正文依赖、缺失段信息与销毁，以及媒体行删除／跨块移动后的设置重装。Node 24 下 `npm run check` 的类型检查、lint 和 **247 项测试通过**，`npm run build` 通过。
-- [宿主探针](probes/pr12-retained-sections.js.txt) 与 [结果](probes/pr12-retained-sections.json) 使用生产构建 `d278038306ae4ef86c1a6a92d1a812cb06b0f7f89f963708b651b98e6e5e2e3a`。Obsidian 1.13.7／vml-test-vault 中，两次正文编辑及前文插入后，两份重复媒体布局的原 DOM 都保留，额外强制重绘为 0；原 context 返回的全文与当前宿主一致，两段行号各增加 2。删除前一媒体行后，后一行从 row 1 重新安装为 row 0，高度由 300px 变为 100px，强制重绘一次。已检查截图。此宿主验证覆盖复用、动态段信息及媒体行设置；projection 的 settled 与 coverage 由实际适配器回归断言，未声称从生产宿主读出内部状态。首轮冷打开固定等待 800ms 时布局尚未就绪，后续同构建复跑通过，此探针不代替完整冷／热打开生命周期验收。
+- [宿主探针](../probes/pr12-retained-sections.js.txt) 与 [结果](../probes/pr12-retained-sections.json) 使用生产构建 `d278038306ae4ef86c1a6a92d1a812cb06b0f7f89f963708b651b98e6e5e2e3a`。Obsidian 1.13.7／vml-test-vault 中，两次正文编辑及前文插入后，两份重复媒体布局的原 DOM 都保留，额外强制重绘为 0；原 context 返回的全文与当前宿主一致，两段行号各增加 2。删除前一媒体行后，后一行从 row 1 重新安装为 row 0，高度由 300px 变为 100px，强制重绘一次。已检查截图。此宿主验证覆盖复用、动态段信息及媒体行设置；projection 的 settled 与 coverage 由实际适配器回归断言，未声称从生产宿主读出内部状态。首轮冷打开固定等待 800ms 时布局尚未就绪，后续同构建复跑通过，此探针不代替完整冷／热打开生命周期验收。
 - 原有笔记哈希不变，临时 fixture 移入测试库垃圾箱；测试插件 main.js、manifest.json、styles.css、data.json 已恢复并逐一核对哈希，`dev:errors` 无捕获错误。完整 P2 生命周期与真实拖动仍属于后续验收。
