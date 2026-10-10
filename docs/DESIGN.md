@@ -2,7 +2,7 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-实现范围（2026-10-10）：本工作树为 codex/android-adaptation，包含三视图／共用渲染修复与 Android 触摸／输入适配，真机验收延期。公开版本仍为 0.7.2；本分支的修复尚未合入 main 或公开发布。下文保留本分支实际实现及历史宿主说明，主目录 0.7.3、其他待合并分支与 W02／W03 原型的范围见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md) 和 [36](plans/layout-redesign/36-worktree-and-android-priority.md)。
+实现范围（2026-10-10）：本工作树为 codex/android-adaptation，包含三视图／共用渲染修复与 Android 触摸／输入适配；nova 12／11.5S 本轮已列相关验收通过。用户要求 0.7.3 保持原定桌面范围，本分支留到 iPhone／iPad 验收后作为后续移动适配大版本交付，集成候选为 codex/mobile-release-integration。公开版本仍为 0.7.2；这些后续修复尚未合入 main 或公开发布。下文保留本分支实际实现及历史宿主说明，主目录 0.7.3、其他待合并分支与 W02／W03 原型的范围见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md) 和 [36](plans/layout-redesign/36-worktree-and-android-priority.md)。
 
 ## 1. 存储格式
 
