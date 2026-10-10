@@ -1,6 +1,6 @@
 # Adjustable Media：并列、拖动与双视图同步的设计研究
 
-> 项目归档：2026-09-30。第 1–6 节记录初次研究的代码、纯函数与独立浏览器证据；第 7 节记录转写实施方案前的补充研判。文中的“当前”指研究基线。后续已实施 P1 与 P2 协调／缓存基础，见 [08 实施记录](../plans/layout-redesign/08-pane-foundation-record.md) 与 [09 进度安排](../plans/layout-redesign/09-progress-and-next-steps.md)。当前实现以 [DESIGN.md](../DESIGN.md) 为准；新组格式和最终规划器仍是候选。
+> 项目归档：2026-09-30。第 1–6 节记录初次研究的代码、纯函数与独立浏览器证据；第 7 节记录转写实施方案前的补充研判。文中的“当前”指研究基线。后续已实施 P1 与 P2 协调／缓存基础，见 [08 实施记录](../plans/layout-redesign/archive/08-pane-foundation-record.md) 与 [09 进度安排](../plans/layout-redesign/09-progress-and-next-steps.md)。当前实现以 [DESIGN.md](../DESIGN.md) 为准；新组格式和最终规划器仍是候选。
 >
 > 证据附件：[可执行基线探针](LAYOUT_PROBES.md)、[独立浮动实验页](float-model-lab.html)、[测量结果 JSON](layout-study-evidence.json)。
 
@@ -249,4 +249,4 @@ R1 先补齐统一入口保护；R2 仅向实测的保护构建声明安全降�
 
 本报告中的纯函数结果刻画当前缺陷；修复后应该改变错误结果，而不是继续让基线探针通过。独立浏览器像素记录是 CSS 机制证据，真实 Obsidian、中文输入法、双窗、虚拟滚动及 PDF 的结果须在后续工作包单独记录。
 
-2026-09-30 二次核验记录见 [方案核验与修订](../plans/layout-redesign/06-plan-verification.md)。此次补上了完整入口保护、独立只读依赖断言、最终源码读回、松手结束规则、来源／测量隔离及增量交付依赖；这些是实施契约的修订，没有修改插件实现。
+2026-09-30 二次核验记录见 [方案核验与修订](../plans/layout-redesign/archive/06-plan-verification.md)。此次补上了完整入口保护、独立只读依赖断言、最终源码读回、松手结束规则、来源／测量隔离及增量交付依赖；这些是实施契约的修订，没有修改插件实现。

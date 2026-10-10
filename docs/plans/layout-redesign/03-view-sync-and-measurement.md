@@ -2,7 +2,7 @@
 
 状态：规划。前置：[模型](01-model-and-decisions.md)、[规划结果](02-planner-and-interactions.md)。
 
-实施进展：每窗格协调状态、来源回退修正、环境缓存及过期测量保护已接入，定向双窗验证见 [08 实施记录](08-pane-foundation-record.md)。本文其余要求仍按完整 P2／P3 门槛验收，不因基础实现通过而视为全部完成。
+实施进展：每窗格协调状态、来源回退修正、环境缓存及过期测量保护已接入，定向双窗验证见 [08 实施记录](archive/08-pane-foundation-record.md)。本文其余要求仍按完整 P2／P3 门槛验收，不因基础实现通过而视为全部完成。
 
 ## 1. 同步的是内容和意图，测量属于窗格
 
@@ -28,7 +28,7 @@
 
 文件实例、来源分支和 snapshotId 组成内容身份；数字 revision 只在其事件序列内比较。同内容可复用解析，但不能把内容指纹当成事件先后。撤销／重做回到旧文本是一次合法新事件，必须分配新版本，不因“曾显示过这段内容”拒绝同步。分歧缓冲各有 host 状态，只有证明宿主采用同一内容后才合并订阅关系。
 
-阅读 section 必须关联到自己的窗格和内容来源。当前 `noteText.ts` 在 section text 为空时取同路径第一个 MarkdownView，这会绕过每窗格隔离；P2 将该回退纳入改造，以 ctx.docId／DOM 所属窗格建立映射，无法确认时暂不安装新投影。PDF 与嵌入笔记不能假装是该阅读窗格：导出采用单独冻结来源，嵌入笔记首版沿用当前原生呈现范围。
+阅读 section 必须关联到自己的窗格和内容来源。初始方案曾发现同路径第一窗格回退；当前 `noteText.ts` 已通过 section DOM 所属阅读窗格取源，无法确认时返回空来源。这项基础修复已验收，后续仍须保护每个来源、迟到回调与分歧缓冲。PDF 和嵌入笔记分别处理自身来源，不能冒充当前阅读窗格。
 
 Obsidian 的公开 `editor-change`、`file-open`、`layout-change`、`resize` 和 metadata cache 事件可作为入口，但每个事件的实际覆盖范围需要 P0 实测。当前 API 声明见 [官方 obsidian.d.ts](https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts)；对阅读呈现完成的内部接口依赖仍集中在 `obsidianInternals.ts`。
 
@@ -115,3 +115,9 @@ P0 记录稳定需要的测量轮数和原因，建立明确的收敛预算。�
 | `obsidianInternals.ts` | 集中宿主内部能力探测与受限降级，不向核心渗透 |
 
 P2 的完成证明包含：块间正文变更能唤醒两个阅读窗格；不同宽度不交叉复用尺寸；旧异步回调不能回退版本；稳定后停止测量；不同编辑缓冲不被插件覆盖。详细场景见 [交付与验收](05-delivery-and-validation.md)。
+
+## 8. 已冻结的原型调用方契约
+
+W02 的 Windows 既有 V2 原型门槛已通过，具体 API 与证据在其工作树；正式调用方尚未接入，见 [摘要](archive/branch-validation.md#w02-candidate-prototype)。所有者提供实时 context，推进真实源／资源／样式／呈现代际，在事件中 refresh，卸载时 dispose；状态读取不能替代事件订阅。纯滚动不推进环境代际。
+
+首轮测量候选全部布局和完整正文；基线含保护正文与 EOF 的只读依赖，不制造未变成员写入。有影响结束证明前不缩小相关集合。保留测后销毁副本；冷测、纯计算、回调累计、峰值与长任务分别记录，预算见 [05](05-delivery-and-validation.md#首轮量化标准)。
