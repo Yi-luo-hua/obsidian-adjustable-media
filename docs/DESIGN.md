@@ -2,7 +2,7 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-实现范围（2026-10-10）：本文描述主目录 `codex/text-column-breaks` 的 0.7.3 源码；公开版本仍为 0.7.2。三视图、生命周期／播放器和 Android 修复位于各自待合并分支，W02／W03 原型位于独立工作树，不能把这些后续行为视为本目录已实现。当前版本与限制见 [STATUS](STATUS.md)，任务见 [09](plans/layout-redesign/09-progress-and-next-steps.md)，分支与交付见 [36](plans/layout-redesign/36-worktree-and-android-priority.md)。历史宿主说明继续保留原日期与环境。
+实现范围（2026-10-10）：本文描述主目录 `codex/text-column-breaks` 的 0.7.3 源码；公开版本为 0.7.3，标签源码为 `da4aea9`。三视图、生命周期／播放器和 Android 修复位于各自待合并分支，W02／W03 原型位于独立工作树，不能把这些后续行为视为本目录已实现。当前版本与限制见 [STATUS](STATUS.md)，任务见 [09](plans/layout-redesign/09-progress-and-next-steps.md)，分支与交付见 [36](plans/layout-redesign/36-worktree-and-android-priority.md)。历史宿主说明继续保留原日期与环境。
 
 ## 1. 存储格式
 
@@ -316,6 +316,6 @@ $$
 
 `src/markdown/textColumns.ts` 共用扫描上下文与分段源偏移，忽略代码、公式、注释、缩进及引用／列表里的标记。列表或引用后须空行再写顶层标记。实时预览、阅读与 PDF 共用 `layoutView.ts`，各段分别交给 MarkdownRenderer 后并排显示；块宽变化不改变内容归属。单栏编辑器仍编辑整段原文，点击手动栏时按分段偏移定位光标，退出恢复分栏。编辑器中直接输入 `+++`；源码的「插入分栏标记」命令经原文校验写回，插入隔离为一步撤销。
 
-文字设置中手动栏数只读，栏间距可调整。无插件或旧版本不识别新标记时，它作为普通文字显示；不迁移笔记、不引入新的布局块版本。0.7.3 已完成本地发布准备，尚未公开发布，实测结果见 [34 手动分栏](plans/layout-redesign/34-text-column-breaks.md)。
+文字设置中手动栏数只读，栏间距可调整。无插件或旧版本不识别新标记时，它作为普通文字显示；不迁移笔记、不引入新的布局块版本。0.7.3 已于 2026-10-11（北京时间）正式发布，保持原定桌面范围，实测结果见 [34 手动分栏](plans/layout-redesign/34-text-column-breaks.md)。
 
 编辑文字时点击另一布局或同一图文块的另一文字栏，先经过原栏的正常写回校验再切换编辑；无法保存的内容保留在原编辑器。点击外框非内容区域、超栏提示或把手旁的空白时保留当前编辑焦点和选区，明确的源码按钮仍可展开源码。验证覆盖 Windows／Obsidian 1.14.4 的原失败场景及其他布局模式，范围见 34。
