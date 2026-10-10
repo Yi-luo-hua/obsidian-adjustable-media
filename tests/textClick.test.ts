@@ -15,6 +15,9 @@ import * as paragraphParser from "../src/markdown/paragraphParser.ts";
 import * as highlight from "../src/layout/cursorHighlight.ts";
 import * as identity from "../src/layout/blockIdentity.ts";
 import { mockedModule } from "./support/mockedModule.ts";
+import type { WrapSource } from "../src/view/wrapGuard.ts";
+import type { TextEditHost } from "../src/view/textEditing.ts";
+import type { LayoutContext } from "../src/view/interactions.ts";
 
 test("rendered text retains an existing column's focus until click, without intercepting links or editor selections", async () => {
   const info = stateApi.StateField.define({ create: () => ({ editor: {}, file: { path: "note.md" } }), update: value => value });
@@ -79,4 +82,48 @@ test("rendered text retains an existing column's focus until click, without inte
   const switchSide = event(); handlers.get("click")!(switchSide);
   assert.equal(switchSide.prevented, true);
   assert.deepEqual(opened, ["left"]);
+});
+
+test("a reused stand-in opens and redraws at its current anchor after text is inserted above it", async () => {
+  const info = stateApi.StateField.define({ create: () => ({ editor: {}, file: { path: "note.md" } }), update: value => value });
+  const preview = stateApi.StateField.define({ create: () => true, update: value => value });
+  let source!: WrapSource, host!: TextEditHost, click!: (event: { preventDefault(): void; stopPropagation(): void }) => void;
+  let context!: LayoutContext;
+  const doc = { activeElement: null };
+  const element = () => ({ doc, dataset: {}, empty() {}, toggleClass() {},
+    createEl: () => ({ addEventListener: (_name: string, run: typeof click) => { click = run; } }) });
+  const root = { ...element(), querySelector: () => null, querySelectorAll: () => [], addEventListener() {} };
+  const live = await mockedModule<{ livePreviewExtension(app: object): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
+    obsidian: { editorInfoField: info, editorLivePreviewField: preview, MarkdownView: class {}, Component: class { load() {} unload() {} } },
+    "@codemirror/state": stateApi, "@codemirror/view": viewApi,
+    "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/cursorHighlight.ts": highlight, "../layout/blockIdentity.ts": identity,
+    "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
+    "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
+    "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
+    "./blockDrag.ts": { setUpBlockMove() {} }, "./crossrefView.ts": { refContextOf: () => undefined },
+    "./interactions.ts": { attachInteractions(_root: unknown, next: LayoutContext) { context = next; }, refreshSizingHandles() {} }, "./layoutHistory.ts": { layoutHistory: () => [] },
+    "./layoutView.ts": { renderLayout: () => root, applySizing() {} }, "./messages.ts": { t: (key: string) => key, blockWarning: () => null },
+    "./textEditing.ts": { isEditingText: () => false, startTextEdit: (next: TextEditHost) => { host = next; } },
+    "./wrapGuard.ts": { wrapGuard: (next: WrapSource) => { source = next; return []; } }, "./viewEnvironment.ts": {},
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": {},
+  });
+  const text = 'Intro\n\n<!-- vml {"v":2,"type":"text","wrap":"right"} -->\nText\n<!-- /vml -->\nBody';
+  let state = stateApi.EditorState.create({ doc: text, extensions: [info, preview, live.livePreviewExtension({})] });
+  const view = { get state() { return state; }, dispatch(spec: stateApi.TransactionSpec) { state = state.update(spec).state; }, focus() {} } as viewApi.EditorView;
+  const el = element() as unknown as HTMLElement;
+  const original = source.anchors(state)[0];
+  source.drawStandIn(el, view, original, "note.md");
+  state = state.update({ changes: { from: 0, insert: "Inserted above\n" } }).state;
+  const current = source.anchors(state)[0];
+  assert.notEqual(current.from, original.from);
+  assert.equal(source.resizeStandIn!(el, current, "note.md"), true);
+  click({ preventDefault() {}, stopPropagation() {} });
+  assert.equal(state.selection.main.anchor, current.from);
+  const savedText = state.doc.toString();
+  context.editText!("left");
+  host.redraw(current.block);
+  click({ preventDefault() {}, stopPropagation() {} });
+  assert.equal(state.selection.main.anchor, current.from, "redrawing retains the updated stand-in anchor");
+  assert.equal(state.doc.toString(), savedText);
 });

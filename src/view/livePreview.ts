@@ -548,7 +548,6 @@ class LayoutWidget extends WidgetType {
     if (blockWrap(this.block) === null) {
       this.watch(el, view);
     }
-    markHighlightWidget(el, view, this.block);
     applyBlankEdges(el, this.edges);
     markHighlightWidget(el, view, this.block);
     drawnFor.set(el, this.drawnKey);
@@ -634,7 +633,7 @@ function drawWidget(
   markHighlightWidget(el, view, block);
   // Resolved when asked: the block may have moved since the widget was drawn.
   const position = (): number => standIn ?? view.posAtDOM(el);
-  const context: LayoutContext = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor, position };
+  const context: LayoutContext & { position: () => number } = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor, position };
   const host: TextEditHost = {
     el,
     root,
@@ -644,13 +643,14 @@ function drawWidget(
     editor: view.state.field(editorInfoField, false)?.editor,
     view,
     // Drawn again from the note as it is now, numbers included.
-    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), effectiveSkip, editing, standIn),
+    redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), effectiveSkip, editing,
+      standIn === undefined ? undefined : context.position()),
   };
   if (isEditable(block)) {
     context.editText = (editing) => startTextEdit(host, editing, null);
   }
   context.editSource = () => {
-    view.dispatch({ selection: { anchor: context.position!() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
+    view.dispatch({ selection: { anchor: context.position() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
     view.focus();
   };
   attachInteractions(root, context);

@@ -342,7 +342,10 @@ class WrapGuard {
       if (result.props) {
         for (const item of this.detached.values()) { item.el.setCssProps(result.props); item.signature = result.signature; }
         this.measure();
-      } else this.write(result.update, current);
+      } else {
+        this.prepareMeasurements();
+        this.write(result.update, current);
+      }
     } });
   }
 
