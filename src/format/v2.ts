@@ -332,6 +332,13 @@ export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embe
   return [serializeOpener(meta), ...rows.map(serializeRow), CLOSE_LINE];
 }
 
+/** A validated complete fence travels as one source item, without editing any of its lines. */
+export function mermaidEmbed(lines: readonly string[], from: number, to: number): V2Embed {
+  return { raw: lines.slice(from, to + 1).map(stripCarriageReturn).join("\n"),
+    syntax: "mermaid", target: "", alt: "", kind: "mermaid", nativeWidth: null,
+    line: from, endLine: to, from: 0, to: stripCarriageReturn(lines[to] ?? "").length };
+}
+
 export function mediaKindOf(target: string): MediaKind | null {
   const path = target.split(/[?#]/)[0] ?? target;
   const name = path.split("/").pop() ?? path;
@@ -378,11 +385,8 @@ function buildBlock(
 
     // Code, math and comments are text, whatever they hold.
     const diagramEnd = allText ? undefined : diagrams.get(line);
-    const embeds: V2Embed[] | null = diagramEnd !== undefined ? [{
-      raw: lines.slice(line, diagramEnd + 1).map(stripCarriageReturn).join("\n"),
-      syntax: "mermaid", target: "", alt: "", kind: "mermaid", nativeWidth: null,
-      line, endLine: diagramEnd, from: 0, to: stripCarriageReturn(lines[diagramEnd] ?? "").length,
-    }] : contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
+    const embeds: V2Embed[] | null = diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
+      : contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
     } else if (right.length > 0) {

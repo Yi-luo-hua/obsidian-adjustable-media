@@ -6,7 +6,7 @@ import { crossrefExtension, registerCrossrefs, setRefLanguage } from "./src/view
 import { DEFAULT_SETTINGS, VmlSettingTab, readSettings, type VmlSettings } from "./src/settings.ts";
 import { registerImageMenu } from "./src/view/imageMenu.ts";
 import { livePreviewExtension, refreshLayoutHighlights } from "./src/view/livePreview.ts";
-import { plainImageDrag } from "./src/view/plainDrag.ts";
+import { plainMediaDrag } from "./src/view/plainDrag.ts";
 import { registerReadingView } from "./src/view/readingView.ts";
 import { GuideModal } from "./src/guide/guideModal.ts";
 import { GUIDE_REVISION, shouldShowGuide } from "./src/guide/state.ts";
@@ -28,7 +28,7 @@ export default class AdjustableMediaPlugin extends Plugin {
     this.registerEditorExtension([
       livePreviewExtension(this.app, () => this.settings.keepLayoutHighlight),
       crossrefExtension(),
-      plainImageDrag(this.app),
+      plainMediaDrag(this.app),
       autoConvert(this, () => this.settings.autoConvert),
     ]);
     registerImageMenu(this);

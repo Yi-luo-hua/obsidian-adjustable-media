@@ -44,7 +44,7 @@ for (const scenario of [
       "./src/settings.ts": { DEFAULT_SETTINGS: {}, readSettings: (value: unknown) => value, VmlSettingTab: class {} },
       "./src/view/imageMenu.ts": { registerImageMenu: () => {} },
       "./src/view/livePreview.ts": { livePreviewExtension: () => [], refreshLayoutHighlights: () => {} },
-      "./src/view/plainDrag.ts": { plainImageDrag: () => [] },
+      "./src/view/plainDrag.ts": { plainMediaDrag: () => [] },
       "./src/view/readingView.ts": { registerReadingView: () => {} },
       "./src/guide/guideModal.ts": { GuideModal: Guide },
       "./src/guide/state.ts": { GUIDE_REVISION, shouldShowGuide },

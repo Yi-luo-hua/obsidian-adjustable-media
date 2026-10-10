@@ -17,6 +17,8 @@ sequenceDiagram
 ```
 <!-- /vml -->
 
-Select a complete Mermaid fence and run "Wrap selection in a layout". Include image or video lines in the selection, or drag the diagram beside an image afterwards. Drag a single item's side edge to resize its width. Use "Move out of layout" to restore an ordinary diagram.
+In Live Preview, drag an ordinary Mermaid diagram directly into an existing layout, beside an image or another diagram. Press Esc before releasing, or drop outside a layout, to cancel. One undo restores both the diagram's original position and the destination layout.
+
+You can also select a complete Mermaid fence and run "Wrap selection in a layout", including image or video lines in the selection. Drag a single item's side edge to resize its width. Use "Move out of layout" to restore an ordinary diagram.
 
 Mermaid inside existing V2 text layouts keeps its original behavior. Edit diagram code in the note source; this feature does not include a diagram node editor.

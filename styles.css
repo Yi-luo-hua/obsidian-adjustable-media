@@ -480,6 +480,10 @@
   cursor: grab;
 }
 
+.vml-has-layouts .cm-content .mermaid {
+  cursor: grab;
+}
+
 .vml-layout--dragging,
 .vml-layout--dragging .vml-item,
 body.vml-is-dragging,
