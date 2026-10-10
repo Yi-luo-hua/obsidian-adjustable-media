@@ -99,7 +99,6 @@ test("an unseen float waits for rendered nonzero geometry and releases its read-
   assert.equal(guard.measurementsReady(), true);
   assert.equal(guard.sizes.get(anchor.key)?.layoutHeight, 300);
   assert.equal(guard.sizes.get(anchor.key)?.width, 139.6);
-  guard.mediaChanged();
-  assert.equal(released, 1);
+  assert.equal(released, 1, "valid geometry releases the renderer without another media or viewport event");
   guard.destroy(); assert.equal(released, 1);
 });
