@@ -1,17 +1,17 @@
 # 项目状态
 
-更新：2026-10-10。本页汇总当前交付范围；工作包细节见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)，分支与目录见 [工作树记录](plans/layout-redesign/36-worktree-and-android-priority.md)，历史验证见 [归档索引](archive/README.md)。
+更新：2026-10-11。本页汇总当前交付范围；工作包细节见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)，分支与目录见 [工作树记录](plans/layout-redesign/36-worktree-and-android-priority.md)，历史验证见 [归档索引](archive/README.md)。
 
 ## 版本与交付范围
 
-- **当前公开版本：[0.7.2](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.2)**。正式标签源码为 `df37e08`；包含 #16 的列宽双击恢复、外框右边缩放保持单图尺寸，W08 常驻／悬停／编辑焦点高亮、重置后微拖图片适配修复，以及每版本一次的离线更新说明。
-- **0.7.3 已推送标签并生成 GitHub 发布草稿，尚未公开发布**。主目录检出 `codex/text-column-breaks`，标签源码 `da4aea9`；保留原定 `+++` 手动文字分栏、文字栏切换／外框空隙点击修复及中英文样例。干净源码的类型检查、lint、327 项测试和生产发布构建通过；GitHub 发布流程成功，三份附件与统一 LF 换行的本地重建逐字节一致，来源签名全部核对至标签／源码提交及发布工作流。已列 Windows／Obsidian 1.14.4 定向实测范围见 [34](plans/layout-redesign/34-text-column-breaks.md)。
-- **main 与发布附件来自不同源码线**。远端 main 为 `5bd34e7`，已包含 #17–#20 与 0.7.2 发布索引；0.7.2 的独立功能通过本次待合并分支重新合流，尚未合入 main。main HEAD 不能当作 0.7.2 附件来源，也不能跳过这些已发布功能直接构建下一版。
+- **当前公开版本：[0.7.3](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.3)**。2026-10-11（北京时间）正式发布并设为最新版本，标签源码为 `da4aea9`；保持原定桌面范围，新增手动文字分栏与点击修复，保留 0.7.2 已发布功能。
+- **本次范围与验证**。主目录检出 `codex/text-column-breaks`，标签源码 `da4aea9`；保留原定 `+++` 手动文字分栏、文字栏切换／外框空隙点击修复及中英文样例。干净源码的类型检查、lint、327 项测试和生产发布构建通过；GitHub 发布流程成功，三份公开附件与统一 LF 换行的本地重建逐字节一致，来源签名全部核对至标签／源码提交及发布工作流。已列 Windows／Obsidian 1.14.4 定向实测范围见 [34](plans/layout-redesign/34-text-column-breaks.md)。
+- **main 与发布附件来自不同源码线**。远端／本地 main 为 `3f31feb`，已合并发布索引 PR #22；本次只同步版本元数据与发布说明，不改 main 实现。main HEAD 不能当作 0.7.3 附件来源，下一次从 main 构建前仍需集成待合并分支以保留全部已发布功能。
 - 所有准备交付分支仍声明 `isDesktopOnly: true`，笔记格式保持 V2，不迁移旧笔记。插件已在 Obsidian 社区目录中。
 
 用户确认的交付边界（2026-10-10）：0.7.3 保持已确认的原定桌面内容，不追加三视图、共用渲染或 Android 增量；移动适配留到 Android、iPhone、iPad 一起验收后作为后续大版本交付。移动集成候选保留在 `codex/mobile-release-integration`，本轮本地集成没有推入 main；主目录继续检出 `codex/text-column-breaks`。后续大版本号尚未确定。
 
-0.7.3 [发布草稿](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/untagged-c9731f55d620db8cec9a)及 [发布索引草稿 PR #22](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/22)已可审阅，PR 检查通过；索引只更新版本及发布说明，插件实现保持原 main 状态。当前公开版本仍为 0.7.2，公开发布及索引合并待最终确认。主目录默认 lint 会扫描未入库的 `.claude/` 历史工作树，本次 327 项检查在只含入库源码的副本中通过，没有修改这些历史工作树。
+0.7.3 [正式发布](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.3)及已合并的 [发布索引 PR #22](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/22)均已核对，main 检查通过；公开下载的三份文件哈希与草稿核验结果一致，正式 manifest 保持 `isDesktopOnly: true`。主目录默认 lint 会扫描未入库的 `.claude/` 历史工作树，本次 327 项检查在只含入库源码的副本中通过，没有修改这些历史工作树。
 
 ## 已有工作与当前边界
 
