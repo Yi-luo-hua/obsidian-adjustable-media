@@ -4,15 +4,17 @@
 
 ## 分支与范围
 
-| 分支 | 核对时 HEAD | 基线与职责 | 下一步 |
+| 分支 | 本轮内容基线 | 基线与职责 | 下一步 |
 | --- | --- | --- | --- |
-| `codex/text-column-breaks` | `4c3eb7a`，已推送 | 正式 0.7.2 + 0.7.3 手动分栏、点击修复及双语样例；主目录 | 保持可发布状态，其他增量独立审查 |
-| `codex/pending-view-parity` | `be38d7f`，已推送 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 三视图／既有拖动修复待集成；不含 W02 原型 |
-| `codex/pending-render-stability` | `205408b`，已推送 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 共用渲染修复单独审查与相关宿主回归 |
-| `codex/android-adaptation` | `3b77a1e`，已推送 | 接共用渲染分支；手机／平板触摸、输入、焦点与控件 | Android 优先；真机验收按用户要求稍后进行 |
+| `codex/text-column-breaks` | `c1572bd` 文档整理 | 正式 0.7.2 + 0.7.3 手动分栏、点击修复及双语样例；主目录 | 保持可发布状态，标签／公开发布待安排 |
+| `codex/pending-view-parity` | `7963b0f` 文档合流 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 本轮审查和 Windows 定向回归通过，待集成 |
+| `codex/pending-render-stability` | `bf8dcd8` 审查修复 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 416 项检查、构建与 Windows 定向回归通过，待集成 |
+| `codex/android-adaptation` | `c1d0427` 渲染修复合流 | 接共用渲染分支；手机／平板触摸、输入、焦点与控件 | 427 项检查与构建通过；Android 真机验收延期 |
 | `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
 
 待合并分支按依赖堆叠：`text-column-breaks → pending-view-parity → pending-render-stability → android-adaptation`。这表示代码依赖，不表示已经合并或发布；评审每一层时以其上一层为比较基线。旧 `codex/android-layout-stability` 留作完整历史来源，不再作为新的混合开发入口。
+
+表中提交固定本轮内容基线，后续文档同步会继续推进各分支 HEAD；实时位置以 `git worktree list` 与对应远端分支为准。
 
 远端 main 为 `5bd34e7`，正式 0.7.2 标签为 `df37e08`；本地 main 仍为 `7fcd086`，落后远端 5 个提交，当前没有工作树检出 main。本次核对不改变这些分支或版本标签。
 
@@ -37,7 +39,7 @@ W02／W03 的 33 个未提交文件已搬到原独立功能工作树，逐文件
 
 ## Android 本轮安排
 
-用户选择先完成 Android 手机／平板，再推进 iPhone／iPad，并明确真机验收稍后进行。具体场景与恢复顺序统一维护在 [Android 适配](mobile-adaptation.md)，旧构建证据见 [验收摘要](archive/branch-validation.md#android-phone-and-tablet)。上次分支整理检查时 ADB 没有连接设备；本次只整理文档，未复核设备或部署新构建。
+用户选择先完成 Android 手机／平板，再推进 iPhone／iPad，并明确真机验收稍后进行。具体场景与恢复顺序统一维护在 [Android 适配](mobile-adaptation.md)，旧构建证据见 [验收摘要](archive/branch-validation.md#android-phone-and-tablet)。上次分支整理检查时 ADB 没有连接设备；本轮进行了桌面审查／定向回归，未复核 Android 设备或部署手机／平板构建。
 
 ## 分支整理时的检查与提交
 
@@ -49,4 +51,4 @@ W02／W03 的 33 个未提交文件已搬到原独立功能工作树，逐文件
 
 日常验证继续按 [AGENTS.md](../../../AGENTS.md) 的改动影响选择范围；W03／W04 的统一规划器触摸接入属于后续增量，不混入本轮 Android 基础适配。
 
-本次文档整理将旧 28 的交付分类／顺序并入本页，候选与发布过程并入 [独立功能归档](archive/independent-features.md)；没有新增代码验收、Git 提交或推送。
+文档整理将旧 28 的交付分类／顺序并入本页，候选与发布过程并入 [独立功能归档](archive/independent-features.md)。整理结果已提交并沿依赖同步；本轮两项共用渲染修复及 Windows 定向回归见 [审查摘要](archive/branch-validation.md#2026-10-10-branch-review)。main、版本标签及公开发布保持原状态。
