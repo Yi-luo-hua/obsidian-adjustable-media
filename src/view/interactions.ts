@@ -52,6 +52,8 @@ export interface LayoutContext extends WriteOptions {
   model: LayoutModel;
   /** Starts typing the text on one side of the media right in the layout. */
   editText?: (side: TextSide) => void;
+  /** Explicit source editing, available from the layout's context menu. */
+  editSource?: () => void;
   /** Where the block starts in the note now, found from its widget. */
   position?: () => number;
 }
@@ -106,6 +108,7 @@ export function attachInteractions(root: HTMLElement, context: LayoutContext): v
   contexts.set(root, context);
   setUpViewer(root, context);
   if (!isEditable(context.block)) {
+    setUpSourceMenu(root, context);
     return;
   }
 
@@ -121,6 +124,7 @@ export function attachInteractions(root: HTMLElement, context: LayoutContext): v
   if (isTextOnly(context.model)) {
     setUpTextBlockMenu(root, context);
   }
+  setUpSourceMenu(root, context);
 }
 
 /** Where an item dragged from `leaf` would land in a layout of the note at (x, y), if anywhere. */
@@ -685,6 +689,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   }
 
   const menu = new Menu();
+  addSourceItem(menu, context);
   // Each group has its own section: Obsidian separates sections and lists these before the file
   // actions added at the end.
   menu.addItem((entry) => entry.setTitle(t("editCaption")).setIcon("text").setSection("vml-caption").onClick(() => {
@@ -849,6 +854,7 @@ function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
     event.preventDefault();
     event.stopPropagation();
     const menu = new Menu();
+    addSourceItem(menu, context);
     addWrapItems(menu, context, "textWrapLeft", "textWrapRight");
     addTextLayoutItem(menu, context);
     menu.addItem((entry) => entry.setTitle(t("unwrapText")).setIcon("log-out").setSection("vml-move").onClick(() => {
@@ -863,6 +869,23 @@ export function refreshSizingHandles(root: HTMLElement, context: LayoutContext):
   for (const handle of Array.from(root.querySelectorAll(".vml-row__height-handle, .vml-item__col-handle, .vml-item__width-handle, .vml-frame__handle"))) handle.remove();
   for (const row of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) setUpRow(row, Number(row.dataset.row), context);
   setUpFrame(root, context);
+}
+
+function addSourceItem(menu: Menu, context: LayoutContext): void {
+  const editSource = context.editSource;
+  if (editSource) menu.addItem(entry => entry.setTitle(t("editSource")).setIcon("code")
+    .setSection("vml-source").onClick(editSource));
+}
+
+function setUpSourceMenu(root: HTMLElement, context: LayoutContext): void {
+  root.addEventListener("contextmenu", event => {
+    if (event.defaultPrevented || eventElement(event)?.closest(".vml-text-editor")) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const menu = new Menu();
+    addSourceItem(menu, context);
+    menu.showAtMouseEvent(event);
+  });
 }
 
 function contentWidth(el: HTMLElement): number {

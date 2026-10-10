@@ -33,7 +33,7 @@ test("an omitted editor file preserves layout identity, dimensions and originati
   class TrackedMeasurements extends projections.PaneMeasurements<number> {
     constructor() { super(); caches.push(this); }
   }
-  const obsidian = { editorInfoField, editorLivePreviewField, MarkdownView, Component: class {} };
+  const obsidian = { editorInfoField, editorLivePreviewField, MarkdownView, Platform: { isMobileApp: false }, Component: class {} };
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
@@ -66,13 +66,22 @@ test("an omitted editor file preserves layout identity, dimensions and originati
     obsidian, "@codemirror/view": viewApi, "./edits.ts": edits, "./editorTransaction.ts": transaction,
     "./blockIdentity.ts": identity, "./documentSnapshot.ts": snapshots,
   });
+  let focused = 0;
   const view = { get state() { return state; }, dom: { isConnected: true },
-    dispatch(spec: stateApi.TransactionSpec) { state = state.update(spec).state; }, focus() {} };
+    dispatch(spec: stateApi.TransactionSpec) { state = state.update(spec).state; }, focus() { focused++; } };
   const block = snapshots.snapshotForState(state)!.blocks[0].block;
   const edit = edits.planModelEdit(block, model.setRowHeight(model.modelFromBlock(block), 0, 300))!;
   const result = await writer.writeBlockEdits(app, file, [edit], { view });
   assert.equal(result.ok, true);
   assert.ok(state.doc.toString().includes('"height":300'));
+  assert.equal(focused, 1, "desktop gestures retain keyboard undo focus");
+  obsidian.Platform.isMobileApp = true;
+  const mobileBlock = snapshots.snapshotForState(state)!.blocks[0].block;
+  const mobileEdit = edits.planModelEdit(mobileBlock, model.setRowHeight(model.modelFromBlock(mobileBlock), 0, 320))!;
+  assert.equal((await writer.writeBlockEdits(app, file, [mobileEdit], { view })).ok, true);
+  assert.ok(state.doc.toString().includes('"height":320'));
+  assert.equal(focused, 1, "mobile resizing keeps focus away from the unrelated note cursor");
+  assert.equal(state.selection.main.from, 0);
   sourceView.editor = {};
   assert.equal((await writer.writeBlockEdits(app, file, [edit], { view })).ok, false);
 });

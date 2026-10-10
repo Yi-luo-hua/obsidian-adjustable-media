@@ -43,6 +43,8 @@ for (const scenario of [
       "./src/view/crossrefView.ts": { crossrefExtension: () => [], registerCrossrefs: () => {}, setRefLanguage: () => {} },
       "./src/settings.ts": { DEFAULT_SETTINGS: {}, readSettings: (value: unknown) => value, VmlSettingTab: class {} },
       "./src/view/imageMenu.ts": { registerImageMenu: () => {} },
+      "./src/view/layoutTouch.ts": { registerLayoutTouch: () => {} },
+      "./src/view/cornerInput.ts": { registerCornerInputGuard: () => {} },
       "./src/view/livePreview.ts": { livePreviewExtension: () => [], refreshLayoutHighlights: () => {} },
       "./src/view/plainDrag.ts": { plainImageDrag: () => [] },
       "./src/view/readingView.ts": { registerReadingView: () => {} },

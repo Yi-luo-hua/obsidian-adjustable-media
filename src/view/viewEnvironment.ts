@@ -4,7 +4,8 @@
  * and counting them would redraw every layout and drop every measured height at the start and end of
  * each drag, the moved layout's own drag styling included.
  */
-const TRANSIENT_CLASS = /^(?:vml-.*|is-grabbing|is-dragging|is-focused)$/;
+// Keyboard/navigation visibility and cursor hiding are UI state; actual width/typography are read independently.
+const TRANSIENT_CLASS = /^(?:vml-.*|is-grabbing|is-dragging|is-focused|keyboard-animating|is-hidden-nav|hide-cursor|mod-toolbar-open)$/;
 
 /** The classes of `className` that can change how layouts are laid out, in a stable order. */
 export function layoutClasses(className: string): string {

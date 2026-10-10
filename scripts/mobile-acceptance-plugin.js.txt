@@ -1,0 +1,39 @@
+const {Plugin,Notice,Platform,apiVersion}=require('obsidian');
+module.exports=class MobileAcceptance extends Plugin {
+  onload(){
+    if(!['adjustable-media-mobile-test','adjustable-media-tablet-test'].includes(this.app.vault.getName()))return;
+    this.events=[];this.samples=[];
+    for(const name of ['pointerdown','pointerup','pointercancel','compositionstart','compositionupdate','compositionend','visibilitychange']){
+      this.registerDomEvent(document,name,event=>{
+        this.events.push({name,at:Date.now(),trusted:event.isTrusted,pointerType:event.pointerType,input:event.data,visibility:document.visibilityState,file:this.app.workspace.getActiveFile()?.path});
+      },true);
+    }
+    this.addCommand({id:'capture-state',name:'记录当前真机状态 / Capture device state',callback:()=>this.capture()});
+    this.addCommand({id:'export-report',name:'导出真机报告 / Export device report',callback:()=>this.exportReport()});
+    this.addRibbonIcon('clipboard-check','记录真机状态 / Capture device state',()=>this.capture());
+    this.app.workspace.onLayoutReady(()=>{void this.capture(false);});
+  }
+  async capture(notify=true){
+    const app=this.app,view=app.workspace.activeLeaf?.view;
+    const cm=view?.editor?.cm,container=view?.getMode?.()==='preview'?view.previewMode.containerEl:cm?.dom??view?.containerEl;
+    const rect=el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};};
+    const sample={at:new Date().toISOString(),vault:app.vault.getName(),file:view?.file?.path,mode:view?.getMode?.(),bodyClasses:document.body.className,documentOverflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,pane:container?{width:container.clientWidth,overflow:container.scrollWidth-container.clientWidth}:null,viewport:{width:innerWidth,height:innerHeight,ratio:devicePixelRatio,visual:window.visualViewport?{width:visualViewport.width,height:visualViewport.height,offsetTop:visualViewport.offsetTop}:null},visibility:document.visibilityState,
+      capabilities:{resizeObserver:typeof ResizeObserver,mutationObserver:typeof MutationObserver,fontFaceSet:!!document.fonts,computeMetadataAsync:typeof app.metadataCache.computeMetadataAsync,editorCM:!!cm,rendererSections:Array.isArray(view?.previewMode?.renderer?.sections)},
+      layouts:[...(container?.querySelectorAll('.vml-layout')||[])].map(el=>({rect:rect(el),renderState:el.dataset.vmlRenderState,block:el.closest('[data-vml-block-id]')?.dataset.vmlBlockId,editing:!!el.querySelector('.vml-text-editor'),overflow:el.scrollWidth-el.clientWidth,
+        media:[...el.querySelectorAll('img,video')].map(m=>({type:m.tagName,rect:rect(m),width:m.naturalWidth??m.videoWidth,height:m.naturalHeight??m.videoHeight,ready:m.complete??m.readyState}))})),
+      bufferMatchesSaved:view?.file&&cm?cm.state.doc.toString()===await app.vault.read(view.file):null,
+      selection:cm?cm.state.selection.ranges.map(r=>({anchor:r.anchor,head:r.head})):[],formulaCount:container?.querySelectorAll('mjx-container,.MathJax').length,
+      inputActions:[...(container?.querySelectorAll('.vml-text-editor__actions button')||[])].map(el=>({text:el.textContent,disabled:el.disabled,rect:rect(el)}))};
+    this.samples.push(sample);if(notify)new Notice('状态已记录；完成测试后运行“导出真机报告”。');return sample;
+  }
+  async exportReport(){
+    await this.capture(false);
+    const app=this.app,build=JSON.parse(await app.vault.adapter.read('build-info.json'));
+    const invariants=[];
+    for(const [path,expected]of Object.entries(build.originals)){const file=app.vault.getAbstractFileByPath(path);invariants.push({path,exact:!!file&&(await app.vault.read(file))===expected});}
+    const report={device:{obsidian:apiVersion,isAndroid:Platform.isAndroidApp,isIos:Platform.isIosApp,userAgent:navigator.userAgent},build,samples:this.samples,events:this.events,invariants,
+      acceptance:'Raw real-device observations. Touch, IME, cancellation and lifecycle cases require separately reviewed outcomes.'};
+    const path='真机报告-'+Date.now()+'.json';await app.vault.create(path,JSON.stringify(report,null,2));
+    new Notice('报告已保存：'+path+'。请把这个文件发回电脑。');return path;
+  }
+};

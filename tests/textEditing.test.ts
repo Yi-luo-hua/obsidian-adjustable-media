@@ -13,8 +13,9 @@ type Handler = (event: { isComposing?: boolean }) => boolean | void;
 
 interface Harness {
   type(text: string): void;
-  compose(text: string): void;
+  compose(value: string | boolean): void;
   switchSide(side: format.TextSide): void;
+  press(label: string): void;
   leave(): void;
   enter(): void;
   key(key: string, modifiers?: string[]): boolean | void;
@@ -77,9 +78,17 @@ async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
     composing: false, compositionStarted: false, contentDOM: content,
     dom: { addEventListener() {} }, focus() {}, destroy() { destroyed = true; },
   };
+  const buttons = new Map<string, { disabled: boolean; listeners: Map<string, () => void> }>();
   const element = (): object => ({
     empty() {}, removeClass() {}, addClass() {}, toggleClass() {}, addEventListener() {},
     createDiv: () => element(),
+    createEl: (_tag: string, options: { text: string }) => {
+      const button = { disabled: false, listeners: new Map<string, () => void>(),
+        addEventListener: (name: string, run: (event: { stopPropagation(): void }) => void) =>
+          button.listeners.set(name, () => run({ stopPropagation() {} })) };
+      buttons.set(options.text, button);
+      return button;
+    },
   });
 
   const module = await mockedModule<{ startTextEdit(host: unknown, side: string, point: null): void; keepWhileEditing(el: unknown, block: unknown): boolean; stopTextEdit(el: unknown): void }>(new URL("../src/view/textEditing.ts", import.meta.url), {
@@ -131,8 +140,9 @@ async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
     .find((handler) => handler.key === name && handler.modifiers.join() === modifiers.join())?.run({ isComposing: false });
   return {
     type(next) { text = next; onUpdate({ docChanged: true }); },
-    compose(next) { editor.composing = true; text = next; onUpdate({ docChanged: true }); },
+    compose(next) { editor.composing = typeof next === "string" || next; editor.compositionStarted = editor.composing; if (typeof next === "string") { text = next; onUpdate({ docChanged: true }); } },
     switchSide(side) { module.startTextEdit(host, side, null); },
+    press(label) { const button = buttons.get(label); assert.ok(button); if (!button.disabled) button.listeners.get("click")?.(); },
     leave() { content.doc.activeElement = null; listeners.get("focusout")?.(); },
     enter() { content.doc.activeElement = content; listeners.get("focusin")?.(); },
     key, notices, written, executed, scopes,
@@ -205,6 +215,37 @@ test("switching columns does not discard text that cannot be written", async () 
   assert.equal(editor.destroyed(), false);
   assert.equal(editor.redraws, 0);
   assert.deepEqual(editor.notices, ["textKeptOpen"]);
+});
+
+test("Done waits for an IME candidate, then saves the confirmed input and closes", async () => {
+  const editor = await session();
+  editor.compose(true);
+  editor.type("组字中");
+  editor.press("textDone");
+  assert.deepEqual(editor.written, []);
+  assert.equal(editor.destroyed(), false);
+  assert.deepEqual(editor.notices, ["textFinishComposition"]);
+  editor.compose(false);
+  editor.press("textDone");
+  assert.deepEqual(editor.written, [["组字中"]]);
+  assert.equal(editor.destroyed(), true);
+  assert.equal(editor.redraws, 1);
+});
+
+test("the visible discard action drops an invalid draft without writing or reopening it", async () => {
+  const editor = await session();
+  editor.press("textDiscardDraft");
+  assert.equal(editor.destroyed(), false);
+  editor.type("```js");
+  editor.press("textDone");
+  assert.equal(editor.destroyed(), false);
+  assert.deepEqual(editor.written, []);
+  editor.press("textDiscardDraft");
+  assert.equal(editor.destroyed(), true);
+  assert.equal(editor.redraws, 1);
+  editor.reopen();
+  assert.equal(editor.editorText(), "Left text");
+  assert.deepEqual(editor.written, []);
 });
 
 test("unsaved text keeps the editor open when the focus leaves it", async () => {

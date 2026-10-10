@@ -649,20 +649,23 @@ function drawWidget(
   if (isEditable(block)) {
     context.editText = (editing) => startTextEdit(host, editing, null);
   }
+  context.editSource = () => {
+    view.dispatch({ selection: { anchor: context.position!() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
+    view.focus();
+  };
   attachInteractions(root, context);
   if (isEditable(block)) {
     setUpBlockMove(root, context);
   }
-  setUpText(view, host);
+  setUpText(host);
 
   // On the media, where it hides none of the text beside them.
   const buttonHost = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
   const button = buttonHost.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
   button.addEventListener("click", (event) => {
     event.preventDefault();
-    // A stand-in's block lies above what is drawn.
-    view.dispatch({ selection: { anchor: position() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
-    view.focus();
+    event.stopPropagation();
+    context.editSource!();
   });
   widgetHosts.set(el, host);
   return host;
@@ -673,7 +676,7 @@ function drawWidget(
  * Read-only columns stay selectable; source editing is an explicit menu action. Links in the text are
  * Obsidian's and open as anywhere else, and selecting some of the text to copy it changes nothing.
  */
-function setUpText(view: EditorView, host: TextEditHost): void {
+function setUpText(host: TextEditHost): void {
   const { block } = host.context;
   host.root.addEventListener("mousedown", (event) => {
     const target = eventElement(event);
@@ -707,13 +710,6 @@ function setUpText(view: EditorView, host: TextEditHost): void {
       if (isEditable(block)) {
         startTextEdit(host, side, { x: event.clientX, y: event.clientY });
         return;
-      }
-      const text = side === "left" ? block.leftText : block.rightText;
-      if (text) {
-        const { doc } = view.state;
-        const open = doc.lineAt(host.context.position?.() ?? view.posAtDOM(host.el)).number;
-        view.dispatch({ selection: { anchor: doc.line(Math.min(doc.lines, open + text.to - block.openLine)).to }, scrollIntoView: host.el.closest(".vml-wrap-proxy") !== null });
-        view.focus();
       }
     });
   }

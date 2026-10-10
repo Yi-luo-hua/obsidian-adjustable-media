@@ -220,6 +220,16 @@ const MESSAGES = {
     zh: "文字底端对齐",
     en: "Text at the bottom",
   },
+  textDone: { zh: "完成", en: "Done" },
+  textDiscardDraft: { zh: "放弃草稿", en: "Discard draft" },
+  textDiscardDraftDesc: {
+    zh: "仅放弃未保存的无效草稿；已写入的内容可通过撤销恢复。",
+    en: "Discard only the unsaved invalid draft. Use undo to restore text already saved.",
+  },
+  textFinishComposition: {
+    zh: "请先选定或取消输入法候选词，再完成编辑。",
+    en: "Confirm or cancel the input method candidate before finishing editing.",
+  },
   textUnsavedEsc: {
     zh: "这段文字还不能写回笔记（框是红的）。改好它，或者再按一次 Esc 放弃这些修改。",
     en: "This text cannot go into the note yet (the frame is red). Fix it, or press Esc again to give up these changes.",

@@ -70,6 +70,14 @@ test("drag and focus classes on the page are not an environment change; a theme 
   setBody("theme-dark vml-is-dragging is-grabbing is-focused");
   setBody("theme-dark");
   assert.equal(environments, 1);
+  for (let index = 0; index < 20; index++) setBody(index % 2 ? "theme-dark" : "theme-dark keyboard-animating");
+  assert.equal(environments, 1, "mobile keyboard animation must not clear float dimensions in a feedback loop");
+  for (let index = 0; index < 20; index++) setBody(index % 2 ? "theme-dark" : "theme-dark is-hidden-nav keyboard-animating");
+  assert.equal(environments, 1, "overlay navigation must not rebuild loaded video widgets during touch scrolling");
+  for (let index = 0; index < 20; index++) setBody(index % 2 ? "theme-dark" : "theme-dark hide-cursor");
+  assert.equal(environments, 1, "touch cursor hiding is not a media measurement change");
+  for (let index = 0; index < 20; index++) setBody(index % 2 ? "theme-dark" : "theme-dark mod-toolbar-open");
+  assert.equal(environments, 1, "mobile input toolbar visibility does not replace the player");
   setBody("theme-light");
   assert.equal(environments, 2);
   assert.equal(module.layoutClasses("  b vml-x a is-grabbing "), "a b");
