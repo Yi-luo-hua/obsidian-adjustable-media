@@ -1,11 +1,11 @@
 # 项目进度与验证记录
 
-更新日期：2026-10-07。当前发布版本：[0.7.1](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.1)（2026-10-05），公开状态和下载附件以 Release 页面为准。插件已在 Obsidian 社区目录中。
+更新日期：2026-10-10。当前发布版本：[0.7.3](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.3)，公开状态和下载附件以 Release 页面为准。插件已在 Obsidian 社区目录中。
 
 
-0.7.2 已从独立标签源码构建，包含 #16 两项操作改进、W08 边框高亮（关闭后悬停或块内编辑时高亮）、重置后微拖时的图片适配修复，以及离线更新弹窗。发布源码见标签 `0.7.2`／分支 `codex/independent-features`；主分支 #17–#20 保留为后续未发布增量。本次主分支仅同步发布索引，不移植 W08 源码；下一次从 main 构建发布前须先合入 W08，以免丢失已发布功能。主分支 HEAD 不等于 0.7.2 的构建源码。
+0.7.3 继续从独立标签源码构建，保持原定桌面范围：保留 0.7.2 已发布功能，新增 `+++` 手动文字分栏、点击与文字栏切换修复及双语样例。源码见标签 `0.7.3`／分支 `codex/text-column-breaks`；主分支 #17–#20、共用渲染与移动适配作为后续增量保留。本次主分支仅同步发布索引，不移植这些功能源码；main HEAD 不等于 0.7.3 附件来源。Android 两台设备本轮已列相关验收通过；用户要求它与 iPhone／iPad 验收一起作为后续移动大版本交付，不追加到 0.7.3。
 
-## 当前进度
+## 历史进度（原构建范围）
 
 - **0.7.1（已发布）**：0.7.0 的布局基础（快照、运行期身份、写入保护、每窗格同步与测量缓存，[PR #12](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/12)）之上，修复审查中发现的交互缺陷（[#14](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/14)），包括文字栏草稿保留、拖动不重画全部布局、合并与移出布局的设置保护。详见 [CHANGELOG](../CHANGELOG.md)。
 - **`main` 上未发布的改动**：
