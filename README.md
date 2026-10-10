@@ -6,7 +6,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [Feature examples](docs/examples/Guide.en.md) · [功能示例](docs/examples/Guide.zh-CN.md). In Obsidian, run **Feature examples** for an offline preview and a button to create a working copy with its media. The guide opens once when first available, including for existing users upgrading to the release that adds it.
 
-The latest release is **0.7.2**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
+The latest release is **0.7.3**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
 
 ![Adjustable Media Preview](assets/demo.jpg)
 
@@ -145,10 +145,10 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 - Released under the [MIT License](LICENSE).
 - Originally inspired by [Fall-Makito/visual-media-layout](https://github.com/Fall-Makito/visual-media-layout), and rewritten from the ground up with a resilient comment-based storage model and safe transactional pipeline.
 
-## 0.7.3 ready for release: manual text columns
+## 0.7.3: manual text columns
 
 Inside a text layout, write `+++` on its own unindented line to start the next column. Up to four equal-width columns align at the top, and each keeps its own content, including empty columns. Without markers, automatic columns continue to work. Type the marker while editing layout text, or use the Insert column break command in the layout source. Code, math and comments are left alone; more than four columns triggers a warning and falls back to automatic columns without changing the source.
 
 This version also fixes clicks between text editors and on frame padding unexpectedly revealing source. Its release notes can create offline [English](docs/examples/ManualColumns.en.md) or [Chinese](docs/examples/ManualColumns.zh-CN.md) examples to match the interface language, using a fresh folder for each creation.
 
-User acceptance, bilingual Windows/Obsidian 1.14.4 checks, all 327 automated tests and release packaging are complete. Version 0.7.3 is tagged from `codex/text-column-breaks`, based on the published 0.7.2 source and retaining its features. The GitHub draft and its three signed build files are verified; it has not been published, so 0.7.2 remains the latest public release. See [status](docs/STATUS.md) and the [implementation record](docs/plans/layout-redesign/34-text-column-breaks.md) for validation details. Desktop only; mobile adaptation is reserved for a later major release after Android, iPhone and iPad validation. The note format remains V2.
+User acceptance, bilingual Windows/Obsidian 1.14.4 checks, all 327 automated tests and release packaging are complete. Version 0.7.3 is tagged from `codex/text-column-breaks`, based on the published 0.7.2 source and retaining its features. Version 0.7.3 is now published as the latest release; its three attested build files and the merged release index are verified. See [status](docs/STATUS.md) and the [implementation record](docs/plans/layout-redesign/34-text-column-breaks.md) for validation details. Desktop only; mobile adaptation is reserved for a later major release after Android, iPhone and iPad validation. The note format remains V2.
