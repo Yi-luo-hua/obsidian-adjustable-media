@@ -4,6 +4,14 @@ import type { V2Block } from "../format/v2.ts";
 
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
+  insertColumnBreak: { zh: "插入分栏标记", en: "Insert column break" },
+  manualColumnsDesc: { zh: "栏数由正文中的 +++ 分栏标记决定；移除标记后恢复自动分栏。", en: "The +++ markers set the column count. Remove them to restore automatic columns." },
+  columnBreakUnavailable: { zh: "请在文字布局块的正文位置插入分栏标记，最多四栏。", en: "Insert a column break in a text layout's body, up to four columns." },
+  textColumnsOverflow: { zh: "手动分栏超过四栏，已按自动分栏显示，原文保留。", en: "More than four manual columns: automatic layout is shown and the source is preserved." },
+  releaseNotesCommand: { zh: "查看更新说明", en: "View release notes" },
+  releaseNotesTitle: { zh: "{version} 更新说明", en: "What's new in {version}" },
+  releaseNotesAgain: { zh: "以后可从命令面板的「查看更新说明」重新打开。本版本仅自动显示一次。", en: "Open View release notes from the command palette to read this again. It appears automatically once per version." },
+  releaseNotesClose: { zh: "知道了", en: "Got it" },
   guideTitle: { zh: "Adjustable Media 功能介绍", en: "Adjustable Media overview" },
   guideCommandName: { zh: "功能示例", en: "Feature examples" },
   guideSubtitle: {
@@ -12,6 +20,10 @@ const MESSAGES = {
   },
   guideLanguage: { zh: "语言", en: "Language" },
   guideCreate: { zh: "在库中创建使用指南", en: "Create guide in vault" },
+  manualColumnExampleCreate: { zh: "在库中创建手动分栏样例", en: "Create manual column examples in vault" },
+  manualColumnExampleName: { zh: "手动文字分栏使用样例", en: "Manual column examples" },
+  manualColumnExampleCreated: { zh: "手动分栏样例已创建并打开。", en: "Manual column examples created and opened." },
+  manualColumnExampleFailed: { zh: "手动分栏样例创建失败，请重试。", en: "Failed to create manual column examples. Please try again." },
   exampleFolderName: { zh: "Adjustable Media 指南", en: "Adjustable Media guide" },
   settingUiLanguage: { zh: "界面语言", en: "Interface language" },
   settingUiLanguageDesc: {
@@ -208,6 +220,16 @@ const MESSAGES = {
     zh: "文字底端对齐",
     en: "Text at the bottom",
   },
+  textDone: { zh: "完成", en: "Done" },
+  textDiscardDraft: { zh: "放弃草稿", en: "Discard draft" },
+  textDiscardDraftDesc: {
+    zh: "仅放弃未保存的无效草稿；已写入的内容可通过撤销恢复。",
+    en: "Discard only the unsaved invalid draft. Use undo to restore text already saved.",
+  },
+  textFinishComposition: {
+    zh: "请先选定或取消输入法候选词，再完成编辑。",
+    en: "Confirm or cancel the input method candidate before finishing editing.",
+  },
   textUnsavedEsc: {
     zh: "这段文字还不能写回笔记（框是红的）。改好它，或者再按一次 Esc 放弃这些修改。",
     en: "This text cannot go into the note yet (the frame is red). Fix it, or press Esc again to give up these changes.",
@@ -344,6 +366,14 @@ const MESSAGES = {
   settingRefLanguage: {
     zh: "图表编号的语言",
     en: "Language of figure and table numbers",
+  },
+  settingCursorHighlight: {
+    zh: "保持布局块边框高亮",
+    en: "Keep layout borders highlighted",
+  },
+  settingCursorHighlightDesc: {
+    zh: "默认开启，保持实时预览中的布局块边框高亮。关闭后，鼠标悬停在布局块内或编辑光标进入布局块源码、内部文字栏时高亮；离开后隐藏。不改变布局大小或笔记内容。",
+    en: "On by default: keep layout borders highlighted in live preview. When off, highlight while the mouse is over a layout or the editing caret is in its source or text column. Layout size and note content stay unchanged.",
   },
   settingRefLanguageDesc: {
     zh: "图注、表注和引用（@fig:名字、@tbl:名字、@eq:名字）显示成“图 1”还是“Figure 1”。改动后重新打开笔记生效。",

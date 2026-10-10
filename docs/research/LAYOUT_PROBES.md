@@ -2,7 +2,7 @@
 
 状态：2026-09-30 的基线复现，不是修复后的预期行为。使用 Node 24，在项目根目录执行。无笔记或源码写入。
 
-实施后说明：P1 已修复未知格式解包与实际阅读依赖失效入口，以下旧基线探针的断言不再适用于当前分支，须保留为历史复现。当前正确行为由 `tests/layoutDependencies.test.ts`、[首批宿主记录](../plans/layout-redesign/07-execution-record.md) 和 [每窗格基础记录](../plans/layout-redesign/08-pane-foundation-record.md) 验证；后续顺序见 [09 进度安排](../plans/layout-redesign/09-progress-and-next-steps.md)。
+实施后说明：P1 已修复未知格式解包与实际阅读依赖失效入口，以下旧基线探针的断言不再适用于当前分支，须保留为历史复现。当前正确行为由 `tests/layoutDependencies.test.ts`、[首批宿主记录](../plans/layout-redesign/archive/07-execution-record.md) 和 [每窗格基础记录](../plans/layout-redesign/archive/08-pane-foundation-record.md) 验证；后续顺序见 [09 进度安排](../plans/layout-redesign/09-progress-and-next-steps.md)。
 
 以下脚本使用仓库相对导入，移出原研究目录后仍可运行。以 Markdown 保存可避免把一次性研究脚本加入插件源码与脚本 lint 范围。
 

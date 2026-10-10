@@ -13,6 +13,9 @@ type Handler = (event: { isComposing?: boolean }) => boolean | void;
 
 interface Harness {
   type(text: string): void;
+  compose(value: string | boolean): void;
+  switchSide(side: format.TextSide): void;
+  press(label: string): void;
   leave(): void;
   enter(): void;
   key(key: string, modifiers?: string[]): boolean | void;
@@ -34,6 +37,7 @@ interface Harness {
   reopen(index?: number): void;
   /** What the column's editor started with or holds now. */
   editorText(): string;
+  editorCaret(): number | null;
   notices: string[];
   written: string[][];
   executed: string[];
@@ -50,7 +54,8 @@ const TWO = [...BLOCK, "", ...BLOCK];
  * editor and the page stubbed. The note's editor is modelled as live preview has it: each change is a
  * new state with its own document snapshot, identities carried through the change.
  */
-async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
+async function session(lines: string[] = BLOCK, index = 0,
+  caret?: { api: "modern" | "legacy"; from: number; to: number; before: string }): Promise<Harness> {
   const notices: string[] = [];
   const written: string[][] = [];
   const executed: string[] = [];
@@ -61,6 +66,7 @@ async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
   class Notice { constructor(message: string) { notices.push(message); } }
 
   let text = "";
+  let editorCaret: number | null = null;
   let destroyed = false;
   let onUpdate: (update: { docChanged: boolean }) => void = () => {};
   const listeners = new Map<string, () => void>();
@@ -75,15 +81,31 @@ async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
     composing: false, compositionStarted: false, contentDOM: content,
     dom: { addEventListener() {} }, focus() {}, destroy() { destroyed = true; },
   };
+  const buttons = new Map<string, { disabled: boolean; listeners: Map<string, () => void> }>();
+  const part = { dataset: { sourceFrom: String(caret?.from), sourceTo: String(caret?.to) } };
+  const node = { parentElement: { closest: () => part } };
+  const page = {
+    caretPositionFromPoint: caret?.api === "modern" ? () => ({ offsetNode: node, offset: 1 }) : undefined,
+    caretRangeFromPoint: caret?.api === "legacy" ? () => ({ startContainer: node, startOffset: 1 }) : undefined,
+    createRange: () => ({ setStart() {}, setEnd() {}, toString: () => caret?.before ?? "" }),
+  };
   const element = (): object => ({
+    doc: page, contains: (target: unknown) => target === node,
     empty() {}, removeClass() {}, addClass() {}, toggleClass() {}, addEventListener() {},
     createDiv: () => element(),
+    createEl: (_tag: string, options: { text: string }) => {
+      const button = { disabled: false, listeners: new Map<string, () => void>(),
+        addEventListener: (name: string, run: (event: { stopPropagation(): void }) => void) =>
+          button.listeners.set(name, () => run({ stopPropagation() {} })) };
+      buttons.set(options.text, button);
+      return button;
+    },
   });
 
-  const module = await mockedModule<{ startTextEdit(host: unknown, side: string, point: null): void; keepWhileEditing(el: unknown, block: unknown): boolean; stopTextEdit(el: unknown): void }>(new URL("../src/view/textEditing.ts", import.meta.url), {
+  const module = await mockedModule<{ startTextEdit(host: unknown, side: string, point: { x: number; y: number } | null): void; keepWhileEditing(el: unknown, block: unknown): boolean; stopTextEdit(el: unknown): void }>(new URL("../src/view/textEditing.ts", import.meta.url), {
     obsidian: { Notice, Scope }, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/model.ts": model,
     "../layout/viewProjection.ts": projections, "../layout/blockIdentity.ts": identity, "../layout/documentSnapshot.ts": snapshots,
-    "./columnEditor.ts": { createColumnEditor: (options: { text: string; onUpdate: typeof onUpdate }) => { text = options.text; onUpdate = options.onUpdate; return editor; } },
+    "./columnEditor.ts": { createColumnEditor: (options: { text: string; caret: number | null; onUpdate: typeof onUpdate }) => { text = options.text; editorCaret = options.caret; onUpdate = options.onUpdate; destroyed = false; return editor; } },
     "./interactions.ts": { commitEdits: (_app: unknown, _path: string, planned: edits.BlockEdit[]) => { written.push(planned[0]?.replacement ?? []); return Promise.resolve(true); } },
     "./linkSuggest.ts": { closeLinkSuggest: () => false },
     "./messages.ts": { t: (key: string) => key },
@@ -122,13 +144,16 @@ async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
     sourcePath: file.path, editor: {}, view, context: { block: blockAt(index), model: model.modelFromBlock(blockAt(index)) },
     redraw: () => { redraws++; return host; },
   };
-  module.startTextEdit(host, "left", null);
+  module.startTextEdit(host, "left", caret ? { x: 10, y: 20 } : null);
 
   // Keys go to the scope pushed last: the latest session's.
   const key = (name: string, modifiers: string[] = []): boolean | void => [...handlers].reverse()
     .find((handler) => handler.key === name && handler.modifiers.join() === modifiers.join())?.run({ isComposing: false });
   return {
     type(next) { text = next; onUpdate({ docChanged: true }); },
+    compose(next) { editor.composing = typeof next === "string" || next; editor.compositionStarted = editor.composing; if (typeof next === "string") { text = next; onUpdate({ docChanged: true }); } },
+    switchSide(side) { module.startTextEdit(host, side, null); },
+    press(label) { const button = buttons.get(label); assert.ok(button); if (!button.disabled) button.listeners.get("click")?.(); },
     leave() { content.doc.activeElement = null; listeners.get("focusout")?.(); },
     enter() { content.doc.activeElement = content; listeners.get("focusin")?.(); },
     key, notices, written, executed, scopes,
@@ -166,9 +191,25 @@ async function session(lines: string[] = BLOCK, index = 0): Promise<Harness> {
       module.startTextEdit(host, "left", null);
     },
     editorText: () => text,
+    editorCaret: () => editorCaret,
     get redraws() { return redraws; },
     destroyed: () => destroyed,
   };
+}
+
+for (const api of ["modern", "legacy"] as const) {
+  test(`${api} caret lookup locates repeated headings inside the tapped manual column`, async () => {
+    const heading = "## Same heading";
+    const body = `${heading}\n\nLeft text.\n\n+++\n\n${heading}\n\nRight text.`;
+    const lines = ['<!-- vml {"v":2,"type":"text","cols":4} -->', ...body.split("\n"), "<!-- /vml -->"];
+    for (const from of [0, body.lastIndexOf(heading)]) {
+      const editor = await session(lines, 0, { api, from, to: from === 0 ? body.indexOf("+++") : body.length, before: "Same heading" });
+      assert.equal(editor.editorCaret(), from + heading.length);
+      assert.equal(editor.editorText(), body);
+      assert.deepEqual(editor.written, [], "placing the caret never writes source");
+      editor.abort();
+    }
+  });
 }
 
 test("text that can be saved is written as typed, and leaving the editor draws the layout again", async () => {
@@ -179,6 +220,59 @@ test("text that can be saved is written as typed, and leaving the editor draws t
   assert.equal(editor.destroyed(), true);
   assert.equal(editor.redraws, 1);
   assert.deepEqual(editor.notices, []);
+});
+
+test("switching columns finishes pending text before opening the other side", async () => {
+  const editor = await session(["<!-- vml -->", "Left text", "![[a.png]]", "Right text", "<!-- /vml -->"]);
+  editor.compose("Composed left text");
+  assert.deepEqual(editor.written, []);
+  editor.switchSide("right");
+  assert.deepEqual(editor.written, [["Composed left text"]]);
+  assert.equal(editor.editorText(), "Right text");
+  assert.equal(editor.redraws, 1);
+  assert.equal(editor.destroyed(), false);
+});
+
+test("switching columns does not discard text that cannot be written", async () => {
+  const editor = await session(["<!-- vml -->", "Left text", "![[a.png]]", "Right text", "<!-- /vml -->"]);
+  editor.type("```js");
+  editor.switchSide("right");
+  assert.deepEqual(editor.written, []);
+  assert.equal(editor.editorText(), "```js");
+  assert.equal(editor.destroyed(), false);
+  assert.equal(editor.redraws, 0);
+  assert.deepEqual(editor.notices, ["textKeptOpen"]);
+});
+
+test("Done waits for an IME candidate, then saves the confirmed input and closes", async () => {
+  const editor = await session();
+  editor.compose(true);
+  editor.type("组字中");
+  editor.press("textDone");
+  assert.deepEqual(editor.written, []);
+  assert.equal(editor.destroyed(), false);
+  assert.deepEqual(editor.notices, ["textFinishComposition"]);
+  editor.compose(false);
+  editor.press("textDone");
+  assert.deepEqual(editor.written, [["组字中"]]);
+  assert.equal(editor.destroyed(), true);
+  assert.equal(editor.redraws, 1);
+});
+
+test("the visible discard action drops an invalid draft without writing or reopening it", async () => {
+  const editor = await session();
+  editor.press("textDiscardDraft");
+  assert.equal(editor.destroyed(), false);
+  editor.type("```js");
+  editor.press("textDone");
+  assert.equal(editor.destroyed(), false);
+  assert.deepEqual(editor.written, []);
+  editor.press("textDiscardDraft");
+  assert.equal(editor.destroyed(), true);
+  assert.equal(editor.redraws, 1);
+  editor.reopen();
+  assert.equal(editor.editorText(), "Left text");
+  assert.deepEqual(editor.written, []);
 });
 
 test("unsaved text keeps the editor open when the focus leaves it", async () => {

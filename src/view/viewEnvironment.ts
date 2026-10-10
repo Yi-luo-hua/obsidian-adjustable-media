@@ -4,7 +4,8 @@
  * and counting them would redraw every layout and drop every measured height at the start and end of
  * each drag, the moved layout's own drag styling included.
  */
-const TRANSIENT_CLASS = /^(?:vml-.*|is-grabbing|is-dragging|is-focused)$/;
+// Keyboard/navigation visibility and cursor hiding are UI state; actual width/typography are read independently.
+const TRANSIENT_CLASS = /^(?:vml-.*|is-grabbing|is-dragging|is-focused|keyboard-animating|is-hidden-nav|hide-cursor|mod-toolbar-open)$/;
 
 /** The classes of `className` that can change how layouts are laid out, in a stable order. */
 export function layoutClasses(className: string): string {
@@ -13,7 +14,8 @@ export function layoutClasses(className: string): string {
 
 /** The pane's own document includes a pop-out window. Height alone is not an environment change. */
 export function watchEnvironment(el: HTMLElement, changed: (signature: string) => void,
-  mediaChanged: (media: HTMLImageElement | HTMLVideoElement) => void = () => {}): () => void {
+  mediaChanged: (media: HTMLImageElement | HTMLVideoElement) => void = () => {},
+  layoutRendered: () => void = () => {}): () => void {
   const win = el.win as Window & typeof window;
   const doc = el.doc;
   let signature = "";
@@ -45,6 +47,8 @@ export function watchEnvironment(el: HTMLElement, changed: (signature: string) =
   const theme = new win.MutationObserver(schedule);
   for (const root of [doc.body, doc.documentElement]) theme.observe(root, { attributes: true, attributeFilter: ["class", "style"] });
   for (const name of ["load", "error", "loadedmetadata"]) el.addEventListener(name, resource, true);
+  el.addEventListener("vml-layout-rendered", layoutRendered);
+  doc.fonts.addEventListener("loading", fonts);
   doc.fonts.addEventListener("loadingdone", fonts);
   doc.fonts.addEventListener("loadingerror", fonts);
   win.addEventListener("resize", schedule);
@@ -54,6 +58,8 @@ export function watchEnvironment(el: HTMLElement, changed: (signature: string) =
     win.cancelAnimationFrame(frame);
     resize.disconnect(); theme.disconnect();
     for (const name of ["load", "error", "loadedmetadata"]) el.removeEventListener(name, resource, true);
+    el.removeEventListener("vml-layout-rendered", layoutRendered);
+    doc.fonts.removeEventListener("loading", fonts);
     doc.fonts.removeEventListener("loadingdone", fonts);
     doc.fonts.removeEventListener("loadingerror", fonts);
     win.removeEventListener("resize", schedule);

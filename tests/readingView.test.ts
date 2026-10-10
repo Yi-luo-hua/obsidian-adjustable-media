@@ -4,6 +4,57 @@ import { readingViewHarness } from "./support/readingViewHarness.ts";
 
 const media = '<!-- vml -->\n![[old.png]]\n<!-- /vml -->\n\nBody';
 
+test("file-open retires the previous reader before establishing the newly loaded file", async () => {
+  const host = await readingViewHarness(media);
+  host.section(media); host.frame();
+  const previous = host.projection;
+  const next = media.replace("old.png", "new.png");
+  const count = host.rerenders;
+  host.openFile(next);
+  assert.notEqual(host.projection, previous);
+  assert.equal(host.rerenders, count + 1);
+  host.section(next); host.frame();
+  assert.equal(host.renders.at(-1), "![[new.png]]");
+  assert.equal(host.projection!.phase, "settled");
+  host.dispose();
+});
+
+test("a new reader adopts its first matching section after the host finishes loading", async () => {
+  const next = media.replace("old.png", "new.png");
+  const host = await readingViewHarness(media, true, next);
+  host.setHost(next);
+  host.section(next);
+  host.frame();
+  assert.deepEqual(host.renders, ["![[new.png]]"]);
+  assert.equal(host.projection!.phase, "settled");
+  host.dispose();
+});
+
+test("the previous loading buffer cannot replace the opened file's exact disk source", async () => {
+  const next = media.replace("old.png", "loaded.png");
+  const host = await readingViewHarness(media, true, next);
+  host.section(media); host.frame();
+  assert.deepEqual(host.renders, []);
+  host.setHost(next); host.section(next); host.frame();
+  assert.equal(host.renders.at(-1), "![[loaded.png]]");
+  assert.equal(host.projection!.phase, "settled");
+  host.dispose();
+});
+
+test("initial host confirmation cannot replace an explicit desired edit", async () => {
+  const host = await readingViewHarness(media);
+  const next = media.replace("old.png", "desired.png");
+  host.edit(next);
+  const section = host.section(media);
+  host.frame();
+  assert.deepEqual(host.renders, []);
+  host.setHost(next);
+  section.reprocess(next);
+  host.tick(); host.frame();
+  assert.deepEqual(host.renders, ["![[desired.png]]"]);
+  host.dispose();
+});
+
 test("retained media sections settle after unrelated body edits without full rerenders", async () => {
   const host = await readingViewHarness(media, false);
   host.section(media);
@@ -272,4 +323,18 @@ test("unloading an older child on a reused section keeps its newer pending callb
   assert.deepEqual(host.renders, ["![[old.png]]", "![[next.png]]"]);
   assert.equal(section.watchers, 0);
   host.dispose();
+});
+test("a completed host file-open establishes a reader when initial postprocessing preceded preview mode", async () => {
+  const text = '<!-- vml -->\n![[a.png]]\n<!-- /vml -->';
+  const harness = await readingViewHarness(text, false);
+  assert.equal(harness.projection, undefined);
+  harness.fileOpened();
+  assert.equal(harness.rerenders, 1);
+  const projection = harness.projection!;
+  harness.fileOpened();
+  assert.equal(harness.projection, projection);
+  assert.equal(harness.rerenders, 1);
+  harness.section(text, 1); harness.frame();
+  assert.deepEqual(harness.renders, ['![[a.png]]']);
+  harness.dispose();
 });

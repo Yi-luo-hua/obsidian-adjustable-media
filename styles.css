@@ -80,6 +80,27 @@
   column-count: 1;
 }
 
+/* Explicit text segments stay in their own columns, regardless of their heights. */
+.vml-layout > .vml-layout__text--manual:not(.vml-layout__text--editing) {
+  align-items: start;
+  column-count: 1;
+  display: grid;
+  gap: var(--vml-gap, 2em);
+  grid-template-columns: repeat(var(--vml-cols), minmax(0, 1fr));
+}
+
+.vml-text-column {
+  min-width: 0;
+}
+
+.vml-text-column > :first-child {
+  margin-top: 0;
+}
+
+.vml-text-column > :last-child {
+  margin-bottom: 0;
+}
+
 .vml-layout--text-center > .vml-layout__text {
   text-align: center;
 }
@@ -156,6 +177,15 @@
 
 .vml-layout__text > :last-child {
   margin-bottom: 0;
+}
+
+/* A wide mobile table scrolls within its own box; its text column and the note keep their width. */
+@media screen {
+  .is-mobile .vml-layout__text table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
 }
 
 /* Obsidian removes rule margins in the editor, including rules rendered inside footnotes. */
@@ -249,6 +279,36 @@
 
 .vml-text-editor.is-invalid + .vml-text-editor__note {
   display: block;
+}
+
+.vml-text-editor__actions {
+  display: none;
+}
+
+.is-mobile .vml-layout__text--editing {
+  display: flex;
+  flex-direction: column;
+}
+
+.is-mobile .vml-text-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  order: -1;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--background-primary);
+  margin: 0 0 8px;
+}
+
+.is-mobile .vml-text-editor__actions button {
+  min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+  padding: 6px;
+  white-space: normal;
 }
 
 .vml-live-preview {
@@ -384,12 +444,9 @@
   border-radius: var(--radius-s);
   display: block;
   height: var(--vml-row-height);
-  object-fit: cover;
-  width: 100%;
-}
-
-.vml-item--weighted .vml-item__media {
+  /* Default and manual column widths use the same fit, so the first drag never changes image scale abruptly. */
   object-fit: contain;
+  width: 100%;
 }
 
 .vml-row--single .vml-item__media {
@@ -430,6 +487,7 @@
 
 .vml-edit-source {
   opacity: 0;
+  pointer-events: none;
   position: absolute;
   right: 16px;
   top: 8px;
@@ -440,6 +498,82 @@
 .vml-live-preview:hover .vml-edit-source,
 .vml-edit-source:focus-visible {
   opacity: 1;
+  pointer-events: auto;
+}
+
+@media screen {
+  .is-mobile .vml-edit-source {
+    display: none;
+  }
+
+  .is-mobile .vml-layout--interactive .vml-frame__move {
+    height: 24px;
+    left: calc(50% - 24px);
+    opacity: 1;
+    top: 2px;
+    width: 48px;
+  }
+
+  .is-mobile .vml-layout--interactive .vml-frame__handle,
+  .is-mobile .vml-layout--interactive .vml-item__col-handle {
+    opacity: 1;
+  }
+
+  .is-mobile .vml-layout--interactive .vml-item__col-handle {
+    right: -16px;
+    width: 24px;
+  }
+
+  .is-mobile .vml-item__col-handle::after {
+    left: 11px;
+  }
+
+  .is-mobile .vml-layout--interactive .vml-frame__handle--right {
+    right: 0;
+    width: 24px;
+  }
+
+  .is-mobile .vml-frame__handle--right::after {
+    left: auto;
+    right: 0;
+  }
+
+  .is-mobile .vml-layout--interactive .vml-frame__handle--right.vml-frame__handle--mirrored {
+    left: 0;
+    right: auto;
+  }
+
+  .is-mobile .vml-frame__handle--right.vml-frame__handle--mirrored::after {
+    left: 0;
+    right: auto;
+  }
+
+  .is-mobile .vml-layout--interactive .vml-frame__handle--corner {
+    background: var(--background-primary);
+    border-radius: 50%;
+    bottom: 2px;
+    box-shadow: var(--shadow-s);
+    height: 44px;
+    left: auto;
+    right: 2px;
+    width: 44px;
+    z-index: 6;
+  }
+
+  .is-mobile .vml-frame__handle--corner::after {
+    bottom: 10px;
+    box-sizing: border-box;
+    height: 24px;
+    left: auto;
+    right: 10px;
+    top: auto;
+    width: 24px;
+  }
+
+  .is-mobile .vml-layout--interactive .vml-frame__handle--corner.vml-frame__handle--mirrored {
+    left: 2px;
+    right: auto;
+  }
 }
 
 /* Interactions */
@@ -1296,4 +1430,49 @@ body.vml-is-dragging * {
 
 .vml-guide__start-btn {
   padding: 6px 18px;
+}
+
+.vml-update-modal {
+  width: 620px;
+  max-width: 90vw;
+}
+
+.vml-update__body h3 {
+  margin-top: 24px;
+}
+
+/* Preserve the transparent frame's geometry and hover handles when normal highlighting is off. */
+.vml-cursor-highlights .vml-live-preview:not(.vml-cursor-in-block) .vml-layout:not(:hover):not(.vml-layout--drop-target) {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.vml-cursor-highlights .vml-cursor-in-block .vml-layout {
+  border-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
+  box-shadow:
+    0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.1),
+    0 0 14px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
+}
+
+/* Source expansion keeps its existing widgets; the actual source range gets an inset guide. */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-source-line--active {
+  box-shadow: inset 2px 0 var(--interactive-accent);
+  background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.06);
+}
+.vml-wrap-measure.cm-content {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  contain: layout;
+  top: 0;
+  left: 0;
+  padding: 0 !important;
+  min-height: 0 !important;
+  width: var(--vml-measure-width);
+  font-family: var(--vml-measure-font);
+  font-size: var(--vml-measure-size);
+  line-height: var(--vml-measure-line);
+  font-weight: var(--vml-measure-weight);
+  letter-spacing: var(--vml-measure-spacing);
+  direction: var(--vml-measure-direction);
 }

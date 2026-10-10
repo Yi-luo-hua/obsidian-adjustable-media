@@ -86,7 +86,9 @@ function draftTargets(view: EditorView, sourcePath: string, side: TextSide, key:
 
 /** Starts typing the text on `side` right in the layout, with the caret where `point` is on the drawn text, or at its end. */
 export function startTextEdit(host: TextEditHost, side: TextSide, point: Point | null): void {
-  if (sessions.has(host.el)) {
+  const active = sessions.get(host.el);
+  if (active) {
+    active.switchColumn(side, point);
     return;
   }
   const source = textOf(host.context.block, side);
@@ -140,6 +142,7 @@ class TextEditSession {
   /** The frame around the column's editor. */
   private readonly box: HTMLElement;
   private readonly editor: EditorView;
+  private readonly discardButton: HTMLButtonElement;
   // Obsidian's hotkeys act on the note's editor, not on this one: none of them while typing here, but
   // for the few that act on no editor (GLOBAL_COMMANDS). The column's editor carries out Obsidian's
   // editor commands on their keys itself (columnKeys.ts).
@@ -176,6 +179,29 @@ class TextEditSession {
       text,
       caret,
       onUpdate: (update) => this.updated(update),
+    });
+    const actions = column.createDiv({ cls: "vml-text-editor__actions" });
+    const done = actions.createEl("button", { text: t("textDone"), attr: { type: "button" } });
+    this.discardButton = actions.createEl("button", { text: t("textDiscardDraft"),
+      attr: { type: "button", title: t("textDiscardDraftDesc") } });
+    this.discardButton.disabled = true;
+    // Decide what happens to the draft and IME before the buttons take input focus.
+    for (const name of ["pointerdown", "mousedown"]) actions.addEventListener(name, event => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    done.addEventListener("click", event => {
+      event.stopPropagation();
+      if (this.editor.composing || this.editor.compositionStarted) {
+        new Notice(t("textFinishComposition"));
+        this.editor.focus();
+        return;
+      }
+      this.end();
+    });
+    this.discardButton.addEventListener("click", event => {
+      event.stopPropagation();
+      if (this.invalid) this.discard();
     });
     this.scope.register([], "Escape", (event) => {
       // Esc during an input method's composition cancels the composition, and with link suggestions
@@ -289,21 +315,34 @@ class TextEditSession {
    * Leaves the editor: what is left is written, and the layout is drawn again from the note. Text that
    * cannot be written keeps the editor open, its frame red, for the text to be fixed or given up with Esc.
    */
-  private end(): void {
+  private end(): TextEditHost | null {
     if (this.ended) {
-      return;
+      return null;
     }
     this.write(true);
     if (this.ended) {
-      return;
+      return null;
     }
     if (this.invalid) {
       this.popScope();
       new Notice(t("textKeptOpen"));
-      return;
+      return null;
     }
     this.finish();
-    this.host.redraw(this.block);
+    return this.host.redraw(this.block);
+  }
+
+  /** A click on the other rendered column finishes this one through its normal write checks. */
+  switchColumn(side: TextSide, point: Point | null): void {
+    if (side !== this.side) {
+      const next = this.end();
+      if (next) {
+        startTextEdit(next, side, point);
+        return;
+      }
+    }
+    this.editor.focus();
+    this.pushScope();
   }
 
   /**
@@ -351,6 +390,7 @@ class TextEditSession {
     const plan = planColumnText(this.block, this.side, text);
     this.invalid = !plan.fits;
     this.box.toggleClass("is-invalid", this.invalid);
+    this.discardButton.disabled = !this.invalid;
     if (!plan.edit) {
       return;
     }
@@ -402,29 +442,39 @@ function columnOf(host: TextEditHost, side: TextSide): HTMLElement | null {
  * drawn before it, found exactly once in the source. Otherwise at the end.
  */
 function caretInSource(column: HTMLElement, point: Point, source: string): number {
-  // Chromium 128 and later; before that the caret simply goes to the end.
-  const lookup = column.doc as unknown as { caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null };
-  const position = lookup.caretPositionFromPoint?.(point.x, point.y);
+  // Newer browsers expose a caret position; older Android WebViews expose a collapsed range.
+  const lookup = column.doc as unknown as {
+    caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
+    caretRangeFromPoint?: (x: number, y: number) => Range | null;
+  };
+  let position = lookup.caretPositionFromPoint?.(point.x, point.y);
+  if (!position) {
+    const caret = lookup.caretRangeFromPoint?.(point.x, point.y);
+    if (caret) position = { offsetNode: caret.startContainer, offset: caret.startOffset };
+  }
   if (!position || !column.contains(position.offsetNode)) {
     return source.length;
   }
+  const part = position.offsetNode.parentElement?.closest<HTMLElement>(".vml-text-column");
+  const sourceFrom = part ? Number(part.dataset.sourceFrom) : 0;
+  const sourceTo = part ? Number(part.dataset.sourceTo) : source.length;
   const range = column.doc.createRange();
-  range.setStart(column, 0);
+  range.setStart(part ?? column, 0);
   range.setEnd(position.offsetNode, position.offset);
   const before = range.toString().replace(/\s+/g, "");
   if (before === "") {
-    return 0;
+    return sourceFrom;
   }
   // The drawn text has no line breaks and collapses spaces: both sides are compared without whitespace.
-  const { text: compact, offsets } = withoutWhitespace(source);
+  const { text: compact, offsets } = withoutWhitespace(source.slice(sourceFrom, sourceTo));
   for (const size of CARET_CLUES) {
     const clue = before.slice(-size);
     const at = compact.indexOf(clue);
     if (clue.length === Math.min(size, before.length) && at >= 0 && compact.indexOf(clue, at + 1) < 0) {
-      return (offsets[at + clue.length - 1] ?? source.length - 1) + 1;
+      return sourceFrom + (offsets[at + clue.length - 1] ?? sourceTo - sourceFrom - 1) + 1;
     }
   }
-  return source.length;
+  return sourceTo;
 }
 
 /** `source` without whitespace, and where each of its characters is in `source`. */

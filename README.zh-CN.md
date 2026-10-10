@@ -6,7 +6,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-当前最新发布为 **0.7.2**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，验证范围和已知限制见[项目进度与验证记录](docs/STATUS.md)，剩余布局改进见[布局改进进度与任务队列](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
+当前最新发布为 **0.7.2**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ![Adjustable Media 效果预览](assets/demo.jpg)
 
@@ -39,6 +39,7 @@
 ### ⚡ 融入直觉的编辑流程
 
 - **所见即所得，无缝切换**：编辑模式下具有荧光效果控制框；光标移入或点击「编辑源码」即可切换为纯 Markdown 文本，手写与可视编辑切换便捷。
+- **布局边框高亮**：设置中的「保持布局块边框高亮」默认开启；关闭后，鼠标悬停布局或编辑块内文字时显示完整外框，离开后隐藏。
 - **自动排版（可选）**：在设置中开启后，从电脑拖入或粘贴的多张图片/视频会自动打包成布局块。
 - **单事务安全回写**：所有修改走单次编辑器事务（原生支持 Undo/Redo），写入前严格比对上下文锚点，绝不擅自变动笔记中的任何无关行、空行或缩进。
 
@@ -142,3 +143,11 @@ Adjustable Media 不创造新语法，笔记中仅保留标准嵌入与纯净的
 
 - 本项目基于 [MIT License](LICENSE) 开源。
 - 项目灵感与早期基础来源于 [Fall-Makito/visual-media-layout](https://github.com/Fall-Makito/visual-media-layout)，现已针对存储规范与底层写入链路完成全新重构。
+
+## 0.7.3 已完成发布准备：手动文字分栏
+
+在文字布局块内把 `+++` 顶格独占一行，即可结束当前栏并开始下一栏。最多四栏，等宽、顶部对齐，每栏保留自己的内容，也可以留出空栏。没有标记时保留自动分栏。点击文字进入编辑后可直接输入标记，编辑源码时可用「插入分栏标记」命令。代码、公式和注释中的标记不参与分栏；超过四栏会提示并回退为自动分栏，原文保持不变。
+
+本版同时修复文字编辑器之间切换、点击外框空隙时误展开源码的问题。更新说明中的按钮可按界面语言离线创建[中文样例](docs/examples/ManualColumns.zh-CN.md)或[英文样例](docs/examples/ManualColumns.en.md)，每次使用新目录，不覆盖已有笔记。
+
+用户最终确认、中英文 Windows／Obsidian 1.14.4 定向实测、327 项自动检查和发布构建均已完成。0.7.3 已在 `codex/text-column-breaks` 提交推送并完成发布准备，基于正式 0.7.2 并保留其功能；尚未推送标签或公开发布，当前最新公开版本仍为 0.7.2。验证范围见[项目状态](docs/STATUS.md)和[实施记录](docs/plans/layout-redesign/34-text-column-breaks.md)。本版保持桌面限定与 V2 格式。

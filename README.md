@@ -6,7 +6,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [Feature examples](docs/examples/Guide.en.md) · [功能示例](docs/examples/Guide.zh-CN.md). In Obsidian, run **Feature examples** for an offline preview and a button to create a working copy with its media. The guide opens once when first available, including for existing users upgrading to the release that adds it.
 
-The latest release is **0.7.2**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout progress and task queue](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
+The latest release is **0.7.2**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
 
 ![Adjustable Media Preview](assets/demo.jpg)
 
@@ -39,6 +39,7 @@ The latest release is **0.7.2**. Text boxes, multi-column text and numbered figu
 ### ⚡ Intuitive Editing Workflow
 
 - **WYSIWYG with Instant Source Switching**: Features an illuminated control frame in editing mode; moving the cursor inside or clicking "Edit source" smoothly switches to plain Markdown text for effortless transitions between visual and handwritten editing.
+- **Layout border highlighting**: Keep layout borders highlighted is enabled by default. Turn it off to show the full border on mouse hover or while editing the layout.
 - **Automatic Layouts (Optional)**: When enabled in settings, multiple images or videos dropped from your computer or pasted will automatically be packaged into layout blocks.
 - **Single-Transaction Safe Writes**: All modifications execute through a single editor transaction (with native Undo/Redo support), strictly verifying context anchors before writing, never altering untouched lines, blank lines, or indentations.
 
@@ -143,3 +144,11 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 
 - Released under the [MIT License](LICENSE).
 - Originally inspired by [Fall-Makito/visual-media-layout](https://github.com/Fall-Makito/visual-media-layout), and rewritten from the ground up with a resilient comment-based storage model and safe transactional pipeline.
+
+## 0.7.3 ready for release: manual text columns
+
+Inside a text layout, write `+++` on its own unindented line to start the next column. Up to four equal-width columns align at the top, and each keeps its own content, including empty columns. Without markers, automatic columns continue to work. Type the marker while editing layout text, or use the Insert column break command in the layout source. Code, math and comments are left alone; more than four columns triggers a warning and falls back to automatic columns without changing the source.
+
+This version also fixes clicks between text editors and on frame padding unexpectedly revealing source. Its release notes can create offline [English](docs/examples/ManualColumns.en.md) or [Chinese](docs/examples/ManualColumns.zh-CN.md) examples to match the interface language, using a fresh folder for each creation.
+
+User acceptance, bilingual Windows/Obsidian 1.14.4 checks, all 327 automated tests and release packaging are complete. Version 0.7.3 is committed and pushed on `codex/text-column-breaks`, based on the published 0.7.2 source and retaining its features. It has not been tagged or published; 0.7.2 remains the latest public release. See [status](docs/STATUS.md) and the [implementation record](docs/plans/layout-redesign/34-text-column-breaks.md) for validation details. Desktop only; the note format remains V2.

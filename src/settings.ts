@@ -8,18 +8,23 @@ import { t, type UiLanguageSetting } from "./view/messages.ts";
 export interface VmlSettings {
   /** Wrap dropped or pasted media in a layout. Off by default, since it changes the note. */
   autoConvert: boolean;
+  /** Keep the normal editing frame visible even when the caret is elsewhere. */
+  keepLayoutHighlight: boolean;
   /** The language of the numbers of figures, tables and equations; auto follows Obsidian's. */
   refLanguage: RefLanguageSetting;
   /** The display language of plugin menus and UI; auto follows Obsidian's. */
   uiLanguage: UiLanguageSetting;
   guideRevision: number;
+  lastSeenReleaseNotes: string;
 }
 
 export const DEFAULT_SETTINGS: VmlSettings = {
   autoConvert: false,
+  keepLayoutHighlight: true,
   refLanguage: "auto",
   uiLanguage: "auto",
   guideRevision: 0,
+  lastSeenReleaseNotes: "",
 };
 
 const REF_LANGUAGES: readonly RefLanguageSetting[] = ["auto", "en", "zh"];
@@ -32,9 +37,11 @@ export function readSettings(saved: unknown): VmlSettings {
   const uiLanguage = UI_LANGUAGES.find((language) => language === record.uiLanguage);
   return {
     autoConvert: typeof record.autoConvert === "boolean" ? record.autoConvert : DEFAULT_SETTINGS.autoConvert,
+    keepLayoutHighlight: typeof record.keepLayoutHighlight === "boolean" ? record.keepLayoutHighlight : DEFAULT_SETTINGS.keepLayoutHighlight,
     refLanguage: refLanguage ?? DEFAULT_SETTINGS.refLanguage,
     uiLanguage: uiLanguage ?? DEFAULT_SETTINGS.uiLanguage,
     guideRevision: readGuideRevision(record.guideRevision),
+    lastSeenReleaseNotes: typeof record.lastSeenReleaseNotes === "string" ? record.lastSeenReleaseNotes : "",
   };
 }
 
@@ -81,6 +88,11 @@ export class VmlSettingTab extends PluginSettingTab {
         control: { type: "dropdown", key: "refLanguage", defaultValue: DEFAULT_SETTINGS.refLanguage, options: this.refLanguageOptions() },
       },
       {
+        name: t("settingCursorHighlight"),
+        desc: t("settingCursorHighlightDesc"),
+        control: { type: "toggle", key: "keepLayoutHighlight", defaultValue: DEFAULT_SETTINGS.keepLayoutHighlight },
+      },
+      {
         name: t("settingOpenGuide"),
         desc: t("settingOpenGuideDesc"),
         render: (setting) => {
@@ -99,6 +111,7 @@ export class VmlSettingTab extends PluginSettingTab {
     if (key === "autoConvert") {
       return this.host.settings.autoConvert;
     }
+    if (key === "keepLayoutHighlight") return this.host.settings.keepLayoutHighlight;
     return key === "refLanguage" ? this.host.settings.refLanguage : undefined;
   }
 
@@ -116,6 +129,10 @@ export class VmlSettingTab extends PluginSettingTab {
     }
     if (key === "autoConvert" && typeof value === "boolean") {
       this.host.settings.autoConvert = value;
+      await this.host.saveSettings();
+    }
+    if (key === "keepLayoutHighlight" && typeof value === "boolean") {
+      this.host.settings.keepLayoutHighlight = value;
       await this.host.saveSettings();
     }
     const language = REF_LANGUAGES.find((candidate) => candidate === value);
@@ -166,6 +183,13 @@ export class VmlSettingTab extends PluginSettingTab {
         .onChange(async (value) => {
           await this.setControlValue("refLanguage", value);
         }));
+
+    new Setting(this.containerEl)
+      .setName(t("settingCursorHighlight"))
+      .setDesc(t("settingCursorHighlightDesc"))
+      .addToggle((toggle) => toggle
+        .setValue(this.host.settings.keepLayoutHighlight)
+        .onChange(async (value) => { await this.setControlValue("keepLayoutHighlight", value); }));
 
     new Setting(this.containerEl)
       .setName(t("settingOpenGuide"))

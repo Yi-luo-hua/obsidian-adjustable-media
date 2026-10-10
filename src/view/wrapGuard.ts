@@ -3,6 +3,7 @@ import { StateEffect, StateField, type ChangeDesc, type EditorState, type Extens
 import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockInfo, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 
 import type { V2Block } from "../format/v2.ts";
+import { ConvergenceBudget } from "../layout/convergenceBudget.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { carryFloat, liveProxy, mapFloat, mapPlaced, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
 import { layoutIsRendered } from "./layoutView.ts";
@@ -46,9 +47,15 @@ export interface WrapSource {
   environmentEpoch(state: EditorState): number;
   /** Draws the layout of `anchor` into `el` with all its interactions, as its own widget would. */
   drawStandIn(el: HTMLElement, view: EditorView, anchor: WrapAnchor, sourcePath: string): void;
+  /** Read-only rendering for an unseen float in this pane's current width and typography. */
+  drawMeasurement?(el: HTMLElement, view: EditorView, anchor: WrapAnchor, sourcePath: string): void;
   /** Whether `el` keeps its layout for `block`: one of its text columns is being typed in. */
   keepStandIn(el: HTMLElement, block: V2Block): boolean;
+  /** Adopt sizing changes without replacing a stand-in's media/player. */
+  resizeStandIn?(el: HTMLElement, anchor: WrapAnchor, sourcePath: string): boolean;
   releaseStandIn(el: HTMLElement): void;
+  /** Sizes/gaps have completed their current measurement; the pane can confirm that coverage. */
+  measurementsChanged?(view: EditorView): void;
 }
 
 interface GapUpdate {
@@ -165,7 +172,8 @@ class ProxyWidget extends WidgetType {
   override updateDOM(dom: HTMLElement): boolean {
     const content = dom.querySelector<HTMLElement>(":scope > .vml-wrap-proxy__live");
     const same = dom.dataset.key === this.anchor.key && dom.dataset.from === String(this.anchor.from) && dom.dataset.numbers === this.anchor.numbers;
-    if (!content || !(same || this.source.keepStandIn(content, this.anchor.block))) {
+    if (!content || !(same || this.source.keepStandIn(content, this.anchor.block)
+        || (dom.dataset.numbers === this.anchor.numbers && this.source.resizeStandIn?.(content, this.anchor, this.sourcePath)))) {
       return false;
     }
     this.place(dom);
@@ -235,6 +243,8 @@ class WrapGuard {
   private readonly observed = new Map<HTMLElement, string>();
   private readonly pendingMedia = new Set<string>();
   private pendingUpdate = false;
+  private readonly budget = new ConvergenceBudget();
+  private readonly detached = new Map<string, { anchor: WrapAnchor; el: HTMLElement; signature: string }>();
   /** The stand-ins last sent to proxyField, and the latest plan for them. */
   private proxyKey = "";
   private proxySerial = 0;
@@ -259,10 +269,12 @@ class WrapGuard {
 
   update(update: ViewUpdate): void {
     if (update.docChanged) {
+      this.budget.reset();
+      this.releaseMeasurements();
       this.mapSizes(update.changes);
     }
     const environmentChanged = this.epoch !== this.source.environmentEpoch(update.state);
-    if (environmentChanged) { this.epoch = this.source.environmentEpoch(update.state); this.forgetSizes(); this.pendingMedia.clear(); }
+    if (environmentChanged) { this.budget.reset(); this.releaseMeasurements(); this.epoch = this.source.environmentEpoch(update.state); this.forgetSizes(); this.pendingMedia.clear(); }
     const anchorsChanged = signature(this.source.anchors(update.state)) !== signature(this.source.anchors(update.startState));
     // A stand-in starts below the first drawn line by what the height map has above it, which a
     // measurement of lines above it may change while the viewport stays.
@@ -281,6 +293,7 @@ class WrapGuard {
     this.serial++;
     this.resize.disconnect(); this.observed.clear(); this.forgetSizes();
     this.pendingMedia.clear(); activeGuards.delete(this.view);
+    this.releaseMeasurements();
   }
 
   /** The anchors and the lines the layouts start beside move with the note's text. */
@@ -296,17 +309,18 @@ class WrapGuard {
   }
 
   measurementsReady(): boolean {
-    return !this.pendingUpdate && this.source.anchors(this.view.state).every(anchor => anchor.from > this.view.viewport.to
+    return !this.budget.blocked && !this.pendingUpdate && this.source.anchors(this.view.state).every(anchor => anchor.from > this.view.viewport.to
       || (this.sizes.has(anchor.key) && !this.pendingMedia.has(anchor.key)));
   }
 
-  mediaChanged(): void { this.measure(); }
+  mediaChanged(): void { this.budget.reset(); this.measure(); }
 
   private measure(): void {
     const state = this.view.state;
     if (!this.source.hasWraps(state) && (state.field(gapField, false)?.size ?? 0) === 0) {
       return;
     }
+    this.prepareMeasurements();
     const serial = ++this.serial;
     this.pendingUpdate = true;
     const doc = state.doc;
@@ -314,16 +328,68 @@ class WrapGuard {
     const viewport = this.view.viewport;
     const current = (): boolean => !this.destroyed && this.serial === serial && this.view.state.doc === doc
       && this.source.environmentEpoch(this.view.state) === epoch && this.view.viewport.from === viewport.from && this.view.viewport.to === viewport.to;
-    this.view.requestMeasure({ key: this, read: () => current()
-      ? this.source.hasWraps(state) ? this.read() : { from: 0, to: state.doc.length, gaps: [] }
-      : null, write: update => this.write(update, current) });
+    this.view.requestMeasure({ key: this, read: () => {
+      if (!current()) return null;
+      const style = getComputedStyle(this.view.contentDOM);
+      const props = { "--vml-measure-width": `${this.view.contentDOM.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)}px`,
+        "--vml-measure-font": style.fontFamily, "--vml-measure-size": style.fontSize, "--vml-measure-line": style.lineHeight,
+        "--vml-measure-weight": style.fontWeight, "--vml-measure-spacing": style.letterSpacing, "--vml-measure-direction": style.direction };
+      const signature = JSON.stringify(props);
+      if ([...this.detached.values()].some(item => item.signature !== signature)) return { props, signature, update: null };
+      return { props: null, signature, update: this.source.hasWraps(state) ? this.read() : { from: 0, to: state.doc.length, gaps: [] } };
+    }, write: result => {
+      if (!result || !current()) return;
+      if (result.props) {
+        for (const item of this.detached.values()) { item.el.setCssProps(result.props); item.signature = result.signature; }
+        this.measure();
+      } else {
+        this.prepareMeasurements();
+        this.write(result.update, current);
+      }
+    } });
+  }
+
+  private releaseMeasurements(): void {
+    for (const { el } of this.detached.values()) { this.source.releaseStandIn(el); el.remove(); }
+    this.detached.clear();
+  }
+
+  private prepareMeasurements(): void {
+    if (!this.source.drawMeasurement) return;
+    const anchors = this.source.anchors(this.view.state).filter(anchor => anchor.to < this.view.viewport.from
+      && (!this.sizes.has(anchor.key) || this.pendingMedia.has(anchor.key)) && !drawnApart(this.view, anchor));
+    const keys = new Set(anchors.map(anchor => anchor.key));
+    for (const [key, item] of this.detached) if (!keys.has(key)) { this.source.releaseStandIn(item.el); item.el.remove(); this.detached.delete(key); }
+    const sourcePath = this.view.state.field(editorInfoField, false)?.file?.path ?? "";
+    for (const anchor of anchors) if (!this.detached.has(anchor.key)) {
+      const el = this.view.scrollDOM.createDiv({ cls: "cm-content vml-live-preview vml-wrap-measure", attr: { "aria-hidden": "true" } });
+      this.detached.set(anchor.key, { anchor, el, signature: "" });
+      const completed = (): void => { if (!this.destroyed && this.detached.get(anchor.key)?.el === el) this.mediaChanged(); };
+      for (const type of ["load", "error", "loadedmetadata", "vml-layout-rendered"]) el.addEventListener(type, completed, true);
+      this.source.drawMeasurement(el, this.view, anchor, sourcePath);
+    }
   }
 
   private read(): GapUpdate | null {
     const view = this.view;
+    if (!this.budget.take(`${this.epoch}:${view.viewport.from}:${view.viewport.to}`)) return null;
     const docTop = view.documentTop;
     const anchors = this.source.anchors(view.state);
     const previousSizes = JSON.stringify([...this.sizes]);
+    for (const { anchor, el } of this.detached.values()) {
+      const layout = el.querySelector<HTMLElement>(".vml-layout");
+      if (!layout || !isReady(layout)) { this.pendingMedia.add(anchor.key); continue; }
+      const rect = layout.getBoundingClientRect(), style = getComputedStyle(layout);
+      if (rect.width <= 0 || rect.height <= 0) { this.pendingMedia.add(anchor.key); continue; }
+      const layoutTop = rect.top - el.getBoundingClientRect().top;
+      const top = view.lineBlockAt(anchor.from).top + layoutTop;
+      const beside = view.lineBlockAtHeight(top), side = modelFromBlock(anchor.block).wrap!;
+      this.keep(anchor, { refPos: beside.from, refOffset: top - beside.top, side, layoutTop, layoutHeight: rect.height, width: rect.width,
+        margin: parseFloat(side === "left" ? style.marginRight : style.marginLeft) || 0,
+        marginBottom: parseFloat(style.marginBottom) || 0, marginTop: parseFloat(style.marginTop) || 0 });
+      this.pendingMedia.delete(anchor.key);
+      this.standInSizes.add(anchor.key);
+    }
     // Runs of drawn elements, between the gaps CodeMirror leaves for what it has not drawn.
     let boxes: FlowBox[] = [];
     const runs: FlowBox[][] = [boxes];
@@ -397,7 +463,10 @@ class WrapGuard {
 
   private write(update: GapUpdate | null, current: () => boolean): void {
     if (!update) {
-      if (current()) this.pendingUpdate = false;
+      if (current()) {
+        this.pendingUpdate = false;
+        this.source.measurementsChanged?.(this.view);
+      }
       return;
     }
     // A measurement may not dispatch. The spacers change right after it, before the frame is painted.
@@ -405,6 +474,7 @@ class WrapGuard {
       if (current()) {
         this.pendingUpdate = false;
         this.view.dispatch({ effects: setGaps.of(update) });
+        this.source.measurementsChanged?.(this.view);
       }
     });
   }
@@ -419,6 +489,7 @@ class WrapGuard {
     const anchorRect = anchorEl.getBoundingClientRect();
     const rect = layout.getBoundingClientRect();
     const style = getComputedStyle(layout);
+    if (rect.width <= 0 || rect.height <= 0) { this.pendingMedia.add(anchor.key); return; }
     if (isReady(layout)) this.pendingMedia.delete(anchor.key); else this.pendingMedia.add(anchor.key);
     const side = layout.hasClass("vml-layout--wrap-right") ? "right" : "left";
     // The line it starts beside, as the height map has it: the stand-in follows that line.
@@ -444,14 +515,17 @@ class WrapGuard {
    */
   private measureStandIn(anchors: readonly WrapAnchor[], host: HTMLElement, layout: HTMLElement): void {
     const anchor = anchors.find((candidate) => candidate.key === host.dataset.key);
-    if (!anchor || (this.sizes.has(anchor.key) && !this.standInSizes.has(anchor.key)) || !isReady(layout)) {
-      return;
-    }
+    if (!anchor) return;
+    const wasPending = this.pendingMedia.has(anchor.key);
+    if (!isReady(layout)) { this.pendingMedia.add(anchor.key); return; }
+    this.pendingMedia.delete(anchor.key);
+    if (this.sizes.has(anchor.key) && !this.standInSizes.has(anchor.key) && !wasPending) return;
     const known = this.sizes.get(anchor.key) ?? this.carried(anchor);
     if (!known) {
       return;
     }
     const rect = layout.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) { this.pendingMedia.add(anchor.key); return; }
     this.keep(anchor, { ...known, side: layout.hasClass("vml-layout--wrap-right") ? "right" : "left", layoutHeight: rect.height, width: rect.width });
     this.standInSizes.add(anchor.key);
   }

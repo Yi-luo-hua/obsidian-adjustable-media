@@ -1,4 +1,4 @@
-import { MarkdownView, editorInfoField, type App, type Editor, type TFile } from "obsidian";
+import { MarkdownView, Platform, editorInfoField, type App, type Editor, type TFile } from "obsidian";
 import { EditorView } from "@codemirror/view";
 
 import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure } from "./edits.ts";
@@ -67,9 +67,9 @@ export async function writeBlockEdits(
       return { ok: false, reason: "not-found" };
     }
     const result = writeToView(options.view, edits, options);
-    if (result.ok && !options.typing) {
-      // A pointer gesture can leave focus on the body. Restore keyboard undo to this pane without
-      // moving its selection; focus() in CodeMirror preserves the scroll position.
+    if (result.ok && !options.typing && !Platform.isMobileApp) {
+      // Desktop gestures restore keyboard undo. On mobile, focusing the note opens its input UI
+      // at the unrelated saved cursor; touch layout controls must leave focus where it is.
       options.view.focus();
     }
     return result;

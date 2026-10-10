@@ -50,6 +50,18 @@ export interface LayoutItem {
   caption: string | null;
 }
 
+/** Size/position settings can update existing media; content and other presentation need a redraw. */
+export function onlySizingDiffers(before: LayoutModel, after: LayoutModel): boolean {
+  const content = (model: LayoutModel): unknown => {
+    const { width: _width, align: _align, rows, ...rest } = model;
+    return { ...rest, rows: rows.map(row => {
+      const { height: _height, width: _rowWidth, align: _rowAlign, offset: _offset, items, ...settings } = row;
+      return { ...settings, items: items.map(({ weight: _weight, ...item }) => item) };
+    }) };
+  };
+  return JSON.stringify(content(before)) === JSON.stringify(content(after));
+}
+
 export interface LayoutRow {
   items: LayoutItem[];
   height: number | null;

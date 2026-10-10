@@ -1,13 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.7.3 - 2026-10-10
 
-- Floating layouts whose anchor is above the drawn part of a note in live preview: their stand-ins now have the layout's handles, menu and move grip, no longer stretch a list or quote line, stay put after an edit, and line up with the real layout.
-- Moving a whole layout can drop it into a run of blank lines, and dropping it higher than a floating layout written before it no longer pushes it down.
-- A note that starts with a layout no longer opens showing that layout's source.
-- In a PDF, a floating layout that does not fit at the bottom of a page moves to the next page together with the text it wraps and the heading right before it. It used to move alone, leaving its text behind at full width and wrapping unrelated text on the next page.
-- In a PDF, a table next to a floating layout shrinks to fit beside it, as in reading view, instead of dropping below the layout at full width.
-- In a note with layouts, live preview spaces the note's text like reading view and the PDF: a blank line takes the height of a paragraph break instead of a whole line, extra blank lines take no room while the cursor is elsewhere, and a paragraph break is added where reading view separates blocks written without a blank line (text right after a heading, a list or quote right after text). Layouts get the same spacing as in reading view. The text beside a floating layout is now the same while editing as in reading view and the PDF.
+- Add manual text columns using a standalone, unindented +++ line inside text layouts. Each segment stays in its own equal-width column, with independent content height, up to four columns.
+- Add Insert column break in the command palette, with undo support. Layouts without markers keep automatic column balancing.
+- Share manual column rendering across live preview, reading view and PDF export; preserve code, math, comments and original embeds.
+- Fix clicks from a text editor into another layout revealing source instead of editing text. Switch between a layout's text columns through the normal write checks.
+- Keep the current text editing focus and selection when clicking frame padding, column warnings or empty space near a handle.
+- Create offline manual column examples from the release notes, in Chinese or English to match the interface language. Repeated creation uses a fresh folder without overwriting existing notes.
+
+Desktop only. This patch builds on the published 0.7.2 source and retains its highlight option, divider improvements and update notes.
 
 ## 0.7.2 - 2026-10-09
 

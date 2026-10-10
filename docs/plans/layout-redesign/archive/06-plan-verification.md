@@ -1,5 +1,7 @@
 # 方案二次核验与修订
 
+归档说明（2026-10-10）：本页保留原批次证据；当前状态与任务见 [09](../09-progress-and-next-steps.md)，历史验收不扩大为新组合构建验收。
+
 日期：2026-09-30。状态：文档核验完成，实施门槛尚未运行。核验对象为本目录方案、当前 `34f5896`／0.6.1 工作区及已有两处源码补偿，不代表新架构已经实现。
 
 结论：区分并列组与正文浮动、共享关系规划、每窗格适配的主路线保留；上一版尚缺若干实施闭环，不能直接视为设计已经冻结。本轮修订如下八个主题，并将验收从 A01–A22 扩充到 A01–A27。
@@ -25,7 +27,7 @@ Q1、Q2、Q3、Q6 是格式／写入设计冻结前的必要条件。Q4、Q5 影
 
 `src/layout/edits.ts` 的 isEditable 对未知 V3 为 false，planModelEdit 返回 null；但 planUnwrap 不检查这一状态。`src/commands/plans.ts` 的 blockAt 不过滤不可编辑块；`src/commands/register.ts` 的单块命令调用 applyEditsToEditor，批处理将全部块 map(planUnwrap) 后交给写回入口。
 
-[基线探针](../../research/LAYOUT_PROBES.md) 复现实际纯函数调用链：未知 V3 单块移除成功、memoryEditor 记录一次事务；两块批量移除成功且仅剩媒体原文。这没有操作测试库，只证明该命令规划／提交链具备破坏组注释的路径。
+[基线探针](../../../research/LAYOUT_PROBES.md) 复现实际纯函数调用链：未知 V3 单块移除成功、memoryEditor 记录一次事务；两块批量移除成功且仅剩媒体原文。这没有操作测试库，只证明该命令规划／提交链具备破坏组注释的路径。
 
 ### V2 内部操作与将来的组关系
 
@@ -39,12 +41,12 @@ serializeOpener 默认写 V2；planColumnText 的读回用 findV2Blocks。planMo
 
 ## 3. 修订覆盖位置
 
-- [01 模型](01-model-and-decisions.md)：I11、来源快照、只读依赖、V2 可表达性。
-- [02 规划与交互](02-planner-and-interactions.md)：源码读回、readSet 提交、pointerup、滚动与全入口约束。
-- [03 同步与测量](03-view-sync-and-measurement.md)：来源分支、空 section 回退、候选参数缓存、撤销、rename 和窗口清理。
-- [04 格式](04-groups-and-format.md)：兼容反例、保护构建范围、内部操作适配、响应式／分页和功能开放门槛。
-- [05 交付](05-delivery-and-validation.md)：子包依赖、阶段出口及新增五类验收。
-- [ADR 0002](../../adr/0002-versioned-flat-groups.md)：版本边界改为完整入口保护的条件性推荐，仍为 proposed。
+- [01 模型](../01-model-and-decisions.md)：I11、来源快照、只读依赖、V2 可表达性。
+- [02 规划与交互](../02-planner-and-interactions.md)：源码读回、readSet 提交、pointerup、滚动与全入口约束。
+- [03 同步与测量](../03-view-sync-and-measurement.md)：来源分支、空 section 回退、候选参数缓存、撤销、rename 和窗口清理。
+- [04 格式](../04-groups-and-format.md)：兼容反例、保护构建范围、内部操作适配、响应式／分页和功能开放门槛。
+- [05 交付](../05-delivery-and-validation.md)：子包依赖、阶段出口及新增五类验收。
+- [ADR 0002](../../../adr/0002-versioned-flat-groups.md)：版本边界改为完整入口保护的条件性推荐，仍为 proposed。
 
 ## 4. 剩余门槛和本轮验证边界
 

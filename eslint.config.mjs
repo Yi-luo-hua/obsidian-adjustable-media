@@ -10,6 +10,7 @@ export default defineConfig([
       parserOptions: {
         projectService: {
           allowDefaultProject: ["eslint.config.mjs", "esbuild.config.mjs", "scripts/*.mjs"],
+          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 12,
         },
       },
     },
