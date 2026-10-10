@@ -18,7 +18,9 @@
 
 - 主目录：`E:/TOOLS/obsidian-adjustable-media`，用于 0.7.3。
 - 原独立功能工作树：`C:/Users/丁家宝/.codex/worktrees/independent-features/obsidian-adjustable-media`，现用于 W02／W03；目录保留旧名称。
-- 三视图、渲染和 Android 使用各自新增工作树，实际路径以 `git worktree list` 为准。
+- 三视图：`C:/Users/丁家宝/.codex/worktrees/pending-view-parity/obsidian-adjustable-media`。
+- 共用渲染：`C:/Users/丁家宝/.codex/worktrees/pending-render-stability/obsidian-adjustable-media`。
+- Android：`C:/Users/丁家宝/.codex/worktrees/android-adaptation/obsidian-adjustable-media`。
 - 历史 review-pr18 和 docs/tidy-task-plan 工作树保持原样。
 
 W02／W03 的 33 个未提交文件已搬到原独立功能工作树，逐文件 SHA-256 一致；恢复快照与原构建保存在主目录忽略目录 `dist/worktree-reorganization-20261010/`，恢复 stash 为 `276052785e29b2b26ead891092c9932bd63b3353`。`.claude/`、历史审查修改、笔记及设置没有混入新提交。
@@ -33,5 +35,15 @@ W02／W03 的 33 个未提交文件已搬到原独立功能工作树，逐文件
 4. 通过已列 Android 核心场景后再调整正式支持声明；现阶段 manifest 继续桌面限定。iPhone／iPad 未测，不能记为通过。
 
 本次设备检查：ADB 已启动，无连接设备。分支拆分后的自动检查与构建另记；历史真机证据来自 `f7c8880` 的 [18](https://github.com/Yi-luo-hua/obsidian-adjustable-media/blob/f7c8880/docs/plans/layout-redesign/18-android-and-w01-acceptance.md)、[20](https://github.com/Yi-luo-hua/obsidian-adjustable-media/blob/f7c8880/docs/plans/layout-redesign/20-tablet-acceptance.md) 及 [21–24](https://github.com/Yi-luo-hua/obsidian-adjustable-media/blob/f7c8880/docs/plans/layout-redesign/24-mobile-video-controls-focus.md)，不把它们当成新组合构建的真机验收。
+
+用户随后明确选择：本次先完成分支整理，真机验收稍后进行。未部署 Android 新构建，也未修改正式桌面限定。
+
+## 本次检查与提交
+
+- 0.7.3 实现提交 `664198c` 已推送；类型检查、lint、327 项测试及发布构建通过，主目录再次生产构建通过。
+- 三视图分支 `40104f7` 已推送；类型检查、lint、401 项测试及生产构建通过。解决合流后的宿主解析／高亮冲突，补齐原回归测试的依赖；保留 0.7.3 点击与手动分栏用例。
+- 共用渲染分支 `c993001` 已推送；类型检查、lint、415 项测试及生产构建通过。只提取 W01／播放器相关模块及语义回归，不带候选提供者、触摸控制或输入按钮。
+- Android 实现提交 `a92d38b` 已推送，类型检查、lint、426 项测试及生产构建通过。提取现有触摸／输入／焦点修复、真机工具和对应回归；保留 0.7.2 悬停高亮及 0.7.3 分栏／点击／更新说明。新组合构建的宿主／真机验收仍待进行，不能直接沿用历史通过结论。
+- W02／W03 的 33 个文件再次核对，哈希差异为 0。恢复 stash 保留；没有重置该开发线，也没有把它的未完成模块放入上述待合并分支。
 
 日常验证继续按 [AGENTS.md](../../../AGENTS.md) 的改动影响选择范围；W03／W04 的统一规划器触摸接入属于后续增量，不混入本轮 Android 基础适配。
