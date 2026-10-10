@@ -1,4 +1,4 @@
-import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
+import { fencedCodeBlocks, scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
 
 /**
  * v2 layout format: plain media embeds wrapped in HTML comments.
@@ -16,8 +16,8 @@ import { scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts"
  * invalid. See docs/DESIGN.md, section 1.
  */
 
-export type MediaKind = "image" | "video";
-export type EmbedSyntax = "wiki" | "markdown";
+export type MediaKind = "image" | "video" | "mermaid";
+export type EmbedSyntax = "wiki" | "markdown" | "mermaid";
 export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
 /** The side a layout floats to, with the note's own text wrapping around it. */
@@ -29,6 +29,8 @@ export type TextJustify = "left" | "center" | "right" | "justify";
 export type V2RowMeta = Record<string, unknown>;
 
 export interface V2Meta {
+  /** Multiline media items opt into a version that older plugins keep read-only. */
+  version?: 3;
   rows: V2RowMeta[];
   /** Unknown top-level keys, written back unchanged. */
   extra: Record<string, unknown>;
@@ -45,12 +47,15 @@ export interface V2Embed {
   /** Width written in the embed itself, e.g. the 300 in ![[a.png|300]]. */
   nativeWidth: number | null;
   line: number;
+  /** Last source line of a multiline diagram; ordinary embeds occupy their first line only. */
+  endLine?: number;
   from: number;
   to: number;
 }
 
 export interface V2Row {
   line: number;
+  endLine?: number;
   embeds: V2Embed[];
 }
 
@@ -172,7 +177,8 @@ export function parseMeta(text: string | undefined): { meta: V2Meta; error: stri
   }
 
   const { v: version, rows, ...extra } = parsed;
-  if (version !== undefined && version !== 2) {
+  const mediaItems = version === 3 && extra.kind === "media";
+  if (version !== undefined && version !== 2 && !mediaItems) {
     return { meta: empty, error: `Unsupported layout format version: ${JSON.stringify(version)}` };
   }
 
@@ -184,6 +190,7 @@ export function parseMeta(text: string | undefined): { meta: V2Meta; error: stri
 
   return {
     meta: {
+      ...(mediaItems ? { version: 3 as const } : {}),
       rows: Array.isArray(rows) ? rows.map((row) => ({ ...row })) : [],
       extra,
     },
@@ -305,7 +312,7 @@ export function serializeOpener(meta: V2Meta): string {
   }
 
   // Without row settings, `rows` is left out too: every version reads a missing `rows` as none.
-  const json = JSON.stringify({ v: 2, ...meta.extra, ...(rows.length > 0 ? { rows } : {}) }, roundNumbers)
+  const json = JSON.stringify({ v: meta.version ?? 2, ...meta.extra, ...(rows.length > 0 ? { rows } : {}) }, roundNumbers)
     // "--" may only appear inside strings; escaping it keeps the comment from closing early.
     .replace(/--/g, "-\\u002d")
     // An odd number of "%%" would make the whole line read as an Obsidian comment.
@@ -319,6 +326,9 @@ export function serializeRow(embeds: readonly V2Embed[]): string {
 }
 
 export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embed[]>): string[] {
+  if (meta.version === 3) {
+    return [serializeOpener(meta), ...rows.flatMap((row) => row.flatMap((item) => item.raw.split("\n"))), CLOSE_LINE];
+  }
   return [serializeOpener(meta), ...rows.map(serializeRow), CLOSE_LINE];
 }
 
@@ -348,6 +358,11 @@ function buildBlock(
   metaText: string | undefined,
 ): V2Block {
   const { meta, error } = parseMeta(metaText);
+  let metaError = error;
+  const diagrams = meta.version === 3
+    ? new Map(fencedCodeBlocks(["layout body", ...lines.slice(openLine + 1, closeLine)])
+      .filter((fence) => fence.language === "mermaid")
+      .map((fence) => [openLine + fence.from, openLine + fence.to])) : new Map<number, number>();
   // A block of text holds no rows: its media lines are text too.
   const allText = error === null && readBlockType(meta.extra.type) !== null;
   const rows: V2Row[] = [];
@@ -362,14 +377,38 @@ function buildBlock(
     }
 
     // Code, math and comments are text, whatever they hold.
-    const embeds = contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
+    const diagramEnd = allText ? undefined : diagrams.get(line);
+    const embeds: V2Embed[] | null = diagramEnd !== undefined ? [{
+      raw: lines.slice(line, diagramEnd + 1).map(stripCarriageReturn).join("\n"),
+      syntax: "mermaid", target: "", alt: "", kind: "mermaid", nativeWidth: null,
+      line, endLine: diagramEnd, from: 0, to: stripCarriageReturn(lines[diagramEnd] ?? "").length,
+    }] : contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
     } else if (right.length > 0) {
       // The text before this row came after another one: it belongs to neither side.
       invalidLine ??= right[0] ?? line;
     } else {
-      rows.push({ line, embeds });
+      rows.push({ line, ...(diagramEnd === undefined ? {} : { endLine: diagramEnd }), embeds });
+    }
+    if (diagramEnd !== undefined) line = diagramEnd;
+  }
+
+  let groupedRows = rows;
+  if (meta.version === 3 && meta.rows.some((row) => row.items !== undefined)) {
+    const counts = meta.rows.map((row) => row.items);
+    const items = rows.flatMap((row) => row.embeds);
+    if (!counts.every((count) => typeof count === "number" && Number.isInteger(count) && count > 0)
+      || counts.reduce<number>((total, count) => total + Number(count), 0) !== items.length) {
+      metaError = "Media row item counts must account for every source item";
+    } else {
+      let offset = 0;
+      groupedRows = counts.map((count) => {
+        const embeds = items.slice(offset, offset + Number(count));
+        offset += Number(count);
+        const first = embeds[0], last = embeds.at(-1)!;
+        return { line: first.line, endLine: last.endLine ?? last.line, embeds };
+      });
     }
   }
 
@@ -377,11 +416,11 @@ function buildBlock(
     openLine,
     closeLine,
     lines: lines.slice(openLine, closeLine + 1).map(stripCarriageReturn),
-    rows,
+    rows: groupedRows,
     leftText: textPart(lines, left),
     rightText: textPart(lines, right),
     meta,
-    metaError: error,
+    metaError,
     invalidLine,
   };
 }

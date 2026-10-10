@@ -46,6 +46,32 @@ export function scanMarkdownLines(lines: readonly string[], includeEnd = false):
   return contexts;
 }
 
+export interface FencedCodeBlock {
+  from: number;
+  to: number;
+  language: string;
+}
+
+/** Complete top-level fences, using the same context and closing rules as the layout scanner. */
+export function fencedCodeBlocks(lines: readonly string[]): FencedCodeBlock[] {
+  const blocks: FencedCodeBlock[] = [];
+  let state: ScanState = hasFrontmatter(lines) ? { kind: "frontmatter" } : TEXT;
+  let opening: { from: number; language: string } | null = null;
+  lines.forEach((line, index) => {
+    const [, next] = classifyLine(stripCarriageReturn(line), index, state);
+    if (state.kind === "text" && next.kind === "code") {
+      const fence = next.fence;
+      opening = fence.quoteDepth === 0 && !fence.listMarker && fence.indent <= 3
+        ? { from: index, language: fence.info.trim().toLowerCase() } : null;
+    } else if (state.kind === "code" && next.kind === "text" && opening) {
+      blocks.push({ ...opening, to: index });
+      opening = null;
+    }
+    state = next;
+  });
+  return blocks;
+}
+
 function classifyLine(line: string, index: number, state: ScanState): [LineContext, ScanState] {
   switch (state.kind) {
     case "frontmatter":

@@ -247,7 +247,7 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
   }
 
   itemEl.tabIndex = 0;
-  itemEl.setAttribute("aria-label", item.embed.alt || item.embed.target);
+  itemEl.setAttribute("aria-label", item.embed.kind === "mermaid" ? t("mermaidDiagram") : item.embed.alt || item.embed.target);
   itemEl.addEventListener("contextmenu", (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -772,7 +772,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
 
   // Obsidian's own actions for the media file, as on any link: reveal it in the file list or the
   // system's file manager, open it, copy its path, and whatever other plugins add.
-  const media = resolveMedia(context.app, item.embed, context.sourcePath);
+  const media = item.embed.kind === "mermaid" ? null : resolveMedia(context.app, item.embed, context.sourcePath);
   if (media?.file) {
     context.app.workspace.trigger("file-menu", menu, media.file, "link-context-menu");
   }

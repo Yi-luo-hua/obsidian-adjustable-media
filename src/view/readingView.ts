@@ -196,10 +196,12 @@ export function registerReadingView(plugin: Plugin): void {
     const block = sectionBlock(blocks, info);
     const opening = block?.openLine === info.lineStart && info.lineStart === info.lineEnd;
     if (block && isDrawable(block)) {
+      // A multiline item can share a row with media in another native Markdown section.
+      const whole = hasSideText(block) || block.meta.version === 3;
       let rows: number[] | undefined;
-      if (hasSideText(block) && !opening) el.empty();
+      if (whole && !opening) el.empty();
       else {
-        rows = hasSideText(block) ? undefined : sectionRows(block, info);
+        rows = whole ? undefined : sectionRows(block, info);
         if (rows === undefined || rows.length > 0) {
           const child = new MarkdownRenderChild(el);
           ctx.addChild(child);
@@ -330,7 +332,7 @@ function sectionRange(parsed: Parsed, info: MarkdownSectionInformation): SourceC
 
 function sectionBlock(blocks: readonly V2Block[], info: MarkdownSectionInformation): V2Block | undefined {
   const opening = blocks.find(block => info.lineStart === block.openLine && info.lineEnd === block.openLine);
-  return opening && hasSideText(opening) ? opening
+  return opening && (hasSideText(opening) || opening.meta.version === 3) ? opening
     : blocks.find(block => info.lineStart > block.openLine && info.lineEnd < block.closeLine);
 }
 
@@ -341,6 +343,6 @@ function sectionRows(block: V2Block, info: MarkdownSectionInformation): number[]
 function sectionLayoutKey(parsed: Parsed, info: MarkdownSectionInformation): string {
   const block = sectionBlock(parsed.blocks, info);
   if (!block || !isDrawable(block)) return "";
-  const rows = hasSideText(block) ? info.lineStart === block.openLine ? "columns" : "hidden" : sectionRows(block, info);
+  const rows = hasSideText(block) || block.meta.version === 3 ? info.lineStart === block.openLine ? "whole" : "hidden" : sectionRows(block, info);
   return JSON.stringify([block.lines[0], rows, parsed.skips[parsed.blocks.indexOf(block)] ?? null]);
 }

@@ -6,6 +6,8 @@
 
 ## 1. 存储格式
 
+本分支 `codex/mermaid-layout` 另有未发布的 Mermaid 独立布局项，基线仍为上述 0.7.3。它只对显式新建／接收图表的目标块使用 `v:3, kind:"media"`，不自动迁移旧笔记；单块项数、完整围栏读写和宿主验证见 [37](plans/layout-redesign/37-mermaid-layout-items.md)。以下 V2 说明仍适用于公开版本与旧布局。这个单块格式不是 W06 多块组格式。
+
 ### 1.1 语法
 
 ```markdown

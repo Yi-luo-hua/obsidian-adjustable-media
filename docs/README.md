@@ -25,6 +25,7 @@
 | [Android 适配](plans/layout-redesign/mobile-adaptation.md) | 手机／平板优先范围、待做真机验收与后续 iOS 计划 |
 | [手动文字分栏](plans/layout-redesign/34-text-column-breaks.md) | 已准备交付的 0.7.3 功能语义 |
 | [拖动动画与预览](plans/layout-redesign/35-block-drag-animation-preview.md) | 已确认、尚未实现的 W03／W04／W11 需求 |
+| [Mermaid 独立项](plans/layout-redesign/37-mermaid-layout-items.md) | 独立功能分支的并排、缩放、格式边界与桌面验证，未发布 |
 | [ADR](adr) | proposed 决策及其接受条件 |
 
 ## 历史与证据

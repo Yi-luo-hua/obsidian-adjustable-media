@@ -2,7 +2,7 @@ import { findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, 
 import { planWrap } from "../input/insertion.ts";
 import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
-import { scanMarkdownLines } from "../markdown/lineContext.ts";
+import { fencedCodeBlocks, scanMarkdownLines } from "../markdown/lineContext.ts";
 
 /**
  * Wraps the non-blank lines of a selection (whole lines) in one layout block. Media lines alone are
@@ -49,7 +49,11 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
   // with its media lines as figures in it. An indented media line is list content or indented code:
   // as a row it would lose its indentation once rewritten, so it stays text, in a block of text.
   const columns = targets.some(isMedia) && !targets.some((line) => isMedia(line) && INDENTED.test(text(line)));
-  const attempts = columns ? [wrapLines(body), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)];
+  const hasDiagram = fencedCodeBlocks(lines).some((fence) => fence.language === "mermaid" && fence.from >= first && fence.to <= last);
+  const attempts = [
+    ...(hasDiagram ? [wrapLines(body, { version: 3, rows: [], extra: { kind: "media" } })] : []),
+    ...(columns ? [wrapLines(body), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)]),
+  ];
   for (const replacement of attempts) {
     const after = [...lines.slice(0, first), ...replacement, ...lines.slice(last + 1)];
     const closeLine = first + replacement.length - 1;
@@ -117,12 +121,19 @@ export function planMergeWithNext(lines: readonly string[], line: number): LineC
 
   const first = modelFromBlock(current);
   const merged = { ...first, rows: [...first.rows, ...modelFromBlock(next).rows] };
-  return { from: current.openLine, to: next.closeLine, replacement: serializeBlock(metaFromModel(merged), rowEmbeds(merged)) };
+  const replacement = serializeBlock(metaFromModel(merged), rowEmbeds(merged));
+  const reread = findV2Blocks(replacement);
+  if (reread.length !== 1 || !isEditable(reread[0])
+    || JSON.stringify(reread[0].rows.map(row => row.embeds.map(item => item.raw)))
+      !== JSON.stringify(merged.rows.map(row => row.items.map(item => item.embed.raw)))) return null;
+  return { from: current.openLine, to: next.closeLine, replacement };
 }
 
 /** Whether every block setting of `next` is set the same way in `first`, which the merged block keeps. */
 function settingsKept(first: V2Block, next: V2Block): boolean {
-  return Object.entries(next.meta.extra).every(([key, value]) => JSON.stringify(first.meta.extra[key]) === JSON.stringify(value));
+  return Object.entries(next.meta.extra).every(([key, value]) =>
+    (next.meta.version === 3 && key === "kind" && first.meta.extra.kind === undefined)
+    || JSON.stringify(first.meta.extra[key]) === JSON.stringify(value));
 }
 
 /** Commands and input conversion use the same source validation and write boundary as gestures. */

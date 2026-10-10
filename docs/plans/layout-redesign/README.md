@@ -16,6 +16,7 @@
 | [34 手动分栏](34-text-column-breaks.md) | 0.7.3 已确定语义，与多块并列组区分 |
 | [35 拖动动画与预览](35-block-drag-animation-preview.md) | 已确认、尚未实现的可选动画与完整预览 |
 | [36 工作树与交付](36-worktree-and-android-priority.md) | 分支、工作目录、堆叠集成与恢复信息 |
+| [37 Mermaid 独立项](37-mermaid-layout-items.md) | 独立功能分支的单块图表项、并排与缩放，未发布 |
 | [Android 适配](mobile-adaptation.md) | 本轮手机／平板定向验收和后续 iOS 范围 |
 
 ## 工作包与依赖

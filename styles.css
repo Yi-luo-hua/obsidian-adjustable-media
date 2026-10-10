@@ -93,6 +93,28 @@
   min-width: 0;
 }
 
+/* Mermaid stays a native Markdown-rendered SVG while its item controls the available size. */
+.vml-item__diagram {
+  overflow: hidden;
+  white-space: normal;
+}
+
+.vml-row--single .vml-item__diagram {
+  aspect-ratio: var(--vml-diagram-ratio, auto);
+}
+
+.vml-item__diagram > .mermaid {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.vml-item__diagram .mermaid > svg {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+}
+
 .vml-text-column > :first-child {
   margin-top: 0;
 }

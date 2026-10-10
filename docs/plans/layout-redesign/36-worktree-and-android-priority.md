@@ -13,6 +13,7 @@
 | `codex/mobile-release-integration` | `2630ebb` 本地移动集成 | 保留已验收依赖链与 main 的历史；供后续移动适配大版本使用 | 429 项检查通过；等待 iPhone／iPad 基础真机验收，具体版本号未定 |
 | `codex/release-073-index` | `39889e5` | 只同步 0.7.3 的版本元数据与发布索引，不改 main 实现 | PR #22 已合并到 main（3f31feb），main 检查通过；工作树已归档，可恢复 |
 | `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
+| `codex/mermaid-layout` | `89b4b66` 起点 | 0.7.3 源码线上的独立 Mermaid 布局项；不接移动候选 | 337 项检查、构建与 Windows 相关宿主／PDF 验证通过，未合并／发布，见 [37](37-mermaid-layout-items.md) |
 
 待合并分支按依赖堆叠：`text-column-breaks → pending-view-parity → pending-render-stability → android-adaptation`。这表示代码依赖，不表示已经合并或发布；评审每一层时以其上一层为比较基线。旧 `codex/android-layout-stability` 留作完整历史来源，不再作为新的混合开发入口。
 
@@ -37,6 +38,7 @@ bug 修复按主要职责归入对应工作线，设备验证范围单独记录�
 - 三视图：`C:/Users/丁家宝/.codex/worktrees/pending-view-parity/obsidian-adjustable-media`。
 - 共用渲染：`C:/Users/丁家宝/.codex/worktrees/pending-render-stability/obsidian-adjustable-media`。
 - Android：`C:/Users/丁家宝/.codex/worktrees/android-adaptation/obsidian-adjustable-media`。
+- Mermaid：`C:/Users/丁家宝/.codex/worktrees/mermaid-layout/obsidian-adjustable-media`。
 - 0.7.3 发布索引工作树已归档，可恢复；分支 `codex/release-073-index` 保留，PR #22 已合并。
 - 历史 review-pr18 和 docs/tidy-task-plan 工作树保持原样。
 

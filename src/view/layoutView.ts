@@ -148,13 +148,13 @@ function renderText(root: HTMLElement, side: TextSide, markdown: string, options
 }
 
 /** Draws Markdown with its numbers into `el`, captions and figures marked; without a component, nothing. */
-function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOptions): boolean {
+function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOptions, rendered?: () => void): boolean {
   const { component } = options;
   if (!component) {
     return false;
   }
   const task = MarkdownRenderer.render(options.app, numbered(markdown, options.refs), el, options.sourcePath, component)
-    .then(() => markCaptions(el, markdown));
+    .then(() => { markCaptions(el, markdown); rendered?.(); });
   options.renderTasks?.push(task);
   return true;
 }
@@ -219,8 +219,20 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
     itemEl.setCssProps({ "--vml-grow": String(item.weight) });
   }
 
-  const media = resolveMedia(options.app, item.embed, options.sourcePath);
-  if (!media) {
+  const media = item.embed.kind === "mermaid" ? null : resolveMedia(options.app, item.embed, options.sourcePath);
+  if (item.embed.kind === "mermaid") {
+    itemEl.addClass("vml-item--mermaid");
+    const diagram = itemEl.createDiv({ cls: "vml-item__media vml-item__diagram markdown-rendered" });
+    // Obsidian's diagram processor requires lowercase; normalize only the rendering copy.
+    const markdown = item.embed.raw.replace(/^([ \t]*(?:`{3,}|~{3,}))[ \t]*mermaid[ \t]*/i, "$1mermaid");
+    renderMarkdown(diagram, markdown, options, () => {
+      const box = diagram.querySelector<SVGSVGElement>(".mermaid > svg")?.viewBox.baseVal;
+      if (box && box.width > 0 && box.height > 0) {
+        diagram.setCssProps({ "--vml-diagram-ratio": String(box.width / box.height) });
+        useSize(itemEl, diagram, { width: box.width, height: box.height }, shareByRatio);
+      }
+    });
+  } else if (!media) {
     itemEl.createDiv({ cls: "vml-item__missing", text: t("missingMedia", { target: item.embed.target }) });
   } else {
     const known = mediaSizes.get(media.url);

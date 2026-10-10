@@ -73,6 +73,7 @@ export interface LayoutText {
 }
 
 export interface LayoutModel {
+  version?: 3;
   rows: LayoutRow[];
   /**
    * The block's share of the container width, taken by its media, or by its text in a layout without
@@ -121,6 +122,7 @@ export function modelFromBlock(block: V2Block): LayoutModel {
   const columns = blockHasTextColumns(block);
   const extra = columns ? { ...definedOnly({ wrap, skip }), ...rest } : rest;
   return {
+    ...(block.meta.version === 3 ? { version: 3 as const } : {}),
     rows: block.rows.map((row, rowIndex) => {
       const settings = readRowMeta(block.meta.rows[rowIndex] ?? {}, row.embeds.length);
       return {
@@ -181,10 +183,13 @@ export function canAddText(model: LayoutModel): boolean {
 }
 
 export function metaFromModel(model: LayoutModel): V2Meta {
+  const mediaItems = model.version === 3 || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid"));
   return {
+    ...(mediaItems ? { version: 3 as const } : {}),
     rows: model.rows.map((row) => {
       const single = row.items.length === 1;
       const meta: V2RowMeta = { ...row.extra };
+      if (mediaItems) meta.items = row.items.length;
       if (row.height !== null) {
         meta.height = row.height;
       }
@@ -208,6 +213,7 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       return meta;
     }),
     extra: {
+      ...(mediaItems ? { kind: "media" } : {}),
       ...(model.width === null ? {} : { width: model.width }),
       ...(model.wrap === null ? {} : { wrap: model.wrap }),
       // Without wrapping, skip means nothing; without text beside the media, neither does valign.

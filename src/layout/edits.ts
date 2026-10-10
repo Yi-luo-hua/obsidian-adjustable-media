@@ -82,11 +82,27 @@ export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | n
   }
 
   const meta = metaFromModel(model);
-  if (sameRows(block, embeds)) {
+  const sourceItems = block.rows.flatMap((row) => row.embeds);
+  const nextItems = embeds.flat();
+  const sameOrder = block.meta.version === 3 && sourceItems.length === nextItems.length
+    && sourceItems.every((item, index) => item.raw === nextItems[index]?.raw);
+  if (sameRows(block, embeds) || sameOrder) {
     const opener = serializeOpener(meta);
+    if (!modelReadsBack(block, meta, embeds, [opener, ...block.lines.slice(1)])) return null;
     return opener === block.lines[0] ? null : anchored(block, 0, 0, [opener]);
   }
-  return anchored(block, 0, lastLine, blockLines(block, meta, embeds));
+  const replacement = blockLines(block, meta, embeds);
+  return modelReadsBack(block, meta, embeds, replacement) ? anchored(block, 0, lastLine, replacement) : null;
+}
+
+/** Multiline items must survive serialization as whole items, with both text columns intact. */
+function modelReadsBack(block: V2Block, meta: V2Meta, embeds: ReadonlyArray<readonly V2Embed[]>, lines: string[]): boolean {
+  if (meta.version !== 3) return true;
+  const [after, ...others] = findV2Blocks(lines);
+  return after !== undefined && others.length === 0 && after.openLine === 0 && after.closeLine === lines.length - 1
+    && after.meta.version === 3 && isEditable(after) && sameRows(after, embeds)
+    && sameLines(textOf(after, "left"), textOf(block, "left"))
+    && sameLines(textOf(after, "right"), textOf(block, "right"));
 }
 
 /** The lines right above and below a block in the note, as far as they are known. */
@@ -106,9 +122,10 @@ export function planMoveOut(block: V2Block, model: LayoutModel, embed: V2Embed, 
   }
   const embeds = rowEmbeds(model);
   const rest = embeds.length === 0 ? textLines(block) : blockLines(block, metaFromModel(model), embeds);
+  if (embeds.length > 0 && !modelReadsBack(block, metaFromModel(model), embeds, rest)) return null;
   const head = rest.length > 0 ? [...rest, ""] : isBlankOrEdge(around.before) ? [] : [""];
   const tail = isBlankOrEdge(around.after) ? [] : [""];
-  return anchored(block, 0, block.lines.length - 1, [...head, embed.raw, ...tail]);
+  return anchored(block, 0, block.lines.length - 1, [...head, ...embed.raw.split("\n"), ...tail]);
 }
 
 function isBlankOrEdge(line: string | undefined): boolean {
@@ -404,7 +421,7 @@ function blockLines(block: V2Block, meta: V2Meta, embeds: ReadonlyArray<readonly
     lines[0] ?? "",
     ...block.lines.slice(1, first.line - block.openLine),
     ...lines.slice(1, -1),
-    ...block.lines.slice(last.line - block.openLine + 1),
+    ...block.lines.slice((last.endLine ?? last.line) - block.openLine + 1),
   ];
 }
 
