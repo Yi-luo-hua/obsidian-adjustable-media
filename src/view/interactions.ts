@@ -129,7 +129,9 @@ export function attachInteractions(root: HTMLElement, context: LayoutContext): v
 
 /** Where an item dragged from `leaf` would land in a layout of the note at (x, y), if anywhere. */
 export function findDrop(doc: Document, sourcePath: string, leaf: Element | null, x: number, y: number): DropState | null {
-  const targetRoot = doc.elementFromPoint(x, y)?.closest<HTMLElement>(".vml-layout") ?? null;
+  const hit = doc.elementFromPoint(x, y);
+  const targetRoot = hit?.closest<HTMLElement>(".vml-layout")
+    ?? hit?.closest(".vml-live-preview")?.querySelector<HTMLElement>(".vml-layout") ?? null;
   const targetContext = targetRoot ? contexts.get(targetRoot) : undefined;
   if (!targetRoot || !targetContext || targetContext.sourcePath !== sourcePath || !isEditable(targetContext.block)) {
     return null;

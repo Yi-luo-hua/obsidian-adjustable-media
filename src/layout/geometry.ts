@@ -41,7 +41,7 @@ const OUTSIDE_REACH = 40;
 /**
  * Where a dragged item lands if released at (x, y). The top and bottom bands of an item mean
  * "a new row above / below"; elsewhere on an item it goes before or after it. Returns null when the
- * pointer is outside the layout.
+ * pointer is farther than the layout's edge band.
  */
 export function dropTarget(x: number, y: number, rows: readonly RowBox[], items: readonly ItemBox[]): MoveTarget | null {
   const hit = items.find((box) => contains(box.rect, x, y));
@@ -63,7 +63,7 @@ export function dropTarget(x: number, y: number, rows: readonly RowBox[], items:
   }
   const left = Math.min(...rows.map((box) => box.rect.left));
   const right = Math.max(...rows.map((box) => box.rect.right));
-  if (x < left || x > right) {
+  if (x < left - OUTSIDE_REACH || x > right + OUTSIDE_REACH) {
     return null;
   }
   if (y < first.rect.top) {

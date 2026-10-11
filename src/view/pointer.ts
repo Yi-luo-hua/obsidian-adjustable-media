@@ -16,7 +16,7 @@ export interface PointerHandlers {
  * a native drag that takes over (the browser then sends no pointerup), and a release the document
  * never heard. Either one cancels the gesture.
  */
-export function trackPointer(target: HTMLElement, start: PointerEvent, handlers: PointerHandlers): void {
+export function trackPointer(target: HTMLElement, start: PointerEvent, handlers: PointerHandlers): () => void {
   const doc = target.ownerDocument;
   let finished = false;
 
@@ -91,4 +91,5 @@ export function trackPointer(target: HTMLElement, start: PointerEvent, handlers:
   doc.addEventListener("selectstart", onSelectStart, true);
   doc.addEventListener("dragstart", onDragStart);
   target.addEventListener("lostpointercapture", onCancel);
+  return () => finish(null);
 }

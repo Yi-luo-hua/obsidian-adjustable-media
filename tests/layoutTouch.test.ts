@@ -11,7 +11,7 @@ async function harness() {
   let gripOnly = false;
   const attributes = new Map<string, string>();
   const pane = { getBoundingClientRect: () => ({ left: 0, right: 400, top: 50, bottom: 700 }),
-    querySelectorAll: (selector: string) => gripOnly && !selector.includes(".vml-plain-media__grip") ? [] : [{ getBoundingClientRect: () => box }],
+    querySelectorAll: (selector: string) => gripOnly && !selector.includes(".vml-plain-media--draggable") ? [] : [{ getBoundingClientRect: () => box }],
     getAttribute: (key: string) => attributes.get(key) ?? null,
     setAttribute: (key: string, value: string) => attributes.set(key, value),
     removeAttribute: (key: string) => attributes.delete(key) };

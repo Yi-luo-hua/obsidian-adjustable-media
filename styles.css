@@ -552,6 +552,12 @@
     width: 44px;
   }
 
+  .is-mobile .vml-plain-media--draggable,
+  .is-mobile .vml-plain-media--draggable * {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
   .is-mobile .vml-has-layouts .cm-content .mermaid,
   .is-mobile .vml-layout--interactive .vml-item--mermaid {
     cursor: auto;

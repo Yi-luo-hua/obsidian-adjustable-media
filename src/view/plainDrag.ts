@@ -27,6 +27,7 @@ export function plainMediaDrag(app: App): Extension {
   return ViewPlugin.define((view) => {
     // The media whose drag the plugin is following, if any.
     let dragging: HTMLElement | null = null;
+    let cancelDrag: (() => void) | null = null;
     const hasLayouts = (): boolean => view.dom.querySelector(".vml-layout--interactive") !== null;
     const grips = new Set<HTMLElement>();
     const updateGrips = (): void => {
@@ -55,16 +56,18 @@ export function plainMediaDrag(app: App): Extension {
       if (event.button !== 0 || modified || !media || media.closest(".vml-layout, .vml-text-editor") || !hasLayouts()) {
         return;
       }
-      if (diagram && event.pointerType === "touch" && !target?.closest(".vml-plain-media__grip")) return;
+      const hold = diagram !== null && event.pointerType === "touch" && !target?.closest(".vml-plain-media__grip");
+      if (hold && target?.closest("button, a, input, textarea")) return;
       const sourcePath = view.state.field(editorInfoField, false)?.file?.path;
       const taken = sourcePath ? take(view, media) : null;
       if (sourcePath && taken) {
         // A native text selection could reveal the fence and remove the diagram during the drag.
-        if (diagram) event.preventDefault();
+        if (diagram && !hold) event.preventDefault();
         dragging = media;
-        startPlainDrag(app, view, media, sourcePath, taken, event, () => {
+        cancelDrag = startPlainDrag(app, view, media, sourcePath, taken, event, () => {
           dragging = null;
-        });
+          cancelDrag = null;
+        }, hold);
       }
     };
     // While the plugin follows a drag, the browser's own image drag must not start: it would take
@@ -84,6 +87,7 @@ export function plainMediaDrag(app: App): Extension {
     updateGrips();
     return {
       destroy() {
+        cancelDrag?.();
         observer.disconnect();
         for (const grip of grips) { grip.parentElement?.removeClass("vml-plain-media--draggable"); grip.remove(); }
         grips.clear();
@@ -94,13 +98,18 @@ export function plainMediaDrag(app: App): Extension {
   });
 }
 
-function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, start: PointerEvent, onFinish: () => void): void {
+function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, start: PointerEvent, onFinish: () => void, hold = false): () => void {
   const doc = media.ownerDocument;
   const leaf = media.closest(".workspace-leaf");
   let ghost: DragGhost | null = null;
   let drop: DropState | null = null;
+  let armed = !hold;
+  let timer: number | undefined;
 
   const stop = (): void => {
+    if (timer !== undefined) media.win.clearTimeout(timer);
+    doc.removeEventListener("touchmove", onTouchMove, true);
+    doc.removeEventListener("contextmenu", onContextMenu, true);
     ghost?.remove();
     media.removeClass("vml-plain-image--dragging");
     doc.body.removeClass("vml-is-dragging");
@@ -108,15 +117,30 @@ function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePa
     onFinish();
   };
 
-  trackPointer(media, start, {
+  const showGhost = (event: PointerEvent): DragGhost => {
+    const preview = createDragGhost(doc, media);
+    media.addClass("vml-plain-image--dragging");
+    doc.body.addClass("vml-is-dragging");
+    preview.move(event.clientX, event.clientY);
+    return preview;
+  };
+  const onTouchMove = (event: TouchEvent): void => {
+    if (armed && event.touches.length === 1) event.preventDefault();
+  };
+  const onContextMenu = (event: MouseEvent): void => {
+    if (armed && media.contains(eventElement(event))) { event.preventDefault(); event.stopPropagation(); }
+  };
+  const cancel = trackPointer(media, start, {
     onMove(event) {
+      if (!armed) {
+        if (Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY) >= DRAG_THRESHOLD) cancel();
+        return;
+      }
       if (!ghost) {
         if (Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY) < DRAG_THRESHOLD) {
           return;
         }
-        ghost = createDragGhost(doc, media);
-        media.addClass("vml-plain-image--dragging");
-        doc.body.addClass("vml-is-dragging");
+        ghost = showGhost(event);
       }
       ghost.move(event.clientX, event.clientY);
       clearDropIndicators(doc);
@@ -138,6 +162,12 @@ function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePa
     },
     onCancel: stop,
   });
+  if (hold) {
+    doc.addEventListener("touchmove", onTouchMove, { capture: true, passive: false });
+    doc.addEventListener("contextmenu", onContextMenu, true);
+    timer = media.win.setTimeout(() => { armed = true; ghost = showGhost(start); }, 350);
+  }
+  return cancel;
 }
 
 async function dropPlain(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, drop: DropState): Promise<void> {

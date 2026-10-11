@@ -58,6 +58,15 @@ test("just above or below the layout opens a new row at that end; farther away i
   assert.equal(dropTarget(10, 10, [], []), null);
 });
 
+test("the side band beside a layout accepts insertion while distant whitespace stays outside", () => {
+  assert.deepEqual(dropTarget(324, 50, rows, items), { kind: "beside", position: { row: 0, index: 1 }, side: "after" });
+  assert.deepEqual(dropTarget(-24, 50, rows, items), { kind: "beside", position: { row: 0, index: 0 }, side: "before" });
+  assert.deepEqual(dropTarget(324, 150, rows, items), { kind: "beside", position: { row: 1, index: 0 }, side: "after" });
+  assert.equal(dropTarget(341, 50, rows, items), null);
+  assert.equal(dropTarget(-41, 50, rows, items), null);
+  assert.equal(dropTarget(324, 400, rows, items), null);
+});
+
 test("weights from widths average 1", () => {
   assert.deepEqual(weightsFromWidths([100, 300]), [0.5, 1.5]);
   assert.deepEqual(weightsFromWidths([120, 120, 120]), [1, 1, 1]);
