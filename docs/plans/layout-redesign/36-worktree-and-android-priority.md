@@ -10,7 +10,7 @@
 | `codex/pending-view-parity` | `7963b0f` 文档合流 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 本轮审查和 Windows 定向回归通过，待集成 |
 | `codex/pending-render-stability` | `bf8dcd8` 审查修复 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 416 项检查、构建与 Windows 定向回归通过，待集成 |
 | `codex/android-adaptation` | `2321d44` + 本地 iOS 修复／整理 | 四类设备既有验收源 | 已验收改动复制到移动集成候选；源工作树保持原状态 |
-| `codex/mobile-release-integration` | `2321d44` → `3085095`，合流 Mermaid `53c5f3a` 至 `a945853`，追加 `9d99003` 审查修复及无效把手修复 | 新专用工作树，统一 0.8.0 代码与发布准备 | 当前 456 项检查／构建及专用库触摸、列表、关闭与双窗格复测通过，四类私有测试包更新；新真机回归待连接手机，暂不合入 main 或发布 |
+| `codex/mobile-release-integration` | `2321d44` → `3085095`，合流 Mermaid `53c5f3a` 至 `a945853`，追加 `9d99003` 审查修复及 `85ad423` 无效把手修复 | 新专用工作树，统一 0.8.0 代码与发布准备 | 456 项检查／构建与专用库复测通过；11.5S 新图表自动快测及用户三项手测通过，四类私有测试包更新；手机／iOS 新图表未复测，暂不合入 main 或发布 |
 | `codex/mermaid-layout` | `53c5f3a` | Mermaid 桌面历史和已验收源码 | 已接入移动候选；源分支保持不变 |
 | `codex/release-073-index` | `39889e5` | 只同步 0.7.3 的版本元数据与发布索引，不改 main 实现 | PR #22 已合并到 main（3f31feb），main 检查通过；工作树已归档，可恢复 |
 | `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
