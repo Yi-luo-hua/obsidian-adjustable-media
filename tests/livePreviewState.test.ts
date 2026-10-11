@@ -42,7 +42,7 @@ test("an omitted editor file preserves layout identity, dimensions and originati
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
-    "./obsidianInternals.ts": { fileOfEditor: () => sourceView.file }, "./windows.ts": {},
+    "./obsidianInternals.ts": { fileOfEditor: () => sourceView.file }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   let state = stateApi.EditorState.create({ doc: media, extensions: [editorInfoField, editorLivePreviewField, live.livePreviewExtension(app)] });
   const initial = snapshots.snapshotForState(state)!;
@@ -112,7 +112,7 @@ test("a wrapped text box whose source shows still floats with its text drawn bes
     "./layoutView.ts": { renderLayout: (_el: unknown, options: (typeof drawn)[number]) => drawn.push(options) },
     "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
-    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": {},
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   }, { createSpan: () => ({ dataset: {} }) });
   const doc = '<!-- vml {"v":2,"wrap":"right"} -->\nA side note, see @fig:a.\n<!-- /vml -->\nBody text.';
   // The cursor in the box shows its source.
@@ -150,7 +150,7 @@ test("a note without layouts is not parsed while typing, until a layout is writt
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
-    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": {},
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   let state = stateApi.EditorState.create({ doc: "Plain note\n", extensions: [editorInfoField, editorLivePreviewField, live.livePreviewExtension({})] });
   for (const letter of "more text") state = state.update({ changes: { from: state.doc.length, insert: letter } }).state;
@@ -176,7 +176,7 @@ test("the first reading of a pane's environment draws nothing again; a later cha
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
     "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [], resetWrapGaps: stateApi.StateEffect.define<null>() }, "./viewEnvironment.ts": {},
-    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": {},
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   const widgetOf = (state: stateApi.EditorState): viewApi.WidgetType => {
     const found: viewApi.WidgetType[] = [];
@@ -223,7 +223,7 @@ test("host paragraph results install only in the exact buffer version; structura
     "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": {}, "./interactions.ts": {}, "./layoutView.ts": {},
     "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {}, "./textEditing.ts": {},
-    "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {}, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": {},
+    "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {}, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   let state = stateApi.EditorState.create({ doc: media + '\n> quote\n    code one\n\n    code two',
     extensions: [editorInfoField, editorLivePreviewField, live.livePreviewExtension({})] });

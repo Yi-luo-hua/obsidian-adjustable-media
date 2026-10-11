@@ -25,6 +25,7 @@ import { refreshWrapMedia, resetWrapGaps, wrapGuard, wrapMeasurementsReady, type
 import { watchEnvironment } from "./viewEnvironment.ts";
 import { fileOfEditor, parseBufferSections } from "./obsidianInternals.ts";
 import { eventElement } from "./windows.ts";
+import { guardWidgetWhitespace } from "./widgetWhitespace.ts";
 
 /** The pane's environment as viewEnvironment.ts reads it: width, fonts and page classes that change layout. */
 export const setEnvironment = StateEffect.define<string>();
@@ -649,14 +650,16 @@ function drawWidget(
   if (isEditable(block)) {
     context.editText = (editing) => startTextEdit(host, editing, null);
   }
-  context.editSource = () => {
+  const editSource = () => {
     view.dispatch({ selection: { anchor: context.position() }, scrollIntoView: standIn !== undefined, userEvent: "select" });
     view.focus();
   };
+  context.editSource = editSource;
   attachInteractions(root, context);
   if (isEditable(block)) {
     setUpBlockMove(root, context);
   }
+  guardWidgetWhitespace(el);
   setUpText(host);
 
   // On the media, where it hides none of the text beside them.
@@ -665,7 +668,7 @@ function drawWidget(
   button.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    context.editSource!();
+    editSource();
   });
   widgetHosts.set(el, host);
   return host;
@@ -678,14 +681,6 @@ function drawWidget(
  */
 function setUpText(host: TextEditHost): void {
   const { block } = host.context;
-  host.root.addEventListener("mousedown", (event) => {
-    const target = eventElement(event);
-    // Padding, gaps and warnings are part of the layout frame, not the note's editable text.
-    if (event.button === 0 && target
-      && !target.closest(".vml-layout__text, .vml-item, .vml-handle, .vml-edit-source, a, button, input, textarea, select, video, audio")) {
-      event.preventDefault();
-    }
-  });
   for (const textEl of Array.from(host.root.querySelectorAll<HTMLElement>(":scope > .vml-layout__text"))) {
     const side: TextSide = textEl.dataset.side === "left" ? "left" : "right";
     // Rendered text can own a native selection without focusing the outer note editor.

@@ -1,7 +1,7 @@
 const {Plugin,Notice,Platform,apiVersion}=require('obsidian');
 module.exports=class MobileAcceptance extends Plugin {
   onload(){
-    if(!['adjustable-media-mobile-test','adjustable-media-tablet-test'].includes(this.app.vault.getName()))return;
+    if(!['adjustable-media-mobile-test','adjustable-media-tablet-test','adjustable-media-iphone-test','adjustable-media-ipad-test'].includes(this.app.vault.getName()))return;
     this.events=[];this.samples=[];
     for(const name of ['pointerdown','pointerup','pointercancel','compositionstart','compositionupdate','compositionend','visibilitychange']){
       this.registerDomEvent(document,name,event=>{

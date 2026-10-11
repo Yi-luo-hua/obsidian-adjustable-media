@@ -31,7 +31,7 @@ test("source hints follow caret heads and pane focus while toggles preserve widg
     "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": {}, "./interactions.ts": {}, "./layoutView.ts": {},
     "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {}, "./textEditing.ts": {},
-    "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {}, "./obsidianInternals.ts": {}, "./windows.ts": {},
+    "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {}, "./obsidianInternals.ts": {}, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   const doc = 'Intro\n\n<!-- vml -->\n![[a.png]]\n<!-- /vml -->\n\nTail';
   let state = stateApi.EditorState.create({ doc, selection: { anchor: doc.length }, extensions: [info, preview, live.livePreviewExtension({})] });

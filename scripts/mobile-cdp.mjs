@@ -2,13 +2,14 @@ import { readFile, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { setTimeout as expireCall, clearTimeout as cancelExpiry } from "node:timers";
 
-const adb = "dist/mobile-tools/platform-tools/adb.exe";
-const device = process.env.VML_ANDROID_SERIAL ?? "2UCUT23C27043063";
+if (!process.argv[2]) throw new Error("Usage: node scripts/mobile-cdp.mjs <probe.js> [screenshot.png]");
+const adb = process.env.VML_ADB_PATH ?? "adb";
+const deviceArgs = process.env.VML_ANDROID_SERIAL ? ["-s", process.env.VML_ANDROID_SERIAL] : [];
 const port = process.env.VML_ANDROID_PORT ?? "18709";
 const vaultName = process.env.VML_MOBILE_VAULT ?? "adjustable-media-mobile-test";
-const pid = execFileSync(adb, ["-s", device, "shell", "pidof", "md.obsidian"], { encoding: "utf8" }).trim();
+const pid = execFileSync(adb, [...deviceArgs, "shell", "pidof", "md.obsidian"], { encoding: "utf8" }).trim();
 if (!/^\d+$/.test(pid)) throw new Error("Open Obsidian on the Android test device");
-execFileSync(adb, ["-s", device, "forward", `tcp:${port}`, `localabstract:webview_devtools_remote_${pid}`]);
+execFileSync(adb, [...deviceArgs, "forward", `tcp:${port}`, `localabstract:webview_devtools_remote_${pid}`]);
 const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`, { signal: AbortSignal.timeout(5000) })).json();
 const target = targets.find(item => item.type === "page" && item.url === "http://localhost/");
 if (!target) throw new Error("Obsidian WebView target missing");

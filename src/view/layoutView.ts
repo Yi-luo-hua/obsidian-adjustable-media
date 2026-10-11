@@ -6,6 +6,7 @@ import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { setBounded } from "../layout/viewProjection.ts";
 import { resolveMedia } from "./media.ts";
 import { isolateMediaControls } from "./mediaControls.ts";
+import { videoPreviewUrl } from "./videoSource.ts";
 import { t } from "./messages.ts";
 import { splitTextColumns } from "../markdown/textColumns.ts";
 
@@ -250,7 +251,9 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
       el = img;
     } else {
       itemEl.addClass("vml-item--video");
-      const video = itemEl.createEl("video", { cls: "vml-item__media", attr: { src: media.url, ...size } });
+      const video = itemEl.createEl("video", {
+        cls: "vml-item__media", attr: { playsinline: "", src: videoPreviewUrl(media.url), ...size },
+      });
       video.controls = true;
       isolateMediaControls(video);
       video.preload = "metadata";

@@ -180,29 +180,7 @@ class TextEditSession {
       caret,
       onUpdate: (update) => this.updated(update),
     });
-    const actions = column.createDiv({ cls: "vml-text-editor__actions" });
-    const done = actions.createEl("button", { text: t("textDone"), attr: { type: "button" } });
-    this.discardButton = actions.createEl("button", { text: t("textDiscardDraft"),
-      attr: { type: "button", title: t("textDiscardDraftDesc") } });
-    this.discardButton.disabled = true;
-    // Decide what happens to the draft and IME before the buttons take input focus.
-    for (const name of ["pointerdown", "mousedown"]) actions.addEventListener(name, event => {
-      event.preventDefault();
-      event.stopPropagation();
-    });
-    done.addEventListener("click", event => {
-      event.stopPropagation();
-      if (this.editor.composing || this.editor.compositionStarted) {
-        new Notice(t("textFinishComposition"));
-        this.editor.focus();
-        return;
-      }
-      this.end();
-    });
-    this.discardButton.addEventListener("click", event => {
-      event.stopPropagation();
-      if (this.invalid) this.discard();
-    });
+    this.discardButton = this.createActions(column);
     this.scope.register([], "Escape", (event) => {
       // Esc during an input method's composition cancels the composition, and with link suggestions
       // open it closes them.
@@ -309,6 +287,37 @@ class TextEditSession {
       }
     }
     this.finish();
+  }
+
+  /** Keep mobile actions separate from the editor's input, scope and lifetime. */
+  private createActions(column: HTMLElement): HTMLButtonElement {
+    const actions = column.createDiv({ cls: "vml-text-editor__actions" });
+    const done = actions.createEl("button", { text: t("textDone"), attr: { type: "button" } });
+    const discard = actions.createEl("button", {
+      text: t("textDiscardDraft"), attr: { type: "button", title: t("textDiscardDraftDesc") },
+    });
+    discard.disabled = true;
+    // Decide what happens to the draft and IME before the buttons take input focus.
+    for (const name of ["pointerdown", "mousedown"]) {
+      actions.addEventListener(name, event => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
+    }
+    done.addEventListener("click", event => {
+      event.stopPropagation();
+      if (this.editor.composing || this.editor.compositionStarted) {
+        new Notice(t("textFinishComposition"));
+        this.editor.focus();
+        return;
+      }
+      this.end();
+    });
+    discard.addEventListener("click", event => {
+      event.stopPropagation();
+      if (this.invalid) this.discard();
+    });
+    return discard;
   }
 
   /**

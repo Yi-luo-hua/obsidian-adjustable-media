@@ -9,8 +9,9 @@
 | `codex/text-column-breaks` | `da4aea9`／标签 `0.7.3` | 正式 0.7.2 + 0.7.3 原定桌面功能；主目录 | 327 项检查、发布流程、附件重建一致性及签名核对通过；已正式发布 |
 | `codex/pending-view-parity` | `7963b0f` 文档合流 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 本轮审查和 Windows 定向回归通过，待集成 |
 | `codex/pending-render-stability` | `bf8dcd8` 审查修复 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 416 项检查、构建与 Windows 定向回归通过，待集成 |
-| `codex/android-adaptation` | `a0bf98b` 旧 WebView 定位修复 | 接共用渲染分支；手机／平板触摸、输入、焦点与控件 | 429 项检查、构建及代码 CI 通过；nova 12／11.5S 本轮已列相关验收通过，待集成／交付 |
-| `codex/mobile-release-integration` | `2630ebb` 本地移动集成 | 保留已验收依赖链与 main 的历史；供后续移动适配大版本使用 | 429 项检查通过；等待 iPhone／iPad 基础真机验收，具体版本号未定 |
+| `codex/android-adaptation` | `2321d44` + 本地 iPhone 修复／移动整理 | 接共用渲染分支；四类移动设备共用触摸、输入、焦点与控件 | 各设备本轮已列操作分别通过；历史 iPhone／iPad 候选通过 434 项检查，整理构建单独记录；待 Mermaid 版本之后集成／交付 |
+| `codex/mobile-release-integration` | `2321d44` 本地移动集成 | 保留依赖链与 main 历史；尚未包含本轮未提交修复或 Mermaid 增量 | 作为后续集成基础保留；移动发布源码应接 Mermaid 版本，具体版本号未定 |
+| `codex/mermaid-layout` | `53c5f3a` | 独立 Mermaid 图表、缩放与拖入布局；桌面分支 | 先交付 Mermaid 适配版本，再交付移动适配版本；本轮不修改该工作树 |
 | `codex/release-073-index` | `39889e5` | 只同步 0.7.3 的版本元数据与发布索引，不改 main 实现 | PR #22 已合并到 main（3f31feb），main 检查通过；工作树已归档，可恢复 |
 | `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
 
@@ -24,7 +25,7 @@
 
 0.7.3 可按自身验收范围交付；三视图、共用渲染和移动适配分别审查与集成，不把后续完整规划器／并列组装进同一个发布增量。Android 优先表示本轮工作优先级，不要求先公开发布三视图或渲染版本才允许做真机回归。
 
-用户最新确认：0.7.3 不追加内容，保持原定桌面版本；Android 本轮测试与 iPhone／iPad 验收一起，作为后续移动适配大版本交付。刚做的本地集成已保留为 `codex/mobile-release-integration`，主目录恢复为 0.7.3 基线，main 与 origin/main 均为 `3f31feb`；移动候选尚未合入 main。
+用户最新确认（2026-10-11）：0.7.3 不追加内容；先发布 Mermaid 适配，移动端适配作为其后的下一版本发布，具体版本号未定。Android、iPhone、iPad 本轮已列操作分别通过。本地集成保留为 `codex/mobile-release-integration`，新修复与整理仍位于 `codex/android-adaptation`；移动候选尚未合入 main。Mermaid 发布后，以其最终源码集成移动依赖链并验证相交路径，保留已发布的 Mermaid 功能；当前移动 V2 清单不证明合流后的 V3 图表已在移动端验收。
 
 bug 修复按主要职责归入对应工作线，设备验证范围单独记录；在平板发现的播放器保留属于共用渲染，移动写回焦点属于平台适配。文档、样例和诊断维护随对应功能交付。
 
@@ -37,6 +38,7 @@ bug 修复按主要职责归入对应工作线，设备验证范围单独记录�
 - 三视图：`C:/Users/丁家宝/.codex/worktrees/pending-view-parity/obsidian-adjustable-media`。
 - 共用渲染：`C:/Users/丁家宝/.codex/worktrees/pending-render-stability/obsidian-adjustable-media`。
 - Android：`C:/Users/丁家宝/.codex/worktrees/android-adaptation/obsidian-adjustable-media`。
+- Mermaid：`C:/Users/丁家宝/.codex/worktrees/mermaid-layout/obsidian-adjustable-media`。
 - 0.7.3 发布索引工作树已归档，可恢复；分支 `codex/release-073-index` 保留，PR #22 已合并。
 - 历史 review-pr18 和 docs/tidy-task-plan 工作树保持原样。
 

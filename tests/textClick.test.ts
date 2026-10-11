@@ -25,7 +25,7 @@ test("rendered text retains an existing column's focus until click, without inte
   let focusedColumn = true, collapsed = true;
   const opened: string[] = [];
   const handlers = new Map<string, (event: object) => void>();
-  const frameHandlers = new Map<string, (event: object) => void>();
+  let guardedElement: unknown;
   const doc = { getSelection: () => ({ isCollapsed: collapsed }), activeElement: { closest: () => focusedColumn ? {} : null } };
   const element = () => ({ doc, dataset: {}, empty() {}, toggleClass() {},
     createEl: () => ({ addEventListener() {} }),
@@ -33,7 +33,7 @@ test("rendered text retains an existing column's focus until click, without inte
   });
   const column = { dataset: { side: "left" }, addEventListener: (name: string, run: (event: object) => void) => handlers.set(name, run) };
   const root = { ...element(), querySelector: () => null, querySelectorAll: () => [column],
-    addEventListener: (name: string, run: (event: object) => void) => frameHandlers.set(name, run) };
+    addEventListener() {} };
   const live = await mockedModule<{ livePreviewExtension(app: object): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian: { editorInfoField: info, editorLivePreviewField: preview, MarkdownView: class {}, Component: class { load() {} unload() {} } },
     "@codemirror/state": stateApi, "@codemirror/view": viewApi,
@@ -47,7 +47,7 @@ test("rendered text retains an existing column's focus until click, without inte
     "./layoutView.ts": { renderLayout: () => root }, "./messages.ts": { t: (key: string) => key, blockWarning: () => null },
     "./textEditing.ts": { startTextEdit: (_host: object, side: string) => opened.push(side) },
     "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
-    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": { eventElement: (event: { target: object }) => event.target },
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace(el: unknown) { guardedElement = el; } }, "./windows.ts": { eventElement: (event: { target: object }) => event.target },
   }, { createDiv: element });
   const state = stateApi.EditorState.create({ doc: 'Intro\n\n<!-- vml {"v":2,"type":"text"} -->\nText\n<!-- /vml -->', extensions: [info, preview, live.livePreviewExtension({})] });
   const widgets: viewApi.WidgetType[] = [];
@@ -58,19 +58,14 @@ test("rendered text retains an existing column's focus until click, without inte
     });
   }
   assert.equal(widgets.length, 1);
-  widgets[0].toDOM({ state } as viewApi.EditorView);
+  const widgetEl = widgets[0].toDOM({ state } as viewApi.EditorView);
+  assert.equal(guardedElement, widgetEl, "whitespace protection covers the full widget, including side gaps");
   const event = (interactive = false, shiftKey = false) => {
     const result = { button: 0, shiftKey, clientX: 10, clientY: 20, prevented: false,
       target: { closest: () => interactive ? {} : null }, preventDefault() { this.prevented = true; } };
     return result;
   };
   const press = event(); handlers.get("mousedown")!(press); assert.equal(press.prevented, true);
-  for (const target of ["frame padding", "warning"]) {
-    const gap = event(); frameHandlers.get("mousedown")!(gap);
-    assert.equal(gap.prevented, true, target);
-  }
-  const frameControl = event(true); frameHandlers.get("mousedown")!(frameControl); assert.equal(frameControl.prevented, false);
-  const rightClick = { ...event(), button: 2 }; frameHandlers.get("mousedown")!(rightClick); assert.equal(rightClick.prevented, false);
   focusedColumn = false;
   const nativeSelection = event(); handlers.get("mousedown")!(nativeSelection); assert.equal(nativeSelection.prevented, false);
   focusedColumn = true;
@@ -106,7 +101,7 @@ test("a reused stand-in opens and redraws at its current anchor after text is in
     "./layoutView.ts": { renderLayout: () => root, applySizing() {} }, "./messages.ts": { t: (key: string) => key, blockWarning: () => null },
     "./textEditing.ts": { isEditingText: () => false, startTextEdit: (next: TextEditHost) => { host = next; } },
     "./wrapGuard.ts": { wrapGuard: (next: WrapSource) => { source = next; return []; } }, "./viewEnvironment.ts": {},
-    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./windows.ts": {},
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   const text = 'Intro\n\n<!-- vml {"v":2,"type":"text","wrap":"right"} -->\nText\n<!-- /vml -->\nBody';
   let state = stateApi.EditorState.create({ doc: text, extensions: [info, preview, live.livePreviewExtension({})] });
