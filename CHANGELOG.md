@@ -12,7 +12,7 @@
 - Fix text caret placement on older Android WebViews, mobile input/focus handling, iOS video first frames and inline playback, and whitespace taps that misplaced the caret.
 - Keep existing V2 notes unchanged. New diagram layouts explicitly use `v:3, kind:"media"`; older plugin versions that do not understand this format retain its source and disable layout writes.
 
-Release candidate only; not publicly published. Existing mobile device results and new integration validation are recorded separately in `docs/plans/layout-redesign/mobile-adaptation.md`. Complete float planning, drag animation and grouped layouts remain outside this release.
+Existing mobile device results and new integration validation are recorded separately in `docs/plans/layout-redesign/mobile-adaptation.md`. Complete float planning, drag animation and grouped layouts remain outside this release.
 
 ## 0.7.3 - 2026-10-10
 

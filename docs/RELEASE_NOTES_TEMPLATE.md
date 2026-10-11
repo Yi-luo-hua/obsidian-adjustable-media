@@ -10,9 +10,11 @@ Restart Obsidian and enable Adjustable Media in Settings → Community plugins.
 
 ## Compatibility
 
-- Obsidian 1.5.0 or newer; targeted validation with 1.14.4
-- Desktop only
+- Obsidian 1.5.0 or newer
+- Desktop, Android, iPhone and iPad
 - Plugin ID: `adjustable-media`
+
+Device and build-specific validation is recorded in the repository's `docs/plans/layout-redesign/mobile-adaptation.md`. The latest standalone Mermaid hold-and-drop gestures were verified on an Android tablet; those new gestures have not been retested on Android phones or iOS.
 
 ## Verifying the files
 
