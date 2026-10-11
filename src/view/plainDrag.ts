@@ -32,12 +32,13 @@ export function plainMediaDrag(app: App): Extension {
     const updateGrips = (): void => {
       const available = hasLayouts();
       for (const grip of grips) {
-        if (!grip.isConnected || !available) { grip.parentElement?.removeClass("vml-plain-media--draggable"); grip.remove(); grips.delete(grip); }
+        const diagram = grip.parentElement;
+        if (!grip.isConnected || !available || !diagram || !take(view, diagram)) { diagram?.removeClass("vml-plain-media--draggable"); grip.remove(); grips.delete(grip); }
       }
       if (!available) return;
       for (const diagram of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".mermaid"))) {
         if (diagram.closest(".vml-layout, .vml-text-editor") || !diagram.querySelector("svg")
-          || diagram.querySelector(":scope > .vml-plain-media__grip")) continue;
+          || diagram.querySelector(":scope > .vml-plain-media__grip") || !take(view, diagram)) continue;
         const grip = diagram.createEl("button", { cls: "vml-plain-media__grip", attr: { type: "button", "aria-label": t("dragHandle") } });
         setIcon(grip, "grip-vertical");
         grip.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); });
