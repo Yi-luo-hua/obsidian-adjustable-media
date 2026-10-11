@@ -2,7 +2,7 @@
 
 当前口径（2026-10-10）：本文约定跨工作树的交付门槛；已勾选项仅表示所注明的旧构建／平台范围通过，不表示主目录包含全部代码或新组合构建已验收。当前状态见 [09](09-progress-and-next-steps.md) 与 [分支验收摘要](archive/branch-validation.md)。本轮 Android 真机验收按用户要求延期。
 
-状态：分批实施中。[首批实施记录](archive/07-execution-record.md) 记录 P0a 数据契约与 P1 基础，[每窗格记录](archive/08-pane-foundation-record.md) 记录 P2 协调／缓存基础。未勾选的完整包尚未完成；工作包整体退出仍须核对宿主矩阵，基础测试通过不等于完整 R1 已交付。普通增量按 [AGENTS.md](../../../AGENTS.md#日常验证与快速迭代) 选择受影响的场景／设备，不要求每次重复全平台矩阵；近期交付顺序见 [36](36-worktree-and-android-priority.md)。
+状态：分批实施中。[首批实施记录](archive/07-execution-record.md) 记录 P0a 数据契约与 P1 基础，[每窗格记录](archive/08-pane-foundation-record.md) 记录 P2 协调／缓存基础。未勾选的完整包尚未完成；工作包整体退出仍须核对宿主矩阵，基础测试通过不等于完整 R1 已交付。普通增量按 [AGENTS.md](../../../AGENTS.md#日常验证与快速迭代) 选择受影响的场景／设备，不要求每次重复全平台矩阵；近期交付顺序见 [36](../../WORKTREES.md)。
 
 ## 1. 实施基线
 

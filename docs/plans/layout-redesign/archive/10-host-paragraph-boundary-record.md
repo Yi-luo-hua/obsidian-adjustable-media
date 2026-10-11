@@ -18,15 +18,15 @@
 环境：Node 24.11.1，Obsidian 1.14.4，`E:\TOOLS\vml-test-vault`。只使用自己新开的标签页；测试前禁用后台节流。原有真实笔记库没有加载插件。测试库原有笔记 SHA-256 在每份探针结束时均未变化；三个临时文件恢复创建时内容并核对哈希后，移入系统回收站。
 
 - `npm run check`：353 项测试通过，类型检查与 lint 通过；`npm run build`、`git diff --check` 通过。
-- [宿主边界](probes/w07-boundaries.json)：24 种写法的 Worker 位置与阅读渲染器位置逐块相同，包括换符号的列表、嵌套缩进、引用后代码、列表里的围栏、公式、HTML／`%%` 注释。宿主数据保存为固定测试夹具，预期间距由已有策略与这些边界确定。
-- [真实编辑器装饰](probes/w07-live-boundaries.json)：24/24 的实际行装饰符合固定预期；临时移除内部接口后，实际编辑器保留原有推断。单元测试另行覆盖结构性编辑后的迟到结果、同文本换缓冲、退出／销毁、输入合并、无效返回和转移后的空缓冲。
-- [双视图对比](probes/w07-surface-comparison.json)：以干净 `7fcd086` 生产构建为基线，在约 678px 正文宽度和相同字体下遍历四篇笔记。`wrap-test.md`／`wrap-multi.md`／`text-test.md`／`text-block-test.md` 分别观察 6／9／4／5 个布局块；两种模式共 48 次块观测，实时预览的新旧位置和宽高差为 0；阅读视图的尺寸与横向位置不变，`wrap-multi.md` 后三块的纵向位置差约 0.12px，其余为 0。已观测正文行的高度、左边界与间距装饰不变。此范围未见排版退化，不代表三种视图所有几何均已验收。
-- 678px 的[基线](probes/w07-678-baseline-surfaces.json)与[当前结果](probes/w07-678-current-surfaces.json)分别附构建哈希。已检查浮动旁正文的截图；滚动时两份构建各出现一次 `Measure loop restarted more than 5 times` 警告，`dev:errors` 无错误，未据此宣称完整滚动验收。
+- [宿主边界](../probes/w07-boundaries.json)：24 种写法的 Worker 位置与阅读渲染器位置逐块相同，包括换符号的列表、嵌套缩进、引用后代码、列表里的围栏、公式、HTML／`%%` 注释。宿主数据保存为固定测试夹具，预期间距由已有策略与这些边界确定。
+- [真实编辑器装饰](../probes/w07-live-boundaries.json)：24/24 的实际行装饰符合固定预期；临时移除内部接口后，实际编辑器保留原有推断。单元测试另行覆盖结构性编辑后的迟到结果、同文本换缓冲、退出／销毁、输入合并、无效返回和转移后的空缓冲。
+- [双视图对比](../probes/w07-surface-comparison.json)：以干净 `7fcd086` 生产构建为基线，在约 678px 正文宽度和相同字体下遍历四篇笔记。`wrap-test.md`／`wrap-multi.md`／`text-test.md`／`text-block-test.md` 分别观察 6／9／4／5 个布局块；两种模式共 48 次块观测，实时预览的新旧位置和宽高差为 0；阅读视图的尺寸与横向位置不变，`wrap-multi.md` 后三块的纵向位置差约 0.12px，其余为 0。已观测正文行的高度、左边界与间距装饰不变。此范围未见排版退化，不代表三种视图所有几何均已验收。
+- 678px 的[基线](../probes/w07-678-baseline-surfaces.json)与[当前结果](../probes/w07-678-current-surfaces.json)分别附构建哈希。已检查浮动旁正文的截图；滚动时两份构建各出现一次 `Measure loop restarted more than 5 times` 警告，`dev:errors` 无错误，未据此宣称完整滚动验收。
 - 最终生产构建与测试库已安装的 `main.js` SHA-256 均为 `eac2db6a0f1bace887564f5db768f2ac5d30d54a4267153543b21147bb01fb40`；当前屏幕、编辑器装饰和性能记录对应此构建。
 
 ## 热态端到端成本
 
-[性能探针](probes/w07-performance.js.txt)及[40 次样本](probes/w07-performance.json)。每种文本 20 次整缓冲结构修改，计时从编辑事务开始，到宿主装饰安装后的 CodeMirror 测量读取；包含防抖、同步解析／快照、编码、Worker 排队与往返、验证、装饰更新和测量等待。编码还单独测量，不能把分段分位数相加当作端到端分位数。
+[性能探针](../probes/w07-performance.js.txt)及[40 次样本](../probes/w07-performance.json)。每种文本 20 次整缓冲结构修改，计时从编辑事务开始，到宿主装饰安装后的 CodeMirror 测量读取；包含防抖、同步解析／快照、编码、Worker 排队与往返、验证、装饰更新和测量等待。编码还单独测量，不能把分段分位数相加当作端到端分位数。
 
 | 场景 | 端到端 p50／p95 | Worker p50／p95 | 装饰更新 p95 | 编码 p95 |
 | --- | --- | --- | --- | --- |
@@ -45,6 +45,6 @@
 
 ## 证据脚本与恢复
 
-- [边界](probes/w07-boundaries.js.txt)、[编辑器装饰](probes/w07-live-boundaries.js.txt)、[屏幕](probes/w07-surfaces.js.txt)、[性能](probes/w07-performance.js.txt)。所有脚本首先核对完整测试库名。
+- [边界](../probes/w07-boundaries.js.txt)、[编辑器装饰](../probes/w07-live-boundaries.js.txt)、[屏幕](../probes/w07-surfaces.js.txt)、[性能](../probes/w07-performance.js.txt)。所有脚本首先核对完整测试库名。
 - 最初安装的测试库构建备份在 `dist/w07-installed-backup/`；干净基线与最初未固定宽度的探索数据在 `dist/w07-baseline/`、`dist/w07-exploratory/`，这些目录不入库。测试结束保留本分支的生产构建供后续验收。
 - 保留开始任务前已有的 W06 进入条件修改及 `.claude/` 内容，没有重置或提交它们。

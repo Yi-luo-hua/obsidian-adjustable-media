@@ -17,4 +17,4 @@
 - 多个／多行定义、定义紧邻浮动、Setext H2、标题前后空行一并实测。控制台错误检查为空。
 - 临时笔记恢复初始文本并核对哈希后回收；所有原有笔记哈希未变。测试库的插件文件恢复到测试前版本，恢复哈希一致。仓库的 `main.js` 保留新生产构建，不入库。
 
-精简实测数据见 [pr20-spacing-regressions.json](probes/pr20-spacing-regressions.json)。以上验证覆盖默认主题与当前宿主版本，不重新声明 W07 的全部 PDF、启动和性能验收。
+精简实测数据见 [pr20-spacing-regressions.json](../probes/pr20-spacing-regressions.json)。以上验证覆盖默认主题与当前宿主版本，不重新声明 W07 的全部 PDF、启动和性能验收。

@@ -2,7 +2,7 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-实现范围（2026-10-12）：统一的 0.8.0 候选 `740dcd6` 已提升为 `main`，主目录检出该主线；原 main `3f31feb` 完整保留为 `codex/main-before-080`。已整合三视图／共用渲染、Android／iOS 输入与视频修复、Mermaid 独立布局项及触摸把手，不带入 W02／W03 未完成原型。既有 Android、iPhone、iPad 的已列真机结果分别保留，新 Mermaid 合流结果另记；主线调整不扩大三视角或移动验收范围。公开版本仍为 0.7.3（桌面版，标签源码 `da4aea9`），0.8.0 尚未公开发布。实际范围与验证见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md)、[36](plans/layout-redesign/36-worktree-and-android-priority.md) 和 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
+实现范围（2026-10-12）：统一的 0.8.0 候选 `740dcd6` 已提升为 `main`，主目录检出该主线；原 main `3f31feb` 完整保留为 `codex/main-before-080`。已整合三视图／共用渲染、Android／iOS 输入与视频修复、Mermaid 独立布局项及触摸把手，不带入 W02／W03 未完成原型。既有 Android、iPhone、iPad 的已列真机结果分别保留，新 Mermaid 合流结果另记；主线调整不扩大三视角或移动验收范围。公开版本仍为 0.7.3（桌面版，标签源码 `da4aea9`），0.8.0 尚未公开发布。实际范围与验证见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md)、[WORKTREES](WORKTREES.md) 和 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
 
 ## 1. 存储格式
 

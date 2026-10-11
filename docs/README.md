@@ -22,11 +22,11 @@
 | [领域词汇](../CONTEXT.md) | 布局块、浮动集合、并列组等定义 |
 | [布局规划索引](plans/layout-redesign/README.md) | 仍有效的模型、规划、同步、格式与验收要求 |
 | [任务队列](plans/layout-redesign/09-progress-and-next-steps.md) | W01–W11 的完成范围、依赖和下一步 |
-| [工作树与交付顺序](plans/layout-redesign/36-worktree-and-android-priority.md) | 当前分支、工作目录、集成关系和恢复位置 |
-| [Android 适配](plans/layout-redesign/mobile-adaptation.md) | 手机／平板优先范围、待做真机验收与后续 iOS 计划 |
-| [手动文字分栏](plans/layout-redesign/34-text-column-breaks.md) | 已准备交付的 0.7.3 功能语义 |
+| [工作树与分支](WORKTREES.md) | 活动目录、待归档目录、保留分支和备份恢复位置 |
+| [移动适配记录](plans/layout-redesign/mobile-adaptation.md) | 各平台已测构建、Mermaid 增量和未复测范围 |
+| [手动文字分栏](plans/layout-redesign/34-text-column-breaks.md) | 已发布的 0.7.3 功能语义 |
 | [拖动动画与预览](plans/layout-redesign/35-block-drag-animation-preview.md) | 已确认、尚未实现的 W03／W04／W11 需求 |
-| [Mermaid 独立项](plans/layout-redesign/37-mermaid-layout-items.md) | 独立功能分支的并排、缩放、格式边界与桌面验证，未发布 |
+| [Mermaid 独立项](plans/layout-redesign/37-mermaid-layout-items.md) | main 中的单块图表项、格式边界和历史验证，尚未公开发布 |
 | [ADR](adr) | proposed 决策及其接受条件 |
 
 ## 历史与证据
@@ -35,4 +35,4 @@
 
 [布局冲突研究](research/LAYOUT_CONFLICTS.md) 与 [基线探针](research/LAYOUT_PROBES.md) 保留研究起点的反例，不作为当前实现的预期行为。原始 JSON、截图和探针保留在原位置；没有将旧构建验收扩大为新组合构建验收。
 
-维护时：版本与项目总状态更新 STATUS，工作包进度更新 09，分支／目录调整更新 36，实际代码行为更新 DESIGN。阶段性过程放归档，避免在多个当前入口反复追加同一状态。
+维护时：版本与项目总状态更新 STATUS，工作包进度更新 09，分支／目录调整更新 WORKTREES，实际代码行为更新 DESIGN。阶段性过程放归档，避免在多个当前入口反复追加同一状态。

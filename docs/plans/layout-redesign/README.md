@@ -1,6 +1,6 @@
 # 布局改进计划索引
 
-更新：2026-10-10。本目录保存仍有效的设计约定与任务；实现状态统一见 [09](09-progress-and-next-steps.md)，版本状态见 [STATUS](../../STATUS.md)，工作树与交付范围见 [36](36-worktree-and-android-priority.md)。计划中的接口、并列组和动画不自动成为主目录现行实现。
+更新：2026-10-12。本目录保存仍有效的设计约定与未完成任务；实现状态统一见 [09](09-progress-and-next-steps.md)，版本状态见 [STATUS](../../STATUS.md)，工作树与分支见 [WORKTREES](../../WORKTREES.md)。已完成的逐次实施、验收和旧分支整理移到 archive；计划中的完整规划器、并列组和动画不自动成为 main 的现行实现。
 
 ## 当前计划
 
@@ -15,9 +15,9 @@
 | [09 任务队列](09-progress-and-next-steps.md) | W01–W11 的当前完成范围与执行优先级 |
 | [34 手动分栏](34-text-column-breaks.md) | 0.7.3 已确定语义，与多块并列组区分 |
 | [35 拖动动画与预览](35-block-drag-animation-preview.md) | 已确认、尚未实现的可选动画与完整预览 |
-| [36 工作树与交付](36-worktree-and-android-priority.md) | 分支、工作目录、堆叠集成与恢复信息 |
-| [37 Mermaid 独立项](37-mermaid-layout-items.md) | 独立功能分支的单块图表项、并排与缩放，未发布 |
-| [Android 适配](mobile-adaptation.md) | 本轮手机／平板定向验收和后续 iOS 范围 |
+| [工作树与分支](../../WORKTREES.md) | 活动开发入口、保留分支、归档与恢复信息 |
+| [37 Mermaid 独立项](37-mermaid-layout-items.md) | main 的单块图表项语义与格式边界，未公开发布 |
+| [移动适配记录](mobile-adaptation.md) | Android／iPhone／iPad 各构建验收与未复测范围 |
 
 ## 工作包与依赖
 
