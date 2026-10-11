@@ -6,6 +6,7 @@
 - Drag an ordinary Mermaid diagram directly into an existing layout. Move the complete original fence in one validated transaction; cancellation writes nothing and one undo restores both source and destination.
 - Enable mobile installation on Android, iPhone and iPad. Add visible 44px diagram grips for touch dragging while keeping page scrolling available on diagram bodies and preserving native source editing.
 - Wait for native Mermaid drawing before revealing diagrams or measuring proportions. Refresh changed diagram code in reading view and retain asynchronous PDF rendering.
+- Keep diagram proportions after resizing, stop late diagram observers when their view closes, preserve diagrams inside lists, and allow scrolling on diagram content near the corner grip.
 - Integrate recent pane/view synchronization, host paragraph boundaries, layout readiness and retained-media fixes alongside the published manual columns and highlight behavior.
 - Fix text caret placement on older Android WebViews, mobile input/focus handling, iOS video first frames and inline playback, and whitespace taps that misplaced the caret.
 - Keep existing V2 notes unchanged. New diagram layouts explicitly use `v:3, kind:"media"`; older plugin versions that do not understand this format retain its source and disable layout writes.

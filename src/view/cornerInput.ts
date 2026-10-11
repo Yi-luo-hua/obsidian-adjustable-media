@@ -9,7 +9,7 @@ export function registerCornerInputGuard(plugin: Plugin): void {
     let pointer: number | null = null;
     let pendingClick = false;
     const blocked = (target: Element, x: number, y: number): boolean => {
-      if (target.closest(".vml-handle, button, a, video, audio")) return false;
+      if (target.closest(".vml-handle, .vml-item__diagram, .mermaid, button, a, video, audio")) return false;
       const pane = target.closest<HTMLElement>(".markdown-source-view");
       if (!pane) return false;
       const viewport = pane.getBoundingClientRect();

@@ -106,7 +106,7 @@ test("Markdown completion wakes its pane after installing rendered or failed sta
   }, { console: { error: (...args: unknown[]) => errors.push(args) } });
   renderState = root => module.layoutRenderState(root);
   const block = format.findV2Blocks(['<!-- vml {"v":2,"type":"text"} -->', 'Text', '<!-- /vml -->'])[0];
-  const root = module.renderLayout(new ElementStub(), { app: {}, sourcePath: "note.md", model: model.modelFromBlock(block), editable: false, warning: null, component: {} });
+  const root = module.renderLayout(new ElementStub(), { app: {}, sourcePath: "note.md", model: model.modelFromBlock(block), editable: false, warning: null, component: { register() {} } });
   assert.equal(module.layoutRenderState(root), "pending");
   assert.equal(notifications.length, 0);
   if (outcome === "failed") reject(new Error("Markdown rejected")); else resolve();
@@ -118,43 +118,72 @@ test("Markdown completion wakes its pane after installing rendered or failed sta
   }
 });
 
-test("Mermaid waits for deferred native drawing, stops on disposal, and exposes completed errors", async () => {
+async function diagramHarness(render = () => Promise.resolve()) {
   const elements: ElementStub[] = [];
   const observers: ObserverStub[] = [];
   class ObserverStub {
     callback: () => void;
     disconnected = false;
     constructor(callback: () => void) { this.callback = callback; observers.push(this); }
-    observe(): void {} disconnect(): void { this.disconnected = true; }
+    target: ElementStub | null = null;
+    observe(target: ElementStub): void { this.target = target; }
+    disconnect(): void { this.disconnected = true; }
   }
   class ElementStub {
     classes: Set<string>;
     props: Record<string, string> = {};
+    children: ElementStub[] = [];
+    dataset: Record<string, string> = {};
     svg: { viewBox: { baseVal: { width: number; height: number } } } | null = null;
     error: string | null = null;
     win = { MutationObserver: ObserverStub, Event };
     events: string[] = [];
     dispatchEvent(event: Event): boolean { this.events.push(event.type); return true; }
     constructor(cls = "") { this.classes = new Set(cls.split(" ")); elements.push(this); }
-    createDiv(options?: { cls?: string }) { return new ElementStub(options?.cls); }
-    toggleClass(): void {} addClass(cls: string): void { this.classes.add(cls); }
+    createDiv(options?: { cls?: string; attr?: Record<string, string> }) {
+      const child = new ElementStub(options?.cls);
+      for (const [key, value] of Object.entries(options?.attr ?? {})) child.dataset[key.replace("data-", "")] = value;
+      this.children.push(child); return child;
+    }
+    toggleClass(cls: string, on: boolean): void { if (on) this.classes.add(cls); else this.classes.delete(cls); }
+    addClass(cls: string): void { this.classes.add(cls); }
+    hasClass(cls: string): boolean { return this.classes.has(cls); }
     removeClass(cls: string): void { this.classes.delete(cls); }
     setCssProps(props: Record<string, string>): void { Object.assign(this.props, props); }
-    querySelectorAll() { return []; }
-    querySelector(selector: string) { return selector === ".mermaid > svg" ? this.svg : this.error === null ? null : { textContent: this.error }; }
+    descendants(): ElementStub[] { return this.children.flatMap(child => [child, ...child.descendants()]); }
+    querySelectorAll(selector: string): ElementStub[] { return this.descendants().filter(child => child.classes.has(selector.slice(1))); }
+    getAttribute(): null { return null; }
+    querySelector(selector: string): unknown {
+      if (selector === ".mermaid > svg") return this.svg;
+      if (selector === "code.language-mermaid") return this.error === null ? null : { textContent: this.error };
+      return this.querySelectorAll(selector)[0] ?? null;
+    }
   }
-  const module = await mockedModule<{ renderLayout(el: unknown, options: unknown): object; layoutRenderState(root: object): string }>(new URL("../src/view/layoutView.ts", import.meta.url), {
-    obsidian: { MarkdownRenderer: { render: () => Promise.resolve() } }, "../format/v2.ts": format, "../layout/model.ts": model,
+  const module = await mockedModule<{ renderLayout(el: unknown, options: unknown): ElementStub; layoutRenderState(root: object): string;
+    applySizing(root: object, model: model.LayoutModel): void }>(new URL("../src/view/layoutView.ts", import.meta.url), {
+    obsidian: { MarkdownRenderer: { render } }, "../format/v2.ts": format, "../layout/model.ts": model,
     "../layout/viewProjection.ts": projections, "../markdown/textColumns.ts": textColumns,
     "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./mediaControls.ts": {}, "./videoSource.ts": {}, "./messages.ts": {},
   });
-  const create = (name: string) => {
+  const create = (name: string, mixed = false) => {
     const cleanup: Array<() => void> = [];
-    const block = format.findV2Blocks(['<!-- vml {"v":3,"kind":"media"} -->', "```mermaid", `flowchart LR\nA-->${name}`, "```", "<!-- /vml -->"])[0];
-    const root = module.renderLayout(new ElementStub(), { app: {}, sourcePath: "note.md", model: model.modelFromBlock(block), editable: false,
-      warning: null, component: { register: (stop: () => void) => cleanup.push(stop) } });
-    return { root, diagram: [...elements].reverse().find(el => el.classes.has("vml-item__diagram"))!, cleanup };
+    const block = format.findV2Blocks([`<!-- vml {"v":3,"kind":"media","rows":[{"items":${mixed ? 2 : 1}}]} -->`,
+      "```mermaid", "flowchart LR", `A-->${name}`, "```", ...(mixed ? ["```mermaid", "flowchart TB", `C-->${name}`, "```"] : []), "<!-- /vml -->"])[0];
+    const layout = model.modelFromBlock(block), tasks: Promise<void>[] = [];
+    const root = module.renderLayout(new ElementStub(), { app: {}, sourcePath: "note.md", model: layout, editable: false,
+      warning: null, component: { register: (stop: () => void) => cleanup.push(stop) }, renderTasks: tasks });
+    const diagrams = root.querySelectorAll(".vml-item__diagram");
+    return { root, diagram: diagrams[0], diagrams, layout, cleanup, tasks, unload() { while (cleanup.length) cleanup.pop()!(); } };
   };
+  const draw = (diagram: ElementStub, width: number, height: number): void => {
+    diagram.svg = { viewBox: { baseVal: { width, height } } };
+    observers.find(observer => observer.target === diagram)!.callback();
+  };
+  return { module, create, draw, observers };
+}
+
+test("Mermaid waits for deferred native drawing, stops on disposal, and exposes completed errors", async () => {
+  const { module, create, observers } = await diagramHarness();
   const rendered = create("B");
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(module.layoutRenderState(rendered.root), "pending");
@@ -165,7 +194,7 @@ test("Mermaid waits for deferred native drawing, stops on disposal, and exposes 
   assert.equal(module.layoutRenderState(rendered.root), "rendered");
   assert.equal(rendered.diagram.props["--vml-natural-width"], "400px");
   assert.equal(rendered.diagram.classes.has("vml-item__diagram--pending"), false);
-  assert.deepEqual((rendered.root as ElementStub).events, ["vml-layout-rendered"], "the mobile pane wakes after actual diagram completion");
+  assert.deepEqual(rendered.root.events, ["vml-layout-rendered"], "the mobile pane wakes after actual diagram completion");
   const disposed = create("C");
   await new Promise(resolve => setImmediate(resolve));
   disposed.cleanup.forEach(stop => stop());
@@ -178,4 +207,40 @@ test("Mermaid waits for deferred native drawing, stops on disposal, and exposes 
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(module.layoutRenderState(failed.root), "rendered");
   assert.equal(failed.diagram.classes.has("vml-item__diagram--pending"), false);
+});
+
+test("closing a component before Markdown completes prevents late diagram observers and releases render tasks", async () => {
+  let complete!: () => void;
+  const promise = new Promise<void>(resolve => { complete = resolve; });
+  const { module, create, observers } = await diagramHarness(() => promise);
+  const late = create("Late");
+  late.unload(); complete();
+  await Promise.all(late.tasks);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(observers.length, 0);
+  assert.equal(late.cleanup.length, 0, "nothing registers against the unloaded component");
+  assert.notEqual(module.layoutRenderState(late.root), "pending");
+});
+
+test("diagram proportions survive sizing reuse, explicit weights and dimensions arriving after a resize", async () => {
+  const { module, create, draw } = await diagramHarness();
+  const mixed = create("Ratios", true);
+  await new Promise(resolve => setImmediate(resolve));
+  draw(mixed.diagrams[0], 400, 100); draw(mixed.diagrams[1], 100, 100);
+  await Promise.all(mixed.tasks);
+  const grows = () => mixed.root.querySelectorAll(".vml-item").map(item => item.props["--vml-grow"]);
+  for (const layout of [model.setBlockWidth(mixed.layout, 0.7), model.setRowHeight(mixed.layout, 0, 300), model.scaleRows(mixed.layout, 1.3), mixed.layout]) {
+    module.applySizing(mixed.root, layout); assert.deepEqual(grows(), ["4", "1"]);
+  }
+  module.applySizing(mixed.root, model.setWeights(mixed.layout, 0, [2, 3])); assert.deepEqual(grows(), ["2", "3"]);
+  module.applySizing(mixed.root, mixed.layout); assert.deepEqual(grows(), ["4", "1"]);
+
+  const pending = create("PendingRatios", true);
+  module.applySizing(pending.root, model.setWeights(pending.layout, 0, [2, 3]));
+  await new Promise(resolve => setImmediate(resolve));
+  draw(pending.diagrams[0], 400, 100); draw(pending.diagrams[1], 100, 100);
+  await Promise.all(pending.tasks);
+  assert.deepEqual(pending.root.querySelectorAll(".vml-item").map(item => item.props["--vml-grow"]), ["2", "3"]);
+  module.applySizing(pending.root, pending.layout);
+  assert.deepEqual(pending.root.querySelectorAll(".vml-item").map(item => item.props["--vml-grow"]), ["4", "1"]);
 });

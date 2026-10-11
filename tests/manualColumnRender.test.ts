@@ -37,7 +37,7 @@ test("all views render exact manual segments separately and wait for every colum
   const lines = ['<!-- vml {"v":2,"type":"text","cols":4,"gap":1} -->', 'First', '', '+++', '', 'Second ![[a.png|120]]', '<!-- /vml -->'];
   const original = lines.join("\n");
   const tasks: Promise<void>[] = [];
-  const root = module.renderLayout(new Element(), { app: {}, sourcePath: "note.md", model: model.modelFromBlock(format.findV2Blocks(lines)[0]), editable: false, warning: null, component: {}, renderTasks: tasks });
+  const root = module.renderLayout(new Element(), { app: {}, sourcePath: "note.md", model: model.modelFromBlock(format.findV2Blocks(lines)[0]), editable: false, warning: null, component: { register() {} }, renderTasks: tasks });
   assert.deepEqual(rendered.map(item => item.text), ["First\n\n", "\nSecond ![[a.png|120]]"]);
   assert.equal(root.props["--vml-cols"], "2");
   assert.equal(root.props["--vml-gap"], "1em");

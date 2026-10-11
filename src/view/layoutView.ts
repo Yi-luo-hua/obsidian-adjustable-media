@@ -42,6 +42,7 @@ const mediaSizes = new Map<string, MediaSize>();
 /** Enough for every image of a long session's notes; the oldest go first. */
 const MAX_MEDIA_SIZES = 500;
 const diagramSizes = new Map<string, MediaSize>();
+const diagramMeasurements = new WeakMap<HTMLElement, MediaSize>();
 const pendingLayouts = new WeakSet<HTMLElement>();
 const failedLayouts = new WeakSet<HTMLElement>();
 
@@ -160,8 +161,10 @@ function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOp
   if (!component) {
     return false;
   }
+  let active = true;
+  component.register(() => { active = false; });
   const task = MarkdownRenderer.render(options.app, numbered(markdown, options.refs), el, options.sourcePath, component)
-    .then(() => { markCaptions(el, markdown); return rendered?.(); });
+    .then(() => { if (!active) return; markCaptions(el, markdown); return rendered?.(); });
   options.renderTasks?.push(task);
   return true;
 }
@@ -193,7 +196,7 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
         const item = row.items[Number(el.dataset.index)];
         if (!item) continue;
         const media = el.querySelector<HTMLElement>(".vml-item__media");
-        const known = media ? mediaSizes.get(media.getAttribute("src") ?? "") : undefined;
+        const known = media ? diagramMeasurements.get(media) ?? mediaSizes.get(media.getAttribute("src") ?? "") : undefined;
         el.toggleClass("vml-item--weighted", item.weight !== null);
         el.setCssProps({ "--vml-grow": item.weight !== null ? String(item.weight) : known ? String(known.width / known.height) : "" });
       }
@@ -243,8 +246,9 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
     const sizeKey = `${options.sourcePath}\n${item.embed.raw}`;
     const size = diagramSizes.get(sizeKey);
     const applySize = (size: MediaSize): void => {
+      diagramMeasurements.set(diagram, size);
       diagram.setCssProps({ "--vml-diagram-ratio": String(size.width / size.height) });
-      useSize(itemEl, diagram, size, shareByRatio);
+      useSize(itemEl, diagram, size, !single && !itemEl.hasClass("vml-item--weighted"));
     };
     if (size) applySize(size);
     // Obsidian's diagram processor requires lowercase; normalize only the rendering copy.

@@ -5,6 +5,7 @@ import { findV2Blocks, serializeBlock } from "../src/format/v2.ts";
 import { metaFromModel, modelFromBlock, moveItem, removeItem, insertItem, setRowHeight, setWeights } from "../src/layout/model.ts";
 import { applyEditsToText, isEditable, planModelEdit, planMoveOut } from "../src/layout/edits.ts";
 import { planMergeWithNext, planWrapSelection } from "../src/commands/plans.ts";
+import { takePlainMermaid } from "../src/layout/plainEmbed.ts";
 
 const diagram = ["```mermaid", "flowchart LR", "    A[开始] --> B[完成]", "```"];
 const opener = '<!-- vml {"v":3,"kind":"media","rows":[{"items":2,"height":220,"widths":[1,1]}]} -->';
@@ -54,6 +55,34 @@ test("multiline items serialize on their own lines and read back into the same r
 test("only complete top-level Mermaid fences become diagram sources", () => {
   const examples = ["---", "example: '```mermaid'", "---", "````md", ...diagram, "````", "> ```mermaid", "> A --> B", "> ```", ...diagram, "```mermaid", "unclosed"];
   assert.deepEqual(fencedCodeBlocks(examples).filter((fence) => fence.language === "mermaid"), [{ from: 12, to: 15, language: "mermaid" }]);
+});
+
+test("list-contained fences stay text through scanning, wrapping and plain extraction", () => {
+  for (const prefix of [["- item", ""], ["- item", "lazy continuation", ""], ["- item", "  - nested", ""], ["1. item", ""]]) {
+    const indent = prefix[0].startsWith("1.") ? "   " : "  ";
+    const lines = [...prefix, ...diagram.map(line => indent + line), "", "after"];
+    assert.deepEqual(fencedCodeBlocks(lines), []);
+    assert.equal(takePlainMermaid(lines, prefix.length), null);
+    const edit = planWrapSelection(lines, 0, lines.length - 1);
+    assert.ok(edit);
+    const block = findV2Blocks(edit.replacement)[0];
+    assert.equal(block.meta.version, undefined);
+    assert.equal(block.rows.length, 0);
+    assert.ok(block.leftText?.lines.join("\n").includes(diagram.map(line => indent + line).join("\n")));
+  }
+  for (const construct of [["<!--", "note", "-->"], ["$$", "x", "$$"], ["<!-- note -->"], ["$$x$$"]]) {
+    const contained = ["- item", ...construct, "", ...diagram.map(line => "  " + line)];
+    assert.deepEqual(fencedCodeBlocks(contained), [], "native list continuations keep their diagram inside the list");
+    assert.equal(takePlainMermaid(contained, construct.length + 2), null);
+    const outside = ["- item", "", ...construct, "", ...diagram.map(line => "  " + line)];
+    assert.equal(fencedCodeBlocks(outside).length, 1, "a blank before the margin construct closes the list");
+  }
+  for (const indent of ["", " ", "  ", "   "]) {
+    const lines = ["- item", "", "outside the list", "", ...diagram.map(line => indent + line)];
+    assert.equal(fencedCodeBlocks(lines).length, 1, "a genuine top-level indented fence remains supported");
+    assert.ok(takePlainMermaid(lines, 4));
+  }
+  assert.equal(fencedCodeBlocks(["- item", "", ...diagram]).length, 1, "a margin fence ends the list");
 });
 
 test("incorrect item counts are displayed without permitting writes", () => {

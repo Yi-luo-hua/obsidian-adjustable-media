@@ -76,11 +76,38 @@ export function fencedCodeBlocks(lines: readonly string[]): FencedCodeBlock[] {
   const blocks: FencedCodeBlock[] = [];
   let state: ScanState = hasFrontmatter(lines) ? { kind: "frontmatter" } : TEXT;
   let opening: { from: number; language: string } | null = null;
+  // The outer item's content column covers nested items too. Lazy paragraphs keep that container;
+  // a dedented fence or another block ends it, while blank lines alone do not.
+  let listIndent = 0;
+  let afterBlank = true;
+  let paragraph = false;
   lines.forEach((line, index) => {
-    const [, next] = classifyLine(stripCarriageReturn(line), index, state);
+    const text = stripCarriageReturn(line);
+    const [, next] = classifyLine(text, index, state);
+    if (state.kind === "text") {
+      const trimmed = text.trimStart();
+      if (trimmed.trim() === "") {
+        afterBlank = true;
+        paragraph = false;
+      } else {
+        const indent = measureIndent(/^[ \t]*/.exec(text)?.[0] ?? "");
+        const rule = /^([-*_])(?:[ \t]*\1){2,}[ \t]*$/.test(trimmed);
+        const item = rule ? null : /^([ \t]*)([-*+]|(\d{1,9})[.)])([ \t]+|$)(.*)$/.exec(text);
+        const own = next.kind !== "text" || rule || /^#{1,6}(?:[ \t]|$)/.test(trimmed) || trimmed.startsWith(">");
+        // Native Markdown keeps a comment/math continuation in the preceding list paragraph.
+        const lazy = paragraph && !afterBlank && !item && (!own || next.kind === "html-comment" || next.kind === "math");
+        if (!lazy && indent < listIndent) listIndent = 0;
+        if (item && listIndent === 0 && (afterBlank || !paragraph || !item[3] || item[3] === "1")) {
+          const spaces = measureIndent(item[4] ?? "");
+          listIndent = indent + (item[2]?.length ?? 0) + (spaces > 4 || !item[5] ? 1 : spaces);
+        }
+        afterBlank = false;
+        paragraph = next.kind === "text" && !own;
+      }
+    }
     if (state.kind === "text" && next.kind === "code") {
       const fence = next.fence;
-      opening = fence.quoteDepth === 0 && !fence.listMarker && fence.indent <= 3
+      opening = fence.quoteDepth === 0 && !fence.listMarker && fence.indent <= 3 && (listIndent === 0 || fence.indent < listIndent)
         ? { from: index, language: fence.info.trim().toLowerCase() } : null;
     } else if (state.kind === "code" && next.kind === "text" && opening) {
       blocks.push({ ...opening, to: index });

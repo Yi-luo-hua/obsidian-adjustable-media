@@ -4,13 +4,13 @@ import { mockedModule } from "./support/mockedModule.ts";
 
 async function harness() {
   const listeners = new Map<string, (event: unknown) => void>();
-  let mobile = true, actualHandle = false, explicitControl = false, inPane = true;
+  let mobile = true, actualHandle = false, explicitControl = false, diagram = false, inPane = true;
   let box = { left: 300, right: 344, top: 200, bottom: 244, width: 44, height: 44 };
   const pane = { getBoundingClientRect: () => ({ left: 0, right: 400, top: 0, bottom: 700 }),
     querySelectorAll: () => [{ getBoundingClientRect: () => box }] };
   const target = { closest(selector: string) {
     if (selector === ".vml-frame__handle--corner") return actualHandle ? {} : null;
-    if (selector === ".vml-handle, button, a, video, audio") return actualHandle || explicitControl ? {} : null;
+    if (selector === ".vml-handle, .vml-item__diagram, .mermaid, button, a, video, audio") return actualHandle || explicitControl || diagram ? {} : null;
     return inPane ? pane : null;
   } };
   const module = await mockedModule<{ registerCornerInputGuard(plugin: unknown): void }>(new URL("../src/view/cornerInput.ts", import.meta.url), {
@@ -27,6 +27,7 @@ async function harness() {
       return prevented && stopped;
     },
     handle(value: boolean) { actualHandle = value; }, control(value: boolean) { explicitControl = value; },
+    diagram(value: boolean) { diagram = value; },
     mobile(value: boolean) { mobile = value; }, inPane(value: boolean) { inPane = value; },
     mirrored() { box = { ...box, left: 10, right: 54 }; },
     offscreen() { box = { ...box, top: 900, bottom: 944 }; },
@@ -70,4 +71,11 @@ test("desktop text, explicit buttons/links and native media controls keep their 
   const host = await harness(); host.mobile(false); assert.equal(host.fire("pointerdown"), false);
   host.mobile(true); host.control(true); assert.equal(host.fire("pointerdown"), false);
   assert.equal(host.fire("click"), false);
+});
+
+test("diagram bodies near the corner keep touch scrolling and native context-menu input", async () => {
+  const host = await harness(); host.diagram(true);
+  for (const name of ["pointerdown", "touchstart", "click"]) assert.equal(host.fire(name, 280, 180), false);
+  host.diagram(false);
+  assert.equal(host.fire("touchstart", 280, 180), true, "nearby text still retains the corner's accidental-input protection");
 });

@@ -13,6 +13,8 @@
 
 移动候选已整合 Android 工作树的已验收 iOS 修复与代码整理，并接入 Mermaid `53c5f3a`；保留已发布的手动分栏、高亮和更新说明，不带入 W02／W03 原型。451 项检查与生产发布构建通过；Windows 宿主 390／820px 的原生触摸仿真验证图表显示、拖入／排序、尺寸调整、取消零写入、一步撤销、图表正文滚动及阅读更新。当前 ADB 未连接设备，新移动 Mermaid 真机回归尚未完成；旧 V2 移动结果不扩展到新 V3 图表。
 
+随后审查发现的四项 Mermaid 缺陷已修复：关闭视图后的晚到渲染、缩放后默认列宽比例丢失、列表内围栏误拆、图表右下角正文滑动被拦截。当前检查为 455 项，生产构建通过；Windows／Obsidian 1.14.4 复测原失败的缩放与触摸场景通过，22 个列表／围栏场景与宿主分块一致。四类 0.8.0 私有测试包同步更新；新的真机回归及三视角未验收增量仍待确认，详见 [修复记录](plans/layout-redesign/mobile-adaptation.md#080-mermaid-审查修复2026-10-11)。
+
 0.7.3 [正式发布](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.3)及已合并的 [发布索引 PR #22](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/22)均已核对，main 检查通过；公开下载的三份文件哈希与草稿核验结果一致，正式 manifest 保持 `isDesktopOnly: true`。主目录默认 lint 会扫描未入库的 `.claude/` 历史工作树，本次 327 项检查在只含入库源码的副本中通过，没有修改这些历史工作树。
 
 ## 已有工作与当前边界
