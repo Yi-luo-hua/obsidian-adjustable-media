@@ -1,10 +1,10 @@
-import { findV2Blocks, readEmbedRow, type V2Embed } from "../format/v2.ts";
-import { scanMarkdownLines } from "../markdown/lineContext.ts";
+import { findV2Blocks, mermaidEmbed, readEmbedRow, type V2Embed } from "../format/v2.ts";
+import { fencedCodeBlocks, scanMarkdownLines } from "../markdown/lineContext.ts";
 import type { BlockEdit } from "./edits.ts";
 
 export interface TakenEmbed {
   embed: V2Embed;
-  /** Removes the embed from its line, anchored to the line's exact text. */
+  /** Removes the whole embed, anchored to its exact source and a plain-text boundary. */
   edit: BlockEdit;
 }
 
@@ -45,4 +45,22 @@ export function takePlainEmbed(lines: readonly string[], line: number, column: n
 
 function stripCarriageReturn(line: string): string {
   return line.endsWith("\r") ? line.slice(0, -1) : line;
+}
+
+/** Only a complete top-level Mermaid outside every layout can be taken as a standalone item. */
+export function takePlainMermaid(lines: readonly string[], line: number): TakenEmbed | null {
+  const fence = fencedCodeBlocks(lines).find(fence => fence.language === "mermaid" && fence.from <= line && line <= fence.to);
+  if (!fence || findV2Blocks(lines).some(block => block.openLine <= fence.to && fence.from <= block.closeLine)) return null;
+  const contexts = scanMarkdownLines(lines, true);
+  // The shared writer validates at a text boundary; the removed range is only the complete fence.
+  const before = fence.from > 0 && contexts[fence.from - 1] === "text";
+  const anchorLine = before ? fence.from - 1 : fence.from;
+  let boundary = fence.to + 1;
+  while (contexts[boundary] !== "text" && boundary < lines.length) boundary++;
+  const anchorEnd = before ? fence.to : boundary;
+  return {
+    embed: mermaidEmbed(lines, fence.from, fence.to),
+    edit: { anchorLine, anchorLines: lines.slice(anchorLine, anchorEnd + 1).map(stripCarriageReturn),
+      textOffset: before ? 0 : boundary - anchorLine, start: fence.from - anchorLine, end: fence.to - anchorLine, replacement: [] },
+  };
 }

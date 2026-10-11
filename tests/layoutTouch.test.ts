@@ -8,9 +8,10 @@ async function harness() {
   let mobile = true;
   let box = { left: 100, right: 300, top: 100, bottom: 300, width: 200, height: 200 };
   let inPane = true;
+  let gripOnly = false;
   const attributes = new Map<string, string>();
   const pane = { getBoundingClientRect: () => ({ left: 0, right: 400, top: 50, bottom: 700 }),
-    querySelectorAll: () => [{ getBoundingClientRect: () => box }],
+    querySelectorAll: (selector: string) => gripOnly && !selector.includes(".vml-plain-media__grip") ? [] : [{ getBoundingClientRect: () => box }],
     getAttribute: (key: string) => attributes.get(key) ?? null,
     setAttribute: (key: string, value: string) => attributes.set(key, value),
     removeAttribute: (key: string) => attributes.delete(key) };
@@ -30,6 +31,7 @@ async function harness() {
     mobile(value: boolean) { mobile = value; },
     inPane(value: boolean) { inPane = value; },
     hidden() { box = { ...box, width: 0, height: 0 }; },
+    plainGrip() { gripOnly = true; box = { left: 352, right: 396, top: 400, bottom: 444, width: 44, height: 44 }; },
     unload() { cleanups.forEach(cleanup => cleanup()); },
   };
 }
@@ -44,6 +46,14 @@ test("a layout blocks sidebar swipes across its whole horizontal band, including
   assert.equal(host.attributes.get("data-ignore-swipe"), "true");
   host.end("touchcancel");
   assert.equal(host.attributes.size, 0);
+});
+
+test("a standalone diagram grip owns a horizontal drag while adjacent bands keep sidebar navigation", async () => {
+  const host = await harness();
+  host.plainGrip(); host.start(374, 420);
+  assert.equal(host.attributes.get("data-ignore-swipe"), "true");
+  host.end("touchcancel"); assert.equal(host.attributes.size, 0);
+  host.start(374, 460); assert.equal(host.attributes.size, 0);
 });
 
 test("unoccupied bands and other panes keep native sidebar gestures", async () => {

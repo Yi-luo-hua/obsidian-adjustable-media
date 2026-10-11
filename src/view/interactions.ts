@@ -253,7 +253,7 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
   }
 
   itemEl.tabIndex = 0;
-  itemEl.setAttribute("aria-label", item.embed.alt || item.embed.target);
+  itemEl.setAttribute("aria-label", item.embed.kind === "mermaid" ? t("mermaidDiagram") : item.embed.alt || item.embed.target);
   itemEl.addEventListener("contextmenu", (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -267,11 +267,12 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
     }
   });
 
-  // Dragging on a video would fight its seek bar and volume, so videos move by a grip.
+  // Videos keep their controls; touch users move diagrams by a grip and scroll on the diagram body.
   let dragFrom = itemEl;
-  if (item.embed.kind === "video") {
-    dragFrom = itemEl.createDiv({ cls: "vml-handle vml-item__grip", attr: { "aria-label": t("dragHandle"), role: "button" } });
-    setIcon(dragFrom, "grip-vertical");
+  if (item.embed.kind === "video" || item.embed.kind === "mermaid") {
+    const grip = itemEl.createDiv({ cls: "vml-handle vml-item__grip", attr: { "aria-label": t("dragHandle"), role: "button" } });
+    setIcon(grip, "grip-vertical");
+    if (item.embed.kind === "video") dragFrom = grip;
   }
   dragFrom.addEventListener("pointerdown", (event) => {
     const target = eventElement(event);
@@ -281,6 +282,7 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
     if (event.button !== 0 || onOtherHandle) {
       return;
     }
+    if (item.embed.kind === "mermaid" && event.pointerType === "touch" && !target?.closest(".vml-item__grip")) return;
     event.preventDefault();
     itemEl.focus({ preventScroll: true });
     startDrag(root, itemEl, dragFrom, position, context, event);
@@ -781,7 +783,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
 
   // Obsidian's own actions for the media file, as on any link: reveal it in the file list or the
   // system's file manager, open it, copy its path, and whatever other plugins add.
-  const media = resolveMedia(context.app, item.embed, context.sourcePath);
+  const media = item.embed.kind === "mermaid" ? null : resolveMedia(context.app, item.embed, context.sourcePath);
   if (media?.file) {
     context.app.workspace.trigger("file-menu", menu, media.file, "link-context-menu");
   }

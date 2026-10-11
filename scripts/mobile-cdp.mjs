@@ -1,3 +1,4 @@
+/* eslint no-restricted-globals: "off" -- This standalone Node tool connects to a local ADB endpoint, outside Obsidian. */
 import { readFile, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { setTimeout as expireCall, clearTimeout as cancelExpiry } from "node:timers";

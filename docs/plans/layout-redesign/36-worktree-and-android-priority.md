@@ -9,11 +9,12 @@
 | `codex/text-column-breaks` | `da4aea9`／标签 `0.7.3` | 正式 0.7.2 + 0.7.3 原定桌面功能；主目录 | 327 项检查、发布流程、附件重建一致性及签名核对通过；已正式发布 |
 | `codex/pending-view-parity` | `7963b0f` 文档合流 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 本轮审查和 Windows 定向回归通过，待集成 |
 | `codex/pending-render-stability` | `bf8dcd8` 审查修复 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 416 项检查、构建与 Windows 定向回归通过，待集成 |
-| `codex/android-adaptation` | `2321d44` + 本地 iPhone 修复／移动整理 | 接共用渲染分支；四类移动设备共用触摸、输入、焦点与控件 | 各设备本轮已列操作分别通过；历史 iPhone／iPad 候选通过 434 项检查，整理构建单独记录；待 Mermaid 版本之后集成／交付 |
-| `codex/mobile-release-integration` | `2321d44` 本地移动集成 | 保留依赖链与 main 历史；尚未包含本轮未提交修复或 Mermaid 增量 | 作为后续集成基础保留；移动发布源码应接 Mermaid 版本，具体版本号未定 |
-| `codex/mermaid-layout` | `53c5f3a` | 独立 Mermaid 图表、缩放与拖入布局；桌面分支 | 先交付 Mermaid 适配版本，再交付移动适配版本；本轮不修改该工作树 |
+| `codex/android-adaptation` | `2321d44` + 本地 iOS 修复／整理 | 四类设备既有验收源 | 已验收改动复制到移动集成候选；源工作树保持原状态 |
+| `codex/mobile-release-integration` | `2321d44` → `3085095`，合流 Mermaid `53c5f3a` | 新专用工作树，统一 0.8.0 代码与发布准备 | 451 项检查／构建与宿主触摸仿真通过，新真机回归待连接手机；暂不合入 main 或发布 |
+| `codex/mermaid-layout` | `53c5f3a` | Mermaid 桌面历史和已验收源码 | 已接入移动候选；源分支保持不变 |
 | `codex/release-073-index` | `39889e5` | 只同步 0.7.3 的版本元数据与发布索引，不改 main 实现 | PR #22 已合并到 main（3f31feb），main 检查通过；工作树已归档，可恢复 |
 | `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
+
 
 待合并分支按依赖堆叠：`text-column-breaks → pending-view-parity → pending-render-stability → android-adaptation`。这表示代码依赖，不表示已经合并或发布；评审每一层时以其上一层为比较基线。旧 `codex/android-layout-stability` 留作完整历史来源，不再作为新的混合开发入口。
 
@@ -25,7 +26,7 @@
 
 0.7.3 可按自身验收范围交付；三视图、共用渲染和移动适配分别审查与集成，不把后续完整规划器／并列组装进同一个发布增量。Android 优先表示本轮工作优先级，不要求先公开发布三视图或渲染版本才允许做真机回归。
 
-用户最新确认（2026-10-11）：0.7.3 不追加内容；先发布 Mermaid 适配，移动端适配作为其后的下一版本发布，具体版本号未定。Android、iPhone、iPad 本轮已列操作分别通过。本地集成保留为 `codex/mobile-release-integration`，新修复与整理仍位于 `codex/android-adaptation`；移动候选尚未合入 main。Mermaid 发布后，以其最终源码集成移动依赖链并验证相交路径，保留已发布的 Mermaid 功能；当前移动 V2 清单不证明合流后的 V3 图表已在移动端验收。
+用户最新安排为在 `codex/mobile-release-integration` 统一准备 0.8.0，接入最近修复和 Mermaid；既有各平台结果与新 V3 图表验收分开。随后明确要求暂不合入 main、切换主目录或公开发布，三视角同步等未验收更新先确认。原“先 Mermaid、再移动”的两版安排由本轮统一候选取代。
 
 bug 修复按主要职责归入对应工作线，设备验证范围单独记录；在平板发现的播放器保留属于共用渲染，移动写回焦点属于平台适配。文档、样例和诊断维护随对应功能交付。
 

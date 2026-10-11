@@ -160,7 +160,8 @@ export function registerReadingView(plugin: Plugin): void {
     if (previous) stop(previous);
     const parsed = parse(view, view.getViewData());
     const reader: Reader = { view, file: view.file!, parsed, sourceRequested: false, projection: new ViewProjection(), requested: null,
-      needsRender: false, markedWrapping: null, timer: 0, frame: 0, sections: new Map(), pendingSections: new Map(), stopEnvironment: () => {} };
+      needsRender: parsed.blocks.some(block => block.meta.version === 3) && view.previewMode.containerEl.querySelector(".vml-layout") !== null,
+      markedWrapping: null, timer: 0, frame: 0, sections: new Map(), pendingSections: new Map(), stopEnvironment: () => {} };
     reader.projection.request(parsed.snapshot);
     reader.projection.observeHost(view.getViewData());
     readers.set(view, reader);
@@ -174,15 +175,17 @@ export function registerReadingView(plugin: Plugin): void {
       for (const section of reader.sections.keys()) if (section.contains(media)) { refreshReadingMedia(section, media); break; }
       confirm(reader);
     }, () => confirm(reader));
-    const scroll = (): void => confirm(reader);
+    const scroll = (): void => { if (!alive(reader)) stop(reader); else confirm(reader); };
     const mutation = new (view.containerEl.win as Window & typeof window).MutationObserver(scroll);
-    mutation.observe(view.previewMode.containerEl, { childList: true, subtree: true });
+    mutation.observe(view.previewMode.containerEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style"] });
     view.previewMode.containerEl.addEventListener("scroll", scroll, true);
     const stopEnvironment = reader.stopEnvironment;
     reader.stopEnvironment = () => { stopEnvironment(); mutation.disconnect(); view.previewMode.containerEl.removeEventListener("scroll", scroll, true); };
     // During file-open the view's file can already be new while its buffer/sections are still old.
     // Reconcile the exact file through the same generation and divergent-buffer checks as disk events.
     diskChanged(reader.file);
+    // The host may retain an unchanged opening comment, including its previous whole V3 layout.
+    if (reader.needsRender) reader.timer = view.containerEl.win.setTimeout(() => wake(reader), 0);
     return reader;
   };
 
@@ -204,10 +207,12 @@ export function registerReadingView(plugin: Plugin): void {
     const block = sectionBlock(blocks, info);
     const opening = block?.openLine === info.lineStart && info.lineStart === info.lineEnd;
     if (block && isDrawable(block)) {
+      // A multiline item can share a row with media in another native Markdown section.
+      const whole = hasSideText(block) || block.meta.version === 3;
       let rows: number[] | undefined;
-      if (hasSideText(block) && !opening) el.empty();
+      if (whole && !opening) el.empty();
       else {
-        rows = hasSideText(block) ? undefined : sectionRows(block, info);
+        rows = whole ? undefined : sectionRows(block, info);
         if (rows === undefined || rows.length > 0) {
           const child = new MarkdownRenderChild(el);
           ctx.addChild(child);
@@ -356,7 +361,7 @@ function sectionRange(parsed: Parsed, info: MarkdownSectionInformation): SourceC
 
 function sectionBlock(blocks: readonly V2Block[], info: MarkdownSectionInformation): V2Block | undefined {
   const opening = blocks.find(block => info.lineStart === block.openLine && info.lineEnd === block.openLine);
-  return opening && hasSideText(opening) ? opening
+  return opening && (hasSideText(opening) || opening.meta.version === 3) ? opening
     : blocks.find(block => info.lineStart > block.openLine && info.lineEnd < block.closeLine);
 }
 
@@ -367,6 +372,6 @@ function sectionRows(block: V2Block, info: MarkdownSectionInformation): number[]
 function sectionLayoutKey(parsed: Parsed, info: MarkdownSectionInformation): string {
   const block = sectionBlock(parsed.blocks, info);
   if (!block || !isDrawable(block)) return "";
-  const rows = hasSideText(block) ? info.lineStart === block.openLine ? "columns" : "hidden" : sectionRows(block, info);
+  const rows = hasSideText(block) || block.meta.version === 3 ? info.lineStart === block.openLine ? "whole" : "hidden" : sectionRows(block, info);
   return JSON.stringify([block.lines[0], rows, parsed.skips[parsed.blocks.indexOf(block)] ?? null]);
 }

@@ -2,9 +2,11 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-实现范围（2026-10-10）：本工作树为 codex/android-adaptation，包含三视图／共用渲染修复与 Android 触摸／输入适配；nova 12／11.5S 本轮已列相关验收通过。用户要求 0.7.3 保持原定桌面范围，Android、iPhone、iPad 本轮已列操作分别验收通过；用户确认先发布 Mermaid 适配，本分支整理后的移动适配作为紧接其后的下一版本，集成候选为 codex/mobile-release-integration。当前候选未包含 Mermaid／V3 增量，后续合流需按影响补相关回归。公开版本为 0.7.3（桌面版，标签源码 da4aea9）；这些后续修复尚未合入 main 或公开发布。下文保留本分支实际实现及历史宿主说明，主目录 0.7.3、其他待合并分支与 W02／W03 原型的范围见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md) 和 [36](plans/layout-redesign/36-worktree-and-android-priority.md)。
+实现范围（2026-10-11）：本工作树为 `codex/mobile-release-integration`，准备统一的 0.8.0 候选，已整合三视图／共用渲染、Android／iOS 输入与视频修复、Mermaid 独立布局项及触摸把手；不带入 W02／W03 未完成原型。既有 Android、iPhone、iPad 的已列真机结果分别保留，新 Mermaid 合流结果另记。用户最新要求暂不合入 main，也不切换主目录；三视角同步等未验收更新继续单独确认。公开版本仍为 0.7.3（桌面版，标签源码 `da4aea9`），本候选未公开发布。实际范围与验证见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md)、[36](plans/layout-redesign/36-worktree-and-android-priority.md) 和 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
 
 ## 1. 存储格式
+
+本候选已接入 `codex/mermaid-layout` 的 Mermaid 独立布局项。它只对显式新建／接收图表的目标块使用 `v:3, kind:"media"`，不自动迁移旧笔记；单块项数、完整围栏读写和宿主验证见 [37](plans/layout-redesign/37-mermaid-layout-items.md)。触摸通过独立把手搬运整段代码，图表正文保留竖向滚动；源码变化与过期目标拒绝写入。以下 V2 说明仍适用于公开版本与旧布局。这个单块格式不是 W06 多块组格式。
 
 ### 1.1 语法
 

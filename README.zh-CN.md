@@ -8,6 +8,8 @@
 
 当前最新发布为 **0.7.3**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
 
+未发布的 0.8.0 候选在 `codex/mobile-release-integration` 整合近期修复、Mermaid 和移动支持；main 与主目录保持原状态，新增图表真机回归待验收。详见[状态](docs/STATUS.md)。
+
 ![Adjustable Media 效果预览](assets/demo.jpg)
 
 ---

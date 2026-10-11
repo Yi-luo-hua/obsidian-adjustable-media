@@ -88,6 +88,7 @@ const MESSAGES = {
     zh: "找不到：{target}",
     en: "Not found: {target}",
   },
+  mermaidDiagram: { zh: "Mermaid 图表", en: "Mermaid diagram" },
   editSource: {
     zh: "编辑源码",
     en: "Edit source",

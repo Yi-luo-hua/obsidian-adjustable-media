@@ -15,7 +15,7 @@ node scripts/prepare-mobile-test.mjs --assets '<素材目录>' --platform ios --
 
 输出依次位于 `dist/adjustable-media-mobile-test/`、`dist/adjustable-media-tablet-test/`、`dist/adjustable-media-iphone-test/`、`dist/adjustable-media-ipad-test/`。命令会更新这些生成目录中的配置和样例；不要在设备已编辑的库中覆盖执行。生成库中的 manifest 临时允许移动端，不修改仓库的正式 manifest。
 
-01／02／03／05 的基础样例由生成器创建；06–12 与操作清单来自 [mobile-test-notes](mobile-test-notes/00%20从这里开始.md)。`build-info.json` 记录实际构建哈希、目标平台和只读基线。没有捆绑真实笔记或媒体素材。
+01／02／03／05 的基础样例由生成器创建；06–14 与操作清单来自 [mobile-test-notes](mobile-test-notes/00%20从这里开始.md)。13／14 只补 Mermaid 混排、触摸把手、缩放、源码编辑与块外拖入回归。`build-info.json` 记录实际构建哈希、目标平台和只读基线。没有捆绑真实笔记或媒体素材。
 
 Mobile acceptance 默认停用，避免诊断记录影响启动时序；发现问题时可在测试库内启用。也可加 `--diagnostics`，让生成库默认启用它。报告是原始观察，不能代替手指、输入法和生命周期操作的人工结果。
 

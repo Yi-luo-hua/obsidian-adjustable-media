@@ -1,10 +1,10 @@
-import { Notice, editorInfoField, type App } from "obsidian";
+import { Notice, editorInfoField, setIcon, type App } from "obsidian";
 import type { Extension } from "@codemirror/state";
 import { EditorView, ViewPlugin } from "@codemirror/view";
 
 import { planModelEdit } from "../layout/edits.ts";
 import { insertItem } from "../layout/model.ts";
-import { takePlainEmbed, type TakenEmbed } from "../layout/plainEmbed.ts";
+import { takePlainEmbed, takePlainMermaid, type TakenEmbed } from "../layout/plainEmbed.ts";
 import { createDragGhost, type DragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, clearDropIndicators, commitEdits, findDrop, showDropIndicator, swallowNextClick, type DropState } from "./interactions.ts";
 import { t } from "./messages.ts";
@@ -15,30 +15,53 @@ import { eventElement } from "./windows.ts";
 const PLAIN_IMAGE = ".image-embed > .image-wrapper > img";
 
 /**
- * Live preview: an image outside any layout can be grabbed and dropped into a layout of the same
- * note. Obsidian's click (select the image, click again to view it), resize corner and menu are
- * left alone: nothing happens until the pointer has moved, and only images on a line of plain
- * media embeds can move. Released anywhere but on a layout, the image stays where it is.
+ * Live preview: an image or complete Mermaid outside a layout can be dropped into a layout of the same
+ * note. Obsidian's image click, resize corner, menu and Mermaid source button remain available.
+ * Nothing moves until the pointer has moved, and only images on a line of plain
+ * media embeds or complete top-level Mermaid fences can move. Released off a layout, they stay put.
  *
  * Listeners go on the editor's DOM directly: CodeMirror hands no events from Obsidian's image
  * widgets to extensions.
  */
-export function plainImageDrag(app: App): Extension {
+export function plainMediaDrag(app: App): Extension {
   return ViewPlugin.define((view) => {
-    // The image whose drag the plugin is following, if any.
-    let dragging: HTMLImageElement | null = null;
+    // The media whose drag the plugin is following, if any.
+    let dragging: HTMLElement | null = null;
     const hasLayouts = (): boolean => view.dom.querySelector(".vml-layout--interactive") !== null;
+    const grips = new Set<HTMLElement>();
+    const updateGrips = (): void => {
+      const available = hasLayouts();
+      for (const grip of grips) {
+        if (!grip.isConnected || !available) { grip.parentElement?.removeClass("vml-plain-media--draggable"); grip.remove(); grips.delete(grip); }
+      }
+      if (!available) return;
+      for (const diagram of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".mermaid"))) {
+        if (diagram.closest(".vml-layout, .vml-text-editor") || !diagram.querySelector("svg")
+          || diagram.querySelector(":scope > .vml-plain-media__grip")) continue;
+        const grip = diagram.createEl("button", { cls: "vml-plain-media__grip", attr: { type: "button", "aria-label": t("dragHandle") } });
+        setIcon(grip, "grip-vertical");
+        grip.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); });
+        diagram.addClass("vml-plain-media--draggable");
+        grips.add(grip);
+      }
+    };
 
     const onPointerDown = (event: PointerEvent): void => {
-      const img = eventElement(event);
+      const target = eventElement(event);
+      const diagram = target?.closest<HTMLElement>(".mermaid");
+      const media = target?.instanceOf(HTMLImageElement) && target.matches(PLAIN_IMAGE) ? target : diagram;
       const modified = event.ctrlKey || event.metaKey || event.shiftKey || event.altKey;
-      if (event.button !== 0 || modified || !img?.instanceOf(HTMLImageElement) || !img.matches(PLAIN_IMAGE) || !hasLayouts()) {
+      if (event.button !== 0 || modified || !media || media.closest(".vml-layout, .vml-text-editor") || !hasLayouts()) {
         return;
       }
+      if (diagram && event.pointerType === "touch" && !target?.closest(".vml-plain-media__grip")) return;
       const sourcePath = view.state.field(editorInfoField, false)?.file?.path;
-      if (sourcePath && take(view, img)) {
-        dragging = img;
-        startPlainDrag(app, view, img, sourcePath, event, () => {
+      const taken = sourcePath ? take(view, media) : null;
+      if (sourcePath && taken) {
+        // A native text selection could reveal the fence and remove the diagram during the drag.
+        if (diagram) event.preventDefault();
+        dragging = media;
+        startPlainDrag(app, view, media, sourcePath, taken, event, () => {
           dragging = null;
         });
       }
@@ -55,8 +78,14 @@ export function plainImageDrag(app: App): Extension {
 
     view.contentDOM.addEventListener("pointerdown", onPointerDown);
     view.contentDOM.addEventListener("dragstart", onDragStart, { capture: true });
+    const observer = new (view.contentDOM.ownerDocument.defaultView as Window & typeof window).MutationObserver(updateGrips);
+    observer.observe(view.contentDOM, { childList: true, subtree: true });
+    updateGrips();
     return {
       destroy() {
+        observer.disconnect();
+        for (const grip of grips) { grip.parentElement?.removeClass("vml-plain-media--draggable"); grip.remove(); }
+        grips.clear();
         view.contentDOM.removeEventListener("pointerdown", onPointerDown);
         view.contentDOM.removeEventListener("dragstart", onDragStart, { capture: true });
       },
@@ -64,28 +93,28 @@ export function plainImageDrag(app: App): Extension {
   });
 }
 
-function startPlainDrag(app: App, view: EditorView, img: HTMLImageElement, sourcePath: string, start: PointerEvent, onFinish: () => void): void {
-  const doc = img.ownerDocument;
-  const leaf = img.closest(".workspace-leaf");
+function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, start: PointerEvent, onFinish: () => void): void {
+  const doc = media.ownerDocument;
+  const leaf = media.closest(".workspace-leaf");
   let ghost: DragGhost | null = null;
   let drop: DropState | null = null;
 
   const stop = (): void => {
     ghost?.remove();
-    img.removeClass("vml-plain-image--dragging");
+    media.removeClass("vml-plain-image--dragging");
     doc.body.removeClass("vml-is-dragging");
     clearDropIndicators(doc);
     onFinish();
   };
 
-  trackPointer(img, start, {
+  trackPointer(media, start, {
     onMove(event) {
       if (!ghost) {
         if (Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY) < DRAG_THRESHOLD) {
           return;
         }
-        ghost = createDragGhost(doc, img);
-        img.addClass("vml-plain-image--dragging");
+        ghost = createDragGhost(doc, media);
+        media.addClass("vml-plain-image--dragging");
         doc.body.addClass("vml-is-dragging");
       }
       ghost.move(event.clientX, event.clientY);
@@ -103,17 +132,17 @@ function startPlainDrag(app: App, view: EditorView, img: HTMLImageElement, sourc
       }
       swallowNextClick(doc);
       if (drop) {
-        void dropPlain(app, view, img, sourcePath, drop);
+        void dropPlain(app, view, media, sourcePath, initial, drop);
       }
     },
     onCancel: stop,
   });
 }
 
-async function dropPlain(app: App, view: EditorView, img: HTMLImageElement, sourcePath: string, drop: DropState): Promise<void> {
+async function dropPlain(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, drop: DropState): Promise<void> {
   // Located again at drop time, from the note as it is now.
-  const taken = take(view, img);
-  if (!taken) {
+  const taken = take(view, media);
+  if (!taken || (initial.embed.kind === "mermaid" && taken.embed.raw !== initial.embed.raw)) {
     new Notice(t("writeNotFound"));
     return;
   }
@@ -124,17 +153,19 @@ async function dropPlain(app: App, view: EditorView, img: HTMLImageElement, sour
   }
 }
 
-function take(view: EditorView, img: HTMLImageElement): TakenEmbed | null {
-  const embedEl = img.closest<HTMLElement>(".image-embed");
+function take(view: EditorView, media: HTMLElement): TakenEmbed | null {
+  const diagram = media.matches(".mermaid");
+  const embedEl = diagram ? media : media.closest<HTMLElement>(".image-embed");
   if (!embedEl) {
     return null;
   }
   try {
     const pos = view.posAtDOM(embedEl);
     const line = view.state.doc.lineAt(pos);
-    return takePlainEmbed(view.state.doc.toString().split("\n"), line.number - 1, pos - line.from);
+    const lines = view.state.doc.toString().split("\n");
+    return diagram ? takePlainMermaid(lines, line.number - 1) : takePlainEmbed(lines, line.number - 1, pos - line.from);
   } catch {
-    // The image is no longer part of the editor.
+    // The media is no longer part of the editor.
     return null;
   }
 }

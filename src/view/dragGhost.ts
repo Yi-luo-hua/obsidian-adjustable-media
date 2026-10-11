@@ -14,7 +14,7 @@ export function createDragGhost(doc: Document, media: Element | null): DragGhost
   if (src) {
     el.createEl("img", { attr: { alt: "", src } });
   } else {
-    setIcon(el, media?.instanceOf(HTMLVideoElement) ? "film" : "image");
+    setIcon(el, media?.matches(".mermaid, .vml-item__diagram") ? "workflow" : media?.instanceOf(HTMLVideoElement) ? "film" : "image");
   }
 
   return {

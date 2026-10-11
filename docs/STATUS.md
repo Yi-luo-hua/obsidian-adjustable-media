@@ -7,15 +7,17 @@
 - **当前公开版本：[0.7.3](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.3)**。2026-10-11（北京时间）正式发布并设为最新版本，标签源码为 `da4aea9`；保持原定桌面范围，新增手动文字分栏与点击修复，保留 0.7.2 已发布功能。
 - **本次范围与验证**。主目录检出 `codex/text-column-breaks`，标签源码 `da4aea9`；保留原定 `+++` 手动文字分栏、文字栏切换／外框空隙点击修复及中英文样例。干净源码的类型检查、lint、327 项测试和生产发布构建通过；GitHub 发布流程成功，三份公开附件与统一 LF 换行的本地重建逐字节一致，来源签名全部核对至标签／源码提交及发布工作流。已列 Windows／Obsidian 1.14.4 定向实测范围见 [34](plans/layout-redesign/34-text-column-breaks.md)。
 - **main 与发布附件来自不同源码线**。远端／本地 main 为 `3f31feb`，已合并发布索引 PR #22；本次只同步版本元数据与发布说明，不改 main 实现。main HEAD 不能当作 0.7.3 附件来源，下一次从 main 构建前仍需集成待合并分支以保留全部已发布功能。
-- 所有准备交付分支仍声明 `isDesktopOnly: true`，笔记格式保持 V2，不迁移旧笔记。插件已在 Obsidian 社区目录中。
+- 公开 0.7.3 仍为 `isDesktopOnly: true`；本工作树的未发布 0.8.0 候选为 `false`。旧 V2 笔记不迁移，新的独立 Mermaid 布局显式使用 V3 媒体格式。插件已在 Obsidian 社区目录中。
 
-用户确认的交付边界（2026-10-11）：0.7.3 保持原定桌面范围；先发布独立的 Mermaid 适配版本，移动端适配作为紧接着的下一版本发布，具体版本号待定。Android、iPhone、iPad 本轮已列验收分别完成。移动集成候选保留在 `codex/mobile-release-integration`，本轮修复与整理位于 `codex/android-adaptation` 本地，尚未提交或推入 main；主目录继续检出 `codex/text-column-breaks`。
+用户最新确认的交付边界（2026-10-11）：准备统一的 **0.8.0**，把最近已完成修复与 Mermaid 同步到移动端。Android、iPhone、iPad 的既有清单已分别完成，结果仍对应各自原构建。本轮所有集成和发布准备位于 `codex/mobile-release-integration`；暂不合入 `main`、不切换主目录，也不公开发布。三视角同步等未验收增量保留待确认，不能把合流或自动检查记作完整人工验收。
 
-Mermaid 实现在独立 `codex/mermaid-layout` 分支，当前移动候选尚未包含该增量。后续移动版本应以 Mermaid 版本的最终源码为基线，保留此前已发布功能，再集成三视图、共用渲染与移动修复；只对合流影响的图表渲染、触摸和写回路径补相关验证，现有 V2 移动验收不自动覆盖尚未合流的 Mermaid／V3 行为。
+移动候选已整合 Android 工作树的已验收 iOS 修复与代码整理，并接入 Mermaid `53c5f3a`；保留已发布的手动分栏、高亮和更新说明，不带入 W02／W03 原型。451 项检查与生产发布构建通过；Windows 宿主 390／820px 的原生触摸仿真验证图表显示、拖入／排序、尺寸调整、取消零写入、一步撤销、图表正文滚动及阅读更新。当前 ADB 未连接设备，新移动 Mermaid 真机回归尚未完成；旧 V2 移动结果不扩展到新 V3 图表。
 
 0.7.3 [正式发布](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.3)及已合并的 [发布索引 PR #22](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/22)均已核对，main 检查通过；公开下载的三份文件哈希与草稿核验结果一致，正式 manifest 保持 `isDesktopOnly: true`。主目录默认 lint 会扫描未入库的 `.claude/` 历史工作树，本次 327 项检查在只含入库源码的副本中通过，没有修改这些历史工作树。
 
 ## 已有工作与当前边界
+
+Mermaid 独立分支的桌面实现和 343 项原检查结果保留，已合流到本移动候选并增加触摸把手及侧栏仲裁；尚未进入 main 或公开发布。范围与开发格式见 [37](plans/layout-redesign/37-mermaid-layout-items.md)，移动增量见 [移动记录](plans/layout-redesign/mobile-adaptation.md)。下文历史各交付线的 V2／桌面声明继续适用于其原范围。
 
 | 工作线 | 当前完成情况 | 仍待完成 |
 | --- | --- | --- |

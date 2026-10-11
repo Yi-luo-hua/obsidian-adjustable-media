@@ -29,7 +29,7 @@ Obsidian tells you when an update is available, under Settings → Community plu
 | --- | --- |
 | Obsidian | 1.5.0 or newer is required; tested with 1.13.7 |
 | Desktop | Supported |
-| Mobile | Not yet supported |
+| Mobile | Public 0.7.3 is desktop only; the unreleased 0.8.0 candidate enables Android, iPhone and iPad installation. New Mermaid device acceptance is pending. |
 
 ## Updating
 

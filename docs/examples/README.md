@@ -2,6 +2,8 @@
 
 [简体中文](Guide.zh-CN.md) · [English](Guide.en.md)
 
+[Mermaid 独立项中文示例](Mermaid.zh-CN.md)／[English example](Mermaid.en.md)：仅供 `codex/mermaid-layout` 功能分支，未包含在公开 0.7.3。
+
 [手动文字分栏样例](ManualColumns.zh-CN.md)：在 0.7.3 更新说明中点击“在库中创建手动分栏样例”，即可离线创建并打开样例笔记。
 
 [Manual column examples](ManualColumns.en.md): click "Create manual column examples in vault" in the 0.7.3 release notes to create and open the English sample offline.

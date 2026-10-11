@@ -15,7 +15,7 @@ export function registerLayoutTouch(plugin: Plugin): void {
       const viewport = pane.getBoundingClientRect();
       if (touch.clientX < viewport.left || touch.clientX > viewport.right
         || touch.clientY < viewport.top || touch.clientY > viewport.bottom) return;
-      const occupied = Array.from(pane.querySelectorAll<HTMLElement>(".vml-layout, .vml-frame__move, .vml-frame__handle"))
+      const occupied = Array.from(pane.querySelectorAll<HTMLElement>(".vml-layout, .vml-frame__move, .vml-frame__handle, .vml-plain-media__grip"))
         .some(el => {
           const box = el.getBoundingClientRect();
           return box.width > 0 && box.height > 0 && box.right > viewport.left && box.left < viewport.right
