@@ -24,6 +24,10 @@ const MESSAGES = {
   manualColumnExampleName: { zh: "手动文字分栏使用样例", en: "Manual column examples" },
   manualColumnExampleCreated: { zh: "手动分栏样例已创建并打开。", en: "Manual column examples created and opened." },
   manualColumnExampleFailed: { zh: "手动分栏样例创建失败，请重试。", en: "Failed to create manual column examples. Please try again." },
+  mermaidExampleCreate: { zh: "在库中创建 Mermaid 示例", en: "Create Mermaid examples in vault" },
+  mermaidExampleName: { zh: "Mermaid 示例", en: "Mermaid examples" },
+  mermaidExampleCreated: { zh: "Mermaid 示例已创建并打开。", en: "Mermaid examples created and opened." },
+  mermaidExampleFailed: { zh: "Mermaid 示例创建失败，请重试。", en: "Failed to create Mermaid examples. Please try again." },
   exampleFolderName: { zh: "Adjustable Media 指南", en: "Adjustable Media guide" },
   settingUiLanguage: { zh: "界面语言", en: "Interface language" },
   settingUiLanguageDesc: {

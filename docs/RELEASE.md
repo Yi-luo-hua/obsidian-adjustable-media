@@ -10,7 +10,7 @@
 
 同时在 `CHANGELOG.md` 写好这一版的条目，标题写成 `## 0.1.0 - 2026-09-12` 的形式。Release 的说明由 `scripts/release-notes.mjs` 生成：先是这一条目，后面接 `docs/RELEASE_NOTES_TEMPLATE.md` 里的安装说明。可以用 `node scripts/release-notes.mjs` 预览。
 
-插件内的更新弹窗正文单独放在 `docs/releases/<版本>.zh-CN.md` 和 `<版本>.en.md`，由 `src/guide/releaseContent.ts` 打包；`releaseState.ts` 中的版本也需与本次更新一致。中文和英文应对应最终功能范围与用户确认的文案。0.7.3 的手动分栏样例在 `docs/examples/ManualColumns.zh-CN.md` 和 `ManualColumns.en.md`，更新弹窗按界面语言离线创建对应笔记。说明与样例随 `main.js` 分发，不增加发布附件。
+插件内的更新弹窗正文单独放在 `docs/releases/<版本>.zh-CN.md` 和 `<版本>.en.md`，由 `src/guide/releaseContent.ts` 打包；`releaseState.ts` 中的版本也需与本次更新一致。中文和英文应对应最终功能范围与用户确认的文案。0.7.3 的手动分栏样例在 `docs/examples/ManualColumns.zh-CN.md` 和 `ManualColumns.en.md`，0.8.0 的 Mermaid 样例在 `docs/examples/Mermaid.zh-CN.md` 和 `Mermaid.en.md`；更新弹窗按界面语言离线创建对应笔记。说明与样例随 `main.js` 分发，不增加发布附件。
 
 ## 2. 本地检查
 

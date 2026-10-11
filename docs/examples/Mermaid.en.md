@@ -1,6 +1,6 @@
-# Mermaid layout item examples
+## Side-by-side diagrams
 
-For the `codex/mermaid-layout` feature branch; this is not part of public 0.7.3. Diagrams can share a row. In Live Preview, drag dividers for column ratios, the bottom edge for row height, or diagrams to reorder them. Each diagram keeps its complete original Mermaid fence.
+In editing mode, drag the middle divider to adjust proportions, the bottom edge to change row height, or diagram grips to swap their order. Right-click to move a diagram out of the layout.
 
 <!-- vml {"v":3,"kind":"media","rows":[{"items":2,"height":240,"widths":[1,1]}]} -->
 ```mermaid
@@ -17,8 +17,13 @@ sequenceDiagram
 ```
 <!-- /vml -->
 
-In Live Preview, drag an ordinary Mermaid diagram directly into an existing layout, beside an image or another diagram. Press Esc before releasing, or drop outside a layout, to cancel. One undo restores both the diagram's original position and the destination layout.
+## Drag a standalone diagram into a layout
 
-You can also select a complete Mermaid fence and run "Wrap selection in a layout", including image or video lines in the selection. Drag a single item's side edge to resize its width. Use "Move out of layout" to restore an ordinary diagram.
+Drag the diagram below to the edge of the layout above to add it to the row. On mobile, hold the diagram body for about half a second, then drag.
 
-Mermaid inside existing V2 text layouts keeps its original behavior. Edit diagram code in the note source; this feature does not include a diagram node editor.
+```mermaid
+flowchart LR
+    A[Collect materials] --> B[Organize notes] --> C[Finish review]
+```
+
+You can also select a complete Mermaid code block, right-click and choose **Wrap selection in a layout**. Edit the source code directly to change the diagram.
