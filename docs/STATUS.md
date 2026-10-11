@@ -1,17 +1,17 @@
 # 项目状态
 
-更新：2026-10-11。本页汇总当前交付范围；工作包细节见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)，分支与目录见 [工作树记录](plans/layout-redesign/36-worktree-and-android-priority.md)，历史验证见 [归档索引](archive/README.md)。
+更新：2026-10-12。本页汇总当前交付范围；工作包细节见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)，分支与目录见 [工作树记录](plans/layout-redesign/36-worktree-and-android-priority.md)，历史验证见 [归档索引](archive/README.md)。
 
 ## 版本与交付范围
 
 - **当前公开版本：[0.7.3](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.3)**。2026-10-11（北京时间）正式发布并设为最新版本，标签源码为 `da4aea9`；保持原定桌面范围，新增手动文字分栏与点击修复，保留 0.7.2 已发布功能。
-- **本次范围与验证**。主目录检出 `codex/text-column-breaks`，标签源码 `da4aea9`；保留原定 `+++` 手动文字分栏、文字栏切换／外框空隙点击修复及中英文样例。干净源码的类型检查、lint、327 项测试和生产发布构建通过；GitHub 发布流程成功，三份公开附件与统一 LF 换行的本地重建逐字节一致，来源签名全部核对至标签／源码提交及发布工作流。已列 Windows／Obsidian 1.14.4 定向实测范围见 [34](plans/layout-redesign/34-text-column-breaks.md)。
-- **main 与发布附件来自不同源码线**。远端／本地 main 为 `3f31feb`，已合并发布索引 PR #22；本次只同步版本元数据与发布说明，不改 main 实现。main HEAD 不能当作 0.7.3 附件来源，下一次从 main 构建前仍需集成待合并分支以保留全部已发布功能。
+- **0.7.3 发布范围与验证**。发布时主目录检出 `codex/text-column-breaks`，标签源码 `da4aea9`；保留原定 `+++` 手动文字分栏、文字栏切换／外框空隙点击修复及中英文样例。干净源码的类型检查、lint、327 项测试和生产发布构建通过；GitHub 发布流程成功，三份公开附件与统一 LF 换行的本地重建逐字节一致，来源签名全部核对至标签／源码提交及发布工作流。已列 Windows／Obsidian 1.14.4 定向实测范围见 [34](plans/layout-redesign/34-text-column-breaks.md)。
+- **main 已采用 0.8.0 发布候选**。按用户 2026-10-12 的新安排，将 `codex/mobile-release-integration` 的 `740dcd6` 提升为 main，主目录也切到 main；该基线 465 项检查、构建与 [CI](https://github.com/Yi-luo-hua/obsidian-adjustable-media/actions/runs/38156796855) 通过。原 main `3f31feb` 的完整历史保留在本地／远端 `codex/main-before-080`。0.7.3 公开附件仍来自其原标签，不因主线调整而改变。
 - 公开 0.7.3 仍为 `isDesktopOnly: true`；本工作树的未发布 0.8.0 候选为 `false`。旧 V2 笔记不迁移，新的独立 Mermaid 布局显式使用 V3 媒体格式。插件已在 Obsidian 社区目录中。
 
-用户最新确认的交付边界（2026-10-11）：准备统一的 **0.8.0**，把最近已完成修复与 Mermaid 同步到移动端。Android、iPhone、iPad 的既有清单已分别完成，结果仍对应各自原构建。本轮所有集成和发布准备位于 `codex/mobile-release-integration`；暂不合入 `main`、不切换主目录，也不公开发布。三视角同步等未验收增量保留待确认，不能把合流或自动检查记作完整人工验收。
+用户最新确认的交付边界（2026-10-12）：统一的 **0.8.0** 发布候选已成为 main，原 main 转为独立保留分支，主目录随之切换。Android、iPhone、iPad 的既有清单已分别完成，结果仍对应各自原构建。公开发布与版本标签仍待单独授权；三视角同步等未验收增量保留范围记录，不能把主线调整或自动检查记作完整人工验收。
 
-本轮发布准备以 `3353d63` 代码为基线，补齐安装说明的平台声明和中英文入口状态，使用已提交源码的干净 LF 导出构建并生成说明、附件、校验和及来源记录。源码实现不再变化；公开版本、main 和标签均保持原状态。材料位置与验收边界见 [0.8.0 发布准备](releases/0.8.0-readiness.md)。
+本轮发布准备先以 `3353d63` 交互代码为基线，后在 `740dcd6` 采用用户修订的文稿和离线 Mermaid 示例，使用已提交源码的干净 LF 导出构建并生成说明、附件、校验和及来源记录。main 已采用这条代码线；公开版本和版本标签仍保持原状态。材料位置与验收边界见 [0.8.0 发布准备](releases/0.8.0-readiness.md)。
 
 2026-10-12 文稿收尾：采用用户修订的简短更新说明与 Mermaid 示例，同步英文，并将样例链接接入更新弹窗的离线创建按钮。465 项检查与生产构建通过；Windows 专用库中英文创建、重复创建不覆盖、实时预览／阅读视图的三张图表及原有笔记哈希核对通过。新本地包单独保存，移动交互实现及既有验收范围保持原记录。
 
@@ -25,14 +25,14 @@
 
 ## 已有工作与当前边界
 
-Mermaid 独立分支的桌面实现和 343 项原检查结果保留，已合流到本移动候选并增加触摸把手及侧栏仲裁；尚未进入 main 或公开发布。范围与开发格式见 [37](plans/layout-redesign/37-mermaid-layout-items.md)，移动增量见 [移动记录](plans/layout-redesign/mobile-adaptation.md)。下文历史各交付线的 V2／桌面声明继续适用于其原范围。
+Mermaid 独立分支的桌面实现和 343 项原检查结果保留，已随移动候选进入 main，包含触摸把手及侧栏仲裁；尚未公开发布。范围与开发格式见 [37](plans/layout-redesign/37-mermaid-layout-items.md)，移动增量见 [移动记录](plans/layout-redesign/mobile-adaptation.md)。下文历史各交付线的 V2／桌面声明继续适用于其原范围。
 
 | 工作线 | 当前完成情况 | 仍待完成 |
 | --- | --- | --- |
 | 身份、关系、写入与每窗格基础 | P1／P2 基础已随 0.7.0 发布；0.7.1 修复交互缺陷 | 完整 R1／R2 不能由基础发布替代 |
-| 三视图与既有拖动修复 | #17–#20 与 0.7.3 已合流；规范／需求审查、生产构建及本轮 Windows 定向回归通过；原 401 项自动检查范围保留 | 尚未合入 main 或进入正式附件 |
-| 共用渲染稳定性 | 已修复审查发现的替身源码定位和测量副本释放问题；416 项检查、生产构建及 Windows 定向回归通过 | 尚未合入 main；本次不扩大旧 W01 的验收范围 |
-| Android 手机／平板 | 已修复旧 WebView 手动栏点击定位；429 项检查、构建及代码 CI 通过；nova 12／11.5S 本轮已列相关验收通过，保存内容核对及收尾完成 | 保留为后续移动大版本的 Android 阶段结果；iPhone／iPad 本轮已列操作也已分别通过，待代码审查、集成与版本准备后统一交付；不加入 0.7.3，范围见 [移动计划](plans/layout-redesign/mobile-adaptation.md) |
+| 三视图与既有拖动修复 | #17–#20 与 0.7.3 已合流并随统一候选进入 main；规范／需求审查、生产构建及本轮 Windows 定向回归通过；原 401 项自动检查范围保留 | 尚未公开发布，其他未验收范围继续记录 |
+| 共用渲染稳定性 | 已修复审查发现的替身源码定位和测量副本释放问题并进入 main；416 项原检查、生产构建及 Windows 定向回归通过 | 尚未公开发布；本次不扩大旧 W01 的验收范围 |
+| Android 手机／平板 | 已修复旧 WebView 手动栏点击定位；429 项原检查、构建及代码 CI 通过；nova 12／11.5S 本轮已列相关验收通过，代码随统一候选进入 main | 既有 iPhone／iPad 结果与新增 Mermaid 设备结果分别记录，准备 0.8.0 统一交付；公开 0.7.3 保持原范围，见 [移动计划](plans/layout-redesign/mobile-adaptation.md) |
 | 候选测量与完整规划 | W02 的 Windows 既有 V2 原型门槛通过；W03 纯约束基础已开始 | 正式接入、完整求解与 ready 契约、峰值优化；W02／W03 续作尚未提交 |
 | 拖动动画与并列组 | 动画需求已确认；两项组相关 ADR 仍为 proposed | 动画尚未实现；W06／R2 尚未实施，组入口等待 ADR 接受且 P5 验收通过 |
 
@@ -41,7 +41,7 @@ Mermaid 独立分支的桌面实现和 343 项原检查结果保留，已合流�
 ## 已知限制与验收范围
 
 - 阅读视图历史首次／快速虚拟滚动存在有限场景跳动；未证实根治，详见 [设计 4.1](DESIGN.md#41-文字环绕) 与 [历史验证](archive/validation-history.md)。
-- W07 已用当前编辑缓冲的宿主顶层分块处理间距，等待／失败退路和列表内部仍用推断；W07 位于待合流源码，主目录 0.7.3 未包含它。标题、代码、表格、公式及换行仍有原生几何差异，见三视图分支的 DESIGN 4.3 和 [W07 摘要](plans/layout-redesign/archive/branch-validation.md#w07-host-paragraph-boundaries)。
+- W07 已随统一候选进入 main，用当前编辑缓冲的宿主顶层分块处理间距，等待／失败退路和列表内部仍用推断；公开 0.7.3 未包含它。标题、代码、表格、公式及换行仍有原生几何差异，见 DESIGN 4.3 和 [W07 摘要](plans/layout-redesign/archive/branch-validation.md#w07-host-paragraph-boundaries)。
 - PDF 未设置文字字体时可能使用与屏幕不同的字体；纸张与连续画布自然换行／分页不能保证逐像素一致，见 [FAQ](FAQ.md)。
 - 链接建议不支持 `^` 块引用和 `[[##` 全库标题；目标已有别名或尺寸后缀时不补全。
 - 部分快捷键、设置、阅读高度和导出依赖内部接口。最低声明版本为 1.5.0；历史桌面实测为 Obsidian 1.13.7／1.14.4，移动已列场景为 1.12.7，不代表覆盖其他版本、主题与设备。

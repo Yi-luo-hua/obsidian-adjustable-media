@@ -2,7 +2,7 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-实现范围（2026-10-11）：本工作树为 `codex/mobile-release-integration`，准备统一的 0.8.0 候选，已整合三视图／共用渲染、Android／iOS 输入与视频修复、Mermaid 独立布局项及触摸把手；不带入 W02／W03 未完成原型。既有 Android、iPhone、iPad 的已列真机结果分别保留，新 Mermaid 合流结果另记。用户最新要求暂不合入 main，也不切换主目录；三视角同步等未验收更新继续单独确认。公开版本仍为 0.7.3（桌面版，标签源码 `da4aea9`），本候选未公开发布。实际范围与验证见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md)、[36](plans/layout-redesign/36-worktree-and-android-priority.md) 和 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
+实现范围（2026-10-12）：统一的 0.8.0 候选 `740dcd6` 已提升为 `main`，主目录检出该主线；原 main `3f31feb` 完整保留为 `codex/main-before-080`。已整合三视图／共用渲染、Android／iOS 输入与视频修复、Mermaid 独立布局项及触摸把手，不带入 W02／W03 未完成原型。既有 Android、iPhone、iPad 的已列真机结果分别保留，新 Mermaid 合流结果另记；主线调整不扩大三视角或移动验收范围。公开版本仍为 0.7.3（桌面版，标签源码 `da4aea9`），0.8.0 尚未公开发布。实际范围与验证见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md)、[36](plans/layout-redesign/36-worktree-and-android-priority.md) 和 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
 
 ## 1. 存储格式
 
@@ -354,4 +354,4 @@ iPhone 用户确认的操作范围、未复现的新库冷启动结果与未定�
 
 编辑文字时点击另一布局或同一图文块的另一文字栏，先经过原栏的正常写回校验再切换编辑；无法保存的内容保留在原编辑器。点击外框非内容区域、超栏提示或把手旁的空白时保留当前编辑焦点和选区，明确的源码按钮仍可展开源码。验证覆盖 Windows／Obsidian 1.14.4 的原失败场景及其他布局模式，范围见 34。
 
-Android 分支兼容旧 WebView 的点击定位：优先使用 `caretPositionFromPoint`，不可用时读取 `caretRangeFromPoint` 的起点，再沿同一手动栏的源偏移定位。nova 12／WebView 114 的原失败场景中，点击第一栏曾定位到整段末尾 82；修复后第一栏定位 10、第二栏定位 44，分别落在对应的 0–29、33–82 源范围内，进入／退出编辑没有写入原文。此修复尚未进入主目录的独立 0.7.3 源码。
+Android 分支兼容旧 WebView 的点击定位：优先使用 `caretPositionFromPoint`，不可用时读取 `caretRangeFromPoint` 的起点，再沿同一手动栏的源偏移定位。nova 12／WebView 114 的原失败场景中，点击第一栏曾定位到整段末尾 82；修复后第一栏定位 10、第二栏定位 44，分别落在对应的 0–29、33–82 源范围内，进入／退出编辑没有写入原文。此修复已由移动集成带入当前 main，公开 0.7.3 不包含它。

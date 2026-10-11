@@ -1,40 +1,44 @@
 # 工作树分工与 Android 优先交付
 
-更新：2026-10-11。本页维护工作树、分支依赖与交付顺序；版本总状态见 [STATUS](../../STATUS.md)，工作包完成范围见 [09](09-progress-and-next-steps.md)。当前公开版本为 0.7.3；正式发布与发布索引 PR #22 合并已完成，主目录保持该桌面源码线，移动候选继续单独保留。
+更新：2026-10-12。本页维护工作树、分支依赖与交付顺序；版本总状态见 [STATUS](../../STATUS.md)，工作包完成范围见 [09](09-progress-and-next-steps.md)。当前公开版本为 0.7.3；统一 0.8.0 候选已成为 main，主目录也切换到 main，旧 main 的完整历史保留为独立分支。
 
 ## 分支与范围
 
 | 分支 | 本轮内容基线 | 基线与职责 | 下一步 |
 | --- | --- | --- | --- |
-| `codex/text-column-breaks` | `da4aea9`／标签 `0.7.3` | 正式 0.7.2 + 0.7.3 原定桌面功能；主目录 | 327 项检查、发布流程、附件重建一致性及签名核对通过；已正式发布 |
+| `main` | `740dcd6`，后续只同步分支状态文档 | 统一 0.8.0 候选，主目录当前开发与发布准备入口 | 465 项检查、生产构建与基线 CI 通过；尚未公开发布 |
+| `codex/main-before-080` | `3f31feb` | 主线调整前的 main，完整历史独立保留 | 本地／远端均保存；无单独工作树，需要续作时再检出 |
+| `codex/text-column-breaks` | `89b4b66`／标签 `0.7.3` 为 `da4aea9` | 正式 0.7.2 + 0.7.3 原定桌面功能，旧分支保留 | 已正式发布；原主目录两份未提交文档另存 stash 和备份 |
 | `codex/pending-view-parity` | `7963b0f` 文档合流 | 0.7.3 + 远端 main 的 #17–#20；保留已发布独立功能 | 本轮审查和 Windows 定向回归通过，待集成 |
 | `codex/pending-render-stability` | `bf8dcd8` 审查修复 | 接三视图分支；W01、离屏测量、完成通知及播放器保留 | 416 项检查、构建与 Windows 定向回归通过，待集成 |
 | `codex/android-adaptation` | `2321d44` + 本地 iOS 修复／整理 | 四类设备既有验收源 | 已验收改动复制到移动集成候选；源工作树保持原状态 |
-| `codex/mobile-release-integration` | `2321d44` → `3085095`，合流 Mermaid `53c5f3a` 至 `a945853`，追加审查、把手与正文长按／边缘投放修复 | 新专用工作树，统一 0.8.0 代码与发布准备 | 当前 461 项检查／构建通过；11.5S 原失败正文长按拖入和边缘投放自动复测及用户确认通过，四类私有测试包更新；手机／iOS 新手势未复测，暂不合入 main 或发布 |
+| `codex/mobile-release-integration` | `740dcd6` | 已提升为 main 的固定发布候选，原专用工作树保留 | 465 项检查／构建／CI 通过；11.5S 新手势通过，手机／iOS 新手势未复测；后续工作从主目录 main 推进 |
 | `codex/mermaid-layout` | `53c5f3a` | Mermaid 桌面历史和已验收源码 | 已接入移动候选；源分支保持不变 |
 | `codex/release-073-index` | `39889e5` | 只同步 0.7.3 的版本元数据与发布索引，不改 main 实现 | PR #22 已合并到 main（3f31feb），main 检查通过；工作树已归档，可恢复 |
 | `codex/w02-candidate-measurement` | `b3efef7`，未推送 | 候选测量及未提交的 W02／W03 续作 | 保留原工作，不作为 Android 本轮交付依赖 |
 
 
-待合并分支按依赖堆叠：`text-column-breaks → pending-view-parity → pending-render-stability → android-adaptation`。这表示代码依赖，不表示已经合并或发布；评审每一层时以其上一层为比较基线。旧 `codex/android-layout-stability` 留作完整历史来源，不再作为新的混合开发入口。
+此前各独立分支按依赖堆叠：`text-column-breaks → pending-view-parity → pending-render-stability → android-adaptation`，随后与 Mermaid 一起进入统一候选，现已成为 main。原工作树与各自证据保留；这不表示 0.8.0 已公开发布。W02／W03 仍为独立未完成原型。
 
 表中提交固定本轮内容基线，后续文档同步会继续推进各分支 HEAD；实时位置以 `git worktree list` 与对应远端分支为准。
 
-远端 main 与已快进的本地 main 均为 `3f31feb`，正式 0.7.3 标签为 `da4aea9`；移动候选未推入 main。主目录继续检出 `codex/text-column-breaks`，版本标签与公开发布状态见 STATUS。
+主目录检出 main，发布代码基线为 `740dcd6`；原 main `3f31feb` 已完整保留为 `codex/main-before-080`。正式 0.7.3 标签仍为 `da4aea9`，版本标签与公开发布状态见 STATUS。
 
 ## 交付与集成规则
 
 0.7.3 可按自身验收范围交付；三视图、共用渲染和移动适配分别审查与集成，不把后续完整规划器／并列组装进同一个发布增量。Android 优先表示本轮工作优先级，不要求先公开发布三视图或渲染版本才允许做真机回归。
 
-用户最新安排为在 `codex/mobile-release-integration` 统一准备 0.8.0，接入最近修复和 Mermaid；既有各平台结果与新 V3 图表验收分开。随后明确要求暂不合入 main、切换主目录或公开发布，三视角同步等未验收更新先确认。原“先 Mermaid、再移动”的两版安排由本轮统一候选取代。
+用户于 2026-10-12 更新安排：统一的 0.8.0 发布候选成为 main，原 main 转为独立分支，主目录随之切换。既有各平台结果与新 V3 图表验收分开；主线调整不改变未验收范围，也不包含公开发布。原“先 Mermaid、再移动”的两版安排已由统一候选取代。
 
 bug 修复按主要职责归入对应工作线，设备验证范围单独记录；在平板发现的播放器保留属于共用渲染，移动写回焦点属于平台适配。文档、样例和诊断维护随对应功能交付。
 
-下一次从 main 发布前，必须集成已经发布的 W08、更新弹窗与图片适配修复；本次三视图待合并分支已完成源码合流，但尚未合入 main。0.7.3 手动分栏与 W06 多块组区分，独立交付不等待组格式或全设备矩阵。
+当前 main 已保留发布过的 W08、手动分栏、更新弹窗与图片适配修复。0.7.3 手动分栏与 W06 多块组区分；未完成的组格式与完整规划器继续单独推进。
 
 ## 工作目录
 
-- 主目录：`E:/TOOLS/obsidian-adjustable-media`，用于 0.7.3。
+- 主目录：`E:/TOOLS/obsidian-adjustable-media`，检出 main，用于当前 0.8.0 发布准备。
+- 移动候选原工作树：`C:/Users/丁家宝/.codex/worktrees/mobile-release-integration/obsidian-adjustable-media`，保留 `740dcd6` 固定候选。
+- 原主目录文档备份：`dist/main-promotion-20261012/`；stash 的完整 SHA 保存于其中 `primary-documents-stash.txt`，未应用到新 main。
 - 原独立功能工作树：`C:/Users/丁家宝/.codex/worktrees/independent-features/obsidian-adjustable-media`，现用于 W02／W03；目录保留旧名称。
 - 三视图：`C:/Users/丁家宝/.codex/worktrees/pending-view-parity/obsidian-adjustable-media`。
 - 共用渲染：`C:/Users/丁家宝/.codex/worktrees/pending-render-stability/obsidian-adjustable-media`。

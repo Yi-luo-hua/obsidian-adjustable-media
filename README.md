@@ -4,7 +4,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-Unreleased 0.8.0 candidate: recent fixes, Mermaid layout items and mobile support are integrated in `codex/mobile-release-integration`. Android tablet Mermaid regression and the reported hold-to-drag problem have passed automatic and user checks; new gestures have not been retested on phones or iOS. Main and the primary checkout remain unchanged. See [release preparation](docs/releases/0.8.0-readiness.md) and [status](docs/STATUS.md).
+Unreleased 0.8.0 candidate: recent fixes, Mermaid layout items and mobile support now form `main`, checked out in the primary directory. The previous main is preserved as `codex/main-before-080`. Android tablet Mermaid regression and the reported hold-to-drag problem have passed automatic and user checks; new gestures have not been retested on phones or iOS. See [release preparation](docs/releases/0.8.0-readiness.md) and [status](docs/STATUS.md).
 
 [Feature examples](docs/examples/Guide.en.md) · [功能示例](docs/examples/Guide.zh-CN.md). In Obsidian, run **Feature examples** for an offline preview and a button to create a working copy with its media. The guide opens once when first available, including for existing users upgrading to the release that adds it.
 
