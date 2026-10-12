@@ -26,7 +26,7 @@
 | [移动适配记录](plans/layout-redesign/mobile-adaptation.md) | 各平台已测构建、Mermaid 增量和未复测范围 |
 | [手动文字分栏](plans/layout-redesign/34-text-column-breaks.md) | 已发布的 0.7.3 功能语义 |
 | [拖动动画与预览](plans/layout-redesign/35-block-drag-animation-preview.md) | 已确认、尚未实现的 W03／W04／W11 需求 |
-| [Mermaid 独立项](plans/layout-redesign/37-mermaid-layout-items.md) | main 中的单块图表项、格式边界和历史验证，尚未公开发布 |
+| [Mermaid 独立项](plans/layout-redesign/37-mermaid-layout-items.md) | 0.8.0 已发布的单块图表项、格式边界和历史验证 |
 | [ADR](adr) | proposed 决策及其接受条件 |
 
 ## 历史与证据

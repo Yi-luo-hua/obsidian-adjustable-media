@@ -1,6 +1,6 @@
 # 工作树与分支
 
-更新：2026-10-12。公开版本是 0.7.3，main 是未发布的 0.8.0 候选。功能与验收见 [STATUS](STATUS.md)，待办见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-10-12。公开版本是 0.8.0，标签源码 `8c0b26b`，main 保留发布代码及后续文档同步。功能与验收见 [STATUS](STATUS.md)，待办见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 当前 Git 仍登记 **7 棵工作树**：2 棵继续开发，5 棵已提交归档请求、尚未完成。历史审查和嵌套文档两棵已清理；本地分支由 33 个减为 9 个，远端由 29 个减为 7 个。
 
@@ -8,7 +8,7 @@
 
 | 目录 | 分支 | 用途与状态 |
 | --- | --- | --- |
-| `E:/TOOLS/obsidian-adjustable-media` | `main` | 0.8.0 发布准备与后续开发；发布代码基线 `740dcd6`，分支调整提交 `25ed9d5` 的 465 项检查、构建和 CI 通过 |
+| `E:/TOOLS/obsidian-adjustable-media` | `main` | 0.8.0 已发布与后续开发；标签 `8c0b26b`，发布代码基线 `740dcd6`，465 项检查、构建及发布工作流通过 |
 | `C:/Users/丁家宝/.codex/worktrees/independent-features/obsidian-adjustable-media` | `codex/w02-candidate-measurement` | W02／W03 未完成原型；HEAD `b3efef7`，保留 17 个修改文件与 16 个新增文件，尚未推送 |
 
 ## 需要保留的独立分支

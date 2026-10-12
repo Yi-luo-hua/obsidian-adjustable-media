@@ -4,17 +4,17 @@
 
 ## 版本与交付范围
 
-- **公开版本：0.7.3**，桌面版，发布标签源码 `da4aea9`；公开附件和来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.7.3)。
-- **main：未发布的 0.8.0 候选**。已整合手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；候选声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
-- 原 main 完整保留为 `codex/main-before-080`。主目录检出 main，公开发布和版本标签仍待单独授权。材料与步骤见 [发布准备](releases/0.8.0-readiness.md)和[发布流程](RELEASE.md)。
+- **公开版本：0.8.0**，标签源码 `8c0b26b`；三份公开附件及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.8.0)。
+- **main：0.8.0 已发布代码及后续文档同步**。已整合手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
+- 原 main 完整保留为 `codex/main-before-080`。主目录检出 main；2026-10-12 按用户授权完成正式发布。材料与步骤见 [发布核验](releases/0.8.0-readiness.md)和[发布流程](RELEASE.md)。
 
 ## 已有工作与当前边界
 
 | 工作线 | 状态 | 接下来 |
 | --- | --- | --- |
 | 手动文字分栏与边框高亮 | 已随 0.7.3／0.7.2 发布，main 保留 | 按实际变化验证，保持旧笔记原文 |
-| 三视图、段落间距、渲染与播放器 | 本轮修复已进入 main，Windows 定向验证通过 | 随 0.8.0 发布；其他未验收范围继续单独记录 |
-| Mermaid 与移动适配 | 已进入 main，用户修订的中英文说明和离线示例已打包 | 随 0.8.0 统一发布，保留设备与构建边界 |
+| 三视图、段落间距、渲染与播放器 | 本轮修复已随 0.8.0 发布，Windows 定向验证通过 | 其他未验收范围继续单独记录 |
+| Mermaid 与移动适配 | 已随 0.8.0 发布，用户修订的中英文说明和离线示例已打包 | 按实际改动做相关回归，保留设备与构建边界 |
 | W02／W03 候选测量与规划 | 原型在独立工作树，33 个未提交文件保留 | 正式接入、完整约束与 ready 契约、峰值优化 |
 | 拖动动画、并列组与 R1／R2 | 未完成，两项组 ADR 仍为 proposed | 按任务队列与依赖推进，不带入当前发布包 |
 

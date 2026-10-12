@@ -4,11 +4,11 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-Unreleased 0.8.0 candidate: recent fixes, Mermaid layout items and mobile support now form `main`, checked out in the primary directory. The previous main is preserved as `codex/main-before-080`. Android tablet Mermaid regression and the reported hold-to-drag problem have passed automatic and user checks; new gestures have not been retested on phones or iOS. See [release preparation](docs/releases/0.8.0-readiness.md) and [status](docs/STATUS.md).
+0.8.0 adds Mermaid layout items and Android, iPhone and iPad support, alongside recent fixes. Android tablet Mermaid regression and the reported hold-to-drag problem have passed automatic and user checks; new gestures have not been retested on phones or iOS. See [release verification](docs/releases/0.8.0-readiness.md) and [status](docs/STATUS.md).
 
 [Feature examples](docs/examples/Guide.en.md) · [功能示例](docs/examples/Guide.zh-CN.md). In Obsidian, run **Feature examples** for an offline preview and a button to create a working copy with its media. The guide opens once when first available, including for existing users upgrading to the release that adds it.
 
-The latest release is **0.7.3**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
+The latest release is **0.8.0**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
 
 ![Adjustable Media Preview](assets/demo.jpg)
 

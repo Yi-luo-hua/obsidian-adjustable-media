@@ -2,11 +2,11 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-实现范围（2026-10-12）：统一的 0.8.0 候选 `740dcd6` 已提升为 `main`，主目录检出该主线；原 main `3f31feb` 完整保留为 `codex/main-before-080`。已整合三视图／共用渲染、Android／iOS 输入与视频修复、Mermaid 独立布局项及触摸把手，不带入 W02／W03 未完成原型。既有 Android、iPhone、iPad 的已列真机结果分别保留，新 Mermaid 合流结果另记；主线调整不扩大三视角或移动验收范围。公开版本仍为 0.7.3（桌面版，标签源码 `da4aea9`），0.8.0 尚未公开发布。实际范围与验证见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md)、[WORKTREES](WORKTREES.md) 和 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
+实现范围（2026-10-12）：统一的 0.8.0 候选 `740dcd6` 已提升为 `main`，主目录检出该主线；原 main `3f31feb` 完整保留为 `codex/main-before-080`。已整合三视图／共用渲染、Android／iOS 输入与视频修复、Mermaid 独立布局项及触摸把手，不带入 W02／W03 未完成原型。既有 Android、iPhone、iPad 的已列真机结果分别保留，新 Mermaid 合流结果另记；主线调整不扩大三视角或移动验收范围。公开版本已为 0.8.0（标签源码 `8c0b26b`），三份附件及来源签名已核对；公开发布不扩大上述验收范围。实际范围与验证见 [STATUS](STATUS.md)、[09](plans/layout-redesign/09-progress-and-next-steps.md)、[WORKTREES](WORKTREES.md) 和 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
 
 ## 1. 存储格式
 
-本候选已接入 `codex/mermaid-layout` 的 Mermaid 独立布局项。它只对显式新建／接收图表的目标块使用 `v:3, kind:"media"`，不自动迁移旧笔记；单块项数、完整围栏读写和宿主验证见 [37](plans/layout-redesign/37-mermaid-layout-items.md)。触摸通过独立把手搬运整段代码；块外独立图表还支持正文长按 350ms 后拖动，先移动 6px 则取消长按并保留滚动，取消／关闭时释放定时器和预览。投放可落在同一布局组件内行边缘外 40px 的区域，仍校验同笔记、同窗格和可编辑状态。源码变化与过期目标拒绝写入。以下 V2 说明仍适用于公开版本与旧布局。这个单块格式不是 W06 多块组格式。
+0.8.0 已接入 `codex/mermaid-layout` 的 Mermaid 独立布局项。它只对显式新建／接收图表的目标块使用 `v:3, kind:"media"`，不自动迁移旧笔记；单块项数、完整围栏读写和宿主验证见 [37](plans/layout-redesign/37-mermaid-layout-items.md)。触摸通过独立把手搬运整段代码；块外独立图表还支持正文长按 350ms 后拖动，先移动 6px 则取消长按并保留滚动，取消／关闭时释放定时器和预览。投放可落在同一布局组件内行边缘外 40px 的区域，仍校验同笔记、同窗格和可编辑状态。源码变化与过期目标拒绝写入。以下 V2 说明仍适用于旧布局。这个单块格式不是 W06 多块组格式。
 
 ### 1.1 语法
 
@@ -330,7 +330,7 @@ iPhone 用户确认的操作范围、未复现的新库冷启动结果与未定�
 
 阅读视图中，带浮动替身的表格段把横向滚动放在表格自己的内层容器；外层允许浮动延伸，避免原生 `overflow-x: auto` 把整张表格挤到浮动图片下方。最后一个替身移除时还原表格结构和外层样式类。
 
-本次合入检查的范围、结果和未发布状态见 [STATUS.md](STATUS.md)。上面的历史实测不能代替所有 Obsidian 版本或主题的兼容性验证。
+本次合入检查的范围、结果和发布状态见 [STATUS.md](STATUS.md)。上面的历史实测不能代替所有 Obsidian 版本或主题的兼容性验证。
 
 - 标题折叠时，阅读视图规划跳过 `shown === false` 的浮动锚点并清理它的全部替身，也清理隐藏目标段上的替身；展开后重新规划。2026-09-15 在测试库验证：折叠前 5 个替身，折叠后 0 个，展开后恢复 5 个，阅读视图没有编辑手柄。
 - 链接目标后面已有 `|别名` 或 `|尺寸` 时，文字栏不弹出补全列表，避免替换目标时把后缀留在新的闭合括号之外。没有后缀的链接照常补全；相关纯函数回归测试和真实输入测试均已通过。

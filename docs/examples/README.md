@@ -2,7 +2,7 @@
 
 [简体中文](Guide.zh-CN.md) · [English](Guide.en.md)
 
-[Mermaid 中文示例](Mermaid.zh-CN.md)／[English example](Mermaid.en.md)：在 0.8.0 候选更新说明中点击“在库中创建 Mermaid 示例”，即可离线创建并打开对应语言的样例。当前公开 0.7.3 不包含此功能。
+[Mermaid 中文示例](Mermaid.zh-CN.md)／[English example](Mermaid.en.md)：在 0.8.0 更新说明中点击“在库中创建 Mermaid 示例”，即可离线创建并打开对应语言的样例。
 
 [手动文字分栏样例](ManualColumns.zh-CN.md)：在 0.7.3 更新说明中点击“在库中创建手动分栏样例”，即可离线创建并打开样例笔记。
 

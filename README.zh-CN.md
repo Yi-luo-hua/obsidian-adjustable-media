@@ -6,9 +6,9 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-当前最新发布为 **0.7.3**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
+当前最新发布为 **0.8.0**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
 
-未发布的 0.8.0 候选已成为 `main`，主目录同步检出该主线，包含近期修复、Mermaid 和移动支持；原 main 保留为 `codex/main-before-080`。Android 平板图表回归及正文长按拖入修复已通过自动检查与用户确认，新手势未在手机／iOS 复测。详见[发布准备](docs/releases/0.8.0-readiness.md)和[状态](docs/STATUS.md)。
+0.8.0 已发布，包含近期修复、Mermaid 布局项及 Android／iPhone／iPad 支持。Android 平板图表回归及正文长按拖入修复已通过自动检查与用户确认，新手势未在手机／iOS 复测。详见[发布核验](docs/releases/0.8.0-readiness.md)和[状态](docs/STATUS.md)。
 
 ![Adjustable Media 效果预览](assets/demo.jpg)
 
