@@ -1,12 +1,12 @@
 # 项目状态
 
-更新：2026-10-12。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-10-14。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
 
-- **公开版本：0.8.0**，标签源码 `8c0b26b`；三份公开附件及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.8.0)。
-- **main：0.8.0 已发布代码及后续文档同步**。已整合手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
-- 原 main 完整保留为 `codex/main-before-080`。主目录检出 main；2026-10-12 按用户授权完成正式发布。材料与步骤见 [发布核验](releases/0.8.0-readiness.md)和[发布流程](RELEASE.md)。
+- **公开版本：0.8.1**，标签源码 `b3a7216`；三份公开附件及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.8.1)。
+- **main：0.8.1 已发布代码及后续文档同步**。已整合手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
+- 原 main 完整保留为 `codex/main-before-080`。主目录检出 main；2026-10-14 按用户授权发布 0.8.1。材料与步骤见 [补丁核验](releases/0.8.1-readiness.md)、[0.8.0 核验](releases/0.8.0-readiness.md)和[发布流程](RELEASE.md)。
 
 ## 已有工作与当前边界
 
@@ -20,6 +20,8 @@
 
 ## 验证
 
+- 0.8.1：类型检查、lint、467 项测试、生产构建、main／标签 CI 与 Release 工作流通过；三份正式附件来源签名已核对。Windows／Obsidian 1.14.4／默认主题的把手、框外缩放、取消、一步撤销与 1／3／5 行间距通过；未复测移动设备或其他主题。
+
 - 发布代码基线 `740dcd6` 与主线调整 `25ed9d5`：本地／CI 的类型检查、lint、**465 项测试**及生产构建通过；主线调整只改文档，干净源码构建的三份附件与已准备的包逐字节一致。
 - Windows／Obsidian 1.14.4：相关 Mermaid、布局交互与更新弹窗通过；中英文离线示例创建、重复创建不覆盖、实时预览／阅读视图的三张图表通过，原有测试笔记未改动。
 - Android 平板 11.5S：新图表、缩放、滚动、旋转和独立图表正文长按／边缘拖入通过自动复测与用户确认。
@@ -27,7 +29,7 @@
 
 ## 已知限制与验收范围
 
-- 0.8.0 已复现 Windows 实时预览普通布局把手被宿主裁剪、布局上下连续空行被压成一行。修复位于独立分支 `codex/fix-layout-handles-and-spacing`，467 项检查、生产构建与 Windows 相关操作通过，已准备为 0.8.1 候选，待正式发布；详见 [修复记录](archive/2026-10-14-layout-handles-and-spacing.md)。
+- 0.8.0 已复现 Windows 实时预览普通布局把手被宿主裁剪、布局上下连续空行被压成一行。两项修复已合入 main 并随 0.8.1 正式发布，467 项检查、生产构建与 Windows 相关操作通过；详见 [修复记录](archive/2026-10-14-layout-handles-and-spacing.md)。
 
 - 主线调整、文档清理和自动检查不代表所有真机或三视角场景通过；本轮没有全量重跑 PDF 与历史矩阵。
 - 阅读视图首次／快速虚拟滚动仍有有限场景跳动；宿主段落分块在等待／失败时和列表内部仍保留推断退路。
