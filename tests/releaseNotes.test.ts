@@ -5,15 +5,15 @@ import { GUIDE_REVISION, shouldShowGuide } from "../src/guide/state.ts";
 import { mockedModule } from "./support/mockedModule.ts";
 
 test("update notes appear once for their bundled version", () => {
-  assert.equal(shouldShowReleaseNotes("", "0.8.0"), true);
-  assert.equal(shouldShowReleaseNotes("0.7.1", "0.8.0"), true);
-  assert.equal(shouldShowReleaseNotes("0.8.0", "0.8.0"), false);
-  assert.equal(shouldShowReleaseNotes("0.8.0", "0.7.4"), false);
+  assert.equal(shouldShowReleaseNotes("", "0.8.1"), true);
+  assert.equal(shouldShowReleaseNotes("0.7.1", "0.8.1"), true);
+  assert.equal(shouldShowReleaseNotes("0.8.1", "0.8.1"), false);
+  assert.equal(shouldShowReleaseNotes("0.8.1", "0.7.4"), false);
 });
 
 for (const scenario of [
   { name: "existing users see update notes and persist the version", seen: "", guide: GUIDE_REVISION, updates: 1, guides: 0, unload: false },
-  { name: "reloading the same release does not show update notes again", seen: "0.8.0", guide: GUIDE_REVISION, updates: 0, guides: 0, unload: false },
+  { name: "reloading the same release does not show update notes again", seen: "0.8.1", guide: GUIDE_REVISION, updates: 0, guides: 0, unload: false },
   { name: "first-use guide does not stack an update modal", seen: "", guide: 0, updates: 0, guides: 1, unload: false },
   { name: "unloading before layout readiness prevents automatic modals", seen: "", guide: GUIDE_REVISION, updates: 0, guides: 0, unload: true },
 ]) {
@@ -23,7 +23,7 @@ for (const scenario of [
     const settings = { guideRevision: scenario.guide, lastSeenReleaseNotes: scenario.seen };
     class Plugin {
       app = { workspace: { onLayoutReady(callback: () => void) { ready = callback; } } };
-      manifest = { version: "0.8.0" };
+      manifest = { version: "0.8.1" };
       persisted: typeof settings | null = null;
       cleanups: Array<() => void> = [];
       commands: Array<{ id: string; callback: () => void }> = [];
@@ -61,7 +61,7 @@ for (const scenario of [
     await Promise.resolve();
     assert.equal(updates, scenario.updates);
     assert.equal(guides, scenario.guides);
-    if (updates || guides) assert.equal(plugin.persisted?.lastSeenReleaseNotes, "0.8.0");
+    if (updates || guides) assert.equal(plugin.persisted?.lastSeenReleaseNotes, "0.8.1");
     else assert.equal(plugin.persisted, null);
     if (!scenario.unload) {
       plugin.commands.find(command => command.id === "show-release-notes")!.callback();

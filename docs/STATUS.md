@@ -27,7 +27,7 @@
 
 ## 已知限制与验收范围
 
-- 0.8.0 已复现 Windows 实时预览普通布局把手被宿主裁剪、布局上下连续空行被压成一行。修复位于独立分支 `codex/fix-layout-handles-and-spacing`，467 项检查、生产构建与 Windows 相关操作通过，尚未合并／发布；详见 [修复记录](archive/2026-10-14-layout-handles-and-spacing.md)。
+- 0.8.0 已复现 Windows 实时预览普通布局把手被宿主裁剪、布局上下连续空行被压成一行。修复位于独立分支 `codex/fix-layout-handles-and-spacing`，467 项检查、生产构建与 Windows 相关操作通过，已准备为 0.8.1 候选，待正式发布；详见 [修复记录](archive/2026-10-14-layout-handles-and-spacing.md)。
 
 - 主线调整、文档清理和自动检查不代表所有真机或三视角场景通过；本轮没有全量重跑 PDF 与历史矩阵。
 - 阅读视图首次／快速虚拟滚动仍有有限场景跳动；宿主段落分块在等待／失败时和列表内部仍保留推断退路。

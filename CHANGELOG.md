@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.1 - 2026-10-14
+
+- Fix layout handles being clipped or unclickable outside the frame in Windows live preview, including notes without floating layouts.
+- Preserve multiple blank lines immediately above and below layouts in live preview. Consecutive floating layouts retain their existing behavior when separated by a single blank line.
+- Keep layout dimensions, original Markdown and reading view/PDF whitespace behavior unchanged.
+
+Validated in Windows / Obsidian 1.14.4 with real mouse resizing, cancellation and one-step undo. Mobile devices and other themes were not retested for this patch.
+
 ## 0.8.0 - 2026-10-11
 
 - Add Mermaid diagrams as independent layout items, with image/video mixing, column and row resizing, frame scaling, captions, reordering and moves between layouts.
