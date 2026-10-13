@@ -6,6 +6,34 @@ import { hostParagraphBreaks, paragraphBreaks, type BreakBlock, type MarkdownSec
 
 const lines = (breaks: ParagraphBreak[]): string[] => breaks.map((item) => `${item.line}:${item.kind}`);
 
+test("every blank beside a layout keeps its height while interior and unrelated whitespace retain their rules", () => {
+  const text = ["Before", "", "", "", "<!-- vml -->", "Layout text", "", "", "<!-- /vml -->", "", "", "", "After", "", "", "Other"];
+  const blocks = [{ openLine: 4, closeLine: 8, floats: false }];
+  const sections: MarkdownSection[] = [
+    { type: "paragraph", from: 0, to: 0 }, { type: "html", from: 4, to: 4 },
+    { type: "paragraph", from: 5, to: 5 }, { type: "html", from: 8, to: 8 },
+    { type: "paragraph", from: 12, to: 12 }, { type: "paragraph", from: 15, to: 15 },
+  ];
+  const expected = ["1:blank", "2:blank", "3:blank", "9:blank", "10:blank", "11:blank", "13:blank", "14:extra"];
+  assert.deepEqual(lines(paragraphBreaks(text, blocks)), expected);
+  assert.deepEqual(lines(hostParagraphBreaks(text, blocks, sections)), expected);
+});
+
+test("blank runs before, between and after layouts survive at document edges and with floats", () => {
+  const text = ["", "", "<!-- vml -->", "A", "<!-- /vml -->", "", "", "<!-- vml -->", "B", "<!-- /vml -->", "", ""];
+  const sections: MarkdownSection[] = [
+    { type: "html", from: 2, to: 2 }, { type: "paragraph", from: 3, to: 3 },
+    { type: "html", from: 4, to: 4 }, { type: "html", from: 7, to: 7 },
+    { type: "paragraph", from: 8, to: 8 }, { type: "html", from: 9, to: 9 },
+  ];
+  for (const floats of [false, true]) {
+    const blocks = [{ openLine: 2, closeLine: 4, floats }, { openLine: 7, closeLine: 9, floats }];
+    const expected = ["0:blank", "1:blank", "5:blank", "6:blank", "10:blank", "11:blank"];
+    assert.deepEqual(lines(paragraphBreaks(text, blocks)), expected);
+    assert.deepEqual(lines(hostParagraphBreaks(text, blocks, sections)), expected);
+  }
+});
+
 // Captured from Obsidian 1.14.4's worker and verified against its reading renderer (W07 probe).
 const hostCases = JSON.parse(readFileSync(new URL("./fixtures/paragraphSections.json", import.meta.url), "utf8")) as
   Array<{ name: string; lines: string[]; sections: MarkdownSection[]; expected: string[] }>;

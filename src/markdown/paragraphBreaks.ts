@@ -4,7 +4,7 @@ import { scanMarkdownConstructs } from "./lineContext.ts";
  * A line live preview draws with reading view's break between two paragraphs:
  * - `blank`: a blank line, as high as the break instead of a whole line;
  * - `extra`: a blank line after the first of a run, which reading view makes one break with; it takes
- *   no room while the cursor is elsewhere;
+ *   no room while the cursor is elsewhere. Runs directly beside a layout keep every blank instead;
  * - `after`: a line followed right away by another block, which reading view parts from it by the
  *   break and live preview does not; the break goes below it.
  */
@@ -72,7 +72,8 @@ export function hostParagraphBreaks(lines: readonly string[], blocks: readonly B
     const start = line;
     while (line + 1 < lines.length && owner[line + 1] === -1 && !layout[line + 1] && lines[line + 1].trim() === "") line++;
     if (headingAt(line + 1) === 0 && headingAt(start - 1) !== 1) add(start, "blank");
-    for (let extra = start + 1; extra <= line; extra++) add(extra, "extra");
+    const besideLayout = layout[start - 1] === 1 || layout[line + 1] === 1;
+    for (let extra = start + 1; extra <= line; extra++) add(extra, besideLayout ? "blank" : "extra");
   }
   for (let index = 1; index < sections.length; index++) {
     const before = sections[index - 1];
@@ -172,8 +173,9 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     if (headingLevel(lines[end + 1]) === 0 && headingLevel(lines[line - 1]) !== 1) {
       add(line, "blank");
     }
+    const besideLayout = inBlock[line - 1] === 1 || inBlock[end + 1] === 1;
     for (let extra = line + 1; extra <= end; extra += 1) {
-      add(extra, "extra");
+      add(extra, besideLayout ? "blank" : "extra");
     }
     line = end;
   }

@@ -356,7 +356,7 @@
 /*
  * CodeMirror measures a widget by its box and ignores margins, so a layout's spacing is padding of
  * its widget. As a margin it could reach out of a widget whose painting is not contained
- * (see .vml-has-wraps below), and every line after it would be placed too high.
+ * (see the paint-containment override below), and every line after it would be placed too high.
  *
  * In reading view the layout's margin collapses with the paragraph's beside it into one paragraph
  * break. So does the widget's padding here: a paragraph break against text, none on a side where a
@@ -1082,11 +1082,11 @@ body.vml-is-dragging * {
 }
 
 /*
- * Live preview. A wrapped layout's widget is a zero-height anchor the layout floats out of, and so is
- * the widget holding stand-ins for floats whose anchors are not drawn. Obsidian contains the painting
- * of every block widget, which would keep the float inside.
+ * Live preview. Frame handles extend outside every layout widget, including ordinary layouts in
+ * notes without floats. Obsidian's paint containment would clip their visible and clickable area.
+ * Wrapped layouts and their stand-ins also need their floats to extend outside the anchor widget.
  */
-.markdown-source-view.mod-cm6 .cm-content > .vml-live-preview--wrap[contenteditable="false"],
+.markdown-source-view.mod-cm6 .cm-content > .vml-live-preview[contenteditable="false"],
 .markdown-source-view.mod-cm6 .cm-content > .vml-wrap-proxy[contenteditable="false"] {
   contain: none !important;
 }
@@ -1180,14 +1180,7 @@ body.vml-is-dragging * {
   }
 }
 
-/*
- * A layout that does not wrap starts below the floats before it. The clearance stays inside its
- * widget, whose height CodeMirror measures, so the widget's painting cannot be contained either.
- */
-.vml-has-wraps .cm-content > .vml-live-preview:not(.vml-live-preview--wrap)[contenteditable="false"] {
-  contain: none !important;
-}
-
+/* A layout that does not wrap starts below the floats before it; clearance stays inside its widget. */
 .vml-has-wraps .vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout {
   clear: both;
 }

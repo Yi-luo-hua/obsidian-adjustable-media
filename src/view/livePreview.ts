@@ -385,8 +385,8 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     }
   }
 
-  // Blank lines between two floating layouts written one after the other would push the later one a
-  // line down: they take no room while the cursor is elsewhere.
+  // A single separator blank keeps consecutive floats beside one another. Longer runs explicitly
+  // request vertical space and use the same blank-line heights as other layout boundaries.
   const floatGaps = new Set<number>();
   for (let index = 1; index < blocks.length; index += 1) {
     const before = blocks[index - 1];
@@ -394,6 +394,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     if (!before || !after || !isDrawable(before) || !isDrawable(after) || blockWrap(before) === null || blockWrap(after) === null) {
       continue;
     }
+    if (after.openLine - before.closeLine > 2) continue;
     const gap = state.doc.sliceString(state.doc.line(before.closeLine + 1).to, state.doc.line(after.openLine + 1).from);
     if (gap.trim() !== "" || state.selection.ranges.some((range) => touches(range, state.doc.line(before.openLine + 1).from, state.doc.line(after.closeLine + 1).to))) {
       continue;
@@ -405,7 +406,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
   }
 
   // The note's text keeps reading view's paragraph spacing, which is what it lies on there and in the
-  // PDF (paragraphBreaks); a blank line more takes no room while the cursor is elsewhere.
+  // PDF (paragraphBreaks); blank runs beside layouts retain each authored line's height.
   for (const { line, kind } of parsed.breaks) {
     if (floatGaps.has(line) || line >= state.doc.lines) {
       continue;
