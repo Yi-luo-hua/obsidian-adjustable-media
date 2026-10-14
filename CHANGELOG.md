@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fix figure, table and equation reference clicks in live preview being replaced with source before navigation (#23).
+- Find reference targets in the active view, so switching between reading view and live preview cannot jump to a hidden label.
+
 ## 0.8.1 - 2026-10-14
 
 - Fix layout handles being clipped or unclickable outside the frame in Windows live preview, including notes without floating layouts.
