@@ -125,23 +125,35 @@ export function registerCrossrefs(plugin: Plugin): void {
   plugin.registerMarkdownPostProcessor((el, ctx) => numberSection(plugin.app, el, ctx));
 
   // In every window: the main document's listener never hears a click in a pop-out window.
-  onEveryDocument(plugin, (doc) => plugin.registerDomEvent(doc, "click", (event) => {
-    const ref = eventElement(event)?.closest<HTMLElement>(".vml-ref") ?? null;
-    const id = ref?.dataset.vmlRef;
-    if (!ref || !id || ref.hasClass("is-unresolved")) {
-      return;
-    }
-    const view = plugin.app.workspace.getLeavesOfType("markdown")
-      .map((leaf) => leaf.view)
-      .find((candidate): candidate is MarkdownView => candidate instanceof MarkdownView && candidate.containerEl.contains(ref));
-    const target = view ? refIndexOf(view.getViewData()).targets.get(id) : undefined;
-    if (!view || !target) {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    goTo(view, target.id, target.line);
-  }, { capture: true }));
+  onEveryDocument(plugin, (doc) => {
+    plugin.registerDomEvent(doc, "mousedown", (event) => {
+      const ref = eventElement(event)?.closest(".vml-ref");
+      if (event.button !== 0 || !ref || ref.hasClass("is-unresolved")) {
+        return;
+      }
+      // CodeMirror would move the selection into the reference and replace it with source before
+      // mouseup, so there would be no reference left to receive the click (including in callouts).
+      event.preventDefault();
+      event.stopPropagation();
+    }, { capture: true });
+    plugin.registerDomEvent(doc, "click", (event) => {
+      const ref = eventElement(event)?.closest<HTMLElement>(".vml-ref") ?? null;
+      const id = ref?.dataset.vmlRef;
+      if (!ref || !id || ref.hasClass("is-unresolved")) {
+        return;
+      }
+      const view = plugin.app.workspace.getLeavesOfType("markdown")
+        .map((leaf) => leaf.view)
+        .find((candidate): candidate is MarkdownView => candidate instanceof MarkdownView && candidate.containerEl.contains(ref));
+      const target = view ? refIndexOf(view.getViewData()).targets.get(id) : undefined;
+      if (!view || !target) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      goTo(view, target.id, target.line);
+    }, { capture: true });
+  });
 }
 
 /**
@@ -150,13 +162,15 @@ export function registerCrossrefs(plugin: Plugin): void {
  * by its line first.
  */
 function goTo(view: MarkdownView, id: string, line: number): void {
-  const find = (): HTMLElement | null => view.containerEl.querySelector<HTMLElement>(`[data-vml-label="${CSS.escape(id)}"]`);
+  const editor = (view.editor as unknown as { cm?: EditorView }).cm;
+  // The inactive mode can retain its DOM. Its hidden labels cannot be scrolled into view.
+  const root = view.getMode() === "source" ? editor?.dom : view.previewMode.containerEl;
+  const find = (): HTMLElement | null => root?.querySelector<HTMLElement>(`[data-vml-label="${CSS.escape(id)}"]`) ?? null;
   const drawn = find();
   if (drawn) {
     drawn.scrollIntoView({ block: "center" });
     return;
   }
-  const editor = (view.editor as unknown as { cm?: EditorView }).cm;
   if (view.getMode() === "source" && editor) {
     const pos = editor.state.doc.line(Math.min(line + 1, editor.state.doc.lines)).from;
     editor.dispatch({ effects: EditorView.scrollIntoView(pos, { y: "center" }) });
