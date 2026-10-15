@@ -6,9 +6,9 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-当前最新发布为 **0.8.1**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
+当前最新发布为 **0.8.2**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
 
-0.8.1 已发布，修复 Windows 实时预览布局框外把手裁剪、连续空行折叠，详见[补丁核验](docs/releases/0.8.1-readiness.md)。
+0.8.2 已发布，修复实时预览远离布局块的连续空行消失、行号重叠，以及引用点击和跳转问题，详见[补丁核验](docs/releases/0.8.2-readiness.md)。
 
 0.8.0 已发布，包含近期修复、Mermaid 布局项及 Android／iPhone／iPad 支持。Android 平板图表回归及正文长按拖入修复已通过自动检查与用户确认，新手势未在手机／iOS 复测。详见[发布核验](docs/releases/0.8.0-readiness.md)和[状态](docs/STATUS.md)。
 

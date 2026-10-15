@@ -1,6 +1,6 @@
 # 0.8.1 正文连续空行显示修复
 
-日期：2026-10-15。修复基于 `codex/fix-crossref-navigation` 的 `35b2d9e`，现已纳入 0.8.2 发布候选；发布状态与正式附件见 [发布核验](../releases/0.8.2-readiness.md)。
+日期：2026-10-15。修复基于 `codex/fix-crossref-navigation` 的 `35b2d9e`，已随 0.8.2 正式发布；发布状态与正式附件见 [发布核验](../releases/0.8.2-readiness.md)。
 
 ## 原因与改动
 

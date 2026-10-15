@@ -1,12 +1,12 @@
 # 项目状态
 
-更新：2026-10-14。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-10-15。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
 
-- **公开版本：0.8.1**，标签源码 `b3a7216`；三份公开附件及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.8.1)。
-- **main：0.8.1 已发布代码及后续文档同步**。已整合手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
-- 原 main 完整保留为 `codex/main-before-080`。主目录检出 main；2026-10-14 按用户授权发布 0.8.1。材料与步骤见 [补丁核验](releases/0.8.1-readiness.md)、[0.8.0 核验](releases/0.8.0-readiness.md)和[发布流程](RELEASE.md)。
+- **公开版本：0.8.2**，标签源码 `3c8d2aa`；三份公开附件及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.8.2)。
+- **main：0.8.2 已发布代码及后续文档同步**。已整合正文连续空行与引用跳转修复、手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
+- 原 main 完整保留为 `codex/main-before-080`。主目录检出 main；2026-10-15 按用户授权发布 0.8.2。材料与步骤见 [补丁核验](releases/0.8.2-readiness.md)、[0.8.1 核验](releases/0.8.1-readiness.md)和[发布流程](RELEASE.md)。
 
 ## 已有工作与当前边界
 
@@ -20,9 +20,9 @@
 
 ## 验证
 
-- 2026-10-15 正文连续空行修复，纳入 0.8.2 发布候选：移除远离布局的连续空行折叠规则。类型检查、lint、474 项测试与生产构建通过；Windows／Obsidian 1.14.4／默认主题验证远近 1／3／5 个空行、真实回车、移开光标、模式切换、长笔记滚动及相邻浮动间距。测试库原插件、设置、窗格与原笔记已恢复并核对。移动设备、其他主题和 PDF 未复测，详见 [修复记录](archive/2026-10-15-distant-blank-lines.md)和[发布核验](releases/0.8.2-readiness.md)。
+- 2026-10-15 正文连续空行修复，已随 0.8.2 正式发布：移除远离布局的连续空行折叠规则。类型检查、lint、474 项测试与生产构建通过；Windows／Obsidian 1.14.4／默认主题验证远近 1／3／5 个空行、真实回车、移开光标、模式切换、长笔记滚动及相邻浮动间距。测试库原插件、设置、窗格与原笔记已恢复并核对。移动设备、其他主题和 PDF 未复测，详见 [修复记录](archive/2026-10-15-distant-blank-lines.md)和[发布核验](releases/0.8.2-readiness.md)。
 
-- Issue [#23](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/23) 修复已通过 PR #24 合入 main，纳入 0.8.2 发布候选：阻止按下引用时展开源码，目标查找限于当前模式。原修复的类型检查、lint、473 项测试与生产构建通过；Windows／Obsidian 1.14.4／默认主题的真实鼠标验证覆盖实时预览与阅读视图各 6 次跳转（正文图／表／公式、标注框、文字栏），含远处尚未渲染的目标及模式切换，光标和笔记原文不变。移动设备、弹出窗口与其他主题未复测。
+- Issue [#23](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/23) 修复已通过 PR #24 合入 main，已随 0.8.2 正式发布：阻止按下引用时展开源码，目标查找限于当前模式。原修复的类型检查、lint、473 项测试与生产构建通过；Windows／Obsidian 1.14.4／默认主题的真实鼠标验证覆盖实时预览与阅读视图各 6 次跳转（正文图／表／公式、标注框、文字栏），含远处尚未渲染的目标及模式切换，光标和笔记原文不变。移动设备、弹出窗口与其他主题未复测。
 
 - 0.8.1：类型检查、lint、467 项测试、生产构建、main／标签 CI 与 Release 工作流通过；三份正式附件来源签名已核对。Windows／Obsidian 1.14.4／默认主题的把手、框外缩放、取消、一步撤销与 1／3／5 行间距通过；未复测移动设备或其他主题。
 
