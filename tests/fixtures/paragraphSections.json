@@ -498,7 +498,7 @@
     "expected": [
       "1:blank",
       "9:blank",
-      "10:extra"
+      "10:blank"
     ]
   },
   {
@@ -527,7 +527,7 @@
     "expected": [
       "1:blank",
       "9:blank",
-      "10:extra"
+      "10:blank"
     ]
   },
   {

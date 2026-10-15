@@ -377,8 +377,7 @@
 /*
  * In a note with layouts the text keeps reading view's paragraph spacing (paragraphBreaks.ts), so it,
  * and what of it sits beside a float, lies where reading view and the PDF put it. A blank line is as
- * high as the break; a blank line more takes no room while the cursor is elsewhere: reading view
- * makes one break of them all.
+ * high as the break; consecutive blank lines each retain that height regardless of the cursor.
  */
 .markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break {
   line-height: var(--p-spacing, 1rem);
@@ -387,13 +386,6 @@
 /* A line that reading view parts from the next block by a paragraph break, where no blank line does. */
 .markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break-after {
   padding-bottom: var(--p-spacing, 1rem);
-}
-
-.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break--extra {
-  height: 0;
-  overflow: hidden;
-  padding-bottom: 0;
-  padding-top: 0;
 }
 
 .vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout {

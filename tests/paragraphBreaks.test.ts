@@ -6,7 +6,7 @@ import { hostParagraphBreaks, paragraphBreaks, type BreakBlock, type MarkdownSec
 
 const lines = (breaks: ParagraphBreak[]): string[] => breaks.map((item) => `${item.line}:${item.kind}`);
 
-test("every blank beside a layout keeps its height while interior and unrelated whitespace retain their rules", () => {
+test("every blank beside and far from a layout keeps its height while layout contents stay untouched", () => {
   const text = ["Before", "", "", "", "<!-- vml -->", "Layout text", "", "", "<!-- /vml -->", "", "", "", "After", "", "", "Other"];
   const blocks = [{ openLine: 4, closeLine: 8, floats: false }];
   const sections: MarkdownSection[] = [
@@ -14,7 +14,7 @@ test("every blank beside a layout keeps its height while interior and unrelated 
     { type: "paragraph", from: 5, to: 5 }, { type: "html", from: 8, to: 8 },
     { type: "paragraph", from: 12, to: 12 }, { type: "paragraph", from: 15, to: 15 },
   ];
-  const expected = ["1:blank", "2:blank", "3:blank", "9:blank", "10:blank", "11:blank", "13:blank", "14:extra"];
+  const expected = ["1:blank", "2:blank", "3:blank", "9:blank", "10:blank", "11:blank", "13:blank", "14:blank"];
   assert.deepEqual(lines(paragraphBreaks(text, blocks)), expected);
   assert.deepEqual(lines(hostParagraphBreaks(text, blocks, sections)), expected);
 });
@@ -31,6 +31,22 @@ test("blank runs before, between and after layouts survive at document edges and
     const expected = ["0:blank", "1:blank", "5:blank", "6:blank", "10:blank", "11:blank"];
     assert.deepEqual(lines(paragraphBreaks(text, blocks)), expected);
     assert.deepEqual(lines(hostParagraphBreaks(text, blocks, sections)), expected);
+  }
+});
+
+test("one, three and five blank lines remain visible across intervening body paragraphs and document edges", () => {
+  for (const count of [1, 3, 5]) {
+    for (const floats of [false, true]) {
+      const blanks = Array<string>(count).fill("");
+      const text = [...blanks, "Start", ...blanks, "Before layout", "", "<!-- vml -->", "![[a.png]]", "<!-- /vml -->",
+        "", "After layout", ...blanks, "End", ...blanks];
+      const blocks = [{ openLine: text.indexOf("<!-- vml -->"), closeLine: text.indexOf("<!-- /vml -->"), floats }];
+      const sections: MarkdownSection[] = text.flatMap((source, line) => source === "" ? [] :
+        [{ type: source.startsWith("<!--") ? "html" : "paragraph", from: line, to: line }]);
+      const expected = text.flatMap((source, line) => source === "" ? [`${line}:blank`] : []);
+      assert.deepEqual(lines(paragraphBreaks(text, blocks)), expected);
+      assert.deepEqual(lines(hostParagraphBreaks(text, blocks, sections)), expected);
+    }
   }
 });
 
@@ -73,14 +89,14 @@ test("a floating anchor does not add a paragraph break to code, math or a commen
   }
 });
 
-test("blank lines between paragraphs become breaks; more blank lines in a run are extra", () => {
+test("every blank between paragraphs becomes a visible break", () => {
   assert.deepEqual(lines(paragraphBreaks(["One.", "", "Two.", "", "", "", "Three."], [])),
-    ["1:blank", "3:blank", "4:extra", "5:extra"]);
+    ["1:blank", "3:blank", "4:blank", "5:blank"]);
 });
 
 test("a heading keeps the spacing above it, and a first-level one below it too", () => {
   const text = ["Text.", "", "## Heading", "", "", "Text.", "", "# Title", "", "Text.", "", "#Tag is text", "", "   ### Indented"];
-  assert.deepEqual(lines(paragraphBreaks(text, [])), ["3:blank", "4:extra", "10:blank"]);
+  assert.deepEqual(lines(paragraphBreaks(text, [])), ["3:blank", "4:blank", "10:blank"]);
 });
 
 test("a heading followed right away by text gets the break below it", () => {
@@ -187,7 +203,7 @@ test("math or an HTML comment at the margin stays in the list item; a %% comment
   // After a fence in the item: the paragraphs below are the item's text, the blank lines breaks.
   for (const construct of [["$$", "y", "$$"], ["<!--", "c", "-->"]]) {
     assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", ...construct, "    para one", "", "", "    para two"], [])),
-      ["1:blank", "9:blank", "10:extra"], construct[0]);
+      ["1:blank", "9:blank", "10:blank"], construct[0]);
   }
   // Obsidian ends the list at a %% comment: the lines below are code at the margin.
   assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "%%", "c", "%%", "    code one", "", "", "    code two"], [])),

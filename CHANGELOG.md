@@ -1,9 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.8.2 - 2026-10-15
 
-- Fix figure, table and equation reference clicks in live preview being replaced with source before navigation (#23).
-- Find reference targets in the active view, so switching between reading view and live preview cannot jump to a hidden label.
+- Fix consecutive blank lines disappearing and line numbers overlapping away from layouts in live preview.
+- Fix figure, table and equation reference clicks and navigation after switching views (#23).
 
 ## 0.8.1 - 2026-10-14
 
