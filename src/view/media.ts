@@ -1,10 +1,10 @@
-import { TFile, normalizePath, type App } from "obsidian";
+import { Platform, TFile, normalizePath, type App } from "obsidian";
 
 import { isRemoteTarget, type V2Embed } from "../format/v2.ts";
 
 export interface ResolvedMedia {
   url: string;
-  /** The vault file, or null for a remote URL. */
+  /** The vault file, or null for a URL outside the vault. */
   file: TFile | null;
 }
 
@@ -15,7 +15,9 @@ export interface ResolvedMedia {
  */
 export function resolveMedia(app: App, embed: V2Embed, sourcePath: string): ResolvedMedia | null {
   if (isRemoteTarget(embed.target)) {
-    return { url: embed.target, file: null };
+    // Match native embeds: desktop pages load local files through Obsidian's resource
+    // protocol. Keep URL escapes (including encoded Windows separators) intact.
+    return { url: embed.target.replace(/^file:\/\/\//i, Platform.resourcePathPrefix), file: null };
   }
 
   const linked = app.metadataCache.getFirstLinkpathDest(embed.target, sourcePath);

@@ -40,7 +40,7 @@ export interface V2Embed {
   /** Exact source text of the embed. */
   raw: string;
   syntax: EmbedSyntax;
-  /** Path used to find the file: decoded, without subpath, size or title. */
+  /** Vault path (decoded, without subpath) or URL (encoding preserved); no size or title. */
   target: string;
   alt: string;
   kind: MediaKind;
