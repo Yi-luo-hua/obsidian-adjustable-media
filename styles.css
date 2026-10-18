@@ -1,10 +1,11 @@
 .vml-layout {
-  /* The editing frame must not change the columns' available width between modes. */
+  /* Content shares the note's horizontal edges in every view; the editing outline takes no width. */
   border: 1.5px solid transparent;
+  border-inline-width: 0;
   border-radius: 12px;
   box-sizing: border-box;
   margin: 0.75em 0;
-  padding: 2px 10px;
+  padding: 2px 0;
 }
 
 .vml-layout--sized {
@@ -394,33 +395,30 @@
 
 /* In live preview a glowing frame shows where a layout begins and ends; its edges resize it. */
 .vml-live-preview .vml-layout {
-  border: 1.5px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
-  border-radius: 12px;
+  outline: 1.5px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
   box-shadow:
     0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.1),
     0 0 14px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
-  box-sizing: border-box;
-  padding: 2px 10px;
   position: relative;
-  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+  transition: outline-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
 }
 
 .vml-live-preview .vml-layout:hover,
 .vml-live-preview .vml-layout--resizing {
-  border-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.9);
+  outline-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.9);
   box-shadow:
     0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.14),
     0 0 18px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.4);
 }
 
 .vml-live-preview .vml-layout--readonly {
-  border: 1.5px dashed var(--background-modifier-border);
+  outline: 1.5px dashed var(--background-modifier-border);
   box-shadow: none;
 }
 
 .vml-live-preview .vml-layout.vml-layout--drop-target {
   background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.06);
-  border-color: var(--interactive-accent);
+  outline-color: var(--interactive-accent);
   box-shadow:
     0 0 0 4px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.25),
     0 0 24px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.55);
@@ -1519,14 +1517,14 @@ body.vml-is-dragging * {
   margin-top: 24px;
 }
 
-/* Preserve the transparent frame's geometry and hover handles when normal highlighting is off. */
+/* Hiding the editing outline keeps layout geometry and hover handles unchanged. */
 .vml-cursor-highlights .vml-live-preview:not(.vml-cursor-in-block) .vml-layout:not(:hover):not(.vml-layout--drop-target) {
-  border-color: transparent;
+  outline-color: transparent;
   box-shadow: none;
 }
 
 .vml-cursor-highlights .vml-cursor-in-block .vml-layout {
-  border-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
+  outline-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
   box-shadow:
     0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.1),
     0 0 14px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
