@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "promo-studio",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d E:\\TOOLS\\adjustable-media-promo && npx remotion studio src/index.ts --port 3123 --no-open"],
+      "port": 3123
+    }
+  ]
+}
