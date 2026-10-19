@@ -139,6 +139,11 @@ export function registerReadingView(plugin: Plugin): void {
 
   const wake = (reader: Reader): void => {
     if (!alive(reader)) { stop(reader); return; }
+    if (isCanvasPreview(reader.view)) {
+      const text = reader.view.getViewData();
+      // Canvas can reuse every remaining section, so no postprocessor may announce its new text.
+      if (text !== reader.parsed.snapshot.text) { desire(reader, text); return; }
+    }
     const win = reader.view.containerEl.win;
     win.clearTimeout(reader.timer); reader.timer = 0;
     if (!reader.projection.observeHost(reader.view.getViewData())) {
@@ -176,7 +181,11 @@ export function registerReadingView(plugin: Plugin): void {
       for (const section of reader.sections.keys()) if (section.contains(media)) { refreshReadingMedia(section, media); break; }
       confirm(reader);
     }, () => confirm(reader));
-    const scroll = (): void => { if (!alive(reader)) stop(reader); else confirm(reader); };
+    const scroll = (): void => {
+      if (!alive(reader)) stop(reader);
+      else if (isCanvasPreview(reader.view)) wake(reader);
+      else confirm(reader);
+    };
     const mutation = new (view.containerEl.win as Window & typeof window).MutationObserver(scroll);
     mutation.observe(view.previewMode.containerEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style"] });
     view.previewMode.containerEl.addEventListener("scroll", scroll, true);
