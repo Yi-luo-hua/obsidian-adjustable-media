@@ -4,6 +4,7 @@ import type { V2Block } from "../format/v2.ts";
 
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
+  resizeCalloutImage: { zh: "拖动调整图片大小", en: "Drag to resize the image" },
   insertColumnBreak: { zh: "插入分栏标记", en: "Insert column break" },
   manualColumnsDesc: { zh: "栏数由正文中的 +++ 分栏标记决定；移除标记后恢复自动分栏。", en: "The +++ markers set the column count. Remove them to restore automatic columns." },
   columnBreakUnavailable: { zh: "请在文字布局块的正文位置插入分栏标记，最多四栏。", en: "Insert a column break in a text layout's body, up to four columns." },

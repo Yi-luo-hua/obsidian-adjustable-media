@@ -45,6 +45,7 @@ for (const scenario of [
       "./src/view/imageMenu.ts": { registerImageMenu: () => {} },
       "./src/view/layoutTouch.ts": { registerLayoutTouch: () => {} },
       "./src/view/cornerInput.ts": { registerCornerInputGuard: () => {} },
+      "./src/view/calloutImages.ts": { calloutImageExtension: () => [], registerCalloutImages: () => {} },
       "./src/view/livePreview.ts": { livePreviewExtension: () => [], refreshLayoutHighlights: () => {} },
       "./src/view/plainDrag.ts": { plainMediaDrag: () => [] },
       "./src/view/readingView.ts": { registerReadingView: () => {} },
