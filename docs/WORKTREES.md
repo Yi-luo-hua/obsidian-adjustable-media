@@ -1,5 +1,7 @@
 # 工作树与分支
 
+2026-10-19 补充：主目录当前检出 `codex/fix-themed-layout-handles`（基于 main），修复 Blue Topaz 的部件滚动裁剪，尚未合入 main 或发布，验证见 [STATUS](STATUS.md)。先前的 Callout 单图缩放提交 `88208a7` 保留在 `codex/callout-image-resize`，本分支不包含它。
+
 更新：2026-10-14。公开版本是 0.8.1，标签源码 `b3a7216`，main 保留发布代码及后续文档同步。功能与验收见 [STATUS](STATUS.md)，待办见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 当前 Git 仍登记 **8 棵工作树**：2 棵继续使用，5 棵已提交归档请求、尚未完成，另有 1 棵补丁树已合入 main 并发布，暂保留。历史审查和嵌套文档两棵已清理；本地分支由 33 个减为 9 个，远端由 29 个减为 7 个。

@@ -1,12 +1,12 @@
 # 项目状态
 
-更新：2026-10-18。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-10-19。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
 
 - **公开版本：0.8.2**，标签源码 `3c8d2aa`；三份公开附件及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.8.2)。
 - **main：0.8.2 已发布代码及后续修复（尚未发布）**。已整合正文连续空行与引用跳转修复、手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
-- 原 main 完整保留为 `codex/main-before-080`。主目录检出 main；2026-10-15 按用户授权发布 0.8.2。材料与步骤见 [补丁核验](releases/0.8.2-readiness.md)、[0.8.1 核验](releases/0.8.1-readiness.md)和[发布流程](RELEASE.md)。
+- 原 main 完整保留为 `codex/main-before-080`。主目录当前检出 `codex/fix-themed-layout-handles`，修复主题引起的把手裁剪；Callout 单图缩放仍保留在 `codex/callout-image-resize`。这两项本地工作尚未合入 main 或发布。2026-10-15 按用户授权发布 0.8.2。材料与步骤见 [补丁核验](releases/0.8.2-readiness.md)、[0.8.1 核验](releases/0.8.1-readiness.md)和[发布流程](RELEASE.md)。
 
 ## 已有工作与当前边界
 
@@ -19,6 +19,8 @@
 | 拖动动画、并列组与 R1／R2 | 未完成，两项组 ADR 仍为 proposed | 按任务队列与依赖推进，不带入当前发布包 |
 
 ## 验证
+
+- 2026-10-19 Blue Topaz 把手裁剪修复（分支 `codex/fix-themed-layout-handles`，未合入 main、未发布）：STUDY 只读检查确认主题给所有非编辑块部件设置 `overflow: auto`，此前的 `contain: none` 无法解除这层裁剪。插件仅给直属 CodeMirror 正文的布局部件／浮动替身设置 `overflow: visible`，保留替身的条件 `clip-path`。Windows／Obsidian 1.14.4 测试库加载该主题 CSS，使用报告中的 PNG＋Mermaid 布局副本，在原版 0.8.2 与主线样式上复现顶部把手上半部及右侧框外命中失败，修复后均可命中。真实鼠标验证顶部拖动取消零写入、框外缩放预览零写入、松手只改设置及一步撤销；默认主题原版样式的布局宽高前后完全一致。类型检查、lint、477 项测试通过；测试库原有 98 篇笔记及 STUDY 源笔记哈希不变，测试插件、设置与窗格恢复，临时笔记和图片移入回收站。另筛查官方目录 901 个主题的主 CSS 与本机四份主题，选取全部候选及一组常用主题共 57 份快照，隔离渲染浅深色、普通／浮动／未裁切替身共 342 个组合：未发现 Blue Topaz 之外新增的同类裁剪故障，Cardinal／Sandstorm／Subtlegold 的绘制裁剪已被现有规则覆盖。此筛查不代表全部主题完整安装验收；可选设置、自定义片段、所有窗格边界、移动设备和 PDF 未复测。
 
 - 2026-10-18 布局与正文左右对齐修复（[PR #30](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/30) 已合入 main，未发布）：共用布局去掉横向留白，实时预览改用不占宽度的轮廓线。类型检查、lint、477 项测试与生产构建通过；在 Windows／Obsidian 1.14.4／默认主题、0.8.2 脚本配合修复样式下，9 种布局的阅读／实时预览内容宽度与块高度差均为 0，满宽布局左右缩进由约 11px 变为 0；430px 窗格复测文字、分栏、媒体和图文栏。真实鼠标验证框外缩放、取消零写入、一步撤销，以及高亮开关的尺寸稳定性。测试库临时笔记原文恢复并核对哈希后移入回收站，原样式恢复。原生导出的 5 页 Letter PDF 已逐页渲染检查，满宽文字块与前后相同正文的左右坐标差均为 0pt，3 张图片、分栏与左右浮动正常，没有编辑轮廓；导出设置哈希和测试笔记原文均不变。移动真机和其他主题未复测。
 

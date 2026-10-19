@@ -1074,11 +1074,13 @@ body.vml-is-dragging * {
 /*
  * Live preview. Frame handles extend outside every layout widget, including ordinary layouts in
  * notes without floats. Obsidian's paint containment would clip their visible and clickable area.
+ * Themes can also make all non-editable widgets scroll containers, clipping the same handles.
  * Wrapped layouts and their stand-ins also need their floats to extend outside the anchor widget.
  */
 .markdown-source-view.mod-cm6 .cm-content > .vml-live-preview[contenteditable="false"],
 .markdown-source-view.mod-cm6 .cm-content > .vml-wrap-proxy[contenteditable="false"] {
   contain: none !important;
+  overflow: visible;
 }
 
 /* The editor's lines are positioned, so they would paint and take clicks above a plain float. */
