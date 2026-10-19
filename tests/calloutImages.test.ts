@@ -37,6 +37,14 @@ test("nested Callouts, repeated images and inline images retain their source ord
     '> > <!-- vml {"v":2,"scope":"callout-image","rows":[{"width":0.5}]} -->\n> > ![[pic.png]]\n> > <!-- /vml -->') });
 });
 
+test("outer and nested title images retain DOM order without becoming editable", () => {
+  const text = '> [!note] ![title](pic.png)\n> ![[pic.png]]\n> > [!tip] ![[pic.png]]\n> > ![[pic.png]]';
+  const [source] = calloutImages(text.split("\n"));
+  assert.deepEqual(source.images.map(image => [image.line, image.editable]), [[0, false], [1, true], [2, false], [3, true]]);
+  assert.equal(planCalloutImageWidth(source, source.images[0], 0.5), null);
+  assert.equal(planCalloutImageWidth(source, source.images[2], 0.5), null);
+});
+
 test("code, math, comments and frontmatter examples cannot become resizable images", () => {
   const text = '---\nexample: |\n  > [!note]\n  > ![[frontmatter.png]]\n---\n\n```md\n> [!note]\n> ![[code.png]]\n```\n\n> [!note]\n> ```md\n> ![[fence.png]]\n> ```\n> $$\n> ![[math.png]]\n> $$\n> %%\n> ![[comment.png]]\n> %%\n> <!--\n> ![[html.png]]\n> -->\n> `![[inline.png]]`\n> ![[real.png]]';
   assert.deepEqual(calloutImages(text.split("\n")).flatMap(source => source.images.map(image => image.embed.target)), ['real.png']);

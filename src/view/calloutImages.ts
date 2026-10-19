@@ -18,7 +18,7 @@ function roots(el: HTMLElement): HTMLElement[] {
 
 /** The whole native widget maps to its first source line, so bind all images together in DOM order. */
 function bindImages(app: App, root: HTMLElement, source: CalloutImages, path: string): Binding[] {
-  const images = Array.from(root.querySelectorAll<HTMLImageElement>(".callout-content img"))
+  const images = Array.from(root.querySelectorAll<HTMLImageElement>(".callout-title img, .callout-content img"))
     .filter(img => !img.closest(".markdown-embed, .vml-layout"));
   if (images.length !== source.images.length || images.some((img, index) =>
     resolveMedia(app, source.images[index].embed, path)?.url !== img.getAttribute("src"))) return [];
@@ -183,10 +183,18 @@ export function applyCalloutImageWidths(app: App, el: HTMLElement, path: string,
 
 /** Saved widths also apply to native Reading View Callouts. No controls or writes here. */
 export function registerCalloutImages(plugin: Plugin): void {
+  // Parsing only depends on exact text. Retain one buffer across section callbacks, not a note history.
+  let parsedText: string | null = null;
+  let parsedSources: CalloutImages[] = [];
   plugin.registerMarkdownPostProcessor((el, ctx) => {
+    if (!roots(el).length) return;
     const info = ctx.getSectionInfo(el);
     if (!info || !info.text.includes("<!-- vml")) return;
-    const sources = calloutImages(info.text.split("\n")).filter(source => source.from >= info.lineStart && source.from <= info.lineEnd);
+    if (info.text !== parsedText) {
+      parsedSources = calloutImages(info.text.split("\n"));
+      parsedText = info.text;
+    }
+    const sources = parsedSources.filter(source => source.from >= info.lineStart && source.from <= info.lineEnd);
     if (!sources.length) return;
     const child = new MarkdownRenderChild(el);
     ctx.addChild(child);
