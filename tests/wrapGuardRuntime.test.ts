@@ -14,7 +14,7 @@ test("a ready stand-in finishes an anchor's pending Markdown measurement after i
   const module = await mockedModule<{ wrapGuard(source: unknown): unknown[] }>(new URL("../src/view/wrapGuard.ts", import.meta.url), {
     obsidian: { editorInfoField: info }, "@codemirror/state": stateApi,
     "@codemirror/view": { ...viewApi, ViewPlugin: { define: (create: unknown) => create } },
-    "../layout/model.ts": model, "../layout/wrapGaps.ts": gaps, "../layout/convergenceBudget.ts": budget, "./layoutView.ts": { layoutIsRendered: () => ready },
+    "../layout/model.ts": model, "../layout/wrapGaps.ts": gaps, "../layout/convergenceBudget.ts": budget, "../layout/documentSnapshot.ts": { snapshotForState: () => null }, "./layoutView.ts": { layoutIsRendered: () => ready },
   }, { queueMicrotask });
   const doc = '<!-- vml {"v":2,"type":"text","wrap":"right"} -->\nText\n<!-- /vml -->\nBody';
   const block = findV2Blocks(doc.split("\n"))[0];
@@ -62,7 +62,7 @@ test("an unseen float waits for rendered nonzero geometry and releases its read-
     obsidian: { editorInfoField: info }, "@codemirror/state": stateApi,
     "@codemirror/view": { ...viewApi, ViewPlugin: { define: (create: unknown) => create } },
     "../layout/model.ts": model, "../layout/wrapGaps.ts": gaps, "../layout/convergenceBudget.ts": budget,
-    "./layoutView.ts": { layoutIsRendered: () => ready },
+    "../layout/documentSnapshot.ts": { snapshotForState: () => null }, "./layoutView.ts": { layoutIsRendered: () => ready },
   }, { queueMicrotask, getComputedStyle: () => style });
   const doc = '<!-- vml {"v":2,"type":"text","wrap":"right"} -->\nText\n<!-- /vml -->\nBody';
   const block = findV2Blocks(doc.split("\n"))[0], from = doc.indexOf("Body");

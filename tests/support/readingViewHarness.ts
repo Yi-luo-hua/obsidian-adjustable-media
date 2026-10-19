@@ -88,6 +88,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     registerEvent() {}, register(callback: () => void) { cleanups.push(callback); } };
   const modules: Record<string, unknown> = {
     obsidian: { MarkdownView: ViewStub, MarkdownRenderChild: RenderChild, TFile: FileStub },
+    "./canvas.ts": { canvasPreviewHosts: () => [], isCanvasPreview: () => false },
     "../format/v2.ts": format,
     "../layout/documentSnapshot.ts": snapshots,
     "../layout/drawn.ts": drawn,

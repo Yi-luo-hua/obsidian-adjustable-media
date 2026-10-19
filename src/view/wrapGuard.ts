@@ -3,6 +3,7 @@ import { StateEffect, StateField, type ChangeDesc, type EditorState, type Extens
 import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockInfo, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 
 import type { V2Block } from "../format/v2.ts";
+import { snapshotForState } from "../layout/documentSnapshot.ts";
 import { ConvergenceBudget } from "../layout/convergenceBudget.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { carryFloat, liveProxy, mapFloat, mapPlaced, planGaps, planProxy, stackProxies, standInAnchorTop, viewportRun, type FlowBox, type FloatSize, type Gap, type LiveProxyPlan, type PlacedFloat } from "../layout/wrapGaps.ts";
@@ -360,7 +361,7 @@ class WrapGuard {
       && (!this.sizes.has(anchor.key) || this.pendingMedia.has(anchor.key)) && !drawnApart(this.view, anchor));
     const keys = new Set(anchors.map(anchor => anchor.key));
     for (const [key, item] of this.detached) if (!keys.has(key)) { this.source.releaseStandIn(item.el); item.el.remove(); this.detached.delete(key); }
-    const sourcePath = this.view.state.field(editorInfoField, false)?.file?.path ?? "";
+    const sourcePath = snapshotForState(this.view.state)?.origin.path ?? this.view.state.field(editorInfoField, false)?.file?.path ?? "";
     for (const anchor of anchors) if (!this.detached.has(anchor.key)) {
       const el = this.view.scrollDOM.createDiv({ cls: "cm-content vml-live-preview vml-wrap-measure", attr: { "aria-hidden": "true" } });
       this.detached.set(anchor.key, { anchor, el, signature: "" });
@@ -590,7 +591,7 @@ class WrapGuard {
       return [];
     }
 
-    const sourcePath = view.state.field(editorInfoField, false)?.file?.path ?? "";
+    const sourcePath = snapshotForState(view.state)?.origin.path ?? view.state.field(editorInfoField, false)?.file?.path ?? "";
     const planned: Array<{ anchor: WrapAnchor; side: FloatSize["side"]; plan: LiveProxyPlan }> = [];
     // Floats drawn apart above the first drawn line come before the stand-ins: none starts above them.
     let floor = 0;

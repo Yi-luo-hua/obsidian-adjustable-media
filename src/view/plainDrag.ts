@@ -7,6 +7,7 @@ import { insertItem } from "../layout/model.ts";
 import { takePlainEmbed, takePlainMermaid, type TakenEmbed } from "../layout/plainEmbed.ts";
 import { createDragGhost, type DragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, clearDropIndicators, commitEdits, findDrop, showDropIndicator, swallowNextClick, type DropState } from "./interactions.ts";
+import { fileOfEditor } from "./obsidianInternals.ts";
 import { t } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
 import { eventElement } from "./windows.ts";
@@ -58,7 +59,8 @@ export function plainMediaDrag(app: App): Extension {
       }
       const hold = diagram !== null && event.pointerType === "touch" && !target?.closest(".vml-plain-media__grip");
       if (hold && target?.closest("button, a, input, textarea")) return;
-      const sourcePath = view.state.field(editorInfoField, false)?.file?.path;
+      const info = view.state.field(editorInfoField, false);
+      const sourcePath = (info?.file ?? fileOfEditor(app, info?.editor))?.path;
       const taken = sourcePath ? take(view, media) : null;
       if (sourcePath && taken) {
         // A native text selection could reveal the fence and remove the diagram during the drag.

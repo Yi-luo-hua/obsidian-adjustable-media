@@ -1,4 +1,5 @@
 import type { Plugin } from "obsidian";
+import { ViewPlugin } from "@codemirror/view";
 
 /**
  * Runs `watch` once for the main window's document and once for each pop-out window's: those open
@@ -14,6 +15,14 @@ export function onEveryDocument(plugin: Plugin, watch: (doc: Document) => void):
     }
   };
   add(document);
+  // Canvas text editors live in iframes; their events never reach the containing window.
+  plugin.registerEditorExtension(ViewPlugin.define(view => {
+    const mounted = (): void => add(view.dom.doc);
+    mounted();
+    // Canvas can adopt the editor DOM into its iframe after constructing the CM view.
+    const stop = view.dom.onNodeInserted(mounted);
+    return { update: mounted, destroy: stop };
+  }));
   plugin.registerEvent(plugin.app.workspace.on("window-open", (win) => add(win.doc)));
   plugin.app.workspace.onLayoutReady(() => {
     plugin.app.workspace.iterateAllLeaves((leaf) => add(leaf.view.containerEl.doc));

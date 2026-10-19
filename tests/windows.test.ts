@@ -9,7 +9,8 @@ interface WindowsModule {
 
 class ElementStub {}
 const main = { name: "main" };
-const load = (): Promise<WindowsModule> => mockedModule<WindowsModule>(new URL("../src/view/windows.ts", import.meta.url), {},
+let editorOpened: (view: { dom: { doc: object; onNodeInserted(callback: () => void): () => void } }) => object;
+const load = (): Promise<WindowsModule> => mockedModule<WindowsModule>(new URL("../src/view/windows.ts", import.meta.url), { "@codemirror/view": { ViewPlugin: { define(callback: typeof editorOpened) { editorOpened = callback; return {}; } } } },
   { document: main, Element: ElementStub });
 
 test("listeners go on the main window and on every pop-out window once", async () => {
@@ -19,7 +20,7 @@ test("listeners go on the main window and on every pop-out window once", async (
   let opened: ((win: { doc: object }) => void) | null = null;
   let ready: (() => void) | null = null;
   const plugin = {
-    registerEvent() {},
+    registerEvent() {}, registerEditorExtension() {},
     app: { workspace: {
       on(name: string, callback: (win: { doc: object }) => void) { assert.equal(name, "window-open"); opened = callback; return {}; },
       onLayoutReady(callback: () => void) { ready = callback; },
@@ -37,6 +38,14 @@ test("listeners go on the main window and on every pop-out window once", async (
   opened!({ doc: later });
   opened!({ doc: popout });
   assert.deepEqual(watched, [main, popout, later]);
+  const iframe = { name: "canvas iframe" };
+  let mounted = (): void => {};
+  const dom = { doc: main, onNodeInserted(callback: () => void) { mounted = callback; return () => {}; } };
+  editorOpened({ dom });
+  dom.doc = iframe;
+  mounted();
+  mounted();
+  assert.deepEqual(watched, [main, popout, later, iframe]);
 });
 
 test("an event's element is found in any window, by Obsidian's cross-window check", async () => {
