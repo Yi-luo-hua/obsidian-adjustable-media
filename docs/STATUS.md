@@ -1,12 +1,12 @@
 # 项目状态
 
-更新：2026-10-18。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-10-19。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
 
 - **公开版本：0.8.2**，标签源码 `3c8d2aa`；三份公开附件及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.8.2)。
 - **main：0.8.2 已发布代码及后续修复（尚未发布）**。已整合正文连续空行与引用跳转修复、手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
-- 原 main 完整保留为 `codex/main-before-080`。主目录检出 main；2026-10-15 按用户授权发布 0.8.2。材料与步骤见 [补丁核验](releases/0.8.2-readiness.md)、[0.8.1 核验](releases/0.8.1-readiness.md)和[发布流程](RELEASE.md)。
+- 原 main 完整保留为 `codex/main-before-080`。主目录当前检出 issue #26 的本地开发分支 `codex/callout-image-resize`；2026-10-15 按用户授权发布 0.8.2。材料与步骤见 [补丁核验](releases/0.8.2-readiness.md)、[0.8.1 核验](releases/0.8.1-readiness.md)和[发布流程](RELEASE.md)。
 
 ## 已有工作与当前边界
 
@@ -19,6 +19,10 @@
 | 拖动动画、并列组与 R1／R2 | 未完成，两项组 ADR 仍为 proposed | 按任务队列与依赖推进，不带入当前发布包 |
 
 ## 验证
+
+- 2026-10-19 PR #31 私密审查修复：标题图片与正文图片按同一顺序配对，标题保持不可编辑；阅读后处理跳过普通段落，同一文本的 Callout 段落共用一次解析。类型检查、lint、488 项测试及生产构建通过。Windows／Obsidian 1.14.4／默认主题已先复现旧版标题图片导致正文无手柄和保存宽度失效，再验证外层／嵌套标题、重复图片、实时预览手柄与阅读视图 50%／40% 保存宽度；真实鼠标缩放只改目标宽度，一步撤销恢复原文。新增用例验证 100 个普通段落零全文读取／解析、相同文本复用与变更失效。测试库原插件及设置文件哈希一致、窗格布局已恢复；临时笔记核对原文后移入回收站，42 篇原有笔记哈希一致，另一项并行测试的 `Handle-theme-20261019.md` 被移走，未回退。本轮未复测 PDF、移动设备和其他主题。
+
+- Issue [#26](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/26) Callout 内单图缩放（2026-10-19，本地分支 `codex/callout-image-resize`，待审查、未合入 main、未发布）：独立图片行在实时预览中提供右下角缩放手柄，宽度保存在带引用前缀的 `scope:"callout-image"` 注释中，嵌入文本原样保留。类型检查、lint、485 项测试与生产构建通过。Windows／Obsidian 1.14.4／默认主题验证 Markdown 与 wiki 图片、重复图片、嵌套 Callout、拖动预览零写入、已有设置只改开始注释、无移动点击、Esc 取消与尾随点击、源码并发变化拒绝写入及一步撤销。阅读视图应用保存宽度且无手柄；原生 Letter PDF 的单独 Callout（1 页）及与文字布局混排（2 页）已逐页渲染检查，图片完整、嵌套宽度生效、无编辑控件。测试库 42 篇原有笔记哈希不变，原插件文件／设置与窗格布局已恢复，临时测试笔记恢复原文核对哈希后移入回收站。行内图片、多图同行、既有外层布局里的图片不接入此手柄；移动设备、弹出窗口与其他主题未复测。
 
 - 2026-10-18 布局与正文左右对齐修复（[PR #30](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/30) 已合入 main，未发布）：共用布局去掉横向留白，实时预览改用不占宽度的轮廓线。类型检查、lint、477 项测试与生产构建通过；在 Windows／Obsidian 1.14.4／默认主题、0.8.2 脚本配合修复样式下，9 种布局的阅读／实时预览内容宽度与块高度差均为 0，满宽布局左右缩进由约 11px 变为 0；430px 窗格复测文字、分栏、媒体和图文栏。真实鼠标验证框外缩放、取消零写入、一步撤销，以及高亮开关的尺寸稳定性。测试库临时笔记原文恢复并核对哈希后移入回收站，原样式恢复。原生导出的 5 页 Letter PDF 已逐页渲染检查，满宽文字块与前后相同正文的左右坐标差均为 0pt，3 张图片、分栏与左右浮动正常，没有编辑轮廓；导出设置哈希和测试笔记原文均不变。移动真机和其他主题未复测。
 

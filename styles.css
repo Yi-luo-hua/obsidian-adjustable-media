@@ -1552,3 +1552,44 @@ body.vml-is-dragging * {
   letter-spacing: var(--vml-measure-spacing);
   direction: var(--vml-measure-direction);
 }
+/* Native Callout images keep their embeds; only the settings comment stores the width. */
+.vml-callout-image {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+}
+.vml-callout-image--sized {
+  width: var(--vml-callout-width) !important;
+}
+.vml-callout-image--sized > img {
+  width: 100% !important;
+  max-width: 100%;
+  height: auto !important;
+}
+.vml-callout-image__resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  min-width: 0;
+  padding: 0;
+  border: 2px solid var(--interactive-accent);
+  border-top: 0;
+  border-left: 0;
+  border-radius: 0;
+  background: var(--background-primary);
+  box-shadow: none;
+  cursor: nwse-resize;
+  touch-action: none;
+  opacity: 0;
+}
+.vml-callout-image:hover > .vml-callout-image__resize,
+.vml-callout-image:focus-within > .vml-callout-image__resize,
+.is-mobile .vml-callout-image__resize {
+  opacity: 1;
+}
+@media print {
+  .vml-callout-image__resize { display: none; }
+}

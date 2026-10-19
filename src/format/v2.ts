@@ -465,27 +465,28 @@ export function blockWrap(block: V2Block): WrapSide | null {
 
 /** Returns the embeds of a row, or null when the line holds anything but media embeds. */
 export function readEmbedRow(text: string, line: number): V2Embed[] | null {
-  const embeds: V2Embed[] = [];
-  let leftover = "";
+  const embeds = readMediaEmbeds(text, line);
   let cursor = 0;
+  for (const embed of embeds) {
+    if (text.slice(cursor, embed.from).trim() !== "") return null;
+    cursor = embed.to;
+  }
+  return embeds.length > 0 && text.slice(cursor).trim() === "" ? embeds : null;
+}
 
+/** Media tokens in source order, including those sharing a line with ordinary text. */
+export function readMediaEmbeds(text: string, line: number): V2Embed[] {
+  const embeds: V2Embed[] = [];
   for (const match of text.matchAll(EMBED_PATTERN)) {
     const from = match.index ?? 0;
-    leftover += text.slice(cursor, from);
-    cursor = from + match[0].length;
 
     const parsed = match[1] !== undefined
       ? { syntax: "wiki" as const, ...parseWikiEmbed(match[1]) }
       : { syntax: "markdown" as const, ...parseMarkdownEmbed(match[2] ?? "", match[3] ?? "") };
     const kind = mediaKindOf(parsed.target);
-    if (!kind) {
-      return null;
-    }
-    embeds.push({ raw: match[0], ...parsed, kind, line, from, to: cursor });
+    if (kind) embeds.push({ raw: match[0], ...parsed, kind, line, from, to: from + match[0].length });
   }
-
-  leftover += text.slice(cursor);
-  return embeds.length > 0 && leftover.trim() === "" ? embeds : null;
+  return embeds;
 }
 
 function parseWikiEmbed(inner: string): { target: string; alt: string; nativeWidth: number | null } {

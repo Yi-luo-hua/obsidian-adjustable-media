@@ -7,6 +7,7 @@ import { DEFAULT_SETTINGS, VmlSettingTab, readSettings, type VmlSettings } from 
 import { registerImageMenu } from "./src/view/imageMenu.ts";
 import { registerLayoutTouch } from "./src/view/layoutTouch.ts";
 import { registerCornerInputGuard } from "./src/view/cornerInput.ts";
+import { calloutImageExtension, registerCalloutImages } from "./src/view/calloutImages.ts";
 import { livePreviewExtension, refreshLayoutHighlights } from "./src/view/livePreview.ts";
 import { plainMediaDrag } from "./src/view/plainDrag.ts";
 import { registerReadingView } from "./src/view/readingView.ts";
@@ -27,10 +28,12 @@ export default class AdjustableMediaPlugin extends Plugin {
 
     registerReadingView(this);
     registerCrossrefs(this);
+    registerCalloutImages(this);
     this.registerEditorExtension([
       livePreviewExtension(this.app, () => this.settings.keepLayoutHighlight),
       crossrefExtension(),
       plainMediaDrag(this.app),
+      calloutImageExtension(this.app),
       autoConvert(this, () => this.settings.autoConvert),
     ]);
     registerImageMenu(this);
