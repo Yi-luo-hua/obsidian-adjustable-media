@@ -10,6 +10,7 @@
 | [中英文功能示例](examples/README.md) | 插件内置的离线指南、手动分栏和 Mermaid 样例 |
 | [项目状态](STATUS.md) | 当前公开版本、已交付功能、开发进展与限制 |
 | [发布流程](RELEASE.md) | 版本号、构建、标签、附件和公开发布 |
+| [0.9.0 发布核验](releases/0.9.0-readiness.md) | Canvas、Callout、Mermaid 菜单与显示修复的发布范围和核验 |
 | [0.8.2 发布核验](releases/0.8.2-readiness.md) | 正文连续空行与引用跳转修复、附件签名及验证边界 |
 | [0.8.1 发布核验](releases/0.8.1-readiness.md) | 实时预览把手与空行补丁、附件签名及验证边界 |
 | [0.8.0 发布准备](releases/0.8.0-readiness.md) | 固定源码、本地附件、验收边界与正式发布步骤 |

@@ -3,6 +3,7 @@ import { Modal, Notice, type App, type Editor, type Plugin, type TFile } from "o
 import { findV2Blocks, type V2Block } from "../format/v2.ts";
 import { isEditable, planUnwrap, planUnwrapAll, type LineChange } from "../layout/edits.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
+import { fileOfEditor } from "../view/obsidianInternals.ts";
 import { reportWriteError, t } from "../view/messages.ts";
 import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection, selectedLines } from "./plans.ts";
 import { planTextColumnBreak } from "./textColumnBreak.ts";
@@ -13,8 +14,9 @@ export function registerCommands(plugin: Plugin): void {
     name: t("insertColumnBreak"),
     editorCallback: (editor, view) => {
       const edit = editor.somethingSelected() ? null : planTextColumnBreak(editor.getValue().split("\n"), editor.getCursor());
-      if (!edit || !view.file) { new Notice(t("columnBreakUnavailable")); return; }
-      void writeBlockEdits(plugin.app, view.file, [edit], { editor }).then(result => {
+      const file = view.file ?? fileOfEditor(plugin.app, editor);
+      if (!edit || !file) { new Notice(t("columnBreakUnavailable")); return; }
+      void writeBlockEdits(plugin.app, file, [edit], { editor }).then(result => {
         if (!result.ok) new Notice(t("writeNotFound"));
       }).catch(reportWriteError);
     },
@@ -74,11 +76,12 @@ export function registerCommands(plugin: Plugin): void {
     editorCallback: (editor, view) => {
       const block = blockAt(editor.getValue().split("\n"), editor.getCursor().line);
       const edit = block ? planUnwrap(block) : null;
-      if (!edit || !view.file) {
+      const file = view.file ?? fileOfEditor(plugin.app, editor);
+      if (!edit || !file) {
         new Notice(t(block ? "unreadableSettings" : "unwrapNothing"));
         return;
       }
-      void writeBlockEdits(plugin.app, view.file, [edit], { editor }).then(result => {
+      void writeBlockEdits(plugin.app, file, [edit], { editor }).then(result => {
         if (!result.ok) new Notice(t("writeNotFound"));
       }).catch(reportWriteError);
     },
@@ -94,7 +97,8 @@ export function registerCommands(plugin: Plugin): void {
 }
 
 function writeCommandChange(plugin: Plugin, editor: Editor, file: TFile | null, change: LineChange): void {
-  if (!file) return;
+  file ??= fileOfEditor(plugin.app, editor);
+  if (!file) { new Notice(t("writeNotFound")); return; }
   const edit = lineChangeEdit(editor.getValue().split("\n"), change);
   void writeBlockEdits(plugin.app, file, [edit], { editor }).then(result => {
     if (!result.ok) new Notice(t("writeNotFound"));

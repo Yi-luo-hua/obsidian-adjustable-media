@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.0 - 2026-10-20
+
+- Add layouts inside Canvas text and Markdown file cards, including media, Mermaid diagrams and editable text columns. Keep each card's edits and previews independent.
+- Add a resize handle for standalone images inside Callouts in live preview. Preserve the original embed and apply saved widths in reading view and PDF export.
+- Add Wrap in a layout to standalone Mermaid diagrams' context menu in live preview.
+- Fix layout handles being clipped by Blue Topaz theme overflow rules.
+- Align full-width layout content with surrounding text in live preview, reading view and PDF export.
+- Fix images linked through external file URLs in layouts and the image viewer.
+
+Canvas support covers layouts within individual cards; cross-card layout dragging, bulk removal from Canvas text cards and Canvas cross-reference navigation are outside this release. Callout resizing applies to standalone image lines. Existing Windows feature checks are recorded in `docs/STATUS.md`; mobile devices and a complete theme matrix were not retested for 0.9.0.
+
 ## 0.8.2 - 2026-10-15
 
 - Fix consecutive blank lines disappearing and line numbers overlapping away from layouts in live preview.

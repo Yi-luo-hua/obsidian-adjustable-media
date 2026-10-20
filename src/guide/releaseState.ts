@@ -1,5 +1,5 @@
 /** Keep bundled update notes tied to their release, and show each version once. */
-export const RELEASE_NOTES_VERSION = "0.8.2";
+export const RELEASE_NOTES_VERSION = "0.9.0";
 
 export function shouldShowReleaseNotes(seen: string, version: string): boolean {
   return version === RELEASE_NOTES_VERSION && seen !== version;

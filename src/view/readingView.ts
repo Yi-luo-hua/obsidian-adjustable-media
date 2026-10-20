@@ -1,6 +1,7 @@
 import { MarkdownRenderChild, MarkdownView, TFile, type MarkdownPostProcessorContext, type MarkdownSectionInformation, type Plugin } from "obsidian";
 
 import { hasSideText, isDrawable, type V2Block } from "../format/v2.ts";
+import { canvasPreviewHosts, isCanvasPreview, type PreviewHost } from "./canvas.ts";
 import { documentSnapshot, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { drawnFrom, isStale, type Drawn } from "../layout/drawn.ts";
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
@@ -30,7 +31,7 @@ interface Parsed {
 }
 
 interface Reader {
-  view: MarkdownView;
+  view: PreviewHost;
   file: TFile;
   projection: ViewProjection;
   parsed: Parsed;
@@ -58,11 +59,11 @@ interface InstalledSection {
 
 /** Each reader waits for its own host and confirms only sections actually installed in that pane. */
 export function registerReadingView(plugin: Plugin): void {
-  const readers = new Map<MarkdownView, Reader>();
+  const readers = new Map<PreviewHost, Reader>();
   const generations = new WeakMap<TFile, number>();
   let unloaded = false;
 
-  const parse = (view: MarkdownView, text: string, previous?: DocumentSnapshot): Parsed => {
+  const parse = (view: PreviewHost, text: string, previous?: DocumentSnapshot): Parsed => {
     const snapshot = documentSnapshot(text, { file: view.file!, branch: view, path: view.file!.path }, previous);
     const lines = [...snapshot.lines];
     let offset = 0;
@@ -138,6 +139,11 @@ export function registerReadingView(plugin: Plugin): void {
 
   const wake = (reader: Reader): void => {
     if (!alive(reader)) { stop(reader); return; }
+    if (isCanvasPreview(reader.view)) {
+      const text = reader.view.getViewData();
+      // Canvas can reuse every remaining section, so no postprocessor may announce its new text.
+      if (text !== reader.parsed.snapshot.text) { desire(reader, text); return; }
+    }
     const win = reader.view.containerEl.win;
     win.clearTimeout(reader.timer); reader.timer = 0;
     if (!reader.projection.observeHost(reader.view.getViewData())) {
@@ -154,7 +160,7 @@ export function registerReadingView(plugin: Plugin): void {
     confirm(reader);
   };
 
-  const getReader = (view: MarkdownView): Reader => {
+  const getReader = (view: PreviewHost): Reader => {
     const previous = readers.get(view);
     if (previous?.file === view.file) return previous;
     if (previous) stop(previous);
@@ -175,7 +181,11 @@ export function registerReadingView(plugin: Plugin): void {
       for (const section of reader.sections.keys()) if (section.contains(media)) { refreshReadingMedia(section, media); break; }
       confirm(reader);
     }, () => confirm(reader));
-    const scroll = (): void => { if (!alive(reader)) stop(reader); else confirm(reader); };
+    const scroll = (): void => {
+      if (!alive(reader)) stop(reader);
+      else if (isCanvasPreview(reader.view)) wake(reader);
+      else confirm(reader);
+    };
     const mutation = new (view.containerEl.win as Window & typeof window).MutationObserver(scroll);
     mutation.observe(view.previewMode.containerEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style"] });
     view.previewMode.containerEl.addEventListener("scroll", scroll, true);
@@ -218,7 +228,7 @@ export function registerReadingView(plugin: Plugin): void {
           ctx.addChild(child);
           el.empty();
           const model = modelFromBlock(block);
-          const root = renderLayout(el, { app: plugin.app, sourcePath: ctx.sourcePath, model,
+          const root = renderLayout(el, { app: plugin.app, sourcePath: snapshot.origin.path, model,
             effectiveSkip: skips[blocks.indexOf(block)] ?? null, rowIndices: rows,
             editable: false, warning: blockWarning(block), component: child, refs });
           if (model.wrap !== null) child.register(keepWrapped(plugin.app, el, root, model.wrap));
@@ -229,7 +239,7 @@ export function registerReadingView(plugin: Plugin): void {
     markWrapping(reader, wrapped);
     if (wrapped) keepWrapsBeside(plugin.app, el);
     const record: InstalledSection = { snapshotId: snapshot.id, range: sectionRange(reader.parsed, info),
-      source: sectionSource(reader.parsed, info), sourcePath: ctx.sourcePath, drawn: reader.parsed.drawn,
+      source: sectionSource(reader.parsed, info), sourcePath: snapshot.origin.path, drawn: reader.parsed.drawn,
       layoutKey: sectionLayoutKey(reader.parsed, info), context: ctx };
     reader.sections.set(el, record);
     const lifecycle = new MarkdownRenderChild(el);
@@ -250,11 +260,11 @@ export function registerReadingView(plugin: Plugin): void {
     };
     const process = (): boolean => {
       const view = readingViewOfSection(plugin.app, el);
-      if (!view?.file || view.file.path !== ctx.sourcePath) return false;
+      if (!view?.file || (!isCanvasPreview(view) && view.file.path !== ctx.sourcePath)) return false;
       const text = sectionNoteText(plugin.app, ctx, info, el);
       if (!text.includes("<!-- vml") && !readers.has(view)) return true;
       const reader = getReader(view);
-      if (!reader.sourceRequested && text === view.getViewData()) {
+      if ((!reader.sourceRequested || isCanvasPreview(view)) && text === view.getViewData()) {
         // Only this pane's matching section confirms initial data. A requested source from an
         // editor/vault event must never be replaced by a late host section.
         desire(reader, text);
@@ -331,12 +341,22 @@ export function registerReadingView(plugin: Plugin): void {
         reader.needsRender = reader.parsed.blocks.some(isDrawable);
       }
     }
+    for (const view of canvasPreviewHosts(plugin.app)) {
+      if (view.file && view.getMode() === "preview" && view.getViewData().includes("<!-- vml")) getReader(view);
+    }
     for (const reader of readers.values()) wake(reader);
   };
   plugin.registerEvent(plugin.app.workspace.on("layout-change", layoutChanged));
   plugin.registerEvent(plugin.app.workspace.on("file-open", layoutChanged));
   plugin.app.workspace.onLayoutReady(() => {
     if (unloaded) return;
+    for (const view of canvasPreviewHosts(plugin.app)) {
+      if (view.file && view.getMode() === "preview" && view.getViewData().includes("<!-- vml")) {
+        const reader = getReader(view);
+        reader.needsRender = true;
+        wake(reader);
+      }
+    }
     for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
       if (leaf.view instanceof MarkdownView && leaf.view.file && leaf.view.getMode() === "preview") {
         if (!leaf.view.getViewData().includes("<!-- vml")) continue;

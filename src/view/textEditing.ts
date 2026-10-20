@@ -69,6 +69,17 @@ const GLOBAL_COMMANDS: ReadonlyArray<{ id: string; keys: Hotkey[] }> = [
  */
 const drafts = new Map<string, string>();
 const MAX_DRAFTS = 20;
+const canvasDraftScopes = new WeakMap<object, number>();
+let nextCanvasDraftScope = 0;
+
+/** Text cards share a file path, but an unsaved draft belongs to just one editing buffer. */
+function draftPath(host: TextEditHost): string {
+  if (!host.sourcePath.endsWith(".canvas")) return host.sourcePath;
+  const branch = host.editor ?? host.view;
+  let scope = canvasDraftScopes.get(branch);
+  if (scope === undefined) { scope = ++nextCanvasDraftScope; canvasDraftScopes.set(branch, scope); }
+  return `${host.sourcePath}#${scope}`;
+}
 
 /**
  * What a draft was typed for: the note, the side, and the block's opening comment, rows and text on
@@ -92,11 +103,11 @@ export function startTextEdit(host: TextEditHost, side: TextSide, point: Point |
     return;
   }
   const source = textOf(host.context.block, side);
-  const key = draftKey(host.sourcePath, host.context.block, side);
+  const key = draftKey(draftPath(host), host.context.block, side);
   let draft = drafts.get(key);
   // With identical blocks in the note, nothing tells which one the draft was typed in: it stays kept,
   // and comes back once that block is the only one like it.
-  if (draft !== undefined && draftTargets(host.view, host.sourcePath, side, key) > 1) {
+  if (draft !== undefined && draftTargets(host.view, draftPath(host), side, key) > 1) {
     new Notice(t("textDraftAmbiguous"));
     draft = undefined;
   }
@@ -278,7 +289,7 @@ class TextEditSession {
       return;
     }
     if (this.invalid) {
-      const key = draftKey(this.host.sourcePath, this.block, this.side);
+      const key = draftKey(draftPath(this.host), this.block, this.side);
       if (this.draftBelongs(key)) {
         setBounded(drafts, key, this.editor.state.doc.toString(), MAX_DRAFTS);
         new Notice(t("textDraftSaved"));
@@ -366,7 +377,7 @@ class TextEditSession {
     const mine = blockIdentity(this.block);
     const snapshot = this.lineage === undefined ? null : latestSnapshotOf(this.lineage);
     return mine !== undefined && snapshot !== null
-      && !snapshot.blocks.some((ref) => ref.id !== mine && draftKey(this.host.sourcePath, ref.block, this.side) === key);
+      && !snapshot.blocks.some((ref) => ref.id !== mine && draftKey(draftPath(this.host), ref.block, this.side) === key);
   }
 
   /** Gives up the text that cannot be written, and draws the layout again from the note. */

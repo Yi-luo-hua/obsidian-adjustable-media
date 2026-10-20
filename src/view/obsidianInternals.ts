@@ -1,4 +1,5 @@
 import { MarkdownView, type App, type Editor, type Hotkey, type TFile } from "obsidian";
+import { canvasEditor, canvasPreviewHosts, type PreviewHost } from "./canvas.ts";
 import { metadataSections, type MarkdownSection } from "../markdown/paragraphBreaks.ts";
 
 /** Parse this exact buffer, never the metadata cache of a possibly different saved version. */
@@ -96,14 +97,15 @@ export function fileOfEditor(app: App, editor: Editor | undefined): TFile | null
     const view = leaf.view;
     if (view instanceof MarkdownView && view.getMode() === "source" && view.editor === editor) return view.file;
   }
-  return null;
+  return canvasEditor(app, editor, false)?.file ?? null;
 }
 
 /** Uses section ownership, including detached sections being processed by the renderer. */
-export function readingViewOfSection(app: App, el: HTMLElement): MarkdownView | null {
-  for (const leaf of app.workspace.getLeavesOfType("markdown")) {
-    const view = leaf.view;
-    if (!(view instanceof MarkdownView) || view.getMode() !== "preview") continue;
+export function readingViewOfSection(app: App, el: HTMLElement): PreviewHost | null {
+  const views: PreviewHost[] = [...app.workspace.getLeavesOfType("markdown").map(leaf => leaf.view)
+    .filter((view): view is MarkdownView => view instanceof MarkdownView), ...canvasPreviewHosts(app)];
+  for (const view of views) {
+    if (view.getMode() !== "preview") continue;
     if (view.containerEl.contains(el)) return view;
     const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
     if (Array.isArray(renderer?.sections) && renderer.sections.some(section => isSection(section) && section.el === el)) return view;
@@ -131,7 +133,7 @@ export function readingSections(app: App, el: HTMLElement): ReadingSections | nu
 }
 
 /** A coordinator already knows the pane: do not search the section list again for each element. */
-export function readingSectionsOfView(view: MarkdownView): ReadingSections | null {
+export function readingSectionsOfView(view: PreviewHost): ReadingSections | null {
   const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
   const sections = renderer?.sections;
   return Array.isArray(sections) && sections.every(isSection) && isElement(renderer?.sizerEl)
@@ -164,11 +166,9 @@ export function remeasureSections(app: App, el: HTMLElement, from: number, to: n
 
 /** The renderer of the reading view that has `el` among its sections. */
 function rendererOf(app: App, el: HTMLElement): { renderer: Renderer; sections: unknown[] } | null {
-  for (const leaf of app.workspace.getLeavesOfType("markdown")) {
-    const view = leaf.view;
-    if (!(view instanceof MarkdownView)) {
-      continue;
-    }
+  const views: PreviewHost[] = [...app.workspace.getLeavesOfType("markdown").map(leaf => leaf.view)
+    .filter((view): view is MarkdownView => view instanceof MarkdownView), ...canvasPreviewHosts(app)];
+  for (const view of views) {
     const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
     const sections = renderer?.sections;
     if (renderer && Array.isArray(sections) && sections.some((section) => isSection(section) && section.el === el)) {

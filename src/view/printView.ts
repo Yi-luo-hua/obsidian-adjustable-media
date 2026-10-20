@@ -6,6 +6,8 @@ import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { markCaptions, numbered, refContextOf } from "./crossrefView.ts";
 import { renderLayout } from "./layoutView.ts";
 import { blockWarning } from "./messages.ts";
+import { calloutImages } from "../layout/calloutImages.ts";
+import { applyCalloutImageWidths } from "./calloutImages.ts";
 
 const rendering = new WeakSet<HTMLElement>();
 
@@ -28,7 +30,8 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
   const text = await app.vault.cachedRead(file);
   const token = crypto.randomUUID();
   const { markdown, blocks } = printPlan(text, token);
-  if (blocks.length === 0) {
+  const callouts = calloutImages(text.split("\n"));
+  if (blocks.length === 0 && !callouts.some(source => source.images.some(image => image.width !== null))) {
     rendering.delete(el);
     return;
   }
@@ -64,6 +67,7 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
     img.addEventListener("load", finish);
     img.addEventListener("error", finish);
   })));
+  applyCalloutImageWidths(app, content, ctx.sourcePath, callouts);
   el.replaceChildren(...(title ? [title] : []), content);
 }
 

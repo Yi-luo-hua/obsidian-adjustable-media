@@ -1,6 +1,7 @@
 import { MarkdownView, Platform, editorInfoField, type App, type Editor, type TFile } from "obsidian";
 import { EditorView } from "@codemirror/view";
 
+import { canvasEditor } from "../view/canvas.ts";
 import { applyEditsToEditor, applyEditsToText, type BlockEdit, type EditFailure } from "./edits.ts";
 import { applyEditsToView } from "./editorTransaction.ts";
 import type { SourceAssertion } from "./sourceAssertions.ts";
@@ -61,7 +62,8 @@ export async function writeBlockEdits(
     // A modal may outlive the pane that opened it. Matching text in a different note is not consent
     // to edit that note, and a hidden reading-mode editor does not save its buffer.
     const info = options.view.state.field(editorInfoField, false);
-    const origin = app.workspace.getLeavesOfType("markdown").some((leaf) => leaf.view instanceof MarkdownView
+    const card = canvasEditor(app, info?.editor);
+    const origin = (card?.file === file && card.view === options.view) || app.workspace.getLeavesOfType("markdown").some((leaf) => leaf.view instanceof MarkdownView
       && leaf.view.file === file && leaf.view.getMode() === "source" && leaf.view.editor === info?.editor);
     if ((info?.file && info.file !== file) || !options.view.dom.isConnected || !origin) {
       return { ok: false, reason: "not-found" };
@@ -78,6 +80,8 @@ export async function writeBlockEdits(
     const origin = app.workspace.getLeavesOfType("markdown").map(leaf => leaf.view)
       .find((view): view is MarkdownView => view instanceof MarkdownView
         && view.file === file && view.getMode() === "source" && view.editor === options.editor);
+    const card = canvasEditor(app, options.editor);
+    if (card?.file === file) return writeBlockEdits(app, file, edits, { ...options, view: card.view });
     if (!origin) return { ok: false, reason: "not-found" };
     const element = origin.containerEl.querySelector<HTMLElement>(".cm-editor");
     const view = element ? EditorView.findFromDOM(element) : null;
@@ -87,6 +91,9 @@ export async function writeBlockEdits(
     if (edits.some(edit => edit.blockId)) return { ok: false, reason: "not-found" };
     return applyEditsToEditor(options.editor, edits, options.readSet);
   }
+
+  // A Canvas file is a JSON container, never a Markdown fallback write target.
+  if (file.extension === "canvas") return { ok: false, reason: "not-found" };
 
   const view = app.workspace.getLeavesOfType("markdown")
     .map((leaf) => leaf.view)
