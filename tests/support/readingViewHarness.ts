@@ -33,7 +33,7 @@ class FileStub { path = "note.md"; }
 class ViewStub {}
 
 /** Run the actual adapter; mock only Obsidian and DOM integrations, not source/queue logic. */
-export async function readingViewHarness(initialText: string, startup = true, initialDiskText = initialText) {
+export async function readingViewHarness(initialText: string, startup = true, initialDiskText = initialText, kind: "markdown" | "canvas" = "markdown") {
   const file = new FileStub();
   let hostText = initialText;
   let diskText = initialDiskText;
@@ -53,8 +53,9 @@ export async function readingViewHarness(initialText: string, startup = true, in
   const sections: Array<{ el: ElementStub; computed: boolean; rendered: boolean }> = [];
   const counts = { observers: 0, environments: 0, scrollListeners: 0, sectionLookups: 0, classWrites: 0 };
   let scroll = (): void => {};
+  let mutation = (): void => {};
   class ObserverStub {
-    constructor() { counts.observers++; }
+    constructor(callback: () => void) { counts.observers++; mutation = callback; }
     observe(): void {} disconnect(): void {}
   }
   let timerId = 0;
@@ -79,7 +80,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
   const leaves = [{ view: reader }];
   const on = (name: string, callback: Listener): void => { listeners.set(name, callback); };
   const app = {
-    workspace: { getLeavesOfType: () => leaves, on, onLayoutReady(callback: () => void) { onReady = callback; } },
+    workspace: { getLeavesOfType: (type: string) => type === "markdown" && kind === "markdown" ? leaves : [], on, onLayoutReady(callback: () => void) { onReady = callback; } },
     vault: { on, cachedRead: () => Promise.resolve(diskText) },
     metadataCache: { on },
   };
@@ -88,6 +89,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     registerEvent() {}, register(callback: () => void) { cleanups.push(callback); } };
   const modules: Record<string, unknown> = {
     obsidian: { MarkdownView: ViewStub, MarkdownRenderChild: RenderChild, TFile: FileStub },
+    "./canvas.ts": { canvasPreviewHosts: () => kind === "canvas" ? [reader] : [], isCanvasPreview: (view: unknown) => kind === "canvas" && view === reader },
     "../format/v2.ts": format,
     "../layout/documentSnapshot.ts": snapshots,
     "../layout/drawn.ts": drawn,
@@ -124,6 +126,8 @@ export async function readingViewHarness(initialText: string, startup = true, in
       listeners.get("file-open")!();
     },
     scroll() { scroll(); },
+    mutate() { mutation(); },
+    layoutChanged() { listeners.get("layout-change")!(); },
     frame() { const callbacks = [...frames.values()]; frames.clear(); for (const callback of callbacks) callback(); },
     setHost(text: string) { hostText = text; for (const info of infos.values()) info.text = text; },
     edit(text: string) {

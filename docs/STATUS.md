@@ -24,6 +24,8 @@
 
 - Issue [#26](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/26) Callout 内单图缩放（2026-10-19，本地分支 `codex/callout-image-resize`，待审查、未合入 main、未发布）：独立图片行在实时预览中提供右下角缩放手柄，宽度保存在带引用前缀的 `scope:"callout-image"` 注释中，嵌入文本原样保留。类型检查、lint、485 项测试与生产构建通过。Windows／Obsidian 1.14.4／默认主题验证 Markdown 与 wiki 图片、重复图片、嵌套 Callout、拖动预览零写入、已有设置只改开始注释、无移动点击、Esc 取消与尾随点击、源码并发变化拒绝写入及一步撤销。阅读视图应用保存宽度且无手柄；原生 Letter PDF 的单独 Callout（1 页）及与文字布局混排（2 页）已逐页渲染检查，图片完整、嵌套宽度生效、无编辑控件。测试库 42 篇原有笔记哈希不变，原插件文件／设置与窗格布局已恢复，临时测试笔记恢复原文核对哈希后移入回收站。行内图片、多图同行、既有外层布局里的图片不接入此手柄；移动设备、弹出窗口与其他主题未复测。
 
+- 2026-10-19 Canvas 适配（分支 `codex/canvas-support`，未合入 main、未发布）：接通文字／Markdown 文件卡片的来源、精确写回、独立预览及 iframe 菜单监听。Windows／Obsidian 1.14.4 测试库验证选区／图片菜单包装、图片＋Mermaid、文字栏编辑、取消零写入及一步撤销；482 项检查与生产打包通过。实现、构建和未复测范围见 [Canvas 记录](archive/2026-10-19-canvas-support.md)。
+
 - 2026-10-18 布局与正文左右对齐修复（[PR #30](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/30) 已合入 main，未发布）：共用布局去掉横向留白，实时预览改用不占宽度的轮廓线。类型检查、lint、477 项测试与生产构建通过；在 Windows／Obsidian 1.14.4／默认主题、0.8.2 脚本配合修复样式下，9 种布局的阅读／实时预览内容宽度与块高度差均为 0，满宽布局左右缩进由约 11px 变为 0；430px 窗格复测文字、分栏、媒体和图文栏。真实鼠标验证框外缩放、取消零写入、一步撤销，以及高亮开关的尺寸稳定性。测试库临时笔记原文恢复并核对哈希后移入回收站，原样式恢复。原生导出的 5 页 Letter PDF 已逐页渲染检查，满宽文字块与前后相同正文的左右坐标差均为 0pt，3 张图片、分栏与左右浮动正常，没有编辑轮廓；导出设置哈希和测试笔记原文均不变。移动真机和其他主题未复测。
 
 - Issue [#25](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/25) 修复（2026-10-18，[PR #28](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/28) 已合入 main，issue 已关闭，未发布）：库外 `file:///` 媒体使用宿主资源前缀显示，保留原始链接及 URL 编码。类型检查、lint、477 项测试与生产构建通过。Windows／Obsidian 1.14.4／默认主题已复现旧版破图，并验证普通路径、中文与空格、`%5C` 和含 `%`／`#` 文件名在阅读视图、实时预览及看图弹窗正常加载；笔记原文哈希一致，测试库临时笔记已移入回收站、原插件已恢复。移动设备未复测。

@@ -79,7 +79,7 @@ test("host section data rejects missing, fractional, inverted, overlapping and o
 test("the host adapter allocates each transferable buffer and falls back without reading a saved cache", async () => {
   const adapter = await mockedModule<{ parseBufferSections(app: unknown, text: string, lines: number): Promise<unknown> }>(
     new URL("../src/view/obsidianInternals.ts", import.meta.url),
-    { obsidian: { MarkdownView: class {} }, "../markdown/paragraphBreaks.ts": paragraphBreaks }, { TextEncoder });
+    { obsidian: { MarkdownView: class {} }, "../markdown/paragraphBreaks.ts": paragraphBreaks, "./canvas.ts": {} }, { TextEncoder });
   const buffers: ArrayBuffer[] = [];
   const cache = {
     getFileCache: () => { throw new Error("saved cache must not be used for a buffer"); },

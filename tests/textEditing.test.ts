@@ -55,7 +55,7 @@ const TWO = [...BLOCK, "", ...BLOCK];
  * new state with its own document snapshot, identities carried through the change.
  */
 async function session(lines: string[] = BLOCK, index = 0,
-  caret?: { api: "modern" | "legacy"; from: number; to: number; before: string }): Promise<Harness> {
+  caret?: { api: "modern" | "legacy"; from: number; to: number; before: string }, sourcePath = "note.md"): Promise<Harness> {
   const notices: string[] = [];
   const written: string[][] = [];
   const executed: string[] = [];
@@ -113,7 +113,7 @@ async function session(lines: string[] = BLOCK, index = 0,
   });
 
   // The note's editor: its current text, snapshot and state, as live preview's field keeps them.
-  const file = { path: "note.md" };
+  const file = { path: sourcePath };
   let origin = { file, branch: {}, path: file.path };
   let doc = Text.of(lines);
   let snapshot: snapshots.DocumentSnapshot | null = null;
@@ -177,6 +177,7 @@ async function session(lines: string[] = BLOCK, index = 0,
     },
     close() { change(0, doc.length, ""); },
     open(source) {
+      host.editor = {};
       origin = { file, branch: {}, path: file.path };
       snapshot = null;
       history.length = 0;
@@ -473,4 +474,17 @@ test("a kept draft waits while the note has identical blocks, and comes back onc
   editor.reopen();
   assert.equal(editor.editorText(), "```js");
   assert.equal(editor.notices.at(-1), "textDraftRestored");
+});
+
+
+test("Canvas drafts return to the same buffer but never to an identical card sharing its file path", async () => {
+  const editor = await session(BLOCK, 0, undefined, "board.canvas");
+  editor.type("```js");
+  editor.abort();
+  editor.reopen();
+  assert.equal(editor.editorText(), "```js");
+  editor.abort();
+  editor.open(BLOCK);
+  editor.reopen();
+  assert.equal(editor.editorText(), "Left text");
 });

@@ -45,7 +45,7 @@ test("standalone grips follow source ownership, including a diagram that becomes
   const module = await mockedModule<{ plainMediaDrag(app: unknown): (view: unknown) => { destroy(): void } }>(new URL("../src/view/plainDrag.ts", import.meta.url), {
     obsidian: { setIcon() {} }, "@codemirror/view": { ViewPlugin: { define: (factory: unknown) => factory } },
     "../layout/edits.ts": {}, "../layout/model.ts": {}, "../layout/plainEmbed.ts": plain,
-    "./dragGhost.ts": {}, "./interactions.ts": {}, "./messages.ts": { t: () => "Drag" }, "./pointer.ts": {}, "./windows.ts": {},
+    "./dragGhost.ts": {}, "./interactions.ts": {}, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./messages.ts": { t: () => "Drag" }, "./pointer.ts": {}, "./windows.ts": {},
   });
   const plugin = module.plainMediaDrag({})(view);
   assert.equal(list.grip, null, "a list diagram has no unusable drag grip");
@@ -85,7 +85,7 @@ async function touchHarness() {
     "../layout/edits.ts": {}, "../layout/model.ts": {}, "../layout/plainEmbed.ts": plain,
     "./dragGhost.ts": { createDragGhost: () => { created++; return { move() {}, remove() { removed++; } }; } },
     "./interactions.ts": { DRAG_THRESHOLD: 6, clearDropIndicators() {}, findDrop: () => null, swallowNextClick() {} },
-    "./messages.ts": { t: () => "Drag" }, "./pointer.ts": { trackPointer }, "./windows.ts": { eventElement: (event: { target: unknown }) => event.target },
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./messages.ts": { t: () => "Drag" }, "./pointer.ts": { trackPointer }, "./windows.ts": { eventElement: (event: { target: unknown }) => event.target },
   }, { HTMLImageElement: class {} });
   const plugin = module.plainMediaDrag({})(view);
   const fire = (type: string, x = 100, y = 100): boolean => {

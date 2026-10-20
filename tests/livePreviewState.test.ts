@@ -64,7 +64,7 @@ test("an omitted editor file preserves layout identity, dimensions and originati
 
   const writer = await mockedModule<{ writeBlockEdits(app: unknown, file: object, edits: edits.BlockEdit[], options: unknown): Promise<{ ok: boolean }> }>(new URL("../src/layout/writeBack.ts", import.meta.url), {
     obsidian, "@codemirror/view": viewApi, "./edits.ts": edits, "./editorTransaction.ts": transaction,
-    "./blockIdentity.ts": identity, "./documentSnapshot.ts": snapshots,
+    "./blockIdentity.ts": identity, "./documentSnapshot.ts": snapshots, "../view/canvas.ts": { canvasEditor: () => null },
   });
   let focused = 0;
   const view = { get state() { return state; }, dom: { isConnected: true },

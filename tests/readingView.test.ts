@@ -204,6 +204,51 @@ test("moving retained media into a different block reinstalls that block's setti
   host.dispose();
 });
 
+for (const event of ["layoutChanged", "mutate"] as const) {
+  test(`Canvas ${event} reinstalls a retained media section with its new row settings`, async () => {
+    const text = '<!-- vml {"v":2,"rows":[{"height":100},{"height":300}]} -->\n![[first.png]]\n\n![[second.png]]\n<!-- /vml -->';
+    const host = await readingViewHarness(text, false, text, "canvas");
+    const section = host.section(text, 3); host.frame();
+    assert.deepEqual(host.renderedRows, [[300]]);
+    const next = text.replace("![[first.png]]\n\n", "");
+    host.setHost(next); section.move(1); host[event](); host.frame();
+    assert.equal(host.rerenders, 1);
+    assert.deepEqual(host.projection!.coverage, []);
+    host[event](); host.frame();
+    assert.equal(host.rerenders, 1);
+    section.reprocess(next); host.frame();
+    assert.deepEqual(host.renderedRows, [[300], [100]]);
+    assert.equal(host.projection!.phase, "settled");
+    host.dispose();
+  });
+}
+
+test("Canvas retained media settles after body changes without a full rerender", async () => {
+  const host = await readingViewHarness(media, false, media, "canvas");
+  host.section(media); host.frame();
+  for (const text of [media + " more", media + " text", media]) {
+    host.setHost(text); host.mutate(); host.frame();
+    assert.equal(host.projection!.desired!.text, text);
+    assert.equal(host.projection!.phase, "settled");
+  }
+  assert.equal(host.rerenders, 0);
+  assert.equal(host.renders.length, 1);
+  host.dispose();
+});
+
+test("removing the final Canvas layout retires its reader and clears wrapping", async () => {
+  const text = media.replace("<!-- vml -->", '<!-- vml {"v":2,"wrap":"right"} -->');
+  const host = await readingViewHarness(text, false, text, "canvas");
+  const section = host.section(text); host.frame();
+  assert.equal(section.wrapping, true);
+  host.setHost("Body"); host.layoutChanged(); host.frame();
+  assert.equal(section.wrapping, false);
+  const observers = host.counts.observers;
+  host.section("Body", 0);
+  assert.equal(host.counts.observers, observers);
+  host.dispose();
+});
+
 test("plain reading notes keep host section rendering at startup and on each edit", async () => {
   const host = await readingViewHarness("Body");
   host.section("Body", 0);

@@ -1,4 +1,5 @@
 import type { App, MarkdownPostProcessorContext, MarkdownSectionInformation } from "obsidian";
+import { isCanvasPreview } from "./canvas.ts";
 import { readingViewOfSection } from "./obsidianInternals.ts";
 
 /**
@@ -11,5 +12,5 @@ export function sectionNoteText(app: App, ctx: MarkdownPostProcessorContext, inf
     return info.text;
   }
   const view = readingViewOfSection(app, el);
-  return view?.file?.path === ctx.sourcePath ? view.getViewData() : "";
+  return view && (isCanvasPreview(view) || view.file?.path === ctx.sourcePath) ? view.getViewData() : "";
 }
