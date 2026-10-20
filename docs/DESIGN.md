@@ -2,7 +2,7 @@
 
 本文说明 Adjustable Media 的存储格式、代码结构和写入规则，以及开发时在 Obsidian 里实测确认过的行为。
 
-实现范围（2026-10-20）：0.9.0 候选在最新 main 上整合 Canvas 卡片布局、Callout 单图缩放、Mermaid 右键包装，以及库外图片、正文对齐和主题把手修复。原 main `3f31feb` 保留为 `codex/main-before-080`，W02／W03 原型不带入发布。历史设备结果保留各自构建边界；当前公开版本及发布核验见 [STATUS](STATUS.md)和[0.9.0 核验](releases/0.9.0-readiness.md)，格式与写回规则仍按下文执行。
+实现范围（2026-10-20）：0.9.0 已从 main 发布，包含 Canvas 卡片布局、Callout 单图缩放、Mermaid 右键包装，以及库外图片、正文对齐和主题把手修复。原 main `3f31feb` 保留为 `codex/main-before-080`，W02／W03 原型不带入发布。历史设备结果保留各自构建边界；当前公开版本及发布核验见 [STATUS](STATUS.md)和[0.9.0 核验](releases/0.9.0-readiness.md)，格式与写回规则仍按下文执行。
 
 ## 1. 存储格式
 
@@ -312,7 +312,7 @@ $$
 
 2026-10-14 修复分支 `codex/fix-layout-handles-and-spacing` 增量：实时预览里直接接在布局块前后的一串空行逐行保留 `--p-spacing`，不再压掉第二行以后的高度；正文其他位置及块内部的规则保持原有范围。连续浮动之间的一行分隔仍用于并排，多个空行则保留高度。普通布局的部件也关闭宿主绘制裁剪，允许边框把手显示与点击到框外；浮动替身的条件裁剪继续保留。此增量已随 0.8.1 发布，相关实测见 [修复记录](archive/2026-10-14-layout-handles-and-spacing.md)；下文保留历史三视图对照范围。
 
-2026-10-19 主题兼容修复（本地、未发布）：Blue Topaz 给非编辑部件设置 `overflow: auto`，即使已解除 `contain: paint`，仍会裁掉框外把手。直属 CodeMirror 正文的插件布局部件与浮动替身同时使用 `overflow: visible`；不改变其他宿主部件，也不取消替身的条件 `clip-path`。原版 0.8.2 的主题组合与默认主题对照见 [STATUS](STATUS.md)。
+2026-10-19 主题兼容修复（已随 0.9.0 发布）：Blue Topaz 给非编辑部件设置 `overflow: auto`，即使已解除 `contain: paint`，仍会裁掉框外把手。直属 CodeMirror 正文的插件布局部件与浮动替身同时使用 `overflow: visible`；不改变其他宿主部件，也不取消替身的条件 `clip-path`。原版 0.8.2 的主题组合与默认主题对照见 [STATUS](STATUS.md)。
 
 2026-10-07 在测试库（Obsidian 1.14.4，默认主题）对比 `text-test.md`、`text-block-test.md`、`wrap-test.md`、`wrap-multi.md` 的实时预览、阅读视图和导出的 PDF：两种视图用 Obsidian 的可读行宽机制临时设成 PDF 的正文宽度（Letter 纸、默认边距，约 678px），逐段比较每一行开头的文字和左边界、每个布局块的位置和尺寸、各元素文字顶端之间的距离；PDF 用 PyMuPDF 取出每行文字和图片的坐标。
 

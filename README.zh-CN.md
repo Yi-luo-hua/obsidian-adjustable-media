@@ -6,7 +6,9 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-当前最新发布为 **0.8.2**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
+当前最新发布为 **0.9.0**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
+
+0.9.0 已发布，新增 Canvas 卡片布局、Callout 图片缩放和 Mermaid 右键包装，并修复主题样式导致的把手裁剪、布局正文对齐及库外图片显示。已筛查官方目录全部 901 个主题的主 CSS，并对 57 组样式完成 342 种渲染组合检查。详见[发布核验](docs/releases/0.9.0-readiness.md)。
 
 0.8.2 已发布，修复实时预览远离布局块的连续空行消失、行号重叠，以及引用点击和跳转问题，详见[补丁核验](docs/releases/0.8.2-readiness.md)。
 
@@ -154,4 +156,4 @@ Adjustable Media 不创造新语法，笔记中仅保留标准嵌入与纯净的
 
 本版同时修复文字编辑器之间切换、点击外框空隙时误展开源码的问题。更新说明中的按钮可按界面语言离线创建[中文样例](docs/examples/ManualColumns.zh-CN.md)或[英文样例](docs/examples/ManualColumns.en.md)，每次使用新目录，不覆盖已有笔记。
 
-用户最终确认、中英文 Windows／Obsidian 1.14.4 定向实测、327 项自动检查和发布构建均已完成。0.7.3 已从 `codex/text-column-breaks` 推送标签，基于正式 0.7.2 并保留其功能；GitHub 正式发布及三份带来源签名的附件已核对，发布索引已合并，当前最新公开版本为 0.7.3。验证范围见[项目状态](docs/STATUS.md)和[实施记录](docs/plans/layout-redesign/34-text-column-breaks.md)。本版保持桌面限定与 V2 格式；移动适配留到 Android、iPhone、iPad 验收后作为后续大版本交付。
+用户最终确认、中英文 Windows／Obsidian 1.14.4 定向实测、327 项自动检查和发布构建均已完成。0.7.3 已从 `codex/text-column-breaks` 推送标签，基于正式 0.7.2 并保留其功能；GitHub 正式发布及三份带来源签名的附件已核对，发布索引已合并，该阶段的公开版本为 0.7.3。验证范围见[项目状态](docs/STATUS.md)和[实施记录](docs/plans/layout-redesign/34-text-column-breaks.md)。0.7.3 当时保持桌面限定与 V2 格式；当前版本与移动支持范围见页首。

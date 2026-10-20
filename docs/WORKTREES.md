@@ -1,6 +1,6 @@
 # 工作树与分支
 
-2026-10-20 补充：主目录当前检出 `codex/release-0.9.0`，整合最新 main（含 PR #31 Callout 与 PR #32 Canvas）、Blue Topaz 把手修复和 Mermaid 右键包装，准备发布 0.9.0，验证见 [STATUS](STATUS.md)。以下工作树清单保留 2026-10-14 的历史快照，不代表当前分支或公开版本。
+2026-10-20 补充：主目录当前检出 main，0.9.0 已正式发布，整合 Callout、Canvas、主题把手修复和 Mermaid 右键包装；验证见 [STATUS](STATUS.md)。以下工作树清单保留 2026-10-14 的历史快照，不代表当前分支或公开版本。
 
 更新：2026-10-14。公开版本是 0.8.1，标签源码 `b3a7216`，main 保留发布代码及后续文档同步。功能与验收见 [STATUS](STATUS.md)，待办见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 

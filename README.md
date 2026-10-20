@@ -4,13 +4,15 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
+0.9.0 adds Canvas card layouts, Callout image resizing and Mermaid context-menu wrapping, and fixes theme-related handle clipping, layout alignment and external file URL images. Theme compatibility checks screened all 901 official themes' main CSS and 342 rendering combinations from 57 theme styles. See [release verification](docs/releases/0.9.0-readiness.md).
+
 0.8.2 fixes disappearing blank lines and overlapping line numbers away from layouts in live preview, plus reference clicks and navigation. See [patch verification](docs/releases/0.8.2-readiness.md).
 
 0.8.0 adds Mermaid layout items and Android, iPhone and iPad support, alongside recent fixes. Android tablet Mermaid regression and the reported hold-to-drag problem have passed automatic and user checks; new gestures have not been retested on phones or iOS. See [release verification](docs/releases/0.8.0-readiness.md) and [status](docs/STATUS.md).
 
 [Feature examples](docs/examples/Guide.en.md) · [功能示例](docs/examples/Guide.zh-CN.md). In Obsidian, run **Feature examples** for an offline preview and a button to create a working copy with its media. The guide opens once when first available, including for existing users upgrading to the release that adds it.
 
-The latest release is **0.8.2**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
+The latest release is **0.9.0**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
 
 ![Adjustable Media Preview](assets/demo.jpg)
 
@@ -155,4 +157,4 @@ Inside a text layout, write `+++` on its own unindented line to start the next c
 
 This version also fixes clicks between text editors and on frame padding unexpectedly revealing source. Its release notes can create offline [English](docs/examples/ManualColumns.en.md) or [Chinese](docs/examples/ManualColumns.zh-CN.md) examples to match the interface language, using a fresh folder for each creation.
 
-User acceptance, bilingual Windows/Obsidian 1.14.4 checks, all 327 automated tests and release packaging are complete. Version 0.7.3 is tagged from `codex/text-column-breaks`, based on the published 0.7.2 source and retaining its features. Version 0.7.3 is now published as the latest release; its three attested build files and the merged release index are verified. See [status](docs/STATUS.md) and the [implementation record](docs/plans/layout-redesign/34-text-column-breaks.md) for validation details. Desktop only; mobile adaptation is reserved for a later major release after Android, iPhone and iPad validation. The note format remains V2.
+User acceptance, bilingual Windows/Obsidian 1.14.4 checks, all 327 automated tests and release packaging are complete. Version 0.7.3 is tagged from `codex/text-column-breaks`, based on the published 0.7.2 source and retaining its features. Version 0.7.3 was published at that stage; its three attested build files and the merged release index are verified. See [status](docs/STATUS.md) and the [implementation record](docs/plans/layout-redesign/34-text-column-breaks.md) for validation details. Version 0.7.3 was desktop only and used V2. Current mobile support and version information are recorded above.
