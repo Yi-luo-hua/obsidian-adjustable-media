@@ -130,7 +130,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     inBlock.fill(1, block.openLine, block.closeLine + 1);
   }
   const text = (line: number): boolean => contexts[line] === "text" && inBlock[line] === 0;
-  const blank = (line: number): boolean => text(line) && (lines[line] ?? "").trim() === "";
+  const blank = (line: number): boolean => text(line) && code[line] !== 1 && (lines[line] ?? "").trim() === "";
   const filled = (line: number): boolean => text(line) && (lines[line] ?? "").trim() !== "";
   const breaks: ParagraphBreak[] = [];
   const taken = new Set<number>();
@@ -162,11 +162,6 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     let end = line;
     while (end + 1 < lines.length && blank(end + 1)) {
       end += 1;
-    }
-    // Blank lines inside an indented code block belong to the code.
-    if (code[line - 1] === 1 && code[end + 1] === 1) {
-      line = end;
-      continue;
     }
     if (headingLevel(lines[end + 1]) === 0 && headingLevel(lines[line - 1]) !== 1) {
       add(line, "blank");
@@ -252,6 +247,7 @@ function indentedCode(lines: readonly string[], text: (line: number) => boolean,
   const base = (): number => items[items.length - 1] ?? 0;
   let afterBlank = true;
   let afterParagraph = false;
+  let lastCodeLine = -1;
   for (let line = 0; line < lines.length; line += 1) {
     const source = lines[line] ?? "";
     if (!text(line)) {
@@ -268,9 +264,16 @@ function indentedCode(lines: readonly string[], text: (line: number) => boolean,
       }
       afterBlank = false;
       afterParagraph = false;
+      lastCodeLine = -1;
       continue;
     }
     if (source.trim() === "") {
+      // The host keeps sufficiently indented whitespace in an existing code block, including
+      // trailing Tabs inserted by Enter. Any blank lines before that continuation belong to it too.
+      if (lastCodeLine >= 0 && columnAfter(source, 0) >= base() + 4) {
+        code.fill(1, lastCodeLine + 1, line + 1);
+        lastCodeLine = line;
+      }
       afterBlank = true;
       afterParagraph = false;
       continue;
@@ -286,7 +289,12 @@ function indentedCode(lines: readonly string[], text: (line: number) => boolean,
       }
     }
     const inCode: boolean = indent >= base() + 4 && !afterParagraph;
-    code[line] = inCode ? 1 : 0;
+    if (inCode) {
+      code.fill(1, lastCodeLine >= 0 ? lastCodeLine + 1 : line, line + 1);
+      lastCodeLine = line;
+    } else {
+      lastCodeLine = -1;
+    }
     if (item && !inCode) {
       items.push(item.content);
     }
