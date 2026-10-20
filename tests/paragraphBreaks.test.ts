@@ -134,6 +134,40 @@ test("blank lines inside an indented code block stay as they are", () => {
   assert.deepEqual(lines(paragraphBreaks(text, [])), ["1:blank", "6:blank"]);
 });
 
+// Obsidian 1.14.4's worker includes sufficiently indented whitespace at the end of code, including
+// the Tab carried onto a new line by Enter. The synchronous result must not shrink it until parsing.
+test("trailing indented whitespace keeps code height before and after the host parse", () => {
+  for (const indent of ["\t", "    ", "\t "]) {
+    for (const gap of [[], [""], ["", "  "]]) {
+      const text = [`${indent}code`, ...gap, indent, "", "Body"];
+      const end = gap.length + 1;
+      const sections: MarkdownSection[] = [{ type: "code", from: 0, to: end },
+        { type: "paragraph", from: end + 2, to: end + 2 }];
+      const expected = [`${end + 1}:blank`];
+      assert.deepEqual(lines(paragraphBreaks(text, [])), expected, JSON.stringify(text));
+      assert.deepEqual(lines(hostParagraphBreaks(text, [], sections)), expected);
+    }
+  }
+});
+
+test("code does not absorb leading whitespace or trailing whitespace without enough indentation", () => {
+  const text = ["\t", "", "\tcode", "\t", "  ", "", "Body"];
+  const sections: MarkdownSection[] = [{ type: "code", from: 2, to: 3 }, { type: "paragraph", from: 6, to: 6 }];
+  const expected = ["0:blank", "1:blank", "4:blank", "5:blank"];
+  assert.deepEqual(lines(paragraphBreaks(text, [])), expected);
+  assert.deepEqual(lines(hostParagraphBreaks(text, [], sections)), expected);
+});
+
+test("trailing whitespace in list code is measured from the item's text column", () => {
+  for (const indent of ["      ", "\t\t"]) {
+    const text = ["- item", "", `${indent}code`, "", indent, "    ", "", "Body"];
+    const sections: MarkdownSection[] = [{ type: "list", from: 0, to: 5 }, { type: "paragraph", from: 7, to: 7 }];
+    const expected = ["1:blank", "5:blank", "6:blank"];
+    assert.deepEqual(lines(paragraphBreaks(text, [])), expected);
+    assert.deepEqual(lines(hostParagraphBreaks(text, [], sections)), expected);
+  }
+});
+
 test("a list item is nested only when indented as far as the text of the item above", () => {
   assert.deepEqual(lines(paragraphBreaks(["- a", " * b"], [])), ["0:after"]);
   assert.deepEqual(lines(paragraphBreaks(["1. a", "  - b"], [])), ["0:after"]);
