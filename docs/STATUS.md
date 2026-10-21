@@ -1,12 +1,12 @@
 # 项目状态
 
-更新：2026-10-20。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-10-21。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
 
 - **公开版本：0.9.0**，标签源码 `93a5637`；三份公开附件、摘要及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.0)和[发布核验](releases/0.9.0-readiness.md)。
-- **main：0.9.0 已发布代码及文档同步**。已整合正文连续空行与引用跳转修复、手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配和 Mermaid 独立项；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。
-- 原 main 完整保留为 `codex/main-before-080`。主目录已检出 main，整合 Callout／Canvas、主题把手修复和 Mermaid 右键包装，2026-10-20 按用户授权正式发布 0.9.0；材料与步骤见 [0.9.0 核验](releases/0.9.0-readiness.md)和[发布流程](RELEASE.md)。
+- **main：0.9.0 发布代码加未发布的 Issue #27 修复**。PR [#33](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/33) 已于 2026-10-20 合入，合并提交 `616ac5b`，issue 已关闭；缩进代码续行不再先套用段落间距、随后延迟跳动。版本号仍为 0.9.0，公开附件不含这项修复。
+- 已发布范围保留正文连续空行与引用跳转修复、手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配、Mermaid 独立项、Callout／Canvas 与主题把手等功能；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。原 main 完整保留为 `codex/main-before-080`；当前检出分支以 [WORKTREES](WORKTREES.md) 的日期快照及 `git status` 为准。
 
 ## 已有工作与当前边界
 
@@ -15,10 +15,12 @@
 | 手动文字分栏与边框高亮 | 已随 0.7.3／0.7.2 发布，main 保留 | 按实际变化验证，保持旧笔记原文 |
 | 三视图、段落间距、渲染与播放器 | 本轮修复已随 0.8.0 发布，Windows 定向验证通过 | 其他未验收范围继续单独记录 |
 | Mermaid 与移动适配 | 已随 0.8.0 发布，用户修订的中英文说明和离线示例已打包 | 按实际改动做相关回归，保留设备与构建边界 |
-| W02／W03 候选测量与规划 | 原型在独立工作树，33 个未提交文件保留 | 正式接入、完整约束与 ready 契约、峰值优化 |
+| W02／W03 候选测量与规划 | 原型保留在独立工作树，已提交为 `d680ce6`；2026-10-21 核对工作树干净，尚未进入 main | 正式接入、完整约束与 ready 契约、峰值优化 |
 | 拖动动画、并列组与 R1／R2 | 未完成，两项组 ADR 仍为 proposed | 按任务队列与依赖推进，不带入当前发布包 |
 
 ## 验证
+
+- 2026-10-20 Issue #27 修复：类型检查、lint、503 项测试和生产构建通过；Windows／Obsidian 1.14.4／默认主题验证 Tab／四空格续行、段中与首段回车、源码模式对照、原文与一步撤销。已合入 main，尚未发布；移动设备和其他主题未复测，详见 [修复记录](archive/2026-10-20-indented-newline-jump.md)。2026-10-21 文档核对时，同一源码的 `npm run check` 再次通过（503 项测试，lint 0 错误、165 条警告）；本次未新增宿主或设备验收。
 
 - 2026-10-20 0.9.0 发布验证：Node 24.11.1 类型检查、lint、500 项测试和生产打包通过。Windows／Obsidian 1.14.4 测试库的 Mermaid 真实右键包装、Callout 缩放／取消／一步撤销、普通布局与两类 Canvas 卡片预览、库外图片及中英文更新弹窗通过；98 篇原笔记及测试插件文件已核对恢复。未重复完整移动／PDF／主题矩阵，详见 [0.9.0 核验](releases/0.9.0-readiness.md)。
 
@@ -48,6 +50,8 @@
 - Android 手机、iPhone、iPad 的基础验收保留各自原构建结果；新增正文长按与边缘投放未在这些设备复测。iPhone／iPad 的独立报告和保存内容核对依用户要求跳过，设备细节与历史场景见 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
 
 ## 已知限制与验收范围
+
+- 全库批量移除只处理 Markdown 文件中可编辑的顶层布局注释，不扫描 Canvas 文字卡片，也不移除 Callout 图片设置。Canvas 仅支持卡片内部布局，不支持跨卡片布局拖放或 Canvas 内交叉引用导航。
 
 - Issue [#29](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/29) 仍打开，未认定修复：报告靠右浮动图片使上方正文变成半宽。2026-10-18 在 Windows／Obsidian 1.14.4／默认主题、0.8.2 测试库，用 40% 宽的靠右竖图、`skip` 0／15、模式切换及往返滚动检查，图片上方正文始终保持完整行宽，暂未复现；仍需原始最小笔记及主题／CSS 片段信息。
 

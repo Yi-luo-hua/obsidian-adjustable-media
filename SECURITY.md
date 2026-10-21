@@ -28,4 +28,4 @@ Include:
 
 ## Scope
 
-The plugin runs locally and makes no network requests of its own. It changes notes only in response to layout actions you take, or through automatic conversion if you turn it on. It reads every note in the vault only when you run **Remove layout comments from all notes…**, to find the layouts to remove.
+The plugin runs locally and makes no network requests of its own. It changes notes only in response to layout actions you take, or through automatic conversion if you turn it on. The bulk command **Remove layout comments from all notes…** scans the vault's Markdown files and shows a confirmation before removing editable top-level layout comments. It does not scan Canvas text cards or remove Callout image settings, and layouts with unreadable settings are preserved. Each file is validated and written separately.

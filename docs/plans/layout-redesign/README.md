@@ -1,6 +1,6 @@
 # 布局改进计划索引
 
-更新：2026-10-12。本目录保存仍有效的设计约定与未完成任务；实现状态统一见 [09](09-progress-and-next-steps.md)，版本状态见 [STATUS](../../STATUS.md)，工作树与分支见 [WORKTREES](../../WORKTREES.md)。已完成的逐次实施、验收和旧分支整理移到 archive；计划中的完整规划器、并列组和动画不自动成为 main 的现行实现。
+更新：2026-10-21。本目录保存仍有效的设计约定与未完成任务；实现状态统一见 [09](09-progress-and-next-steps.md)，版本状态见 [STATUS](../../STATUS.md)，工作树与分支见 [WORKTREES](../../WORKTREES.md)。已完成的逐次实施、验收和旧分支整理移到 archive；计划中的完整规划器、并列组和动画不自动成为 main 的现行实现。W02／W03 原型已在独立工作树提交为 `d680ce6`，仍未进入 main。
 
 ## 当前计划
 
@@ -16,7 +16,7 @@
 | [34 手动分栏](34-text-column-breaks.md) | 0.7.3 已确定语义，与多块并列组区分 |
 | [35 拖动动画与预览](35-block-drag-animation-preview.md) | 已确认、尚未实现的可选动画与完整预览 |
 | [工作树与分支](../../WORKTREES.md) | 活动开发入口、保留分支、归档与恢复信息 |
-| [37 Mermaid 独立项](37-mermaid-layout-items.md) | main 的单块图表项语义与格式边界，未公开发布 |
+| [37 Mermaid 独立项](37-mermaid-layout-items.md) | 0.8.0 已发布的单块图表项语义、格式边界与历史验证；0.9.0 增加右键包装 |
 | [移动适配记录](mobile-adaptation.md) | Android／iPhone／iPad 各构建验收与未复测范围 |
 
 ## 工作包与依赖

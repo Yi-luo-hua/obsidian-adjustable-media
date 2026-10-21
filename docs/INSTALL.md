@@ -27,9 +27,11 @@ Obsidian tells you when an update is available, under Settings → Community plu
 
 | | |
 | --- | --- |
-| Obsidian | 1.5.0 or newer is required; tested with 1.13.7 |
+| Obsidian | 1.5.0 or newer is required; recent Windows checks used 1.14.4 |
 | Desktop | Supported |
-| Mobile | Public 0.7.3 is desktop only; the unreleased 0.8.0 candidate enables Android, iPhone and iPad installation. New Mermaid device acceptance is pending. |
+| Mobile | Android, iPhone and iPad are supported from 0.8.0; the current public release is 0.9.0. |
+
+The minimum version is a compatibility declaration, not a claim that every host version, theme and device was tested. See [project status](STATUS.md) and the [mobile validation record](plans/layout-redesign/mobile-adaptation.md) for each build's coverage. Standalone Mermaid hold-and-drop gestures were verified on an Android tablet; those gestures have not been retested on Android phones or iOS. Mobile devices were not retested for 0.9.0.
 
 ## Updating
 

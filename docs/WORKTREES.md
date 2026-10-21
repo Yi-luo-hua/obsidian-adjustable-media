@@ -1,49 +1,38 @@
 # 工作树与分支
 
-2026-10-20 补充：主目录当前检出 main，0.9.0 已正式发布，整合 Callout、Canvas、主题把手修复和 Mermaid 右键包装；验证见 [STATUS](STATUS.md)。以下工作树清单保留 2026-10-14 的历史快照，不代表当前分支或公开版本。
+核对日期：2026-10-21。下表来自本机 `git worktree list` 和各目录的 `git status`，只描述该日期的目录状态；分支后续检出和提交以 Git 为准。公开版本与功能范围见 [STATUS](STATUS.md)，未完成工作见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
-更新：2026-10-14。公开版本是 0.8.1，标签源码 `b3a7216`，main 保留发布代码及后续文档同步。功能与验收见 [STATUS](STATUS.md)，待办见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+## 当前目录快照
 
-当前 Git 仍登记 **8 棵工作树**：2 棵继续使用，5 棵已提交归档请求、尚未完成，另有 1 棵补丁树已合入 main 并发布，暂保留。历史审查和嵌套文档两棵已清理；本地分支由 33 个减为 9 个，远端由 29 个减为 7 个。
+Git 登记 6 棵工作树。主目录本次从已更新的 `origin/main`（`616ac5b`）建立 `codex/docs-align-20261021` 进行文档对齐；切换前的 `codex/fix-indented-newline-jump` 为 `75bb922`，源码树与该 main 一致。其余 5 棵工作树在核对时均无未提交修改。
 
-## 继续使用的工作树
-
-| 目录 | 分支 | 用途与状态 |
+| 目录 | 分支／HEAD | 用途与状态 |
 | --- | --- | --- |
-| `E:/TOOLS/obsidian-adjustable-media` | `main` | 0.8.1 已发布与后续开发；标签 `b3a7216`，467 项检查、构建及发布工作流通过 |
-| `C:/Users/丁家宝/.codex/worktrees/independent-features/obsidian-adjustable-media` | `codex/w02-candidate-measurement` | W02／W03 未完成原型；HEAD `b3efef7`，保留 17 个修改文件与 16 个新增文件，尚未推送 |
+| `E:/TOOLS/obsidian-adjustable-media` | `codex/docs-align-20261021`，基于 `616ac5b` | 本次文档更新；公开版本仍为 0.9.0，Issue #27 修复已合入 main、未发布 |
+| `C:/Users/丁家宝/.codex/worktrees/independent-features/obsidian-adjustable-media` | `codex/w02-candidate-measurement` · `d680ce6` | W02 缓存／会话与 W03 约束原型已提交，工作树干净；未进入 main，不视为完整规划器交付 |
+| `C:/Users/丁家宝/.codex/worktrees/callout-review-fixes/obsidian-adjustable-media` | `codex/callout-review-fixes` · `5d145bd` | 0.9.0 Callout 来源树，干净，目录保留 |
+| `C:/Users/丁家宝/.codex/worktrees/canvas-support/obsidian-adjustable-media` | `codex/canvas-support` · `d05b012` | 0.9.0 Canvas 来源树，干净，目录保留 |
+| `C:/Users/丁家宝/.codex/worktrees/fix-external-file-urls/obsidian-adjustable-media` | `codex/fix-external-file-urls` · `5f2ee62` | 0.9.0 库外媒体来源树，干净，目录保留 |
+| `C:/Users/丁家宝/.codex/worktrees/fix-layout-body-alignment/obsidian-adjustable-media` | `codex/fix-layout-body-alignment` · `e3d4bf0` | 0.9.0 布局正文对齐来源树，干净，目录保留 |
 
-补丁工作树 `C:/Users/丁家宝/.codex/worktrees/fix-layout-handle-clipping/obsidian-adjustable-media`，分支 `codex/fix-layout-handles-and-spacing`，已完整合入 main 并随 0.8.1 发布；干净，暂保留，未提交新的归档请求。
+旧文档中 W02／W03 的“17 个修改文件＋16 个新增文件”属于提交前快照，不能继续作为当前未提交计数。其后续实现与证据仍在原型工作树；main 未复制完整候选测量／规划器模块。
 
-## 需要保留的独立分支
+## 保留分支与历史清理
 
-| 分支 | 用途 |
-| --- | --- |
-| `codex/main-before-080` | 原 main 的完整历史，`3f31feb`；本地／远端均保留，无独立工作树 |
-| `docs/readme-demo` | 未合入的 README 动图与素材，`d197c2f`；仅本地保留，无工作树，不混入此次发布 |
+- `codex/main-before-080`：原 main 的完整历史，`3f31feb`。
+- `docs/readme-demo`：未合入的 README 动图与素材，`d197c2f`，无独立工作树。
+- 已集成的来源分支和当前目录未在本次文档任务中清理；保留目录不表示其功能尚未发布。
 
-## 本次清理
+2026-10-14 的 8 棵工作树、5 项应用归档排队请求及当时分支数量已移至 [清理快照](archive/2026-10-14-worktree-cleanup.md)。其中部分目录不再出现在当前 Git 清单；本次没有查询原任务的应用归档回执，不能据此认定归档快照已成功生成。不要再把旧排队清单作为当前待处理目录。
 
-已清理 24 个本地、22 个远端旧分支。已集成且未被工作树使用的分支，以及有明确替代来源的旧试验／发布索引分支，在验证 Git bundle 后移除；未合入的动图分支保留。`review-pr18` 的未提交文档与 `.review/`、嵌套历史文档树均已备份，目录移入回收站并核对原路径消失，Git 记录已清除；`.claude/launch.json` 保留。
+## 恢复入口
 
-以下 5 棵应用管理的工作树已由所属任务提交归档请求。工具多次返回 `queued`，尚未确认归档快照或目录移除，所以对应本地／远端分支继续保留。目录均位于 `C:/Users/丁家宝/.codex/worktrees/<名称>/obsidian-adjustable-media`。
+历史完整备份位置为 `E:/TOOLS/obsidian-adjustable-media-backups/cleanup-20261012/`：`repository-before.bundle` 保存分支、标签与 stash，ZIP 保存当时工作树及必要的忽略文件。逐文件核验属于原清理批次，本次未重新校验备份内容；恢复步骤见备份目录 README 及 [清理快照](archive/2026-10-14-worktree-cleanup.md)。
 
-| 名称 | 分支／HEAD | 当前状态 |
-| --- | --- | --- |
-| `pending-view-parity` | `codex/pending-view-parity` · `d163209` | 已集成，归档排队，干净 |
-| `pending-render-stability` | `codex/pending-render-stability` · `0bcbfc9` | 已集成，归档排队，干净 |
-| `android-adaptation` | `codex/android-adaptation` · `2321d44` | 已集成的旧来源树，含未提交修改；ZIP 已保存，不丢弃 |
-| `mermaid-layout` | `codex/mermaid-layout` · `53c5f3a` | 已集成，归档排队，干净 |
-| `mobile-release-integration` | `codex/mobile-release-integration` · `740dcd6` | main 的发布基线，归档排队，干净 |
+应用管理的工作树优先从原任务的归档记录恢复；其他历史内容按备份 README 恢复。stash 应按固定提交身份查找，序号会变化；本次核对仍存在：
 
-实际结果以备份目录的 `cleanup-result.json`、应用归档记录与 `git worktree list` 为准。应用完成归档后再移除这 5 条旧分支；当前不把排队状态登记为已完成。
+- `ce9f46e7d726d56548b8db111360241d370d64e9`：切换主目录前的文档。
+- `276052785e29b2b26ead891092c9932bd63b3353`：W02／W03 的旧恢复状态。
+- `a33cddee8591186f84cceae4681f608d0aa4731c`：同步 PR #28／#30 前保留的主目录本地更新。
 
-完整备份位于 `E:/TOOLS/obsidian-adjustable-media-backups/cleanup-20261012/`：Git bundle 保存分支、标签、完整历史和两份 stash；9 份 ZIP 保存文件、未提交内容及必要的忽略构建／证据，已逐文件核对 SHA-256。可重装的 `node_modules`、`.git` 元数据与目录链接未重复打包；主目录 `dist/` 原地保留。
-
-清理只改变文档与开发目录，不改变插件实现、测试库或设备验收范围，也不推版本标签或公开发布。整理前的分支与过程记录见 [历史工作树快照](plans/layout-redesign/archive/36-worktree-integration-20261012.md)。
-
-## 恢复
-
-- 应用已归档工作树优先从原所属任务的归档记录恢复，再从备份 ZIP 补回需要的忽略文件。
-- 被删除的分支可从 `repository-before.bundle` 恢复；Android 未提交状态目前保存在 ZIP 中，应用归档快照尚待生成，详见备份目录 README。
-- 原主目录两份文档的 stash `ce9f46e7d726d56548b8db111360241d370d64e9`、W02／W03 的旧恢复 stash `276052785e29b2b26ead891092c9932bd63b3353` 继续保留。
+本次只调整文档与开发分支，没有移动或删除工作树、清理分支、恢复 stash 或操作测试库。

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fix the delayed live preview jump after Enter continues an indented code block with a Tab or sufficient spaces (#27, merged through #33). This fix is on main and is not included in the published 0.9.0 files.
+
 ## 0.9.0 - 2026-10-20
 
 - Add layouts inside Canvas text and Markdown file cards, including media, Mermaid diagrams and editable text columns. Keep each card's edits and previews independent.

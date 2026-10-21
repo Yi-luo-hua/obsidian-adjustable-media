@@ -1,6 +1,6 @@
 # 文档索引
 
-更新：2026-10-20。主目录已检出 0.9.0 已发布代码的 main，原 main 保存在 `codex/main-before-080`。项目仍有多个独立工作树；当前状态以 STATUS 和 DESIGN 为入口，具体实现和验收注明所属分支与构建，历史快照单独保留。
+更新：2026-10-21。公开版本为 0.9.0；main 另含已合入、尚未发布的 Issue #27 缩进续行修复。项目状态以 STATUS 和 DESIGN 为入口，实际检出分支与独立原型见 WORKTREES 的日期快照；具体实现和验收注明所属分支与构建，历史快照单独保留。
 
 ## 使用与发布
 
@@ -25,7 +25,7 @@
 | [领域词汇](../CONTEXT.md) | 布局块、浮动集合、并列组等定义 |
 | [布局规划索引](plans/layout-redesign/README.md) | 仍有效的模型、规划、同步、格式与验收要求 |
 | [任务队列](plans/layout-redesign/09-progress-and-next-steps.md) | W01–W11 的完成范围、依赖和下一步 |
-| [工作树与分支](WORKTREES.md) | 活动目录、待归档目录、保留分支和备份恢复位置 |
+| [工作树与分支](WORKTREES.md) | 当前目录快照、独立原型、保留分支和历史备份入口 |
 | [移动适配记录](plans/layout-redesign/mobile-adaptation.md) | 各平台已测构建、Mermaid 增量和未复测范围 |
 | [手动文字分栏](plans/layout-redesign/34-text-column-breaks.md) | 已发布的 0.7.3 功能语义 |
 | [拖动动画与预览](plans/layout-redesign/35-block-drag-animation-preview.md) | 已确认、尚未实现的 W03／W04／W11 需求 |

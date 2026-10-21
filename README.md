@@ -47,7 +47,7 @@ The latest release is **0.9.0**. Text boxes, multi-column text and numbered figu
 - **WYSIWYG with Instant Source Switching**: Features an illuminated control frame in editing mode; moving the cursor inside or clicking "Edit source" smoothly switches to plain Markdown text for effortless transitions between visual and handwritten editing.
 - **Layout border highlighting**: Keep layout borders highlighted is enabled by default. Turn it off to show the full border on mouse hover or while editing the layout.
 - **Automatic Layouts (Optional)**: When enabled in settings, multiple images or videos dropped from your computer or pasted will automatically be packaged into layout blocks.
-- **Single-Transaction Safe Writes**: All modifications execute through a single editor transaction (with native Undo/Redo support), strictly verifying context anchors before writing, never altering untouched lines, blank lines, or indentations.
+- **Validated Writes**: Layout gestures in an active editor use one transaction with native Undo/Redo. Markdown file operations without an active editor use `vault.process`; bulk removal validates and updates each file separately. Every write checks the expected source and preserves unrelated text and line endings.
 
 ---
 
@@ -55,10 +55,12 @@ The latest release is **0.9.0**. Text boxes, multi-column text and numbered figu
 
 ### 1. Create a Layout Block
 
-- **Right-Click Menu**: In Live Preview, right-click any image or video and choose **Wrap in a layout block**.
+- **Right-Click Menu**: In Live Preview, right-click a standalone image, video or Mermaid diagram and choose **Wrap in a layout**. For a diagram, keep its complete top-level Mermaid fence.
 - **Command / Hotkey**: Select one or more lines and run `Adjustable Media: Wrap selection in a layout` (assign a dedicated hotkey in Settings → Hotkeys). Lines of media embeds are gathered into rows; lines with text are wrapped as they are, making a text box, or text columns beside the media.
 - **Selected text menu**: In Live Preview or Source mode, select text, right-click and choose **Wrap selection in a layout**. The command wraps the whole lines touched by the selection. It appears only when the selection can form a layout. To choose your own shortcut, open **Settings → Hotkeys**, search for **Wrap selection in a layout**, and assign a key combination; no shortcut is assigned by default.
-- **Drag & Drop**: When a layout block already exists in your note, drag standalone images from the note directly into it.
+- **Drag & Drop**: When a layout block already exists in your note, drag standalone images or Mermaid diagrams from the same note and pane directly into it. On touch devices, diagrams have a drag handle; holding a standalone diagram's body also starts a drag, while a quick swipe scrolls.
+- **Canvas cards**: Text and Markdown file cards support layouts within each card. Edit the card in Live Preview to wrap content or adjust its layout; each card keeps its own preview and edits. Cross-card layout dragging and Canvas cross-reference navigation are outside this release.
+- **Callout images**: Drag the bottom-right handle of a standalone image line in a native Callout. This saves a width setting without changing the original embed; it does not turn the Callout into a layout block.
 
 ### 2. Common Interactions
 
@@ -115,13 +117,13 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 
   Without the plugin, the text and the image show one after the other.
 - Embed syntax remains completely untouched, fully compatible with file renaming and moving.
-- If you ever decide to stop using the plugin, run `Remove layout block comments from all notes…` to cleanly restore plain Markdown in one step.
+- To remove editable top-level layout comments from Markdown files, run `Remove layout comments from all notes…` and review the confirmation. This does not scan Canvas text cards or remove Callout image settings; unreadable layouts are preserved. Their comments can be removed manually while keeping the original content.
 
 ---
 
 ## Installation & Requirements
 
-- **Requirements**: Obsidian 1.5.0 or newer (Desktop).
+- **Requirements**: Obsidian 1.5.0 or newer; desktop, Android, iPhone and iPad. Device and build-specific validation is recorded in [project status](docs/STATUS.md) and the [mobile record](docs/plans/layout-redesign/mobile-adaptation.md). Recent desktop fixes have not all been retested on mobile.
 
 ### Method 1: Community Plugins (Recommended)
 
@@ -139,9 +141,9 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 
 ## Notes
 
-- Layout blocks must start at the beginning of a line (not nested inside quotes, callouts, or lists).
+- Full layout blocks must start at the beginning of a top-level line, outside quotes, Callouts and lists. Resizing a standalone Callout image uses separate settings and does not enable full layouts inside Callouts.
 - Reading View only shows layout blocks; change them in Live Preview.
-- Text inside a layout block goes before its first row of media (left column) or after its last row (right column). A block with text and no media is a text box. Text between two rows is left untouched and renders as normal Markdown. A layout with text beside its media does not wrap the note's text.
+- In a media layout, text goes before its first row of media (left column) or after its last row (right column); text between two media rows makes that layout invalid. A text-only block, or a block marked `type:"text"`, treats all its content as text and can contain embedded media anywhere. A layout with text beside its media does not wrap the note's text.
 - No telemetry or analytics. Local media work offline; remote media embedded in a note still load from their source URLs.
 
 ---

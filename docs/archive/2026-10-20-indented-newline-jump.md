@@ -1,5 +1,7 @@
 # Tab 缩进续行抖动（Issue #27）
 
+交付状态：PR [#33](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/33) 已于 2026-10-20 squash 合入 main（`616ac5b`），Issue #27 随之关闭。公开 0.9.0 的标签与附件早于该修复，未包含本改动；本页验证对应原修复提交 `75bb922`。
+
 ## 原因与修改
 
 [Issue #27](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/27) 补充了 Tab 缩进触发条件。缩进代码末尾按 Enter 时，Obsidian 会将缩进带到新行。同步 `paragraphBreaks` 原先把这种仅含缩进的尾行当成段落空行，约 80ms 后宿主解析又将其归入代码块，移除 `vml-break`，导致行高从 16px 变成约 24px。

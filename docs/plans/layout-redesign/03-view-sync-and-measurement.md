@@ -12,7 +12,7 @@
 
 ## 2. 内容来源与版本协调
 
-建议新增 `documentSnapshot.ts` 与 `viewCoordinator.ts`，区分以下来源：
+当前已有 `documentSnapshot.ts` 与 `viewProjection.ts` 承担快照和每窗格协调基础，`viewEnvironment.ts` 读取窗格环境；没有名为 `viewCoordinator.ts` 的实现。下文描述完整方案需区分的来源与契约，不能把基础接入视为全部完成：
 
 | 来源 | 接受条件 | 处理 |
 | --- | --- | --- |
