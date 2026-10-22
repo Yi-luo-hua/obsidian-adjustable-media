@@ -52,3 +52,23 @@ test("all views render exact manual segments separately and wait for every colum
   assert.equal(module.layoutRenderState(root), "rendered");
   assert.equal(lines.join("\n"), original);
 });
+
+test("shared sizing separates the outer frame from the media share and restores both on cancel", async () => {
+  const module = await mockedModule<{ applySizing(el: unknown, layout: model.LayoutModel): void }>(new URL("../src/view/layoutView.ts", import.meta.url), {
+    obsidian: {}, "../format/v2.ts": format, "../layout/model.ts": model, "../layout/viewProjection.ts": projection,
+    "../markdown/textColumns.ts": columns, "./crossrefView.ts": {}, "./media.ts": {}, "./mediaControls.ts": {}, "./videoSource.ts": {}, "./messages.ts": {},
+  });
+  const layout = model.modelFromBlock(format.findV2Blocks(['<!-- vml {"width":0.5,"align":"right"} -->', '![[a.png]]', 'Text', '<!-- /vml -->'])[0]);
+  const root = new Element();
+  module.applySizing(root, layout);
+  assert.equal(root.props["--vml-block-width"], "");
+  assert.equal(root.props["--vml-media-width"], "50%");
+  assert.equal(root.classes.has("vml-layout--sized"), false);
+  module.applySizing(root, model.setFrameWidth(layout, 0.6));
+  assert.equal(root.props["--vml-block-width"], "60%");
+  assert.equal(root.props["--vml-media-width"], "50%");
+  assert.ok(root.classes.has("vml-layout--align-right"));
+  module.applySizing(root, layout);
+  assert.equal(root.props["--vml-block-width"], "");
+  assert.equal(root.classes.has("vml-layout--align-right"), false);
+});

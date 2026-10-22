@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix media-and-text layouts being stuck at full width (#34). Resize the outer frame independently of the media column, preserving existing media shares, text and embeds.
 - Fix the delayed live preview jump after Enter continues an indented code block with a Tab or sufficient spaces (#27, merged through #33). This fix is on main and is not included in the published 0.9.0 files.
 
 ## 0.9.0 - 2026-10-20

@@ -12,9 +12,14 @@ import {
   scaleRows,
   setAlign,
   setBlockWidth,
+  setFrameWidth,
+  effectiveFrameWidth,
+  effectiveWidth,
+  onlySizingDiffers,
   setPosition,
   type LayoutModel,
 } from "../src/layout/model.ts";
+import { applyEditsToText, planModelEdit } from "../src/layout/edits.ts";
 
 function model(lines: string[]): LayoutModel {
   const [block] = findV2Blocks(lines);
@@ -29,6 +34,36 @@ const sample = [
   "![[c.png]]",
   "<!-- /vml -->",
 ];
+
+test("media-and-text frames shrink independently of their existing media share and preserve source", () => {
+  for (const text of [["Left"], ["Right"], ["Left", "Right"]]) {
+    const lines = ["Before  ", "", '<!-- vml {"v":2,"width":0.5,"future":"keep"} -->',
+      ...(text[0] === "Left" ? ["Left  ", ""] : []),
+      "![[a.png|alias|200]]  ![B](b.png)  ",
+      ...(text.at(-1) === "Right" ? ["", "Right  "] : []), "<!-- /vml -->", "", "After  "];
+    const block = findV2Blocks(lines)[0];
+    const before = modelFromBlock(block);
+    const after = setFrameWidth(before, 0.6);
+    assert.equal(effectiveFrameWidth(before), null);
+    assert.equal(effectiveFrameWidth(after), 0.6);
+    assert.equal(effectiveWidth(after), 0.5);
+    assert.ok(onlySizingDiffers(before, after));
+    const edit = planModelEdit(block, after)!;
+    const result = applyEditsToText(lines.join("\r\n"), [edit]);
+    assert.ok(result.ok);
+    const changed = result.text.split("\r\n");
+    assert.deepEqual(changed.slice(0, 2), lines.slice(0, 2));
+    assert.deepEqual(changed.slice(3), lines.slice(3));
+    assert.equal(changed[2], '<!-- vml {"v":2,"width":0.5,"frameWidth":0.6,"future":"keep"} -->');
+    assert.equal(modelFromBlock(findV2Blocks(changed)[0]).frameWidth, 0.6);
+    assert.equal(setFrameWidth(after, 1).frameWidth, null);
+    assert.equal(setFrameWidth(after, 0).frameWidth, 0.2);
+    assert.equal(setFrameWidth(after, Number.NaN), after);
+    assert.equal(setBlockWidth(after, 0.3).frameWidth, 0.6);
+  }
+  const mediaOnly = model(sample);
+  assert.deepEqual(setFrameWidth(mediaOnly, 0.6), setBlockWidth(mediaOnly, 0.6));
+});
 
 test("a single item's position reads offset first, then align, and is centered by default", () => {
   const layout = model([
