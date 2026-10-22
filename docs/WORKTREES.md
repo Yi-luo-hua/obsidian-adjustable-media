@@ -4,11 +4,11 @@
 
 ## 当前目录快照
 
-Git 登记 6 棵工作树。PR #35 已压缩合入 main（`8b29023`）；主目录本次从该 `origin/main` 建立 `codex/prepare-0.9.1`，准备补丁版本及对齐文档。切换前的 `codex/fix-issue-34-layout-frame` 为 `a4b279f`，已合入 PR #35。其余 5 棵工作树在核对时均无未提交修改。
+Git 登记 6 棵工作树。PR #35 已压缩合入 main（`8b29023`）；`codex/prepare-0.9.1` 的准备提交已快进合入 main，0.9.1 标签指向 `dc3f3ed` 并已正式公开发布。主目录现检出 main，继续同步发布记录。此前的 `codex/fix-issue-34-layout-frame` 为 `a4b279f`，已合入 PR #35。其余 5 棵工作树在核对时均无未提交修改。
 
 | 目录 | 分支／HEAD | 用途与状态 |
 | --- | --- | --- |
-| `E:/TOOLS/obsidian-adjustable-media` | `codex/prepare-0.9.1`，基于 `8b29023` | 准备 0.9.1 三文件包、双语更新说明与文档；公开版本仍为 0.9.0，Issue #27／#34 修复尚未发布 |
+| `E:/TOOLS/obsidian-adjustable-media` | `main`，包含 0.9.1 标签源码 `dc3f3ed` | 0.9.1 已正式发布；Issue #27／#34 修复及用户确认的双语公告已交付，本次同步公开版本与核验记录 |
 | `C:/Users/丁家宝/.codex/worktrees/independent-features/obsidian-adjustable-media` | `codex/w02-candidate-measurement` · `d680ce6` | W02 缓存／会话与 W03 约束原型已提交，工作树干净；未进入 main，不视为完整规划器交付 |
 | `C:/Users/丁家宝/.codex/worktrees/callout-review-fixes/obsidian-adjustable-media` | `codex/callout-review-fixes` · `5d145bd` | 0.9.0 Callout 来源树，干净，目录保留 |
 | `C:/Users/丁家宝/.codex/worktrees/canvas-support/obsidian-adjustable-media` | `codex/canvas-support` · `d05b012` | 0.9.0 Canvas 来源树，干净，目录保留 |
@@ -35,4 +35,4 @@ Git 登记 6 棵工作树。PR #35 已压缩合入 main（`8b29023`）；主目�
 - `276052785e29b2b26ead891092c9932bd63b3353`：W02／W03 的旧恢复状态。
 - `a33cddee8591186f84cceae4681f608d0aa4731c`：同步 PR #28／#30 前保留的主目录本地更新。
 
-本次准备发布文件、同步文档并在专用测试库核对候选包；没有移动或删除工作树、清理分支或恢复 stash。测试范围与设置恢复结果见 [0.9.1 准备记录](releases/0.9.1-readiness.md)。
+本次完成 0.9.1 发布、文档同步与专用测试库公告预览；没有移动或删除工作树、清理分支或恢复 stash。测试范围、设置恢复与后续预览状态见 [0.9.1 核验](releases/0.9.1-readiness.md)。

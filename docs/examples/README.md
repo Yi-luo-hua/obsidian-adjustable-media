@@ -8,9 +8,9 @@
 
 [Manual column examples](ManualColumns.en.md): the 0.7.3 update modal offered an offline creation button. You can also copy this Markdown directly into a note.
 
-0.9.1 候选包的「更新说明」只显示 0.9.1 正文，公开 0.9.0 仍显示该版正文；不能通过该弹窗打开旧版说明或其中的按钮。「功能示例」命令仍可离线创建带素材的通用指南；Mermaid 和手动分栏的纯 Markdown 样例可从本目录复制。
+当前 0.9.1 的「更新说明」只显示 0.9.1 正文，不能通过该弹窗打开旧版说明或其中的按钮。「功能示例」命令仍可离线创建带素材的通用指南；Mermaid 和手动分栏的纯 Markdown 样例可从本目录复制。
 
-The 0.9.1 candidate's update modal shows only its 0.9.1 notes; the public 0.9.0 build retains its own notes. The modal does not browse older notes or their sample buttons. The **Feature examples** command still creates the general guide with its media offline; copy the standalone Mermaid and manual-column samples from this directory.
+The current 0.9.1 update modal shows only its 0.9.1 notes. It does not browse older notes or their sample buttons. The **Feature examples** command still creates the general guide with its media offline; copy the standalone Mermaid and manual-column samples from this directory.
 
 本目录包含 Adjustable Media 的排版示例文档与内置媒体素材。示例以学术论文写作（Transformer / LoRA / GPT-2）为场景，直观演示多图并排、图文混排、文字环绕、双栏排版以及公式图表交叉引用。
 

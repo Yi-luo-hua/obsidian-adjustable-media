@@ -4,9 +4,9 @@
 
 ## 版本与交付范围
 
-- **公开版本：0.9.0**，标签源码 `93a5637`；三份公开附件、摘要及来源签名已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.0)和[发布核验](releases/0.9.0-readiness.md)。
-- **main：0.9.0 发布代码加未发布的 Issue #27／#34 修复**。PR [#33](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/33)（`616ac5b`）修复缩进代码续行间距延迟跳动，PR [#35](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/35)（`8b29023`）修复图文块整体缩放；两项 issue 均已关闭，公开 0.9.0 附件不含这两项修复。
-- **发布准备：0.9.1**，分支 `codex/prepare-0.9.1` 基于 `8b29023`，包含上述两项修复及版本、双语更新说明与文档对齐。506 项检查与生产打包通过，Windows 测试库中英文更新弹窗及升级／重载行为已核对。尚未创建版本标签或 GitHub Release；候选包和验证结果见 [准备记录](releases/0.9.1-readiness.md)。
+- **公开版本：0.9.1**，标签源码 `dc3f3ed`，已设为最新版本；三份公开附件与干净标签构建逐字节一致，摘要及来源证明已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.1)和[发布核验](releases/0.9.1-readiness.md)。
+- **main：已包含 0.9.1 发布代码**。PR [#33](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/33)（`616ac5b`）修复缩进代码续行间距延迟跳动，PR [#35](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/35)（`8b29023`）修复图文块整体缩放；两项 issue 均已关闭，两项修复均已发布。
+- 0.9.1 的 506 项检查、生产打包、main／标签 CI 和 Release 工作流通过。Windows 测试库中英文更新弹窗、升级／重载行为和用户确认的原文结尾已核对；移动设备、其他主题、Obsidian 1.12.7 及 PDF 未复测。
 - 已发布范围保留正文连续空行与引用跳转修复、手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配、Mermaid 独立项、Callout／Canvas 与主题把手等功能；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。原 main 完整保留为 `codex/main-before-080`；当前检出分支以 [WORKTREES](WORKTREES.md) 的日期快照及 `git status` 为准。
 
 ## 已有工作与当前边界
@@ -21,9 +21,9 @@
 
 ## 验证
 
-- 2026-10-22 Issue #34：类型检查、lint、505 项测试和生产构建通过；Windows／Obsidian 1.14.4／默认主题验证左右／双侧文字栏、多图行、外框与图片栏分别缩放、窄块对齐、Esc 取消零写入、一步撤销及原文保留，实时预览／阅读宽度与重载结果一致。PR #35 私密审查未发现明确新增缺陷，已合入 main；原失败场景与未测范围见 [修复记录](archive/2026-10-22-text-media-frame-resize.md)。候选包本轮的检查单独记在 [0.9.1 准备记录](releases/0.9.1-readiness.md)，不将既有实测记为本轮重跑。
+- 2026-10-22 Issue #34：类型检查、lint、505 项测试和生产构建通过；Windows／Obsidian 1.14.4／默认主题验证左右／双侧文字栏、多图行、外框与图片栏分别缩放、窄块对齐、Esc 取消零写入、一步撤销及原文保留，实时预览／阅读宽度与重载结果一致。PR #35 私密审查未发现明确新增缺陷，已合入 main 并随 0.9.1 发布；原失败场景与未测范围见 [修复记录](archive/2026-10-22-text-media-frame-resize.md)。发布包本轮的检查单独记在 [0.9.1 核验](releases/0.9.1-readiness.md)，不将既有实测记为本轮重跑。
 
-- 2026-10-20 Issue #27 修复：类型检查、lint、503 项测试和生产构建通过；Windows／Obsidian 1.14.4／默认主题验证 Tab／四空格续行、段中与首段回车、源码模式对照、原文与一步撤销。已合入 main，尚未发布；移动设备和其他主题未复测，详见 [修复记录](archive/2026-10-20-indented-newline-jump.md)。2026-10-21 文档核对时，同一源码的 `npm run check` 再次通过（503 项测试，lint 0 错误、165 条警告）；本次未新增宿主或设备验收。
+- 2026-10-20 Issue #27 修复：类型检查、lint、503 项测试和生产构建通过；Windows／Obsidian 1.14.4／默认主题验证 Tab／四空格续行、段中与首段回车、源码模式对照、原文与一步撤销。已合入 main 并随 0.9.1 发布；移动设备和其他主题未复测，详见 [修复记录](archive/2026-10-20-indented-newline-jump.md)。2026-10-21 文档核对时，同一源码的 `npm run check` 再次通过（503 项测试，lint 0 错误、165 条警告）；本次未新增宿主或设备验收。
 
 - 2026-10-20 0.9.0 发布验证：Node 24.11.1 类型检查、lint、500 项测试和生产打包通过。Windows／Obsidian 1.14.4 测试库的 Mermaid 真实右键包装、Callout 缩放／取消／一步撤销、普通布局与两类 Canvas 卡片预览、库外图片及中英文更新弹窗通过；98 篇原笔记及测试插件文件已核对恢复。未重复完整移动／PDF／主题矩阵，详见 [0.9.0 核验](releases/0.9.0-readiness.md)。
 
