@@ -53,7 +53,7 @@ export interface LayoutItem {
 /** Size/position settings can update existing media; content and other presentation need a redraw. */
 export function onlySizingDiffers(before: LayoutModel, after: LayoutModel): boolean {
   const content = (model: LayoutModel): unknown => {
-    const { width: _width, align: _align, rows, ...rest } = model;
+    const { width: _width, frameWidth: _frameWidth, align: _align, rows, ...rest } = model;
     return { ...rest, rows: rows.map(row => {
       const { height: _height, width: _rowWidth, align: _rowAlign, offset: _offset, items, ...settings } = row;
       return { ...settings, items: items.map(({ weight: _weight, ...item }) => item) };
@@ -93,6 +93,8 @@ export interface LayoutModel {
    * written in the block beside its media).
    */
   width: number | null;
+  /** Overall width of a media-and-text layout; its media share stays in width. */
+  frameWidth: number | null;
   /** The side the layout floats to, with the note's text wrapping around it; null means no wrapping. */
   wrap: WrapSide | null;
   /** How many lines below its place a wrapped layout starts; null starts it right there. */
@@ -129,7 +131,7 @@ export type MoveTarget =
 const ALIGN_OFFSETS: ReadonlyArray<readonly [Align, number]> = [["left", 0], ["center", 0.5], ["right", 1]];
 
 export function modelFromBlock(block: V2Block): LayoutModel {
-  const { width, wrap, skip, valign, type, cols, gap, textAlign, size, align, ...rest } = block.meta.extra;
+  const { width, frameWidth, wrap, skip, valign, type, cols, gap, textAlign, size, align, ...rest } = block.meta.extra;
   // A layout with text beside its media does not float; its wrap settings are kept as written.
   const columns = blockHasTextColumns(block);
   const extra = columns ? { ...definedOnly({ wrap, skip }), ...rest } : rest;
@@ -152,6 +154,7 @@ export function modelFromBlock(block: V2Block): LayoutModel {
       };
     }),
     width: readBlockWidth(width),
+    frameWidth: readBlockWidth(frameWidth),
     wrap: columns ? null : readBlockWrap(wrap),
     skip: columns ? null : readBlockSkip(skip),
     text: { left: markdownOf(block.leftText), right: markdownOf(block.rightText) },
@@ -227,6 +230,7 @@ export function metaFromModel(model: LayoutModel): V2Meta {
     extra: {
       ...(mediaItems ? { kind: "media" } : {}),
       ...(model.width === null ? {} : { width: model.width }),
+      ...(model.frameWidth === null ? {} : { frameWidth: model.frameWidth }),
       ...(model.wrap === null ? {} : { wrap: model.wrap }),
       // Without wrapping, skip means nothing; without text beside the media, neither does valign.
       ...(model.wrap === null || model.skip === null ? {} : { skip: model.skip }),
@@ -424,6 +428,18 @@ export function maxBlockWidth(model: LayoutModel): number {
 /** The share of the container width a layout's media is drawn at; null means full width. */
 export function effectiveWidth(model: LayoutModel): number | null {
   return model.width ?? (besideText(model) ? DEFAULT_WRAP_WIDTH : null);
+}
+
+/** Overall frame width, independent of the media share in a layout with text columns. */
+export function effectiveFrameWidth(model: LayoutModel): number | null {
+  return hasTextColumns(model) ? model.frameWidth : effectiveWidth(model);
+}
+
+export function setFrameWidth(model: LayoutModel, width: number): LayoutModel {
+  if (!hasTextColumns(model)) return setBlockWidth(model, width);
+  if (!Number.isFinite(width)) return model;
+  const value = round(Math.min(1, Math.max(MIN_BLOCK_WIDTH, width)));
+  return { ...model, frameWidth: value >= 1 ? null : value };
 }
 
 /** Whether text sits beside the layout: the note's text around its float, or its own text beside its media. */

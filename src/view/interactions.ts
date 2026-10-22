@@ -6,6 +6,7 @@ import { dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFr
 import {
   canAddText,
   effectiveWidth,
+  effectiveFrameWidth,
   hasTextColumns,
   insertItem,
   isTextOnly,
@@ -18,6 +19,7 @@ import {
   scaleRows,
   setAlign,
   setBlockWidth,
+  setFrameWidth,
   setCaption,
   setCaptionAlign,
   setPosition,
@@ -575,7 +577,8 @@ function setUpColumnHandle(itemEls: HTMLElement[], itemEl: HTMLElement, index: n
 /**
  * The frame around a layout in live preview: its right edge sets the layout's width, its bottom
  * edge scales the height of every row, and its corner scales both, keeping the images' proportions.
- * With text beside the media, the handles sit on the media's column, which the width belongs to.
+ * With text beside the media, its column keeps width/height controls; the outer frame has its own
+ * width and corner controls, independent of the media share.
  * A layout of text alone has only its width to set: its height follows its text.
  */
 function setUpFrame(root: HTMLElement, context: LayoutContext): void {
@@ -583,21 +586,28 @@ function setUpFrame(root: HTMLElement, context: LayoutContext): void {
   // The width handles sit on the edge that moves as the layout grows. A layout floating right, or
   // media with text on their left only, grow to the left; media between two texts grow both ways.
   const direction = frameResizeDirection(context.model);
-  const mirrored = direction < 0;
-  const edges = isTextOnly(context.model) ? (["right"] as const) : (["right", "bottom", "corner"] as const);
-  for (const edge of edges) {
-    const handle = box.createDiv({
+  const columns = hasTextColumns(context.model);
+  const outerDirection = context.model.align === "right" ? -1 : context.model.align === "center" ? 2 : 1;
+  const controls: Array<{ box: HTMLElement; edge: FrameEdge; direction: number }> = columns
+    ? [
+      { box, edge: "right", direction }, { box, edge: "bottom", direction },
+      { box: root, edge: "right", direction: outerDirection },
+      { box: root, edge: "corner", direction: outerDirection },
+    ]
+    : (isTextOnly(context.model) ? (["right"] as const) : (["right", "bottom", "corner"] as const)).map(edge => ({ box, edge, direction }));
+  for (const { box: target, edge, direction: resizeDirection } of controls) {
+    const handle = target.createDiv({
       cls: `vml-handle vml-frame__handle vml-frame__handle--${edge}`,
       attr: { "aria-label": t(FRAME_LABELS[edge]), role: "separator" },
     });
-    handle.toggleClass("vml-frame__handle--mirrored", mirrored && edge !== "bottom");
+    handle.toggleClass("vml-frame__handle--mirrored", resizeDirection < 0 && edge !== "bottom");
     handle.addEventListener("pointerdown", (event) => {
       if (event.button !== 0) {
         return;
       }
       event.preventDefault();
       event.stopPropagation();
-      resizeBlock(root, box, handle, edge, context, event, direction);
+      resizeBlock(root, target, handle, edge, context, event, resizeDirection);
     });
   }
 }
@@ -613,7 +623,8 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
   if (available <= 0 || rect.width <= 0) {
     return;
   }
-  const startWidth = effectiveWidth(context.model) ?? Math.min(1, rect.width / available);
+  const outerColumns = box === root && hasTextColumns(context.model);
+  const startWidth = (outerColumns ? effectiveFrameWidth(context.model) : effectiveWidth(context.model)) ?? Math.min(1, rect.width / available);
   const rowEls = Array.from(root.querySelectorAll<HTMLElement>(".vml-row"));
   const rowsHeight = rowEls.reduce((sum, rowEl) => sum + rowEl.getBoundingClientRect().height, 0);
   // Single items without a stored width scale from the share of their row they take up now.
@@ -639,15 +650,17 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
       const dx = (move.clientX - start.clientX) * direction;
       const dy = move.clientY - start.clientY;
       if (edge === "right") {
-        next = keepSingleSizes(context.model, setBlockWidth(context.model, (rect.width + dx) / available), available, inset);
+        next = outerColumns
+          ? setFrameWidth(context.model, (rect.width + dx) / available)
+          : keepSingleSizes(context.model, setBlockWidth(context.model, (rect.width + dx) / available), available, inset);
       } else if (edge === "bottom") {
         const scale = clamp(rowsHeight > 0 ? (rowsHeight + dy) / rowsHeight : 1, MIN_SCALE, MAX_SCALE);
         next = scaleRows(context.model, scale, singleWidths);
       } else {
         // The layout's width stays within its limits, so the rows scale by the same factor as it.
-        const widest = maxBlockWidth(context.model) / startWidth;
+        const widest = (outerColumns ? 1 : maxBlockWidth(context.model)) / startWidth;
         const scale = clamp((rect.width + dx) / rect.width, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, widest));
-        next = scaleRows(setBlockWidth(context.model, startWidth * scale), scale, singleWidths, 1);
+        next = scaleRows((outerColumns ? setFrameWidth : setBlockWidth)(context.model, startWidth * scale), scale, singleWidths, 1);
       }
       applySizing(root, next);
     },
@@ -816,7 +829,7 @@ function linesAround(context: LayoutContext): LinesAround {
 
 /** Whether a layout stands alone and is narrower than the note, so its place across the note shows. */
 function placeable(model: LayoutModel): boolean {
-  return model.wrap === null && !hasTextColumns(model) && effectiveWidth(model) !== null;
+  return model.wrap === null && effectiveFrameWidth(model) !== null;
 }
 
 /** Opens the settings of the layout's text: columns, alignment, size and the layout's place. */

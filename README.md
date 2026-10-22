@@ -68,7 +68,7 @@ The latest release is **0.9.0**. Text boxes, multi-column text and numbered figu
 | :--- | :--- |
 | **Adjust column width ratio** | Drag the gap between two items; double-click it to share the row by the images' proportions again |
 | **Change row height** | Drag the bottom edge of the row |
-| **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner for proportional scale; a layout floating right uses its left edge and bottom-left corner; with text beside the media, the handles sit on the media column) |
+| **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner to scale; a layout floating right uses its left edge and bottom-left corner). The development build fixes media-and-text layouts being stuck at full width: outer edge/corner handles resize the entire layout, while media-column edge/bottom handles adjust its share/media sizes. Published 0.9.0 does not include this fix yet |
 | **Position a single item** | Drag the image horizontally; snaps smoothly to left, center, and right |
 | **Reorder or move items** | Drag and drop onto adjacent spots, between rows (to split into a new row), or into another layout block |
 | **Wrap text around a layout** | Right-click an item and choose **Float left, wrap text** or **Float right, wrap text**; **No text wrap** takes it back |

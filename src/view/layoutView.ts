@@ -1,7 +1,7 @@
 import { MarkdownRenderer, type App, type Component } from "obsidian";
 
 import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, type TextSide } from "../format/v2.ts";
-import { effectiveWidth, hasTextColumns, isTextOnly, rowOffset, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
+import { effectiveFrameWidth, effectiveWidth, hasTextColumns, isTextOnly, rowOffset, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
 import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { setBounded } from "../layout/viewProjection.ts";
 import { resolveMedia } from "./media.ts";
@@ -174,12 +174,13 @@ function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOp
  * single items. Rendering uses it, and so do resize gestures, to preview a model and to restore it.
  */
 export function applySizing(root: HTMLElement, model: LayoutModel): void {
-  const width = effectiveWidth(model);
+  const width = effectiveFrameWidth(model);
   root.toggleClass("vml-layout--sized", width !== null);
   root.setCssProps({ "--vml-block-width": width === null ? "" : `${width * 100}%` });
+  root.setCssProps({ "--vml-media-width": hasTextColumns(model) ? `${(effectiveWidth(model) ?? 0.4) * 100}%` : "" });
   // A narrow layout that does not float sits on the left, in the middle or on the right.
   for (const align of ["center", "right"] as const) {
-    root.toggleClass(`vml-layout--align-${align}`, width !== null && model.wrap === null && !hasTextColumns(model) && model.align === align);
+    root.toggleClass(`vml-layout--align-${align}`, width !== null && model.wrap === null && model.align === align);
   }
 
   for (const rowEl of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) {
