@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+## 0.9.1 - 2026-10-22
+
 - Fix media-and-text layouts being stuck at full width (#34). Resize the outer frame independently of the media column, preserving existing media shares, text and embeds.
-- Fix the delayed live preview jump after Enter continues an indented code block with a Tab or sufficient spaces (#27, merged through #33). This fix is on main and is not included in the published 0.9.0 files.
+- Align narrower media-and-text layouts to the left, center or right; text reflows without changing its font size.
+- Fix the delayed live preview jump after Enter continues an indented code block with a Tab or sufficient spaces (#27).
+
+The two fixes were verified with real input on Windows / Obsidian 1.14.4 / the default theme. Mobile devices, Obsidian 1.12.7, other themes and PDF export were not retested for this patch. Release preparation and validation are recorded in `docs/releases/0.9.1-readiness.md`.
 
 ## 0.9.0 - 2026-10-20
 

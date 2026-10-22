@@ -4,6 +4,8 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
+**0.9.1 is being prepared** with fixes for media-and-text frame resizing (#34) and the delayed spacing jump after Enter in indented code (#27). The latest public release remains 0.9.0. See [patch preparation](docs/releases/0.9.1-readiness.md).
+
 0.9.0 adds Canvas card layouts, Callout image resizing and Mermaid context-menu wrapping, and fixes theme-related handle clipping, layout alignment and external file URL images. Theme compatibility checks screened all 901 official themes' main CSS and 342 rendering combinations from 57 theme styles. See [release verification](docs/releases/0.9.0-readiness.md).
 
 0.8.2 fixes disappearing blank lines and overlapping line numbers away from layouts in live preview, plus reference clicks and navigation. See [patch verification](docs/releases/0.8.2-readiness.md).
@@ -68,7 +70,7 @@ The latest release is **0.9.0**. Text boxes, multi-column text and numbered figu
 | :--- | :--- |
 | **Adjust column width ratio** | Drag the gap between two items; double-click it to share the row by the images' proportions again |
 | **Change row height** | Drag the bottom edge of the row |
-| **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner to scale; a layout floating right uses its left edge and bottom-left corner). The development build fixes media-and-text layouts being stuck at full width: outer edge/corner handles resize the entire layout, while media-column edge/bottom handles adjust its share/media sizes. Published 0.9.0 does not include this fix yet |
+| **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner to scale; a layout floating right uses its left edge and bottom-left corner). The 0.9.1 candidate fixes media-and-text layouts being stuck at full width: outer edge/corner handles resize the entire layout, while media-column edge/bottom handles adjust its share/media sizes. Published 0.9.0 does not include this fix |
 | **Position a single item** | Drag the image horizontally; snaps smoothly to left, center, and right |
 | **Reorder or move items** | Drag and drop onto adjacent spots, between rows (to split into a new row), or into another layout block |
 | **Wrap text around a layout** | Right-click an item and choose **Float left, wrap text** or **Float right, wrap text**; **No text wrap** takes it back |
