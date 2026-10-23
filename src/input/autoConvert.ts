@@ -118,7 +118,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
       return;
     }
 
-    void writeBlockEdits(plugin.app, file, [lineChangeEdit(doc.toString().split("\n"), change)], { view }).then(result => {
+    void writeBlockEdits(plugin.app, file, [lineChangeEdit(doc.toString().split("\n"), change)], { view, finishWrapping: true }).then(result => {
       if (!result.ok) new Notice(t("writeNotFound"));
     }).catch(reportWriteError);
   };

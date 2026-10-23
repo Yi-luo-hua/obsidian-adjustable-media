@@ -38,7 +38,7 @@ export function registerCommands(plugin: Plugin): void {
       }
       const change = planWrapSelection(original.split("\n"), from, to);
       if (change) {
-        writeCommandChange(plugin, editor, view.file, change);
+        writeCommandChange(plugin, editor, view.file, change, true);
       }
     }));
   }));
@@ -50,7 +50,7 @@ export function registerCommands(plugin: Plugin): void {
       const { from, to } = selectedLines(editor.getCursor("from"), editor.getCursor("to"));
       const change = planWrapSelection(editor.getValue().split("\n"), from, to);
       if (change) {
-        writeCommandChange(plugin, editor, view.file, change);
+        writeCommandChange(plugin, editor, view.file, change, true);
       } else {
         new Notice(t("wrapNothing"));
       }
@@ -96,11 +96,11 @@ export function registerCommands(plugin: Plugin): void {
   });
 }
 
-function writeCommandChange(plugin: Plugin, editor: Editor, file: TFile | null, change: LineChange): void {
+function writeCommandChange(plugin: Plugin, editor: Editor, file: TFile | null, change: LineChange, finishWrapping = false): void {
   file ??= fileOfEditor(plugin.app, editor);
   if (!file) { new Notice(t("writeNotFound")); return; }
   const edit = lineChangeEdit(editor.getValue().split("\n"), change);
-  void writeBlockEdits(plugin.app, file, [edit], { editor }).then(result => {
+  void writeBlockEdits(plugin.app, file, [edit], { editor, finishWrapping }).then(result => {
     if (!result.ok) new Notice(t("writeNotFound"));
   }).catch(reportWriteError);
 }

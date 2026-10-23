@@ -1,7 +1,7 @@
 import { Menu, Notice, editorInfoField, type Editor, type Plugin } from "obsidian";
 import { EditorView } from "@codemirror/view";
 
-import { lineChangeEdit, planWrapSelection } from "../commands/plans.ts";
+import { lineChangeEdit, planWrapImage, planWrapSelection } from "../commands/plans.ts";
 import { takePlainMermaid } from "../layout/plainEmbed.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
 import { reportWriteError, t } from "./messages.ts";
@@ -33,12 +33,16 @@ export function registerImageMenu(plugin: Plugin): void {
       return;
     }
 
+    const original = editor.getValue();
     menu.addItem((item) => item.setTitle(t("wrapInLayout")).setIcon("layout-grid").setSection("image").onClick(() => {
-      // Planned again: the note may have changed while the menu was open.
+      if (editor.getValue() !== original || !view.contentDOM.contains(embedEl)) {
+        new Notice(t("writeNotFound"));
+        return;
+      }
       const change = planWrap(view, editor, embedEl);
       const file = view.state.field(editorInfoField, false)?.file ?? fileOfEditor(plugin.app, editor);
       if (change && file) {
-        void writeBlockEdits(plugin.app, file, [lineChangeEdit(editor.getValue().split("\n"), change)], { view }).then(result => {
+        void writeBlockEdits(plugin.app, file, [lineChangeEdit(editor.getValue().split("\n"), change)], { view, finishWrapping: true }).then(result => {
           if (!result.ok) new Notice(t("writeNotFound"));
         }).catch(reportWriteError);
       } else {
@@ -78,20 +82,20 @@ function showMermaidMenu(plugin: Plugin, event: MouseEvent, diagram: HTMLElement
       new Notice(t("writeNotFound"));
       return;
     }
-    void writeBlockEdits(plugin.app, file, [lineChangeEdit(lines, change)], { view }).then(result => {
+    void writeBlockEdits(plugin.app, file, [lineChangeEdit(lines, change)], { view, finishWrapping: true }).then(result => {
       if (!result.ok) new Notice(t("writeNotFound"));
     }).catch(reportWriteError);
   }));
   menu.showAtMouseEvent(event);
 }
 
-function planWrap(view: EditorView, editor: Editor, embedEl: HTMLElement): ReturnType<typeof planWrapSelection> {
-  let line: number;
+function planWrap(view: EditorView, editor: Editor, embedEl: HTMLElement): ReturnType<typeof planWrapImage> {
   try {
-    line = view.state.doc.lineAt(view.posAtDOM(embedEl)).number - 1;
+    const position = view.posAtDOM(embedEl);
+    const line = view.state.doc.lineAt(position);
+    return planWrapImage(editor.getValue().split("\n"), line.number - 1, position - line.from);
   } catch {
     // The image is no longer part of the editor.
     return null;
   }
-  return planWrapSelection(editor.getValue().split("\n"), line, line);
 }

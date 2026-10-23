@@ -1,4 +1,4 @@
-import { MarkdownView, Platform, editorInfoField, type App, type Editor, type TFile } from "obsidian";
+import { MarkdownView, Platform, editorInfoField, editorLivePreviewField, type App, type Editor, type TFile } from "obsidian";
 import { EditorView } from "@codemirror/view";
 
 import { canvasEditor } from "../view/canvas.ts";
@@ -14,6 +14,7 @@ export interface WriteOptions {
   editor?: Editor;
   view?: EditorView;
   typing?: boolean;
+  finishWrapping?: boolean;
   readSet?: readonly SourceAssertion[];
 }
 
@@ -118,5 +119,6 @@ export async function writeBlockEdits(
 function writeToView(view: EditorView, edits: readonly BlockEdit[], options: WriteOptions): WriteResult {
   const snapshot = snapshotForState(view.state);
   const bound = bindBlockEdits(edits, snapshot?.text === view.state.doc.toString() ? snapshot.blocks : []);
-  return bound.ok ? applyEditsToView(view, bound.edits, options.typing, options.readSet) : bound;
+  return bound.ok ? applyEditsToView(view, bound.edits, options.typing, options.readSet,
+    options.finishWrapping && view.state.field(editorLivePreviewField, false)) : bound;
 }

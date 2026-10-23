@@ -8,7 +8,7 @@ import { mockedModule } from "./support/mockedModule.ts";
 
 const graph = ["```mermaid", "flowchart LR", "  A[Keep spaces] --> B", "```"];
 
-async function menuHarness(source: string, line: number) {
+async function menuHarness(source: string, line: number, imageColumn?: number) {
   let text = source, connected = true, insideLayout = false, dragging = false;
   const notices: string[] = [];
   const writes: Array<{ file: unknown; edits: BlockEdit[]; options: { view: unknown } }> = [];
@@ -20,7 +20,7 @@ async function menuHarness(source: string, line: number) {
     click!: () => void;
     addItem(build: (item: object) => void) {
       const item = { setTitle: (title: string) => { this.title = title; return item; },
-        setIcon: () => item, onClick: (callback: () => void) => { this.click = callback; return item; } };
+        setIcon: () => item, setSection: () => item, onClick: (callback: () => void) => { this.click = callback; return item; } };
       build(item);
       return this;
     }
@@ -30,11 +30,11 @@ async function menuHarness(source: string, line: number) {
   const editor = { getValue: () => text };
   const view = { state: {
     field: () => ({ editor, file }),
-    doc: { lineAt: () => ({ number: line + 1 }) },
-  }, posAtDOM: () => 0, contentDOM: { contains: () => connected } };
+    doc: { lineAt: () => ({ number: line + 1, from: 0 }) },
+  }, posAtDOM: () => imageColumn ?? 0, contentDOM: { contains: () => connected } };
   const diagram = { closest: (selector: string) => selector === ".cm-editor" ? view
     : selector === ".vml-layout, .vml-text-editor, .vml-plain-image--dragging" && (insideLayout || dragging) ? {} : null };
-  const target = { closest: (selector: string) => selector === ".cm-content .mermaid" ? diagram : null };
+  const target = { closest: (selector: string) => selector === (imageColumn === undefined ? ".cm-content .mermaid" : ".cm-content .image-embed") ? diagram : null };
   const module = await mockedModule<{ registerImageMenu(plugin: unknown): void }>(new URL("../src/view/imageMenu.ts", import.meta.url), {
     obsidian: { Menu: MenuStub, Notice: class { constructor(message: string) { notices.push(message); } }, editorInfoField: {} },
     "@codemirror/view": { EditorView: { findFromDOM: () => view } },
@@ -52,12 +52,42 @@ async function menuHarness(source: string, line: number) {
   });
   return {
     file, view, menus, writes, notices,
-    open() { let prevented = false; context({ preventDefault() { prevented = true; }, stopPropagation() {} }); return prevented; },
+    open() {
+      let prevented = false;
+      context({ preventDefault() { prevented = true; }, stopPropagation() {} });
+      if (imageColumn !== undefined) {
+        const menu = new MenuStub();
+        handlers.get("file-menu")!(menu, file, "link-context-menu");
+        if (menu.title) menus.push(menu);
+      }
+      return prevented;
+    },
     setText(value: string) { text = value; }, detach() { connected = false; },
     insideLayout() { insideLayout = true; },
     dragging() { dragging = true; },
   };
 }
+
+test("an image menu wraps just the inline image and cancels if its source or widget changes", async () => {
+  const source = "输入几个字![[a.png]]";
+  for (const change of ["none", "source", "widget"]) {
+    const host = await menuHarness(source, 0, source.indexOf("![["));
+    host.open();
+    assert.equal(host.menus.length, 1);
+    assert.equal(host.writes.length, 0);
+    if (change === "source") host.setText("其他文字![[b.png]]");
+    if (change === "widget") host.detach();
+    host.menus[0].click();
+    if (change === "none") {
+      assert.equal(host.writes.length, 1);
+      const result = applyEditsToText(source, host.writes[0].edits);
+      assert.deepEqual(result, { ok: true, text: "输入几个字\n\n<!-- vml -->\n![[a.png]]\n<!-- /vml -->" });
+    } else {
+      assert.equal(host.writes.length, 0);
+      assert.deepEqual(host.notices, ["writeNotFound"]);
+    }
+  }
+});
 
 test("right-click wraps only the clicked complete Mermaid, preserving CRLF and identical neighbours", async () => {
   const lines = ["before", "", ...graph, "", "between", "", ...graph, "", "after"];

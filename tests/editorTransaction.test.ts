@@ -7,8 +7,44 @@ import { findV2Blocks } from "../src/format/v2.ts";
 import { planModelEdit } from "../src/layout/edits.ts";
 import { applyEditsToView, isLayoutHistory, layoutHistoryEffects } from "../src/layout/editorTransaction.ts";
 import { modelFromBlock, moveItem } from "../src/layout/model.ts";
+import { lineChangeEdit, planWrapSelection } from "../src/commands/plans.ts";
 
 const original = "Cursor stays here.\n\n<!-- vml -->\n![[a.png]] ![[b.png]]\n<!-- /vml -->\n\nTail";
+
+for (const tail of ["", "\n", "\n\nTail", "\nTail", "\n<!-- vml -->\n![[b.png]]\n<!-- /vml -->"]) {
+  test(`wrapping leaves a typing line outside the layout and undoes in one step: ${JSON.stringify(tail)}`, () => {
+    const text = `Heading\n\n![[a.png|alias|320]]${tail}`;
+    const view = editor();
+    const start = text.indexOf("![[");
+    view.state = EditorState.create({ doc: text, selection: { anchor: start, head: start + 5 },
+      extensions: [history(), layoutHistoryEffects] });
+    const lines = text.split("\n");
+    const change = planWrapSelection(lines, 2, 2)!;
+    assert.deepEqual(applyEditsToView(view, [lineChangeEdit(lines, change)], false, [], true), { ok: true });
+    const block = findV2Blocks(view.state.doc.toString().split("\n"))[0];
+    const caret = view.state.doc.lineAt(view.state.selection.main.head);
+    assert.equal(caret.number, block.closeLine + 2);
+    assert.equal(caret.text, "");
+    assert.equal(view.state.selection.main.empty, true);
+    assert.ok(view.state.doc.toString().includes("![[a.png|alias|320]]"));
+    assert.ok(view.state.doc.toString().endsWith(tail));
+    assert.equal(undo({ state: view.state, dispatch: tr => { view.state = tr.state; } }), true);
+    assert.equal(view.state.doc.toString(), text);
+    assert.equal(view.state.selection.main.anchor, start);
+    assert.equal(redo({ state: view.state, dispatch: tr => { view.state = tr.state; } }), true);
+    assert.equal(view.state.doc.lineAt(view.state.selection.main.head).text, "");
+  });
+}
+
+test("wrapping through a menu preserves a cursor elsewhere in the note", () => {
+  const view = editor();
+  view.state = EditorState.create({ doc: "Heading\n\n![[a.png]]" });
+  const lines = view.state.doc.toString().split("\n");
+  const change = planWrapSelection(lines, 2, 2)!;
+  applyEditsToView(view, [lineChangeEdit(lines, change)], false, [], true);
+  assert.equal(view.state.selection.main.head, 0);
+  assert.ok(view.state.doc.toString().endsWith("<!-- /vml -->"));
+});
 
 function editor() {
   const transactions: Transaction[] = [];

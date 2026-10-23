@@ -1,4 +1,4 @@
-import { findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Meta } from "../format/v2.ts";
+import { findV2Blocks, hasSideText, readEmbedRow, readMediaEmbeds, serializeBlock, type V2Block, type V2Meta } from "../format/v2.ts";
 import { planWrap } from "../input/insertion.ts";
 import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
@@ -75,6 +75,33 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
 
 const TEXT_META: V2Meta = { rows: [], extra: { type: "text" } };
 const INDENTED = /^[ \t]/;
+
+/** The image menu targets an embed, whereas the selection command deliberately wraps whole lines. */
+export function planWrapImage(lines: readonly string[], line: number, column: number): LineChange | null {
+  const text = stripCarriageReturn(lines[line] ?? "");
+  const contexts = scanMarkdownLines(lines);
+  const blocks = findV2Blocks(lines, contexts);
+  if (contexts[line] !== "text" || INDENTED.test(text)
+    || blocks.some(block => block.openLine <= line && line <= block.closeLine)) return null;
+  const embed = readMediaEmbeds(text, line).find(item => item.from <= column && column < item.to);
+  if (!embed) return null;
+  // Retain the existing behaviour for a row consisting entirely of media.
+  if (readEmbedRow(text, line)) return planWrapSelection(lines, line, line);
+  // A block-level layout cannot split a heading, list item or quoted paragraph.
+  if (/^(?:>|#{1,6}(?:\s|$)|(?:[-*+]|\d+[.)])[ \t]|\|)/.test(text)) return null;
+  const before = text.slice(0, embed.from);
+  const after = text.slice(embed.to);
+  const replacement = [
+    ...(before ? [before, ""] : []),
+    ...wrapLines([embed.raw]),
+    ...(after ? ["", after] : []),
+  ];
+  const result = findV2Blocks([...lines.slice(0, line), ...replacement, ...lines.slice(line + 1)]);
+  const opening = line + (before ? 2 : 0);
+  const block = result.find(block => block.openLine === opening);
+  return block && isEditable(block) && block.closeLine === opening + 2 && result.length === blocks.length + 1
+    ? { from: line, to: line, replacement } : null;
+}
 
 interface Position {
   line: number;
