@@ -6,9 +6,9 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-**0.9.1 已发布**，包含图文块整体缩放（#34）和缩进代码回车后间距延迟跳动（#27）两项修复。详见[补丁核验](docs/releases/0.9.1-readiness.md)。
+**0.9.2 已发布**，修复转换布局后的源码展开与光标定位，以及同行图片包装时误带入文字的问题。详见[补丁核验](docs/releases/0.9.2-readiness.md)。
 
-当前最新发布为 **0.9.1**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
+当前最新发布为 **0.9.2**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
 
 0.9.0 已发布，新增 Canvas 卡片布局、Callout 图片缩放和 Mermaid 右键包装，并修复主题样式导致的把手裁剪、布局正文对齐及库外图片显示。已筛查官方目录全部 901 个主题的主 CSS，并对 57 组样式完成 342 种渲染组合检查。详见[发布核验](docs/releases/0.9.0-readiness.md)。
 
