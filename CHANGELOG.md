@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.9.2 - 2026-10-24
+
+- Keep new layouts rendered in live preview after wrapping images or selected content. Place an affected cursor on a blank line after the converted content, including at the end of a note; preserve one-step undo and the cursor on redo.
+- Wrap only the clicked image when it shares a normal paragraph line with text. Keep surrounding text outside the layout and preserve the original embed, aliases and dimensions.
+- Cancel image-menu conversion if the note changes or the original image widget disappears while the menu is open.
+
+Verified with real image context-menu input on Windows / Obsidian 1.14.5 in the dedicated test vault, including the S6 reproduction, source preservation, undo and redo. Mobile devices, other themes and PDF export were not retested for this patch. See `docs/releases/0.9.2-readiness.md`.
+
 ## 0.9.1 - 2026-10-22
 
 - Fix media-and-text layouts being stuck at full width (#34). Resize the outer frame independently of the media column, preserving existing media shares, text and embeds.
