@@ -273,10 +273,10 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
 
   // Videos keep their controls; touch users move diagrams by a grip and scroll on the diagram body.
   let dragFrom = itemEl;
-  if (item.embed.kind === "video" || item.embed.kind === "mermaid") {
+  if (item.embed.kind === "video" || item.embed.kind === "mermaid" || item.embed.kind === "excalidraw") {
     const grip = itemEl.createDiv({ cls: "vml-handle vml-item__grip", attr: { "aria-label": t("dragHandle"), role: "button" } });
     setIcon(grip, "grip-vertical");
-    if (item.embed.kind === "video") dragFrom = grip;
+    if (item.embed.kind === "video" || item.embed.kind === "excalidraw") dragFrom = grip;
   }
   dragFrom.addEventListener("pointerdown", (event) => {
     const target = eventElement(event);

@@ -13,13 +13,15 @@ test("standalone grips follow source ownership, including a diagram that becomes
   }
   class Diagram {
     line: number;
+    excalidraw: boolean;
+    classes = new Set<string>();
     grip: { parentElement: Diagram; isConnected: boolean; addEventListener(): void; remove(): void } | null = null;
-    constructor(line: number) { this.line = line; }
-    closest(): null { return null; }
-    matches(): boolean { return true; }
+    constructor(line: number, excalidraw = false) { this.line = line; this.excalidraw = excalidraw; }
+    closest(selector: string): Diagram | null { return this.excalidraw && selector === ".excalidraw-embedded-img" ? this : null; }
+    matches(selector: string): boolean { return selector === (this.excalidraw ? ".excalidraw-embedded-img" : ".mermaid"); }
     querySelector(selector: string): unknown { return selector === "svg" ? {} : this.grip; }
-    addClass(): void {}
-    removeClass(): void {}
+    addClass(...names: string[]): void { names.forEach(name => this.classes.add(name)); }
+    removeClass(...names: string[]): void { names.forEach(name => this.classes.delete(name)); }
     createEl() {
       const grip = { parentElement: this, isConnected: true, addEventListener() {}, remove: () => { grip.isConnected = false; this.grip = null; } };
       this.grip = grip;
@@ -27,8 +29,8 @@ test("standalone grips follow source ownership, including a diagram that becomes
     }
   }
   const graph = ["```mermaid", "flowchart LR", "A-->B", "```"];
-  let lines = ["<!-- vml -->", "![[photo.png]]", "<!-- /vml -->", "", "- item", "", ...graph.map(line => "  " + line), "", ...graph];
-  const list = new Diagram(6), standalone = new Diagram(11), diagrams = [list, standalone];
+  let lines = ["<!-- vml -->", "![[photo.png]]", "<!-- /vml -->", "", "- item", "", ...graph.map(line => "  " + line), "", ...graph, "", "![[draw.excalidraw|240]]"];
+  const list = new Diagram(6), standalone = new Diagram(11), drawing = new Diagram(16, true), diagrams = [list, standalone, drawing];
   const contentDOM = { ownerDocument: { defaultView: { MutationObserver: Observer } }, querySelectorAll: () => diagrams,
     addEventListener() {}, removeEventListener() {} };
   const view = { contentDOM, dom: { querySelector: () => ({}) },
@@ -50,9 +52,13 @@ test("standalone grips follow source ownership, including a diagram that becomes
   const plugin = module.plainMediaDrag({})(view);
   assert.equal(list.grip, null, "a list diagram has no unusable drag grip");
   assert.ok(standalone.grip, "a complete top-level diagram keeps its grip");
+  assert.ok(drawing.grip, "a native Excalidraw drawing gets its explicit drag grip");
+  assert.ok(drawing.classes.has("vml-plain-excalidraw"));
   lines = [...lines.slice(0, 11), "- another item", "", ...graph.map(line => "  " + line)];
   standalone.line = 13;
   changed();
+  assert.equal(drawing.grip, null, "removing the Excalidraw source releases its old grip");
+  assert.equal(drawing.classes.has("vml-plain-excalidraw"), false);
   assert.equal(standalone.grip, null, "an old grip disappears when the diagram becomes list content");
   lines = [...lines.slice(0, 11), ...graph]; standalone.line = 11;
   changed(); assert.ok(standalone.grip);
@@ -69,7 +75,7 @@ async function touchHarness() {
     removeEventListener(name: string, callback: (event: unknown) => void) { events.get(name)?.delete(callback); } };
   const diagram = { ownerDocument: doc, win, captured: false,
     closest(selector: string) { return selector === ".mermaid" ? this : selector === ".workspace-leaf" ? {} : null; },
-    matches: () => true, instanceOf: () => false, contains: (node: unknown) => node === diagram,
+    matches: (selector: string) => selector === ".mermaid", instanceOf: () => false, contains: (node: unknown) => node === diagram,
     querySelector: (selector: string) => selector === "svg" ? {} : null,
     createEl: () => ({ isConnected: true, parentElement: diagram, addEventListener() {}, remove() {} }),
     addClass() {}, removeClass() {}, addEventListener() {}, removeEventListener() {},

@@ -20,7 +20,11 @@ export function registerImageMenu(plugin: Plugin): void {
     clicked = eventElement(event);
     const diagram = clicked?.closest<HTMLElement>(".cm-content .mermaid");
     if (diagram && !diagram.closest(".vml-layout, .vml-text-editor, .vml-plain-image--dragging")) {
-      showMermaidMenu(plugin, event, diagram);
+      showDiagramMenu(plugin, event, diagram);
+    }
+    const drawing = clicked?.closest<HTMLElement>(".cm-content .excalidraw-embedded-img");
+    if (drawing && !drawing.closest(".vml-layout, .vml-text-editor, .vml-plain-image--dragging")) {
+      showDiagramMenu(plugin, event, drawing, true);
     }
   }, { capture: true }));
 
@@ -52,7 +56,7 @@ export function registerImageMenu(plugin: Plugin): void {
   }));
 }
 
-function showMermaidMenu(plugin: Plugin, event: MouseEvent, diagram: HTMLElement): void {
+function showDiagramMenu(plugin: Plugin, event: MouseEvent, diagram: HTMLElement, excalidraw = false): void {
   const editorEl = diagram.closest<HTMLElement>(".cm-editor");
   const view = editorEl ? EditorView.findFromDOM(editorEl) : null;
   const info = view?.state.field(editorInfoField, false);
@@ -60,17 +64,19 @@ function showMermaidMenu(plugin: Plugin, event: MouseEvent, diagram: HTMLElement
   const file = info?.file ?? (editor ? fileOfEditor(plugin.app, editor) : null);
   if (!view || !editor || !file) return;
 
-  let line: number;
+  let line: number, column: number;
   try {
-    line = view.state.doc.lineAt(view.posAtDOM(diagram)).number - 1;
+    const pos = view.posAtDOM(diagram), source = view.state.doc.lineAt(pos);
+    line = source.number - 1;
+    column = pos - source.from;
   } catch {
     // The native widget may have been replaced before the event reached this listener.
     return;
   }
   const original = editor.getValue();
   const lines = original.split("\n");
-  const embed = takePlainMermaid(lines, line)?.embed;
-  const change = embed ? planWrapSelection(lines, embed.line, embed.endLine ?? embed.line) : null;
+  const embed = excalidraw ? null : takePlainMermaid(lines, line)?.embed;
+  const change = excalidraw ? planWrapImage(lines, line, column) : embed ? planWrapSelection(lines, embed.line, embed.endLine ?? embed.line) : null;
   if (!change) return;
 
   event.preventDefault();

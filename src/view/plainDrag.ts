@@ -35,28 +35,33 @@ export function plainMediaDrag(app: App): Extension {
       const available = hasLayouts();
       for (const grip of grips) {
         const diagram = grip.parentElement;
-        if (!grip.isConnected || !available || !diagram || !take(view, diagram)) { diagram?.removeClass("vml-plain-media--draggable"); grip.remove(); grips.delete(grip); }
+        if (!grip.isConnected || !available || !diagram || !take(view, diagram)) { diagram?.removeClass("vml-plain-media--draggable", "vml-plain-excalidraw"); grip.remove(); grips.delete(grip); }
       }
       if (!available) return;
-      for (const diagram of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".mermaid"))) {
-        if (diagram.closest(".vml-layout, .vml-text-editor") || !diagram.querySelector("svg")
+      for (const native of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".mermaid, .excalidraw-embedded-img"))) {
+        const diagram = native.matches("img") ? native.parentElement! : native;
+        if (diagram.closest(".vml-layout, .vml-text-editor") || !(diagram.querySelector("svg") || diagram.matches("img") || diagram.querySelector("img"))
           || diagram.querySelector(":scope > .vml-plain-media__grip") || !take(view, diagram)) continue;
         const grip = diagram.createEl("button", { cls: "vml-plain-media__grip", attr: { type: "button", "aria-label": t("dragHandle") } });
         setIcon(grip, "grip-vertical");
         grip.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); });
+        grip.addEventListener("pointerdown", (event) => { onPointerDown(event); event.stopPropagation(); });
         diagram.addClass("vml-plain-media--draggable");
+        if (!diagram.matches(".mermaid")) diagram.addClass("vml-plain-excalidraw");
         grips.add(grip);
       }
     };
 
     const onPointerDown = (event: PointerEvent): void => {
       const target = eventElement(event);
-      const diagram = target?.closest<HTMLElement>(".mermaid");
+      const diagram = target?.closest<HTMLElement>(".mermaid") ?? target?.closest<HTMLElement>(".vml-plain-excalidraw") ?? null;
       const media = target?.instanceOf(HTMLImageElement) && target.matches(PLAIN_IMAGE) ? target : diagram;
       const modified = event.ctrlKey || event.metaKey || event.shiftKey || event.altKey;
       if (event.button !== 0 || modified || !media || media.closest(".vml-layout, .vml-text-editor") || !hasLayouts()) {
         return;
       }
+      // Excalidraw already owns body gestures for links and opening the drawing.
+      if (diagram?.matches(".vml-plain-excalidraw") && !target?.closest(".vml-plain-media__grip")) return;
       const hold = diagram !== null && event.pointerType === "touch" && !target?.closest(".vml-plain-media__grip");
       if (hold && target?.closest("button, a, input, textarea")) return;
       const info = view.state.field(editorInfoField, false);
@@ -91,7 +96,7 @@ export function plainMediaDrag(app: App): Extension {
       destroy() {
         cancelDrag?.();
         observer.disconnect();
-        for (const grip of grips) { grip.parentElement?.removeClass("vml-plain-media--draggable"); grip.remove(); }
+        for (const grip of grips) { grip.parentElement?.removeClass("vml-plain-media--draggable", "vml-plain-excalidraw"); grip.remove(); }
         grips.clear();
         view.contentDOM.removeEventListener("pointerdown", onPointerDown);
         view.contentDOM.removeEventListener("dragstart", onDragStart, { capture: true });
@@ -175,7 +180,7 @@ function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePa
 async function dropPlain(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, drop: DropState): Promise<void> {
   // Located again at drop time, from the note as it is now.
   const taken = take(view, media);
-  if (!taken || (initial.embed.kind === "mermaid" && taken.embed.raw !== initial.embed.raw)) {
+  if (!taken || taken.embed.raw !== initial.embed.raw) {
     new Notice(t("writeNotFound"));
     return;
   }
@@ -188,7 +193,9 @@ async function dropPlain(app: App, view: EditorView, media: HTMLElement, sourceP
 
 function take(view: EditorView, media: HTMLElement): TakenEmbed | null {
   const diagram = media.matches(".mermaid");
-  const embedEl = diagram ? media : media.closest<HTMLElement>(".image-embed");
+  const embedEl = diagram ? media : media.closest<HTMLElement>(".vml-plain-excalidraw")
+    ?? media.closest<HTMLElement>(".excalidraw-embedded-img") ?? media.closest<HTMLElement>(".image-embed")
+    ?? (media.querySelector(".excalidraw-embedded-img") ? media : null);
   if (!embedEl) {
     return null;
   }

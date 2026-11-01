@@ -9,6 +9,7 @@ import { isolateMediaControls } from "./mediaControls.ts";
 import { videoPreviewUrl } from "./videoSource.ts";
 import { t } from "./messages.ts";
 import { splitTextColumns } from "../markdown/textColumns.ts";
+import { renderExcalidraw, renderExcalidrawMarkdown } from "./excalidraw.ts";
 
 export interface LayoutViewOptions {
   app: App;
@@ -163,7 +164,8 @@ function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOp
   }
   let active = true;
   component.register(() => { active = false; });
-  const task = MarkdownRenderer.render(options.app, numbered(markdown, options.refs), el, options.sourcePath, component)
+  const render = /\.excalidraw(?:\.md)?(?:[#|\] )>]|$)/i.test(markdown) ? renderExcalidrawMarkdown : MarkdownRenderer.render.bind(MarkdownRenderer);
+  const task = render(options.app, numbered(markdown, options.refs), el, options.sourcePath, component)
     .then(() => { if (!active) return; markCaptions(el, markdown); return rendered?.(); });
   options.renderTasks?.push(task);
   return true;
@@ -241,7 +243,25 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
   }
 
   const media = item.embed.kind === "mermaid" ? null : resolveMedia(options.app, item.embed, options.sourcePath);
-  if (item.embed.kind === "mermaid") {
+  if (item.embed.kind === "excalidraw") {
+    itemEl.addClass("vml-item--excalidraw");
+    const drawing = itemEl.createDiv({ cls: "vml-item__media vml-item__excalidraw" });
+    const sizeKey = `excalidraw:${options.sourcePath}\n${item.embed.raw}`;
+    const applySize = (size: MediaSize): void => {
+      diagramMeasurements.set(drawing, size);
+      drawing.setCssProps({ "--vml-diagram-ratio": String(size.width / size.height) });
+      useSize(itemEl, drawing, size, !single && !itemEl.hasClass("vml-item--weighted"));
+    };
+    const known = diagramSizes.get(sizeKey);
+    if (known) applySize(known);
+    if (options.component) {
+      const task = renderExcalidraw(options.app, item.embed, drawing, options.sourcePath, options.component, size => {
+        setBounded(diagramSizes, sizeKey, size, MAX_MEDIA_SIZES);
+        applySize(size);
+      });
+      options.renderTasks?.push(task);
+    }
+  } else if (item.embed.kind === "mermaid") {
     itemEl.addClass("vml-item--mermaid");
     const diagram = itemEl.createDiv({ cls: "vml-item__media vml-item__diagram vml-item__diagram--pending markdown-rendered" });
     const sizeKey = `${options.sourcePath}\n${item.embed.raw}`;

@@ -9,6 +9,7 @@
 | [安装](INSTALL.md)／[常见问题](FAQ.md) | 安装、更新和使用限制 |
 | [中英文功能示例](examples/README.md) | 插件内置的离线指南、手动分栏和 Mermaid 样例 |
 | [项目状态](STATUS.md) | 当前公开版本、已交付功能、开发进展与限制 |
+| [Excalidraw 布局媒体](features/excalidraw.md) | Issue #36 未发布功能的用法、API 接入与定向验证 |
 | [发布流程](RELEASE.md) | 版本号、构建、标签、附件和公开发布 |
 | [0.9.2 发布核验](releases/0.9.2-readiness.md) | 布局转换与同行图片补丁、正式附件、来源证明及验证边界 |
 | [0.9.1 发布核验](releases/0.9.1-readiness.md) | 图文块缩放与缩进续行补丁、正式附件、来源证明及验证边界 |

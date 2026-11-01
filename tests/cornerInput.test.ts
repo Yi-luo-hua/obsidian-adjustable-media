@@ -10,7 +10,7 @@ async function harness() {
     querySelectorAll: () => [{ getBoundingClientRect: () => box }] };
   const target = { closest(selector: string) {
     if (selector === ".vml-frame__handle--corner") return actualHandle ? {} : null;
-    if (selector === ".vml-handle, .vml-item__diagram, .mermaid, button, a, video, audio") return actualHandle || explicitControl || diagram ? {} : null;
+    if (selector === ".vml-handle, .vml-item__diagram, .vml-item__excalidraw, .vml-excalidraw-embed, .mermaid, button, a, video, audio") return actualHandle || explicitControl || diagram ? {} : null;
     return inPane ? pane : null;
   } };
   const module = await mockedModule<{ registerCornerInputGuard(plugin: unknown): void }>(new URL("../src/view/cornerInput.ts", import.meta.url), {

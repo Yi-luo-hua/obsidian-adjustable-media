@@ -1,11 +1,12 @@
 # 项目状态
 
-更新：2026-10-24。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-11-02。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
 
 - **公开版本：0.9.2**，标签源码 `ce605b7`，已设为最新版本；三份公开附件与干净标签构建逐字节一致，摘要及来源证明已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.2)和[发布核验](releases/0.9.2-readiness.md)。
 - **main：已包含 0.9.2 发布代码**。`ed83461` 修复转换布局后的源码展开、光标定位和同行图片误包文字；保留 0.9.1 的缩进续行与图文块缩放修复。
+- **未发布增量：Issue #36 Excalidraw 布局媒体**。支持多图／图文并排、环绕、调宽、图注、把手拖入及原图保存后的预览更新；修复显式文字块内的空白显示路径。Windows 定向验证通过，详见 [功能与验证记录](features/excalidraw.md)。版本号、标签及公开附件未变。
 - 0.9.2 的 519 项测试、生产打包、main／标签 CI 和 Release 工作流通过。Windows／Obsidian 1.14.5 已核对原失败场景、撤销重做、中英文更新弹窗与升级／重载行为；移动设备、其他主题、旧版 Obsidian 及 PDF 未复测。
 - 已发布范围保留正文连续空行与引用跳转修复、手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配、Mermaid 独立项、Callout／Canvas 与主题把手等功能；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。原 main 完整保留为 `codex/main-before-080`；当前检出分支以 [WORKTREES](WORKTREES.md) 的日期快照及 `git status` 为准。
 

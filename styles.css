@@ -128,6 +128,32 @@
   max-width: none !important;
 }
 
+/* Excalidraw exports the SVG; the layout owns its display size. */
+.vml-item__excalidraw {
+  aspect-ratio: var(--vml-diagram-ratio, 2);
+  overflow: hidden;
+}
+
+.vml-item__excalidraw :is(img, svg) {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
+
+.vml-excalidraw-embed {
+  display: inline-block;
+  width: var(--vml-excalidraw-width, 100%);
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.vml-excalidraw-embed > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .vml-text-column > :first-child {
   margin-top: 0;
 }
@@ -632,7 +658,8 @@
 }
 
 /* Videos move by their grip; the video itself keeps its own controls. */
-.vml-layout--interactive .vml-item--video {
+.vml-layout--interactive .vml-item--video,
+.vml-layout--interactive .vml-item--excalidraw {
   cursor: auto;
 }
 
@@ -652,6 +679,10 @@
 .vml-plain-media__grip,
 .vml-item--mermaid .vml-item__grip {
   display: none;
+}
+
+.vml-plain-excalidraw > .vml-plain-media__grip {
+  display: flex;
 }
 
 .vml-plain-media__grip {

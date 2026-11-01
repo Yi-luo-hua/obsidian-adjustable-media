@@ -8,7 +8,7 @@ import { mockedModule } from "./support/mockedModule.ts";
 
 const graph = ["```mermaid", "flowchart LR", "  A[Keep spaces] --> B", "```"];
 
-async function menuHarness(source: string, line: number, imageColumn?: number) {
+async function menuHarness(source: string, line: number, imageColumn?: number, excalidraw = false) {
   let text = source, connected = true, insideLayout = false, dragging = false;
   const notices: string[] = [];
   const writes: Array<{ file: unknown; edits: BlockEdit[]; options: { view: unknown } }> = [];
@@ -34,7 +34,7 @@ async function menuHarness(source: string, line: number, imageColumn?: number) {
   }, posAtDOM: () => imageColumn ?? 0, contentDOM: { contains: () => connected } };
   const diagram = { closest: (selector: string) => selector === ".cm-editor" ? view
     : selector === ".vml-layout, .vml-text-editor, .vml-plain-image--dragging" && (insideLayout || dragging) ? {} : null };
-  const target = { closest: (selector: string) => selector === (imageColumn === undefined ? ".cm-content .mermaid" : ".cm-content .image-embed") ? diagram : null };
+  const target = { closest: (selector: string) => selector === (excalidraw ? ".cm-content .excalidraw-embedded-img" : imageColumn === undefined ? ".cm-content .mermaid" : ".cm-content .image-embed") ? diagram : null };
   const module = await mockedModule<{ registerImageMenu(plugin: unknown): void }>(new URL("../src/view/imageMenu.ts", import.meta.url), {
     obsidian: { Menu: MenuStub, Notice: class { constructor(message: string) { notices.push(message); } }, editorInfoField: {} },
     "@codemirror/view": { EditorView: { findFromDOM: () => view } },
@@ -55,7 +55,7 @@ async function menuHarness(source: string, line: number, imageColumn?: number) {
     open() {
       let prevented = false;
       context({ preventDefault() { prevented = true; }, stopPropagation() {} });
-      if (imageColumn !== undefined) {
+      if (imageColumn !== undefined && !excalidraw) {
         const menu = new MenuStub();
         handlers.get("file-menu")!(menu, file, "link-context-menu");
         if (menu.title) menus.push(menu);
@@ -67,6 +67,25 @@ async function menuHarness(source: string, line: number, imageColumn?: number) {
     dragging() { dragging = true; },
   };
 }
+
+test("native Excalidraw menu wraps the clicked embed verbatim and rejects changed source", async () => {
+  const raw = "![[draw.excalidraw#^group=abc|240]]";
+  for (const stale of [false, true]) {
+    const source = "Before\r\n\r\n" + raw + "\r\n\r\nAfter";
+    const host = await menuHarness(source, 2, 0, true);
+    assert.equal(host.open(), true);
+    assert.equal(host.menus.length, 1);
+    if (stale) host.setText(source + " changed");
+    host.menus[0].click();
+    await Promise.resolve();
+    assert.equal(host.writes.length, stale ? 0 : 1);
+    if (!stale) {
+      const result = applyEditsToText(source, host.writes[0].edits);
+      assert.equal(result.ok, true);
+      if (result.ok) assert.ok(result.text.includes("\r\n" + raw + "\r\n"));
+    }
+  }
+});
 
 test("an image menu wraps just the inline image and cancels if its source or widget changes", async () => {
   const source = "输入几个字![[a.png]]";

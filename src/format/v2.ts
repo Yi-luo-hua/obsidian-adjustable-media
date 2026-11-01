@@ -16,7 +16,7 @@ import { fencedCodeBlocks, scanMarkdownLines, type LineContext } from "../markdo
  * invalid. See docs/DESIGN.md, section 1.
  */
 
-export type MediaKind = "image" | "video" | "mermaid";
+export type MediaKind = "image" | "video" | "mermaid" | "excalidraw";
 export type EmbedSyntax = "wiki" | "markdown" | "mermaid";
 export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
@@ -42,6 +42,8 @@ export interface V2Embed {
   syntax: EmbedSyntax;
   /** Vault path (decoded, without subpath) or URL (encoding preserved); no size or title. */
   target: string;
+  /** Excalidraw's complete fragment reference, including its leading #. */
+  fragment?: string;
   alt: string;
   kind: MediaKind;
   /** Width written in the embed itself, e.g. the 300 in ![[a.png|300]]. */
@@ -341,6 +343,7 @@ export function mermaidEmbed(lines: readonly string[], from: number, to: number)
 
 export function mediaKindOf(target: string): MediaKind | null {
   const path = target.split(/[?#]/)[0] ?? target;
+  if (!isRemoteTarget(target) && /\.excalidraw(?:\.md)?$/i.test(path)) return "excalidraw";
   const name = path.split("/").pop() ?? path;
   const dot = name.lastIndexOf(".");
   const extension = dot >= 0 ? name.slice(dot + 1).toLowerCase() : "";
@@ -484,7 +487,12 @@ export function readMediaEmbeds(text: string, line: number): V2Embed[] {
       ? { syntax: "wiki" as const, ...parseWikiEmbed(match[1]) }
       : { syntax: "markdown" as const, ...parseMarkdownEmbed(match[2] ?? "", match[3] ?? "") };
     const kind = mediaKindOf(parsed.target);
-    if (kind) embeds.push({ raw: match[0], ...parsed, kind, line, from, to: from + match[0].length });
+    if (kind) {
+      const link = match[1]?.split("|")[0] ?? match[3]?.replace(/^<|>$/g, "") ?? "";
+      const hash = link.indexOf("#");
+      const fragment = kind === "excalidraw" && hash >= 0 ? { fragment: link.slice(hash) } : {};
+      embeds.push({ raw: match[0], ...parsed, ...fragment, kind, line, from, to: from + match[0].length });
+    }
   }
   return embeds;
 }
