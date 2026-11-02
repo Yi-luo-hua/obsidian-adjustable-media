@@ -26,7 +26,6 @@ import { watchEnvironment } from "./viewEnvironment.ts";
 import { fileOfEditor, parseBufferSections } from "./obsidianInternals.ts";
 import { eventElement } from "./windows.ts";
 import { guardWidgetWhitespace } from "./widgetWhitespace.ts";
-import { keepNativeParagraphs } from "../layout/wrapAppearance.ts";
 
 /** The pane's environment as viewEnvironment.ts reads it: width, fonts and page classes that change layout. */
 export const setEnvironment = StateEffect.define<string>();
@@ -152,7 +151,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
       const paragraphs = tr.effects.find(effect => effect.is(setParagraphSections));
       if (paragraphs?.is(setParagraphSections) && paragraphs.value.snapshot === value.snapshot) {
         return withDecorations(app, tr.state, { ...value, ...measurements,
-          breaks: keepNativeParagraphs(value.blocks) ? [] : hostParagraphBreaks(value.lines, breakBlocks(value.blocks), paragraphs.value.sections) }, placedCursor);
+          breaks: hostParagraphBreaks(value.lines, breakBlocks(value.blocks), paragraphs.value.sections) }, placedCursor);
       }
       if (tr.selection || environment || placedCursor !== value.placedCursor || tr.effects.some(effect => effect.is(setLayoutHighlight))) {
         return withDecorations(app, tr.state, { ...value, ...measurements }, placedCursor);
@@ -321,7 +320,7 @@ function parse(app: App, state: EditorState, previous: DocumentSnapshot | null =
   const blocks = snapshot.blocks.map(ref => ref.block);
   const lines = [...snapshot.lines];
   return { buffer, snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks),
-    breaks: blocks.some(isDrawable) && !keepNativeParagraphs(blocks)
+    breaks: blocks.some(isDrawable)
       ? paragraphBreaks(lines, breakBlocks(blocks))
       : [],
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };

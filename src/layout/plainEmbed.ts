@@ -1,5 +1,4 @@
-import { findV2Blocks, mermaidEmbed, tableEmbed, readEmbedRow, type V2Embed } from "../format/v2.ts";
-import { markdownTables } from "../markdown/tables.ts";
+import { findV2Blocks, mermaidEmbed, readEmbedRow, type V2Embed } from "../format/v2.ts";
 import { fencedCodeBlocks, scanMarkdownLines } from "../markdown/lineContext.ts";
 import type { BlockEdit } from "./edits.ts";
 
@@ -46,14 +45,6 @@ export function takePlainEmbed(lines: readonly string[], line: number, column: n
 
 function stripCarriageReturn(line: string): string {
   return line.endsWith("\r") ? line.slice(0, -1) : line;
-}
-
-export function takePlainTable(lines: readonly string[], line: number): TakenEmbed | null {
-  if (findV2Blocks(lines).some(block => block.openLine <= line && line <= block.closeLine)) return null;
-  const table = markdownTables(lines).find(table => table.from <= line && line <= table.to);
-  return table ? { embed: tableEmbed(lines, table.from, table.to),
-    edit: { anchorLine: table.from, anchorLines: lines.slice(table.from, table.to + 1).map(stripCarriageReturn),
-      start: 0, end: table.to - table.from, replacement: [] } } : null;
 }
 
 /** Only a complete top-level Mermaid outside every layout can be taken as a standalone item. */

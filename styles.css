@@ -154,48 +154,6 @@
   height: auto;
 }
 
-/* A wide table scales as a whole to its item, with no horizontal scrolling. */
-.vml-layout .vml-item--table .vml-item__table {
-  background: transparent;
-  height: var(--vml-table-height, 0px);
-  overflow: clip;
-  position: relative;
-  white-space: normal;
-}
-
-.vml-table__content {
-  left: 0;
-  position: absolute;
-  top: 0;
-  transform: scale(var(--vml-table-scale, 1)) scaleY(var(--vml-table-scale-y, 1));
-  transform-origin: top left;
-  width: max-content;
-}
-
-.vml-table__content .table-wrapper {
-  margin: 0;
-  max-width: none;
-  overflow: visible;
-}
-
-.vml-item__table table {
-  margin: 0;
-  min-width: var(--vml-table-natural-width, 0);
-  width: auto;
-}
-
-.vml-item__table :is(th, td) {
-  white-space: normal;
-}
-
-.vml-row--single .vml-item--table:not(.vml-item--sized) {
-  flex: 0 1 100%;
-}
-
-.vml-layout--interactive .vml-item--table {
-  cursor: auto;
-}
-
 .vml-text-column > :first-child {
   margin-top: 0;
 }
@@ -552,30 +510,6 @@
   width: 100%;
 }
 
-/* Conversion keeps the native block's insets, without adding editing-frame space. */
-.vml-layout.vml-layout--native-spacing {
-  border-block-width: 0;
-  padding-top: var(--vml-space-before);
-  padding-bottom: var(--vml-space-after);
-}
-
-.vml-layout--native-spacing > .vml-row {
-  margin: 0;
-}
-
-.vml-live-preview:not(.vml-live-preview--wrap):has(> .vml-layout--native-spacing) {
-  padding: 0;
-}
-
-.vml-row--single .vml-item--aspect .vml-item__media {
-  aspect-ratio: var(--vml-item-aspect);
-  height: auto;
-}
-
-.vml-row--single .vml-item--aspect > img.vml-item__media {
-  object-fit: fill;
-}
-
 .vml-item__missing {
   align-items: center;
   border: 1px dashed var(--background-modifier-border);
@@ -747,14 +681,8 @@
   display: none;
 }
 
-.vml-plain-excalidraw > .vml-plain-media__grip,
-.vml-plain-table > .vml-plain-media__grip {
+.vml-plain-excalidraw > .vml-plain-media__grip {
   display: flex;
-}
-
-.vml-plain-table > .vml-plain-media__grip {
-  right: -24px;
-  top: -12px;
 }
 
 .vml-plain-media__grip {
@@ -944,32 +872,6 @@ body.vml-is-dragging * {
   cursor: nesw-resize;
   left: 4px;
   right: auto;
-}
-
-/* A small table can be narrower than its item: keep its triangle on the drawn table's corner. */
-.vml-item--table .vml-item__width-handle:not(.vml-item__width-handle--left) {
-  left: max(0px, calc(var(--vml-table-drawn-width, 100%) - 18px));
-  right: auto;
-}
-
-.vml-table__height-handle {
-  cursor: ns-resize;
-  height: 14px;
-  left: calc(var(--vml-table-drawn-width, 100%) / 2 - 20px);
-  top: calc(var(--vml-table-drawn-height, 100%) - 7px);
-  width: 40px;
-  z-index: 4;
-}
-
-.vml-table__height-handle::after {
-  background: var(--interactive-accent);
-  border-radius: 2px;
-  content: "";
-  height: 3px;
-  left: 6px;
-  position: absolute;
-  right: 6px;
-  top: 6px;
 }
 
 .vml-item__grip {

@@ -165,12 +165,6 @@ export function wrappedDrop(y: number, targetTop: number, renderedTop: number, c
   return { skip, top: baseTop + skip * lineHeight };
 }
 
-/** Project pointer movement onto the corner's proportional path, without amplifying the short axis. */
-export function cornerScale(width: number, height: number, dx: number, dy: number): number {
-  const length = width * width + height * height;
-  return length > 0 ? 1 + (width * dx + height * dy) / length : 1;
-}
-
 function beside(box: ItemBox, x: number): MoveTarget {
   const side = x < (box.rect.left + box.rect.right) / 2 ? "before" : "after";
   return { kind: "beside", position: { row: box.row, index: box.index }, side };

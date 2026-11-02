@@ -3,7 +3,6 @@ import { planWrap } from "../input/insertion.ts";
 import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
 import { fencedCodeBlocks, scanMarkdownLines } from "../markdown/lineContext.ts";
-import { markdownTables } from "../markdown/tables.ts";
 
 /**
  * Wraps the non-blank lines of a selection (whole lines) in one layout block. Media lines alone are
@@ -50,8 +49,7 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
   // with its media lines as figures in it. An indented media line is list content or indented code:
   // as a row it would lose its indentation once rewritten, so it stays text, in a block of text.
   const columns = targets.some(isMedia) && !targets.some((line) => isMedia(line) && INDENTED.test(text(line)));
-  const hasDiagram = fencedCodeBlocks(lines).some((fence) => fence.language === "mermaid" && fence.from >= first && fence.to <= last)
-    || markdownTables(lines).some(table => table.from >= first && table.to <= last);
+  const hasDiagram = fencedCodeBlocks(lines).some((fence) => fence.language === "mermaid" && fence.from >= first && fence.to <= last);
   const attempts = [
     ...(hasDiagram ? [wrapLines(body, { version: 3, rows: [], extra: { kind: "media" } })] : []),
     ...(columns ? [wrapLines(body), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)]),

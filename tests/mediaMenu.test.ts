@@ -44,7 +44,6 @@ async function menuHarness(source: string, line: number, imageColumn?: number, e
     } },
     "./messages.ts": { t: (key: string) => key, reportWriteError: (error: unknown) => { throw error; } },
     "./obsidianInternals.ts": { fileOfEditor: () => file },
-    "./wrapAppearance.ts": { keepWrapAppearance: (_view: unknown, change: unknown) => change },
     "./windows.ts": { eventElement: () => target, onEveryDocument: (_plugin: unknown, callback: (doc: object) => void) => callback({}) },
   });
   module.registerImageMenu({

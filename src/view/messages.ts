@@ -94,7 +94,6 @@ const MESSAGES = {
     en: "Not found: {target}",
   },
   mermaidDiagram: { zh: "Mermaid 图表", en: "Mermaid diagram" },
-  table: { zh: "表格", en: "Table" },
   excalidrawUnavailable: { zh: "请启用 Excalidraw 插件以显示此绘图。", en: "Enable the Excalidraw plugin to display this drawing." },
   excalidrawFailed: { zh: "Excalidraw 绘图预览失败，可双击打开原图。", en: "Excalidraw preview failed. Double-click to open the drawing." },
   editSource: {
@@ -347,14 +346,6 @@ const MESSAGES = {
   resizeWidth: {
     zh: "拖动调整宽度",
     en: "Drag to resize the width",
-  },
-  resizeTable: {
-    zh: "调整表格大小",
-    en: "Resize table",
-  },
-  resizeTableHeight: {
-    zh: "调整表格高度",
-    en: "Resize table height",
   },
   resizeBlockWidth: {
     zh: "拖动调整布局块的宽度",

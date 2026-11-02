@@ -1,5 +1,4 @@
 import { fencedCodeBlocks, scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
-import { markdownTables } from "../markdown/tables.ts";
 
 /**
  * v2 layout format: plain media embeds wrapped in HTML comments.
@@ -17,8 +16,8 @@ import { markdownTables } from "../markdown/tables.ts";
  * invalid. See docs/DESIGN.md, section 1.
  */
 
-export type MediaKind = "image" | "video" | "mermaid" | "excalidraw" | "table";
-export type EmbedSyntax = "wiki" | "markdown" | "mermaid" | "table";
+export type MediaKind = "image" | "video" | "mermaid" | "excalidraw";
+export type EmbedSyntax = "wiki" | "markdown" | "mermaid";
 export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
 /** The side a layout floats to, with the note's own text wrapping around it. */
@@ -243,7 +242,7 @@ export function readRowMeta(meta: V2RowMeta, embedCount: number): RowSettings {
   return {
     height: height === null ? null : clamp(Math.round(height), MIN_ROW_HEIGHT, MAX_ROW_HEIGHT),
     widths: positiveNumbers(meta.widths, embedCount),
-    width: embedCount === 1 && width !== null && width >= 0.001 && width <= 1 ? width : null,
+    width: embedCount === 1 && width !== null && width >= 0.1 && width <= 1 ? width : null,
     align: embedCount === 1 && isAlign(meta.align) ? meta.align : null,
     offset: embedCount === 1 && offset !== null && offset >= 0 && offset <= 1 ? offset : null,
     captions: captionList(meta.captions, embedCount),
@@ -330,11 +329,7 @@ export function serializeRow(embeds: readonly V2Embed[]): string {
 
 export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embed[]>): string[] {
   if (meta.version === 3) {
-    const items = rows.flat();
-    return [serializeOpener(meta), ...items.flatMap((item, index) => [
-      ...(index > 0 && (item.kind === "table" || items[index - 1].kind === "table") ? [""] : []),
-      ...item.raw.split("\n"),
-    ]), CLOSE_LINE];
+    return [serializeOpener(meta), ...rows.flatMap((row) => row.flatMap((item) => item.raw.split("\n"))), CLOSE_LINE];
   }
   return [serializeOpener(meta), ...rows.map(serializeRow), CLOSE_LINE];
 }
@@ -343,12 +338,6 @@ export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embe
 export function mermaidEmbed(lines: readonly string[], from: number, to: number): V2Embed {
   return { raw: lines.slice(from, to + 1).map(stripCarriageReturn).join("\n"),
     syntax: "mermaid", target: "", alt: "", kind: "mermaid", nativeWidth: null,
-    line: from, endLine: to, from: 0, to: stripCarriageReturn(lines[to] ?? "").length };
-}
-
-export function tableEmbed(lines: readonly string[], from: number, to: number): V2Embed {
-  return { raw: lines.slice(from, to + 1).map(stripCarriageReturn).join("\n"),
-    syntax: "table", target: "", alt: "", kind: "table", nativeWidth: null,
     line: from, endLine: to, from: 0, to: stripCarriageReturn(lines[to] ?? "").length };
 }
 
@@ -384,9 +373,6 @@ function buildBlock(
     ? new Map(fencedCodeBlocks(["layout body", ...lines.slice(openLine + 1, closeLine)])
       .filter((fence) => fence.language === "mermaid")
       .map((fence) => [openLine + fence.from, openLine + fence.to])) : new Map<number, number>();
-  const tables = meta.version === 3
-    ? new Map(markdownTables(["layout body", ...lines.slice(openLine + 1, closeLine)])
-      .map(table => [openLine + table.from, openLine + table.to])) : new Map<number, number>();
   // A block of text holds no rows: its media lines are text too.
   const allText = error === null && readBlockType(meta.extra.type) !== null;
   const rows: V2Row[] = [];
@@ -402,10 +388,7 @@ function buildBlock(
 
     // Code, math and comments are text, whatever they hold.
     const diagramEnd = allText ? undefined : diagrams.get(line);
-    const tableEnd = allText ? undefined : tables.get(line);
-    const itemEnd = diagramEnd ?? tableEnd;
     const embeds: V2Embed[] | null = diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
-      : tableEnd !== undefined ? [tableEmbed(lines, line, tableEnd)]
       : contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
@@ -413,9 +396,9 @@ function buildBlock(
       // The text before this row came after another one: it belongs to neither side.
       invalidLine ??= right[0] ?? line;
     } else {
-      rows.push({ line, ...(itemEnd === undefined ? {} : { endLine: itemEnd }), embeds });
+      rows.push({ line, ...(diagramEnd === undefined ? {} : { endLine: diagramEnd }), embeds });
     }
-    if (itemEnd !== undefined) line = itemEnd;
+    if (diagramEnd !== undefined) line = diagramEnd;
   }
 
   let groupedRows = rows;

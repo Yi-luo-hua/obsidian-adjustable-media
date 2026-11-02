@@ -7,7 +7,6 @@ import { writeBlockEdits } from "../layout/writeBack.ts";
 import { reportWriteError, t } from "./messages.ts";
 import { fileOfEditor } from "./obsidianInternals.ts";
 import { eventElement, onEveryDocument } from "./windows.ts";
-import { keepWrapAppearance } from "./wrapAppearance.ts";
 
 /**
  * Adds "Wrap in a layout" to Obsidian's own menu for an image in live preview. That menu reports
@@ -47,8 +46,7 @@ export function registerImageMenu(plugin: Plugin): void {
       const change = planWrap(view, editor, embedEl);
       const file = view.state.field(editorInfoField, false)?.file ?? fileOfEditor(plugin.app, editor);
       if (change && file) {
-        const fitted = keepWrapAppearance(view, change, embedEl);
-        void writeBlockEdits(plugin.app, file, [lineChangeEdit(editor.getValue().split("\n"), fitted)], { view, finishWrapping: true }).then(result => {
+        void writeBlockEdits(plugin.app, file, [lineChangeEdit(editor.getValue().split("\n"), change)], { view, finishWrapping: true }).then(result => {
           if (!result.ok) new Notice(t("writeNotFound"));
         }).catch(reportWriteError);
       } else {
@@ -90,8 +88,7 @@ function showDiagramMenu(plugin: Plugin, event: MouseEvent, diagram: HTMLElement
       new Notice(t("writeNotFound"));
       return;
     }
-    const fitted = keepWrapAppearance(view, change, diagram);
-    void writeBlockEdits(plugin.app, file, [lineChangeEdit(lines, fitted)], { view, finishWrapping: true }).then(result => {
+    void writeBlockEdits(plugin.app, file, [lineChangeEdit(lines, change)], { view, finishWrapping: true }).then(result => {
       if (!result.ok) new Notice(t("writeNotFound"));
     }).catch(reportWriteError);
   }));

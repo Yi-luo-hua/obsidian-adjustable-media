@@ -421,7 +421,6 @@ function blockLines(block: V2Block, meta: V2Meta, embeds: ReadonlyArray<readonly
     lines[0] ?? "",
     ...block.lines.slice(1, first.line - block.openLine),
     ...lines.slice(1, -1),
-    ...(embeds.at(-1)?.at(-1)?.kind === "table" && block.rightText ? [""] : []),
     ...block.lines.slice((last.endLine ?? last.line) - block.openLine + 1),
   ];
 }

@@ -4,7 +4,7 @@ import { EditorView, ViewPlugin } from "@codemirror/view";
 
 import { planModelEdit } from "../layout/edits.ts";
 import { insertItem } from "../layout/model.ts";
-import { takePlainEmbed, takePlainMermaid, takePlainTable, type TakenEmbed } from "../layout/plainEmbed.ts";
+import { takePlainEmbed, takePlainMermaid, type TakenEmbed } from "../layout/plainEmbed.ts";
 import { createDragGhost, type DragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, clearDropIndicators, commitEdits, findDrop, showDropIndicator, swallowNextClick, type DropState } from "./interactions.ts";
 import { fileOfEditor } from "./obsidianInternals.ts";
@@ -35,34 +35,33 @@ export function plainMediaDrag(app: App): Extension {
       const available = hasLayouts();
       for (const grip of grips) {
         const diagram = grip.parentElement;
-        if (!grip.isConnected || !available || !diagram || !take(view, diagram)) { diagram?.removeClass("vml-plain-media--draggable", "vml-plain-excalidraw", "vml-plain-table"); grip.remove(); grips.delete(grip); }
+        if (!grip.isConnected || !available || !diagram || !take(view, diagram)) { diagram?.removeClass("vml-plain-media--draggable", "vml-plain-excalidraw"); grip.remove(); grips.delete(grip); }
       }
       if (!available) return;
-      for (const native of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".mermaid, .excalidraw-embedded-img, .cm-table-widget"))) {
+      for (const native of Array.from(view.contentDOM.querySelectorAll<HTMLElement>(".mermaid, .excalidraw-embedded-img"))) {
         const diagram = native.matches("img") ? native.parentElement! : native;
-        if (diagram.closest(".vml-layout, .vml-text-editor") || !(diagram.querySelector("svg") || diagram.matches("img") || diagram.querySelector("img") || diagram.querySelector("table"))
+        if (diagram.closest(".vml-layout, .vml-text-editor") || !(diagram.querySelector("svg") || diagram.matches("img") || diagram.querySelector("img"))
           || diagram.querySelector(":scope > .vml-plain-media__grip") || !take(view, diagram)) continue;
         const grip = diagram.createEl("button", { cls: "vml-plain-media__grip", attr: { type: "button", "aria-label": t("dragHandle") } });
         setIcon(grip, "grip-vertical");
         grip.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); });
         grip.addEventListener("pointerdown", (event) => { onPointerDown(event); event.stopPropagation(); });
         diagram.addClass("vml-plain-media--draggable");
-        if (diagram.matches(".cm-table-widget")) diagram.addClass("vml-plain-table");
-        else if (!diagram.matches(".mermaid")) diagram.addClass("vml-plain-excalidraw");
+        if (!diagram.matches(".mermaid")) diagram.addClass("vml-plain-excalidraw");
         grips.add(grip);
       }
     };
 
     const onPointerDown = (event: PointerEvent): void => {
       const target = eventElement(event);
-      const diagram = target?.closest<HTMLElement>(".mermaid") ?? target?.closest<HTMLElement>(".vml-plain-excalidraw") ?? target?.closest<HTMLElement>(".vml-plain-table") ?? null;
+      const diagram = target?.closest<HTMLElement>(".mermaid") ?? target?.closest<HTMLElement>(".vml-plain-excalidraw") ?? null;
       const media = target?.instanceOf(HTMLImageElement) && target.matches(PLAIN_IMAGE) ? target : diagram;
       const modified = event.ctrlKey || event.metaKey || event.shiftKey || event.altKey;
       if (event.button !== 0 || modified || !media || media.closest(".vml-layout, .vml-text-editor") || !hasLayouts()) {
         return;
       }
       // Excalidraw already owns body gestures for links and opening the drawing.
-      if ((diagram?.matches(".vml-plain-excalidraw") || diagram?.matches(".vml-plain-table")) && !target?.closest(".vml-plain-media__grip")) return;
+      if (diagram?.matches(".vml-plain-excalidraw") && !target?.closest(".vml-plain-media__grip")) return;
       const hold = diagram !== null && event.pointerType === "touch" && !target?.closest(".vml-plain-media__grip");
       if (hold && target?.closest("button, a, input, textarea")) return;
       const info = view.state.field(editorInfoField, false);
@@ -97,7 +96,7 @@ export function plainMediaDrag(app: App): Extension {
       destroy() {
         cancelDrag?.();
         observer.disconnect();
-        for (const grip of grips) { grip.parentElement?.removeClass("vml-plain-media--draggable", "vml-plain-excalidraw", "vml-plain-table"); grip.remove(); }
+        for (const grip of grips) { grip.parentElement?.removeClass("vml-plain-media--draggable", "vml-plain-excalidraw"); grip.remove(); }
         grips.clear();
         view.contentDOM.removeEventListener("pointerdown", onPointerDown);
         view.contentDOM.removeEventListener("dragstart", onDragStart, { capture: true });
@@ -194,8 +193,7 @@ async function dropPlain(app: App, view: EditorView, media: HTMLElement, sourceP
 
 function take(view: EditorView, media: HTMLElement): TakenEmbed | null {
   const diagram = media.matches(".mermaid");
-  const table = media.matches(".cm-table-widget");
-  const embedEl = diagram || table ? media : media.closest<HTMLElement>(".vml-plain-excalidraw")
+  const embedEl = diagram ? media : media.closest<HTMLElement>(".vml-plain-excalidraw")
     ?? media.closest<HTMLElement>(".excalidraw-embedded-img") ?? media.closest<HTMLElement>(".image-embed")
     ?? (media.querySelector(".excalidraw-embedded-img") ? media : null);
   if (!embedEl) {
@@ -205,7 +203,7 @@ function take(view: EditorView, media: HTMLElement): TakenEmbed | null {
     const pos = view.posAtDOM(embedEl);
     const line = view.state.doc.lineAt(pos);
     const lines = view.state.doc.toString().split("\n");
-    return diagram ? takePlainMermaid(lines, line.number - 1) : table ? takePlainTable(lines, line.number - 1) : takePlainEmbed(lines, line.number - 1, pos - line.from);
+    return diagram ? takePlainMermaid(lines, line.number - 1) : takePlainEmbed(lines, line.number - 1, pos - line.from);
   } catch {
     // The media is no longer part of the editor.
     return null;

@@ -31,7 +31,6 @@ async function harness() {
     "../commands/tablePlans.ts": tablePlans, "../commands/plans.ts": plans,
     "../layout/writeBack.ts": { writeBlockEdits: async (_app: unknown, _file: unknown, edits: BlockEdit[]) => { writes.push(edits); return { ok: true }; } },
     "./obsidianInternals.ts": {}, "./messages.ts": { t: (key: string) => key, reportWriteError(error: unknown) { throw error; } },
-    "./wrapAppearance.ts": { keepWrapAppearance: (_view: unknown, change: unknown) => change },
     "./windows.ts": { eventElement: () => target, onEveryDocument: (_plugin: unknown, fn: (doc: unknown) => void) => fn({}) },
   });
   module.registerTableMenu({ app: {}, registerDomEvent(_doc: unknown, name: string, fn: (event: unknown) => void) { assert.equal(name, "contextmenu"); callback = fn; } });

@@ -1,4 +1,3 @@
-import * as appearance from "../src/layout/wrapAppearance.ts";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as stateApi from "@codemirror/state";
@@ -48,7 +47,7 @@ test("rendered text retains an existing column's focus until click, without inte
     "./layoutView.ts": { renderLayout: () => root }, "./messages.ts": { t: (key: string) => key, blockWarning: () => null },
     "./textEditing.ts": { startTextEdit: (_host: object, side: string) => opened.push(side) },
     "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
-    "./obsidianInternals.ts": { fileOfEditor: () => null }, "../layout/wrapAppearance.ts": appearance, "./widgetWhitespace.ts": { guardWidgetWhitespace(el: unknown) { guardedElement = el; } }, "./windows.ts": { eventElement: (event: { target: object }) => event.target },
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace(el: unknown) { guardedElement = el; } }, "./windows.ts": { eventElement: (event: { target: object }) => event.target },
   }, { createDiv: element });
   const state = stateApi.EditorState.create({ doc: 'Intro\n\n<!-- vml {"v":2,"type":"text"} -->\nText\n<!-- /vml -->', extensions: [info, preview, live.livePreviewExtension({})] });
   const widgets: viewApi.WidgetType[] = [];
@@ -102,7 +101,7 @@ test("a reused stand-in opens and redraws at its current anchor after text is in
     "./layoutView.ts": { renderLayout: () => root, applySizing() {} }, "./messages.ts": { t: (key: string) => key, blockWarning: () => null },
     "./textEditing.ts": { isEditingText: () => false, startTextEdit: (next: TextEditHost) => { host = next; } },
     "./wrapGuard.ts": { wrapGuard: (next: WrapSource) => { source = next; return []; } }, "./viewEnvironment.ts": {},
-    "./obsidianInternals.ts": { fileOfEditor: () => null }, "../layout/wrapAppearance.ts": appearance, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
+    "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   const text = 'Intro\n\n<!-- vml {"v":2,"type":"text","wrap":"right"} -->\nText\n<!-- /vml -->\nBody';
   let state = stateApi.EditorState.create({ doc: text, extensions: [info, preview, live.livePreviewExtension({})] });

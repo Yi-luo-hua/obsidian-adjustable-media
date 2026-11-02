@@ -2,7 +2,7 @@ import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
 import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason, type LinesAround } from "../layout/edits.ts";
-import { cornerScale, dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
+import { dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
   canAddText,
   effectiveWidth,
@@ -17,7 +17,6 @@ import {
   resetWeights,
   rowOffset,
   scaleRows,
-  scaleRowHeights,
   setAlign,
   setBlockWidth,
   setFrameWidth,
@@ -26,8 +25,6 @@ import {
   setPosition,
   setRowHeight,
   setSingleWidth,
-  setTableScale,
-  setTableStretch,
   setTextLayout,
   setValign,
   setWeights,
@@ -260,14 +257,7 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
   }
 
   itemEl.tabIndex = 0;
-  itemEl.setAttribute("aria-label", item.embed.kind === "mermaid" ? t("mermaidDiagram") : item.embed.kind === "table" ? t("table") : item.embed.alt || item.embed.target);
-  if (item.embed.kind === "table") {
-    itemEl.addEventListener("dblclick", event => {
-      if (eventElement(event)?.closest("a, button, input, .vml-handle")) return;
-      event.preventDefault(); event.stopPropagation();
-      context.editSource?.();
-    });
-  }
+  itemEl.setAttribute("aria-label", item.embed.kind === "mermaid" ? t("mermaidDiagram") : item.embed.alt || item.embed.target);
   itemEl.addEventListener("contextmenu", (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -283,10 +273,10 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
 
   // Videos keep their controls; touch users move diagrams by a grip and scroll on the diagram body.
   let dragFrom = itemEl;
-  if (item.embed.kind === "video" || item.embed.kind === "mermaid" || item.embed.kind === "excalidraw" || item.embed.kind === "table") {
+  if (item.embed.kind === "video" || item.embed.kind === "mermaid" || item.embed.kind === "excalidraw") {
     const grip = itemEl.createDiv({ cls: "vml-handle vml-item__grip", attr: { "aria-label": t("dragHandle"), role: "button" } });
     setIcon(grip, "grip-vertical");
-    if (item.embed.kind === "video" || item.embed.kind === "excalidraw" || item.embed.kind === "table") dragFrom = grip;
+    if (item.embed.kind === "video" || item.embed.kind === "excalidraw") dragFrom = grip;
   }
   dragFrom.addEventListener("pointerdown", (event) => {
     const target = eventElement(event);
@@ -432,9 +422,6 @@ function setUpRow(rowEl: HTMLElement, row: number, context: LayoutContext): void
   if (!layoutRow) {
     return;
   }
-  itemEls.forEach((itemEl, index) => {
-    if (layoutRow.items[index]?.embed.kind === "table") setUpTableHeightHandle(itemEl, row, index, context);
-  });
 
   if (layoutRow.items.length === 1) {
     const itemEl = itemEls[0];
@@ -444,14 +431,12 @@ function setUpRow(rowEl: HTMLElement, row: number, context: LayoutContext): void
     return;
   }
 
-  if (!layoutRow.items.every(item => item.embed.kind === "table")) setUpHeightHandle(rowEl, row, layoutRow.height ?? DEFAULT_ROW_HEIGHT, context);
+  setUpHeightHandle(rowEl, row, layoutRow.height ?? DEFAULT_ROW_HEIGHT, context);
   itemEls.slice(0, -1).forEach((itemEl, index) => setUpColumnHandle(itemEls, itemEl, index, row, context));
 }
 
 function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, offset: number, context: LayoutContext): void {
-  const root = rowEl.closest<HTMLElement>(".vml-layout")!;
-  const table = context.model.rows[row]?.items[0]?.embed.kind === "table";
-  const handle = itemEl.createDiv({ cls: "vml-handle vml-item__width-handle", attr: { "aria-label": t(table ? "resizeTable" : "resizeWidth"), role: "separator" } });
+  const handle = itemEl.createDiv({ cls: "vml-handle vml-item__width-handle", attr: { "aria-label": t("resizeWidth"), role: "separator" } });
   // As the width changes, the free space shrinks on both sides in the ratio of the position: the
   // right edge moves by (1 - offset) of the change, the left one by offset. The handle sits on the
   // edge that moves more, so it follows the pointer at no more than twice the rate.
@@ -466,80 +451,32 @@ function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, 
     event.preventDefault();
     event.stopPropagation();
     const rowWidth = rowEl.getBoundingClientRect().width;
-    const rect = table ? itemEl.querySelector(".vml-table__content table")?.getBoundingClientRect() : null;
-    const startWidth = rect?.width ?? itemEl.getBoundingClientRect().width;
-    const actualOffset = rect && rowWidth - rect.width > 1 ? clamp((rect.left - rowEl.getBoundingClientRect().left) / (rowWidth - rect.width), 0, 1) : offset;
-    const startScale = tableScaleOf(itemEl);
+    const startWidth = itemEl.getBoundingClientRect().width;
     const startWidthProp = itemEl.style.getPropertyValue("--vml-item-width");
     const wasSized = itemEl.hasClass("vml-item--sized");
     let fraction = startWidth / rowWidth;
     let moved = false;
-    let next = context.model;
     handle.addClass("is-active");
 
     trackPointer(handle, event, {
       onMove(move) {
         moved = true;
-        const dx = (move.clientX - event.clientX) * factor;
-        const scale = table ? cornerScale(startWidth * (onLeft ? actualOffset : 1 - actualOffset), rect?.height ?? 0,
-          (move.clientX - event.clientX) * (onLeft ? -1 : 1), move.clientY - event.clientY) : 1 + dx / startWidth;
-        fraction = Math.min(1, Math.max(table ? 0.001 : 0.1, startWidth * scale / rowWidth));
-        if (table) {
-          next = setTableScale(setSingleWidth(setPosition(context.model, row, actualOffset), row, fraction), row, 0, startScale * fraction * rowWidth / startWidth);
-          applySizing(root, next);
-        } else {
-          itemEl.addClass("vml-item--sized");
-          itemEl.setCssProps({ "--vml-item-width": `${fraction * 100}%` });
-        }
+        fraction = Math.min(1, Math.max(0.1, (startWidth + (move.clientX - event.clientX) * factor) / rowWidth));
+        itemEl.addClass("vml-item--sized");
+        itemEl.setCssProps({ "--vml-item-width": `${fraction * 100}%` });
       },
       onEnd() {
         handle.removeClass("is-active");
         // A click without a drag must not write anything.
         if (moved) {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, table ? next : setSingleWidth(context.model, row, round(fraction)))], context).then(changed => {
-            if (table && !changed) applySizing(root, context.model);
-          });
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setSingleWidth(context.model, row, round(fraction)))], context);
         }
       },
       onCancel() {
         handle.removeClass("is-active");
-        if (table) applySizing(root, context.model);
-        else {
-          itemEl.setCssProps({ "--vml-item-width": startWidthProp });
-          itemEl.toggleClass("vml-item--sized", wasSized);
-        }
+        itemEl.setCssProps({ "--vml-item-width": startWidthProp });
+        itemEl.toggleClass("vml-item--sized", wasSized);
       },
-    });
-  });
-}
-
-/** The bottom-center table handle changes height without changing width or hiding rows. */
-function setUpTableHeightHandle(itemEl: HTMLElement, row: number, index: number, context: LayoutContext): void {
-  const root = itemEl.closest<HTMLElement>(".vml-layout")!;
-  const handle = itemEl.createDiv({ cls: "vml-handle vml-table__height-handle",
-    attr: { "aria-label": t("resizeTableHeight"), "aria-orientation": "horizontal", role: "separator" } });
-  handle.addEventListener("pointerdown", event => {
-    if (event.button !== 0) return;
-    const height = itemEl.querySelector(".vml-table__content table")?.getBoundingClientRect().height ?? 0;
-    if (height <= 0) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const stretch = context.model.rows[row]?.items[index]?.tableStretch ?? 1;
-    let next = context.model, moved = false;
-    handle.addClass("is-active");
-    trackPointer(handle, event, {
-      onMove(move) {
-        moved = true;
-        next = setTableStretch(context.model, row, index, stretch * Math.max(1, height + move.clientY - event.clientY) / height);
-        applySizing(root, next);
-      },
-      onEnd() {
-        handle.removeClass("is-active");
-        if (moved) void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, next)], context).then(changed => {
-          if (!changed) applySizing(root, context.model);
-        });
-      },
-      onCancel() { handle.removeClass("is-active"); applySizing(root, context.model); },
     });
   });
 }
@@ -697,11 +634,6 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
     const rowWidth = rowEl?.getBoundingClientRect().width ?? 0;
     return row.items.length === 1 && itemEl && rowWidth > 0 ? itemEl.getBoundingClientRect().width / rowWidth : null;
   });
-  const tableScales = context.model.rows.map((row, index) => row.items.map((item, at) => {
-    const el = rowEls.find(el => Number(el.dataset.row) === index)?.querySelectorAll<HTMLElement>(".vml-item")[at];
-    return item.embed.kind === "table" ? el ? tableScaleOf(el) : item.tableScale ?? 1 : null;
-  }));
-  const hasTables = tableScales.some(row => row.some(scale => scale !== null));
 
   let next = context.model;
   let moved = false;
@@ -722,15 +654,13 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
           ? setFrameWidth(context.model, (rect.width + dx) / available)
           : keepSingleSizes(context.model, setBlockWidth(context.model, (rect.width + dx) / available), available, inset);
       } else if (edge === "bottom") {
-        const scale = rowsHeight > 0 ? (rowsHeight + dy) / rowsHeight : 1;
-        next = hasTables ? scaleRowHeights(context.model, Math.max(0.001, scale), singleWidths)
-          : scaleRows(context.model, clamp(scale, MIN_SCALE, MAX_SCALE), singleWidths);
+        const scale = clamp(rowsHeight > 0 ? (rowsHeight + dy) / rowsHeight : 1, MIN_SCALE, MAX_SCALE);
+        next = scaleRows(context.model, scale, singleWidths);
       } else {
         // The layout's width stays within its limits, so the rows scale by the same factor as it.
         const widest = (outerColumns ? 1 : maxBlockWidth(context.model)) / startWidth;
-        const requested = hasTables ? cornerScale(rect.width / Math.abs(direction), rowsHeight, dx / Math.abs(direction), dy) : (rect.width + dx) / rect.width;
-        const scale = clamp(requested, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, widest));
-        next = scaleRows((outerColumns ? setFrameWidth : setBlockWidth)(context.model, startWidth * scale), scale, singleWidths, 1, tableScales);
+        const scale = clamp((rect.width + dx) / rect.width, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, widest));
+        next = scaleRows((outerColumns ? setFrameWidth : setBlockWidth)(context.model, startWidth * scale), scale, singleWidths, 1);
       }
       applySizing(root, next);
     },
@@ -750,10 +680,6 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
       applySizing(root, context.model);
     },
   });
-}
-
-function tableScaleOf(item: HTMLElement): number {
-  return Number(item.querySelector<HTMLElement>(".vml-table__content")?.style.getPropertyValue("--vml-table-scale")) || 1;
 }
 
 /** `box` is what the layout's width applies to: the layout, or with text beside the media, their column. */
@@ -872,7 +798,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
 
   // Obsidian's own actions for the media file, as on any link: reveal it in the file list or the
   // system's file manager, open it, copy its path, and whatever other plugins add.
-  const media = item.embed.kind === "mermaid" || item.embed.kind === "table" ? null : resolveMedia(context.app, item.embed, context.sourcePath);
+  const media = item.embed.kind === "mermaid" ? null : resolveMedia(context.app, item.embed, context.sourcePath);
   if (media?.file) {
     context.app.workspace.trigger("file-menu", menu, media.file, "link-context-menu");
   }
@@ -957,7 +883,7 @@ function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
 
 /** Replace size handles with captured dimensions; media/menu listeners retain their shared context. */
 export function refreshSizingHandles(root: HTMLElement, context: LayoutContext): void {
-  for (const handle of Array.from(root.querySelectorAll(".vml-row__height-handle, .vml-item__col-handle, .vml-item__width-handle, .vml-table__height-handle, .vml-frame__handle"))) handle.remove();
+  for (const handle of Array.from(root.querySelectorAll(".vml-row__height-handle, .vml-item__col-handle, .vml-item__width-handle, .vml-frame__handle"))) handle.remove();
   for (const row of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) setUpRow(row, Number(row.dataset.row), context);
   setUpFrame(root, context);
 }
