@@ -1,6 +1,6 @@
 # Excalidraw 布局媒体
 
-2026-11-02，处理 [Issue #36](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/36)。实现已进入 main，尚未发布；公开版 0.9.2 不包含此功能。
+2026-11-02，处理 [Issue #36](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/36)，已随 0.9.3 正式发布；见[发布核验](../releases/0.9.3-readiness.md)。
 
 ## 使用
 

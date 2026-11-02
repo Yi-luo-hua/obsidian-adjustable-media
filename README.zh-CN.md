@@ -6,9 +6,9 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-**0.9.2 已发布**，修复转换布局后的源码展开与光标定位，以及同行图片包装时误带入文字的问题。详见[补丁核验](docs/releases/0.9.2-readiness.md)。
+**0.9.3 已发布**，新增 Excalidraw 布局媒体，以及原生表格右键「包成布局块」入口，将整表包装为文字布局。详见[发布核验](docs/releases/0.9.3-readiness.md)。
 
-当前最新发布为 **0.9.2**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
+当前最新发布为 **0.9.3**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
 
 0.9.0 已发布，新增 Canvas 卡片布局、Callout 图片缩放和 Mermaid 右键包装，并修复主题样式导致的把手裁剪、布局正文对齐及库外图片显示。已筛查官方目录全部 901 个主题的主 CSS，并对 57 组样式完成 342 种渲染组合检查。详见[发布核验](docs/releases/0.9.0-readiness.md)。
 
@@ -58,6 +58,7 @@
 ### 1. 创建布局块
 
 - **右键菜单**：在实时预览中右键点击独立的图片、视频或 Mermaid 图表，选择 **包成布局块**。图表按完整的顶层 Mermaid 围栏包装。
+- **Excalidraw 与表格**：启用 Excalidraw 插件后，可右键绘图预览包装本地绘图，或通过把手拖入已有布局。右键顶层 Markdown 表格可将整表包装为文字布局，保留原生行、列和排序菜单（表格菜单需 Obsidian 1.6.0+）。
 - **命令 / 快捷键**：选中单行或多行，执行命令 `Adjustable Media: 把选中的内容包成布局块`（可在快捷键设置中为其指定专属快捷键）。只有媒体嵌入的行合并成图片行；含文字的行原样包进去，成为文字块，或者图片旁的文字栏。
 - **选区右键**：在实时预览或源码模式中选中文字，右键选择 **把选中的内容包成布局块**；只有选区能够组成有效布局时才提供此项。
 - **拖拽加入**：笔记中已存在布局块时，可将同一笔记、同一窗格中的独立图片或 Mermaid 图表直接拖入其中。触摸设备可拖动图表把手，也可长按独立图表正文后拖动；快速滑动保留滚动。

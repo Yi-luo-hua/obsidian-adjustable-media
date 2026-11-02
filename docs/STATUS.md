@@ -4,12 +4,11 @@
 
 ## 版本与交付范围
 
-- **0.9.3 发布候选**：准备发布 Excalidraw 布局媒体及表格右键文字包装，版本和中英文包内公告已同步；534 项检查、生产打包和测试库升级／重载验证通过。尚未公开，见 [0.9.3 核验](releases/0.9.3-readiness.md)。
-- **公开版本：0.9.2**，标签源码 `ce605b7`，已设为最新版本；三份公开附件与干净标签构建逐字节一致，摘要及来源证明已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.2)和[发布核验](releases/0.9.2-readiness.md)。
-- **main：已包含 0.9.2 发布代码**。`ed83461` 修复转换布局后的源码展开、光标定位和同行图片误包文字；保留 0.9.1 的缩进续行与图文块缩放修复。
+- **公开版本：0.9.3**，标签源码 `eeba209`，已设为最新版本；三份公开附件与干净标签构建逐字节一致，摘要及来源证明已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.3)和[发布核验](releases/0.9.3-readiness.md)。
+- **main：已包含 0.9.3 发布代码**。`ed83461` 修复转换布局后的源码展开、光标定位和同行图片误包文字；保留 0.9.1 的缩进续行与图文块缩放修复。
 - **表格适配已回退**：以 `2bba25b` 检查点为基础，仅保留原生表格右键「包成布局块」，生成原有文字布局块；撤回独立表格媒体、整表缩放和专属操作，Excalidraw 支持保留。详见[表格右键包装](features/tables.md)。
-- **未发布增量：Issue #36 Excalidraw 布局媒体**。支持多图／图文并排、环绕、调宽、图注、把手拖入及原图保存后的预览更新；修复显式文字块内的空白显示路径。Windows 定向验证通过，详见 [功能与验证记录](features/excalidraw.md)。版本号、标签及公开附件未变。
-- 0.9.2 的 519 项测试、生产打包、main／标签 CI 和 Release 工作流通过。Windows／Obsidian 1.14.5 已核对原失败场景、撤销重做、中英文更新弹窗与升级／重载行为；移动设备、其他主题、旧版 Obsidian 及 PDF 未复测。
+- **0.9.3 已发布：Issue #36 Excalidraw 布局媒体**。支持多图／图文并排、环绕、调宽、图注、把手拖入及原图保存后的预览更新；修复显式文字块内的空白显示路径。Windows 定向验证通过，详见 [功能与验证记录](features/excalidraw.md)。同时发布原生表格右键文字包装入口。
+- 0.9.3 的 534 项测试、生产打包、main／标签 CI 和 Release 工作流通过。Windows／Obsidian API 1.14.5／Excalidraw 2.29.0 已验证相关功能；本轮发布核对中英文更新弹窗、从 0.9.2 升级与同版重载，68 份笔记 SHA-256 不变。macOS、移动设备、其他主题、旧版 Obsidian 及完整 PDF 导出未复测。
 - 已发布范围保留正文连续空行与引用跳转修复、手动分栏、高亮、三视图／渲染修复、Android／iPhone／iPad 适配、Mermaid 独立项、Callout／Canvas 与主题把手等功能；声明 `isDesktopOnly:false`，不批量迁移旧 V2 笔记。原 main 完整保留为 `codex/main-before-080`；当前检出分支以 [WORKTREES](WORKTREES.md) 的日期快照及 `git status` 为准。
 
 ## 已有工作与当前边界

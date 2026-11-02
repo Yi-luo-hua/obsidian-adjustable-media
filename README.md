@@ -4,7 +4,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-**0.9.2 is released**, keeping layouts rendered after conversion and wrapping inline images without pulling surrounding text into the layout. See [patch verification](docs/releases/0.9.2-readiness.md).
+**0.9.3 is released**, adding Excalidraw drawings to layouts and a native table context-menu action that wraps the complete table in a text layout. See [release verification](docs/releases/0.9.3-readiness.md).
 
 0.9.0 adds Canvas card layouts, Callout image resizing and Mermaid context-menu wrapping, and fixes theme-related handle clipping, layout alignment and external file URL images. Theme compatibility checks screened all 901 official themes' main CSS and 342 rendering combinations from 57 theme styles. See [release verification](docs/releases/0.9.0-readiness.md).
 
@@ -14,7 +14,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [Feature examples](docs/examples/Guide.en.md) · [功能示例](docs/examples/Guide.zh-CN.md). In Obsidian, run **Feature examples** for an offline preview and a button to create a working copy with its media. The guide opens once when first available, including for existing users upgrading to the release that adds it.
 
-The latest release is **0.9.2**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
+The latest release is **0.9.3**. Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
 
 ![Adjustable Media Preview](assets/demo.jpg)
 
@@ -58,6 +58,7 @@ The latest release is **0.9.2**. Text boxes, multi-column text and numbered figu
 ### 1. Create a Layout Block
 
 - **Right-Click Menu**: In Live Preview, right-click a standalone image, video or Mermaid diagram and choose **Wrap in a layout**. For a diagram, keep its complete top-level Mermaid fence.
+- **Excalidraw and tables**: With Excalidraw enabled, right-click its preview to wrap a local drawing, or drag its handle into an existing layout. Right-click a top-level Markdown table to wrap the whole table in a text layout; its native row, column and sorting actions remain available (table menu requires Obsidian 1.6.0+).
 - **Command / Hotkey**: Select one or more lines and run `Adjustable Media: Wrap selection in a layout` (assign a dedicated hotkey in Settings → Hotkeys). Lines of media embeds are gathered into rows; lines with text are wrapped as they are, making a text box, or text columns beside the media.
 - **Selected text menu**: In Live Preview or Source mode, select text, right-click and choose **Wrap selection in a layout**. The command wraps the whole lines touched by the selection. It appears only when the selection can form a layout. To choose your own shortcut, open **Settings → Hotkeys**, search for **Wrap selection in a layout**, and assign a key combination; no shortcut is assigned by default.
 - **Drag & Drop**: When a layout block already exists in your note, drag standalone images or Mermaid diagrams from the same note and pane directly into it. On touch devices, diagrams have a drag handle; holding a standalone diagram's body also starts a drag, while a quick swipe scrolls.
