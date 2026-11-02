@@ -5,7 +5,6 @@ export interface WrapAppearance {
   container: { left: number; width: number };
   media: { left: number; width: number; height: number };
   spacing: [number, number];
-  tableViewport?: [number, number, number, number, number];
 }
 
 /** Add display settings to the new opener; every line of the wrapped source stays untouched. */
@@ -21,8 +20,7 @@ export function preserveWrapAppearance(change: LineChange, appearance: WrapAppea
   const align = offset < 0.001 ? "left" : offset > 0.999 ? "right" : Math.abs(offset - 0.5) < 0.001 ? "center" : null;
   const table = block.rows[0].embeds[0].kind === "table";
   const row = { ...block.meta.rows[0], width, ...(align ? { align } : { offset }),
-    ...(table ? media.width > container.width ? { tableWidth: media.width,
-      ...(appearance.tableViewport ? { tableViewport: appearance.tableViewport } : {}) } : {} : { aspect: media.width / media.height }) };
+    ...(table ? media.width > container.width ? { tableWidth: media.width } : {} : { aspect: media.width / media.height }) };
   const replacement = [...change.replacement];
   replacement[block.openLine] = serializeOpener({ ...block.meta, rows: [row],
     extra: { ...block.meta.extra, spacing: spacing.map(value => Math.max(0, value)) } });

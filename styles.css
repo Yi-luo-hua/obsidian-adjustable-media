@@ -154,30 +154,37 @@
   height: auto;
 }
 
-/* Tables keep their text size and full row content as the available width changes. */
-.vml-layout .vml-item__table {
+/* A wide table scales as a whole to its item, with no horizontal scrolling. */
+.vml-layout .vml-item--table .vml-item__table {
   background: transparent;
-  height: auto;
-  overflow-x: auto;
+  height: var(--vml-table-height, 0px);
+  overflow: clip;
+  position: relative;
   white-space: normal;
 }
 
-.vml-row--single .vml-item--table .vml-item__table {
-  box-sizing: border-box;
-  margin-left: calc(-1 * var(--vml-table-bleed-left, 0px));
-  padding-left: var(--vml-table-pad-left, 0px);
-  padding-right: var(--vml-table-pad-right, 0px);
-  width: calc(100% + var(--vml-table-bleed-left, 0px) + var(--vml-table-bleed-right, 0px));
+.vml-table__content {
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform: scale(var(--vml-table-scale, 1));
+  transform-origin: top left;
+  width: max-content;
+}
+
+.vml-table__content .table-wrapper {
+  margin: 0;
+  max-width: none;
+  overflow: visible;
 }
 
 .vml-item__table table {
   margin: 0;
-  min-width: var(--vml-table-min-width, 0);
-  width: 100%;
+  min-width: var(--vml-table-natural-width, 0);
+  width: auto;
 }
 
 .vml-item__table :is(th, td) {
-  overflow-wrap: anywhere;
   white-space: normal;
 }
 

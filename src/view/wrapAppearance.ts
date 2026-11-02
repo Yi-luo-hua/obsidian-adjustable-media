@@ -10,13 +10,10 @@ export function keepWrapAppearance(view: EditorView, change: LineChange, element
   const box = media.getBoundingClientRect(), host = outer.getBoundingClientRect();
   const content = view.contentDOM.getBoundingClientRect();
   const wide = media.matches("table") && box.width > content.width;
-  const css = wide ? outer.win.getComputedStyle(outer) : null;
   const scrollbar = wide ? outer.offsetHeight - outer.clientHeight : 0;
   return preserveWrapAppearance(change, {
     container: { left: content.left, width: view.contentDOM.clientWidth },
     media: { left: box.left, width: box.width, height: box.height },
     spacing: [box.top - host.top, host.bottom - box.bottom - scrollbar],
-    ...(css ? { tableViewport: [content.left - host.left, host.right - content.right,
-      parseFloat(css.paddingLeft), parseFloat(css.paddingRight), outer.scrollLeft] as [number, number, number, number, number] } : {}),
   });
 }

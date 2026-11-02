@@ -32,7 +32,7 @@ test("all views render exact manual segments separately and wait for every colum
   const finish: Array<() => void> = [];
   const module = await mockedModule<{ renderLayout(el: unknown, options: unknown): Element; layoutRenderState(el: Element): string }>(new URL("../src/view/layoutView.ts", import.meta.url), {
     obsidian: { MarkdownRenderer: { render: (_app: unknown, text: string, element: Element) => { rendered.push({ text, element }); return new Promise<void>(resolve => finish.push(resolve)); } } },
-    "../format/v2.ts": format, "../layout/model.ts": model, "../layout/viewProjection.ts": projection, "../markdown/textColumns.ts": columns, "../layout/wrapAppearance.ts": appearance, "./excalidraw.ts": {},
+    "../format/v2.ts": format, "../layout/model.ts": model, "../layout/viewProjection.ts": projection, "../markdown/textColumns.ts": columns, "../layout/wrapAppearance.ts": appearance, "./tableFit.ts": {}, "./excalidraw.ts": {},
     "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./mediaControls.ts": {}, "./videoSource.ts": {}, "./messages.ts": { t: (key: string) => key },
   });
   const lines = ['<!-- vml {"v":2,"type":"text","cols":4,"gap":1} -->', 'First', '', '+++', '', 'Second ![[a.png|120]]', '<!-- /vml -->'];
@@ -57,7 +57,7 @@ test("all views render exact manual segments separately and wait for every colum
 test("shared sizing separates the outer frame from the media share and restores both on cancel", async () => {
   const module = await mockedModule<{ applySizing(el: unknown, layout: model.LayoutModel): void }>(new URL("../src/view/layoutView.ts", import.meta.url), {
     obsidian: {}, "../format/v2.ts": format, "../layout/model.ts": model, "../layout/viewProjection.ts": projection,
-    "../markdown/textColumns.ts": columns, "./crossrefView.ts": {}, "./media.ts": {}, "./mediaControls.ts": {}, "./videoSource.ts": {}, "./messages.ts": {}, "../layout/wrapAppearance.ts": appearance, "./excalidraw.ts": {},
+    "../markdown/textColumns.ts": columns, "./crossrefView.ts": {}, "./media.ts": {}, "./mediaControls.ts": {}, "./videoSource.ts": {}, "./messages.ts": {}, "../layout/wrapAppearance.ts": appearance, "./tableFit.ts": {}, "./excalidraw.ts": {},
   });
   const layout = model.modelFromBlock(format.findV2Blocks(['<!-- vml {"width":0.5,"align":"right"} -->', '![[a.png]]', 'Text', '<!-- /vml -->'])[0]);
   const root = new Element();

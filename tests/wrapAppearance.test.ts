@@ -41,15 +41,14 @@ test("small tables retain their complete source and natural height instead of be
   assert.deepEqual(model.extra.spacing, [16, 16]);
 });
 
-test("wide table conversion retains its inner width and scrolling instead of reflowing its rows", () => {
+test("wide table conversion records its natural width for fitting without a scrolling viewport", () => {
   const change = preserveWrapAppearance(planWrapTable(table, 1)!, {
     container: { left: 40, width: 900 }, media: { left: 40, width: 1800, height: 90 }, spacing: [16, 16],
-    tableViewport: [16, 16, 16, 16, 120],
   });
   const model = modelFromBlock(findV2Blocks(change.replacement)[0]);
   assert.equal(model.rows[0].width, 1);
   assert.equal(model.rows[0].extra.tableWidth, 1800);
-  assert.deepEqual(model.rows[0].extra.tableViewport, [16, 16, 16, 16, 120]);
+  assert.equal(model.rows[0].extra.tableViewport, undefined);
 });
 
 test("native paragraph spacing ends for floating layouts or an existing regular layout", () => {
@@ -88,5 +87,6 @@ test("activation measures the actual media and native outer block rather than th
   const measured = keepWrapAppearance(pane as never, planWrapTable(table, 0)!, wide as never);
   const measuredModel = modelFromBlock(findV2Blocks(measured.replacement)[0]);
   assert.deepEqual(measuredModel.extra.spacing, [16, 16], "the scrollbar must not be counted twice as bottom spacing");
-  assert.deepEqual(measuredModel.rows[0].extra.tableViewport, [16, 16, 16, 16, 120]);
+  assert.equal(measuredModel.rows[0].extra.tableWidth, 1800);
+  assert.equal(measuredModel.rows[0].extra.tableViewport, undefined);
 });
