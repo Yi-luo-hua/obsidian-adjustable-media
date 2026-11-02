@@ -162,8 +162,17 @@
   white-space: normal;
 }
 
+.vml-row--single .vml-item--table .vml-item__table {
+  box-sizing: border-box;
+  margin-left: calc(-1 * var(--vml-table-bleed-left, 0px));
+  padding-left: var(--vml-table-pad-left, 0px);
+  padding-right: var(--vml-table-pad-right, 0px);
+  width: calc(100% + var(--vml-table-bleed-left, 0px) + var(--vml-table-bleed-right, 0px));
+}
+
 .vml-item__table table {
   margin: 0;
+  min-width: var(--vml-table-min-width, 0);
   width: 100%;
 }
 
@@ -534,6 +543,30 @@
 
 .vml-row--single .vml-item--sized .vml-item__media {
   width: 100%;
+}
+
+/* Conversion keeps the native block's insets, without adding editing-frame space. */
+.vml-layout.vml-layout--native-spacing {
+  border-block-width: 0;
+  padding-top: var(--vml-space-before);
+  padding-bottom: var(--vml-space-after);
+}
+
+.vml-layout--native-spacing > .vml-row {
+  margin: 0;
+}
+
+.vml-live-preview:not(.vml-live-preview--wrap):has(> .vml-layout--native-spacing) {
+  padding: 0;
+}
+
+.vml-row--single .vml-item--aspect .vml-item__media {
+  aspect-ratio: var(--vml-item-aspect);
+  height: auto;
+}
+
+.vml-row--single .vml-item--aspect > img.vml-item__media {
+  object-fit: fill;
 }
 
 .vml-item__missing {

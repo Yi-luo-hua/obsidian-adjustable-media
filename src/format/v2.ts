@@ -243,7 +243,7 @@ export function readRowMeta(meta: V2RowMeta, embedCount: number): RowSettings {
   return {
     height: height === null ? null : clamp(Math.round(height), MIN_ROW_HEIGHT, MAX_ROW_HEIGHT),
     widths: positiveNumbers(meta.widths, embedCount),
-    width: embedCount === 1 && width !== null && width >= 0.1 && width <= 1 ? width : null,
+    width: embedCount === 1 && width !== null && width >= 0.001 && width <= 1 ? width : null,
     align: embedCount === 1 && isAlign(meta.align) ? meta.align : null,
     offset: embedCount === 1 && offset !== null && offset >= 0 && offset <= 1 ? offset : null,
     captions: captionList(meta.captions, embedCount),

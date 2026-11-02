@@ -10,6 +10,7 @@ import { videoPreviewUrl } from "./videoSource.ts";
 import { t } from "./messages.ts";
 import { splitTextColumns } from "../markdown/textColumns.ts";
 import { renderExcalidraw, renderExcalidrawMarkdown } from "./excalidraw.ts";
+import { wrapSpacing } from "../layout/wrapAppearance.ts";
 
 export interface LayoutViewOptions {
   app: App;
@@ -176,6 +177,9 @@ function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOp
  * single items. Rendering uses it, and so do resize gestures, to preview a model and to restore it.
  */
 export function applySizing(root: HTMLElement, model: LayoutModel): void {
+  const spacing = model.wrap === null && !hasTextColumns(model) ? wrapSpacing(model.extra.spacing) : null;
+  root.toggleClass("vml-layout--native-spacing", spacing !== null);
+  root.setCssProps({ "--vml-space-before": spacing ? `${spacing[0]}px` : "", "--vml-space-after": spacing ? `${spacing[1]}px` : "" });
   const width = effectiveFrameWidth(model);
   root.toggleClass("vml-layout--sized", width !== null);
   root.setCssProps({ "--vml-block-width": width === null ? "" : `${width * 100}%` });
@@ -209,6 +213,15 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
     }
     rowEl.setCssProps({ "--vml-offset": String(rowOffset(row)) });
     const width = singleWidth(row, item);
+    const aspect = typeof row.extra.aspect === "number" && row.extra.aspect > 0 ? row.extra.aspect : null;
+    itemEl.toggleClass("vml-item--aspect", aspect !== null && item.embed.kind !== "table");
+    itemEl.setCssProps({ "--vml-item-aspect": aspect === null ? "" : String(aspect) });
+    const tableWidth = typeof row.extra.tableWidth === "number" && row.extra.tableWidth > 0 ? row.extra.tableWidth : null;
+    itemEl.setCssProps({ "--vml-table-min-width": tableWidth === null ? "" : `${tableWidth}px` });
+    const viewport = Array.isArray(row.extra.tableViewport) && row.extra.tableViewport.length === 5
+      && row.extra.tableViewport.every(value => typeof value === "number" && Number.isFinite(value)) ? row.extra.tableViewport as number[] : null;
+    itemEl.setCssProps({ "--vml-table-bleed-left": `${viewport?.[0] ?? 0}px`, "--vml-table-bleed-right": `${viewport?.[1] ?? 0}px`,
+      "--vml-table-pad-left": `${viewport?.[2] ?? 0}px`, "--vml-table-pad-right": `${viewport?.[3] ?? 0}px` });
     itemEl.toggleClass("vml-item--sized", width !== null);
     itemEl.setCssProps({ "--vml-item-width": width ?? "" });
   }
@@ -246,7 +259,10 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
   if (item.embed.kind === "table") {
     itemEl.addClass("vml-item--table");
     const table = itemEl.createDiv({ cls: "vml-item__media vml-item__table markdown-rendered" });
-    renderMarkdown(table, item.embed.raw, options);
+    renderMarkdown(table, item.embed.raw, options, () => {
+      const viewport = row.extra.tableViewport;
+      if (Array.isArray(viewport) && typeof viewport[4] === "number") table.scrollLeft = viewport[4];
+    });
   } else if (item.embed.kind === "excalidraw") {
     itemEl.addClass("vml-item--excalidraw");
     const drawing = itemEl.createDiv({ cls: "vml-item__media vml-item__excalidraw" });
