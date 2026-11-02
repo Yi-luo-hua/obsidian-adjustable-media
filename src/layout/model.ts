@@ -198,7 +198,7 @@ export function canAddText(model: LayoutModel): boolean {
 }
 
 export function metaFromModel(model: LayoutModel): V2Meta {
-  const mediaItems = model.version === 3 || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid"));
+  const mediaItems = model.version === 3 || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid" || item.embed.kind === "table"));
   return {
     ...(mediaItems ? { version: 3 as const } : {}),
     rows: model.rows.map((row) => {

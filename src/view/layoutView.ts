@@ -242,8 +242,12 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
     itemEl.setCssProps({ "--vml-grow": String(item.weight) });
   }
 
-  const media = item.embed.kind === "mermaid" ? null : resolveMedia(options.app, item.embed, options.sourcePath);
-  if (item.embed.kind === "excalidraw") {
+  const media = item.embed.kind === "mermaid" || item.embed.kind === "table" ? null : resolveMedia(options.app, item.embed, options.sourcePath);
+  if (item.embed.kind === "table") {
+    itemEl.addClass("vml-item--table");
+    const table = itemEl.createDiv({ cls: "vml-item__media vml-item__table markdown-rendered" });
+    renderMarkdown(table, item.embed.raw, options);
+  } else if (item.embed.kind === "excalidraw") {
     itemEl.addClass("vml-item--excalidraw");
     const drawing = itemEl.createDiv({ cls: "vml-item__media vml-item__excalidraw" });
     const sizeKey = `excalidraw:${options.sourcePath}\n${item.embed.raw}`;

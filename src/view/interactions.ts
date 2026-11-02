@@ -257,7 +257,14 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
   }
 
   itemEl.tabIndex = 0;
-  itemEl.setAttribute("aria-label", item.embed.kind === "mermaid" ? t("mermaidDiagram") : item.embed.alt || item.embed.target);
+  itemEl.setAttribute("aria-label", item.embed.kind === "mermaid" ? t("mermaidDiagram") : item.embed.kind === "table" ? t("table") : item.embed.alt || item.embed.target);
+  if (item.embed.kind === "table") {
+    itemEl.addEventListener("dblclick", event => {
+      if (eventElement(event)?.closest("a, button, input, .vml-handle")) return;
+      event.preventDefault(); event.stopPropagation();
+      context.editSource?.();
+    });
+  }
   itemEl.addEventListener("contextmenu", (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -273,10 +280,10 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
 
   // Videos keep their controls; touch users move diagrams by a grip and scroll on the diagram body.
   let dragFrom = itemEl;
-  if (item.embed.kind === "video" || item.embed.kind === "mermaid" || item.embed.kind === "excalidraw") {
+  if (item.embed.kind === "video" || item.embed.kind === "mermaid" || item.embed.kind === "excalidraw" || item.embed.kind === "table") {
     const grip = itemEl.createDiv({ cls: "vml-handle vml-item__grip", attr: { "aria-label": t("dragHandle"), role: "button" } });
     setIcon(grip, "grip-vertical");
-    if (item.embed.kind === "video" || item.embed.kind === "excalidraw") dragFrom = grip;
+    if (item.embed.kind === "video" || item.embed.kind === "excalidraw" || item.embed.kind === "table") dragFrom = grip;
   }
   dragFrom.addEventListener("pointerdown", (event) => {
     const target = eventElement(event);
@@ -431,7 +438,7 @@ function setUpRow(rowEl: HTMLElement, row: number, context: LayoutContext): void
     return;
   }
 
-  setUpHeightHandle(rowEl, row, layoutRow.height ?? DEFAULT_ROW_HEIGHT, context);
+  if (!layoutRow.items.every(item => item.embed.kind === "table")) setUpHeightHandle(rowEl, row, layoutRow.height ?? DEFAULT_ROW_HEIGHT, context);
   itemEls.slice(0, -1).forEach((itemEl, index) => setUpColumnHandle(itemEls, itemEl, index, row, context));
 }
 
@@ -595,7 +602,8 @@ function setUpFrame(root: HTMLElement, context: LayoutContext): void {
       { box: root, edge: "corner", direction: outerDirection },
     ]
     : (isTextOnly(context.model) ? (["right"] as const) : (["right", "bottom", "corner"] as const)).map(edge => ({ box, edge, direction }));
-  for (const { box: target, edge, direction: resizeDirection } of controls) {
+  const naturalHeight = isTextOnly(context.model) || context.model.rows.every(row => row.items.every(item => item.embed.kind === "table"));
+  for (const { box: target, edge, direction: resizeDirection } of controls.filter(control => !naturalHeight || control.edge === "right")) {
     const handle = target.createDiv({
       cls: `vml-handle vml-frame__handle vml-frame__handle--${edge}`,
       attr: { "aria-label": t(FRAME_LABELS[edge]), role: "separator" },
@@ -798,7 +806,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
 
   // Obsidian's own actions for the media file, as on any link: reveal it in the file list or the
   // system's file manager, open it, copy its path, and whatever other plugins add.
-  const media = item.embed.kind === "mermaid" ? null : resolveMedia(context.app, item.embed, context.sourcePath);
+  const media = item.embed.kind === "mermaid" || item.embed.kind === "table" ? null : resolveMedia(context.app, item.embed, context.sourcePath);
   if (media?.file) {
     context.app.workspace.trigger("file-menu", menu, media.file, "link-context-menu");
   }

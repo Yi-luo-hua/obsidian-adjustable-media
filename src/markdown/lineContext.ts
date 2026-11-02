@@ -73,7 +73,13 @@ export interface FencedCodeBlock {
 
 /** Complete top-level fences, using the same context and closing rules as the layout scanner. */
 export function fencedCodeBlocks(lines: readonly string[]): FencedCodeBlock[] {
+  return scanMarkdownContainers(lines).fences;
+}
+
+/** Shared top-level ownership for multiline media; lazy list continuations stay in the list. */
+export function scanMarkdownContainers(lines: readonly string[]): { fences: FencedCodeBlock[]; topLevel: boolean[] } {
   const blocks: FencedCodeBlock[] = [];
+  const topLevel: boolean[] = [];
   let state: ScanState = hasFrontmatter(lines) ? { kind: "frontmatter" } : TEXT;
   let opening: { from: number; language: string } | null = null;
   // The outer item's content column covers nested items too. Lazy paragraphs keep that container;
@@ -105,6 +111,7 @@ export function fencedCodeBlocks(lines: readonly string[]): FencedCodeBlock[] {
         paragraph = next.kind === "text" && !own;
       }
     }
+    topLevel.push(state.kind === "text" && listIndent === 0 && !/^[ \t]*>/.test(text));
     if (state.kind === "text" && next.kind === "code") {
       const fence = next.fence;
       opening = fence.quoteDepth === 0 && !fence.listMarker && fence.indent <= 3 && (listIndent === 0 || fence.indent < listIndent)
@@ -115,7 +122,7 @@ export function fencedCodeBlocks(lines: readonly string[]): FencedCodeBlock[] {
     }
     state = next;
   });
-  return blocks;
+  return { fences: blocks, topLevel };
 }
 
 function classifyLine(line: string, index: number, state: ScanState): [LineContext, ScanState] {

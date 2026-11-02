@@ -44,6 +44,7 @@ for (const scenario of [
       "./src/view/crossrefView.ts": { crossrefExtension: () => [], registerCrossrefs: () => {}, setRefLanguage: () => {} },
       "./src/settings.ts": { DEFAULT_SETTINGS: {}, readSettings: (value: unknown) => value, VmlSettingTab: class {} },
       "./src/view/imageMenu.ts": { registerImageMenu: () => {} },
+      "./src/view/tableMenu.ts": { registerTableMenu: () => {} },
       "./src/view/layoutTouch.ts": { registerLayoutTouch: () => {} },
       "./src/view/cornerInput.ts": { registerCornerInputGuard: () => {} },
       "./src/view/calloutImages.ts": { calloutImageExtension: () => [], registerCalloutImages: () => {} },

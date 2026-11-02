@@ -5,6 +5,7 @@ import { autoConvert } from "./src/input/autoConvert.ts";
 import { crossrefExtension, registerCrossrefs, setRefLanguage } from "./src/view/crossrefView.ts";
 import { DEFAULT_SETTINGS, VmlSettingTab, readSettings, type VmlSettings } from "./src/settings.ts";
 import { registerImageMenu } from "./src/view/imageMenu.ts";
+import { registerTableMenu } from "./src/view/tableMenu.ts";
 import { registerLayoutTouch } from "./src/view/layoutTouch.ts";
 import { registerCornerInputGuard } from "./src/view/cornerInput.ts";
 import { calloutImageExtension, registerCalloutImages } from "./src/view/calloutImages.ts";
@@ -37,6 +38,7 @@ export default class AdjustableMediaPlugin extends Plugin {
       autoConvert(this, () => this.settings.autoConvert),
     ]);
     registerImageMenu(this);
+    registerTableMenu(this);
     registerLayoutTouch(this);
     registerCornerInputGuard(this);
     registerCommands(this);

@@ -94,6 +94,7 @@ const MESSAGES = {
     en: "Not found: {target}",
   },
   mermaidDiagram: { zh: "Mermaid 图表", en: "Mermaid diagram" },
+  table: { zh: "表格", en: "Table" },
   excalidrawUnavailable: { zh: "请启用 Excalidraw 插件以显示此绘图。", en: "Enable the Excalidraw plugin to display this drawing." },
   excalidrawFailed: { zh: "Excalidraw 绘图预览失败，可双击打开原图。", en: "Excalidraw preview failed. Double-click to open the drawing." },
   editSource: {

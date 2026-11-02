@@ -154,6 +154,32 @@
   height: auto;
 }
 
+/* Tables keep their text size and full row content as the available width changes. */
+.vml-layout .vml-item__table {
+  background: transparent;
+  height: auto;
+  overflow-x: auto;
+  white-space: normal;
+}
+
+.vml-item__table table {
+  margin: 0;
+  width: 100%;
+}
+
+.vml-item__table :is(th, td) {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.vml-row--single .vml-item--table:not(.vml-item--sized) {
+  flex: 0 1 100%;
+}
+
+.vml-layout--interactive .vml-item--table {
+  cursor: auto;
+}
+
 .vml-text-column > :first-child {
   margin-top: 0;
 }
@@ -681,8 +707,14 @@
   display: none;
 }
 
-.vml-plain-excalidraw > .vml-plain-media__grip {
+.vml-plain-excalidraw > .vml-plain-media__grip,
+.vml-plain-table > .vml-plain-media__grip {
   display: flex;
+}
+
+.vml-plain-table > .vml-plain-media__grip {
+  right: -24px;
+  top: -12px;
 }
 
 .vml-plain-media__grip {
