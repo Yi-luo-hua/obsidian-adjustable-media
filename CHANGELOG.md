@@ -4,7 +4,7 @@
 
 ## 0.9.3 - 2026-11-02
 
-- Add local Excalidraw drawings to media layouts, including side-by-side placement, text wrapping, resizing, captions and drag handles. Double-click a preview to open its drawing. Requires the Excalidraw plugin to be enabled.
+- Add local Excalidraw drawings to media layouts ([#36](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/36)), including side-by-side placement, text wrapping, resizing, captions and drag handles. Double-click a preview to open its drawing. Requires the Excalidraw plugin to be enabled.
 - Refresh Excalidraw previews after drawing saves and light/dark theme changes, and render drawings inside explicit text layouts. Preserve original embeds, aliases, dimensions and partial references without generating SVG files in the vault.
 - Add Wrap in a layout to native Markdown tables' live-preview context menu. Wrap the complete table in the existing text-layout format, preserving its source, native row/column/sorting actions and one-step undo. Table-specific media resizing is outside this release.
 
