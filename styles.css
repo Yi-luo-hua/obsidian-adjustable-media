@@ -946,6 +946,12 @@ body.vml-is-dragging * {
   right: auto;
 }
 
+/* A small table can be narrower than its item: keep its triangle on the drawn table's corner. */
+.vml-item--table .vml-item__width-handle:not(.vml-item__width-handle--left) {
+  left: max(0px, calc(var(--vml-table-drawn-width, 100%) - 18px));
+  right: auto;
+}
+
 .vml-item__grip {
   align-items: center;
   background: var(--background-primary);

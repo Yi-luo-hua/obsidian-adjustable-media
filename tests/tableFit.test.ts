@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fitTable } from "../src/view/tableFit.ts";
+import { fitTable, refreshTableFit } from "../src/view/tableFit.ts";
 
 function harness(available: number, natural: number) {
   let measure!: () => void, dispose!: () => void, disconnected = false;
@@ -12,8 +12,9 @@ function harness(available: number, natural: number) {
     observe(element: unknown) { observed.push(element); }
     disconnect() { disconnected = true; }
   }
-  const viewport = { clientWidth: available, setCssProps: (props: Record<string, string>) => heights.push(parseFloat(props["--vml-table-height"])),
-    win: { ResizeObserver: Observer, getComputedStyle: () => ({ height: String(content.naturalHeight) }),
+  const viewport = { clientWidth: available, requested: "", style: { getPropertyValue: () => viewport.requested },
+    setCssProps: (props: Record<string, string>) => heights.push(parseFloat(props["--vml-table-height"])),
+    win: { ResizeObserver: Observer, getComputedStyle: (element: unknown) => ({ height: String(content.naturalHeight), width: String(element === content ? content.offsetWidth : viewport.clientWidth) }),
       requestAnimationFrame(callback: () => void) { frames.set(++sequence, callback); return sequence; },
       cancelAnimationFrame(id: number) { frames.delete(id); } } };
   const content = { offsetWidth: natural, naturalHeight: 90, setCssProps: (props: Record<string, string>) => scales.push(Number(props["--vml-table-scale"])) };
@@ -35,6 +36,25 @@ test("a wide table scales to its viewport and responds to narrower and wider pan
   h.viewport.clientWidth = 3000; h.measure();
   assert.equal(h.scales.at(-1), 1);
   assert.equal(h.heights.at(-1), 90);
+});
+
+test("manual magnification can enlarge a small table and still shrinks to fit a narrow pane", () => {
+  const h = harness(500, 125);
+  h.viewport.requested = "2";
+  refreshTableFit(h.viewport as never);
+  assert.equal(h.scales.at(-1), 2);
+  assert.equal(h.heights.at(-1), 180);
+  h.viewport.clientWidth = 100; h.measure();
+  assert.equal(h.scales.at(-1), 99 / 125);
+  h.viewport.clientWidth = 500; h.measure();
+  assert.equal(h.scales.at(-1), 2);
+  h.viewport.requested = "";
+  refreshTableFit(h.viewport as never);
+  assert.equal(h.scales.at(-1), 1);
+  h.dispose();
+  h.viewport.requested = "3";
+  refreshTableFit(h.viewport as never);
+  assert.equal(h.scales.at(-1), 1);
 });
 
 test("small tables stay at their original size and content/font changes trigger fitting", () => {

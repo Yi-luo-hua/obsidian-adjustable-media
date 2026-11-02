@@ -45,6 +45,8 @@ import {
 
 export interface LayoutItem {
   embed: V2Embed;
+  /** Explicit table magnification. Without it, tables only shrink to fit. */
+  tableScale?: number;
   /** Column weight; null means an equal share. */
   weight: number | null;
   caption: string | null;
@@ -56,7 +58,7 @@ export function onlySizingDiffers(before: LayoutModel, after: LayoutModel): bool
     const { width: _width, frameWidth: _frameWidth, align: _align, rows, ...rest } = model;
     return { ...rest, rows: rows.map(row => {
       const { height: _height, width: _rowWidth, align: _rowAlign, offset: _offset, items, ...settings } = row;
-      return { ...settings, items: items.map(({ weight: _weight, ...item }) => item) };
+      return { ...settings, items: items.map(({ weight: _weight, tableScale: _tableScale, ...item }) => item) };
     }) };
   };
   return JSON.stringify(content(before)) === JSON.stringify(content(after));
@@ -139,9 +141,12 @@ export function modelFromBlock(block: V2Block): LayoutModel {
     ...(block.meta.version === 3 ? { version: 3 as const } : {}),
     rows: block.rows.map((row, rowIndex) => {
       const settings = readRowMeta(block.meta.rows[rowIndex] ?? {}, row.embeds.length);
+      const { tableScales, ...extra } = settings.extra;
+      const scales = Array.isArray(tableScales) && tableScales.length === row.embeds.length ? tableScales : [];
       return {
         items: row.embeds.map((embed, index) => ({
           embed,
+          ...(embed.kind === "table" && typeof scales[index] === "number" && Number.isFinite(scales[index]) && scales[index] > 0 ? { tableScale: scales[index] } : {}),
           weight: settings.widths?.[index] ?? null,
           caption: settings.captions?.[index] ?? null,
         })),
@@ -150,7 +155,7 @@ export function modelFromBlock(block: V2Block): LayoutModel {
         align: settings.align,
         offset: settings.offset,
         captionAlign: settings.captionAlign,
-        extra: settings.extra,
+        extra,
       };
     }),
     width: readBlockWidth(width),
@@ -224,6 +229,9 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       }
       if (row.captionAlign !== null) {
         meta.captionAlign = row.captionAlign;
+      }
+      if (row.items.some(item => item.tableScale !== undefined)) {
+        meta.tableScales = row.items.map(item => item.tableScale ?? null);
       }
       return meta;
     }),
@@ -358,7 +366,13 @@ export function setSingleWidth(model: LayoutModel, rowIndex: number, width: numb
   if (model.rows[rowIndex]?.items.length !== 1 || !Number.isFinite(width)) {
     return model;
   }
-  return updateRow(model, rowIndex, (row) => ({ ...row, width: clampSingleWidth(width) }));
+  return updateRow(model, rowIndex, (row) => ({ ...row, width: clampSingleWidth(width, row) }));
+}
+
+/** Table scales belong to items, so moving a table carries its magnification with it. */
+export function setTableScale(model: LayoutModel, rowIndex: number, index: number, scale: number): LayoutModel {
+  if (model.rows[rowIndex]?.items[index]?.embed.kind !== "table" || !Number.isFinite(scale) || scale <= 0) return model;
+  return updateRow(model, rowIndex, row => ({ ...row, items: row.items.map((item, at) => at === index ? { ...item, tableScale: scale } : item) }));
 }
 
 export function setAlign(model: LayoutModel, rowIndex: number, align: Align): LayoutModel {
@@ -416,7 +430,7 @@ export function keepSingleSizes(before: LayoutModel, after: LayoutModel, availab
     ...after,
     // Not rounded here: while the frame is dragged, the item would wobble by up to a pixel. Writing
     // the opening comment rounds it, once.
-    rows: after.rows.map((row) => (row.items.length === 1 && row.width !== null ? { ...row, width: clampSingleWidth(row.width * ratio) } : row)),
+    rows: after.rows.map((row) => (row.items.length === 1 && row.width !== null ? { ...row, width: clampSingleWidth(row.width * ratio, row) } : row)),
   };
 }
 
@@ -528,19 +542,25 @@ export function textLayoutOf(model: LayoutModel): TextLayout {
  * scaling their width; their height follows it. A row without a stored width uses the share it
  * currently takes up, given by `singleWidths` for that row. When the container itself scales,
  * pass 1 for `singleWidthFactor`: keep that share instead of scaling single items twice.
+ * Tables scale from their measured magnification; table-only rows keep their natural height.
  */
-export function scaleRows(model: LayoutModel, factor: number, singleWidths?: ReadonlyArray<number | null>, singleWidthFactor = factor): LayoutModel {
+export function scaleRows(model: LayoutModel, factor: number, singleWidths?: ReadonlyArray<number | null>, singleWidthFactor = factor,
+  tableScales?: ReadonlyArray<ReadonlyArray<number | null>>): LayoutModel {
   if (!Number.isFinite(factor) || factor <= 0) {
     return model;
   }
   return {
     ...model,
     rows: model.rows.map((row, index) => {
+      row = { ...row, items: row.items.map((item, at) => {
+        const scale = tableScales?.[index]?.[at] ?? item.tableScale;
+        return item.embed.kind === "table" && scale != null ? { ...item, tableScale: scale * factor } : item;
+      }) };
       if (row.items.length !== 1) {
-        return { ...row, height: clampHeight((row.height ?? DEFAULT_ROW_HEIGHT) * factor) };
+        return row.items.every(item => item.embed.kind === "table") ? row : { ...row, height: clampHeight((row.height ?? DEFAULT_ROW_HEIGHT) * factor) };
       }
       const current = row.width ?? singleWidths?.[index] ?? null;
-      return singleWidths && current !== null ? { ...row, width: clampSingleWidth(round(current * singleWidthFactor)) } : row;
+      return singleWidths && current !== null ? { ...row, width: clampSingleWidth(round(current * singleWidthFactor), row) } : row;
     }),
   };
 }
@@ -612,8 +632,8 @@ function clampHeight(height: number): number {
   return Math.min(MAX_ROW_HEIGHT, Math.max(MIN_ROW_HEIGHT, Math.round(height)));
 }
 
-function clampSingleWidth(width: number): number {
-  return Math.min(1, Math.max(0.1, width));
+function clampSingleWidth(width: number, row?: LayoutRow): number {
+  return Math.min(1, Math.max(row?.items[0]?.embed.kind === "table" ? 0.001 : 0.1, width));
 }
 
 function round(value: number): number {

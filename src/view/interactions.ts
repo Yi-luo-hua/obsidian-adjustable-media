@@ -2,7 +2,7 @@ import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
 import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason, type LinesAround } from "../layout/edits.ts";
-import { dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
+import { cornerScale, dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
   canAddText,
   effectiveWidth,
@@ -25,6 +25,7 @@ import {
   setPosition,
   setRowHeight,
   setSingleWidth,
+  setTableScale,
   setTextLayout,
   setValign,
   setWeights,
@@ -443,7 +444,9 @@ function setUpRow(rowEl: HTMLElement, row: number, context: LayoutContext): void
 }
 
 function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, offset: number, context: LayoutContext): void {
-  const handle = itemEl.createDiv({ cls: "vml-handle vml-item__width-handle", attr: { "aria-label": t("resizeWidth"), role: "separator" } });
+  const root = rowEl.closest<HTMLElement>(".vml-layout")!;
+  const table = context.model.rows[row]?.items[0]?.embed.kind === "table";
+  const handle = itemEl.createDiv({ cls: "vml-handle vml-item__width-handle", attr: { "aria-label": t(table ? "resizeTable" : "resizeWidth"), role: "separator" } });
   // As the width changes, the free space shrinks on both sides in the ratio of the position: the
   // right edge moves by (1 - offset) of the change, the left one by offset. The handle sits on the
   // edge that moves more, so it follows the pointer at no more than twice the rate.
@@ -458,31 +461,46 @@ function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, 
     event.preventDefault();
     event.stopPropagation();
     const rowWidth = rowEl.getBoundingClientRect().width;
-    const startWidth = itemEl.getBoundingClientRect().width;
+    const rect = table ? itemEl.querySelector(".vml-table__content table")?.getBoundingClientRect() : null;
+    const startWidth = rect?.width ?? itemEl.getBoundingClientRect().width;
+    const startScale = tableScaleOf(itemEl);
     const startWidthProp = itemEl.style.getPropertyValue("--vml-item-width");
     const wasSized = itemEl.hasClass("vml-item--sized");
     let fraction = startWidth / rowWidth;
     let moved = false;
+    let next = context.model;
     handle.addClass("is-active");
 
     trackPointer(handle, event, {
       onMove(move) {
         moved = true;
-        fraction = Math.min(1, Math.max(0.1, (startWidth + (move.clientX - event.clientX) * factor) / rowWidth));
-        itemEl.addClass("vml-item--sized");
-        itemEl.setCssProps({ "--vml-item-width": `${fraction * 100}%` });
+        const dx = (move.clientX - event.clientX) * factor;
+        const scale = table ? clamp(cornerScale(startWidth, rect?.height ?? 0, dx, move.clientY - event.clientY), MIN_SCALE, MAX_SCALE) : 1 + dx / startWidth;
+        fraction = Math.min(1, Math.max(table ? 0.001 : 0.1, startWidth * scale / rowWidth));
+        if (table) {
+          next = setTableScale(setSingleWidth(context.model, row, fraction), row, 0, startScale * fraction * rowWidth / startWidth);
+          applySizing(root, next);
+        } else {
+          itemEl.addClass("vml-item--sized");
+          itemEl.setCssProps({ "--vml-item-width": `${fraction * 100}%` });
+        }
       },
       onEnd() {
         handle.removeClass("is-active");
         // A click without a drag must not write anything.
         if (moved) {
-          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setSingleWidth(context.model, row, round(fraction)))], context);
+          void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, table ? next : setSingleWidth(context.model, row, round(fraction)))], context).then(changed => {
+            if (table && !changed) applySizing(root, context.model);
+          });
         }
       },
       onCancel() {
         handle.removeClass("is-active");
-        itemEl.setCssProps({ "--vml-item-width": startWidthProp });
-        itemEl.toggleClass("vml-item--sized", wasSized);
+        if (table) applySizing(root, context.model);
+        else {
+          itemEl.setCssProps({ "--vml-item-width": startWidthProp });
+          itemEl.toggleClass("vml-item--sized", wasSized);
+        }
       },
     });
   });
@@ -602,8 +620,8 @@ function setUpFrame(root: HTMLElement, context: LayoutContext): void {
       { box: root, edge: "corner", direction: outerDirection },
     ]
     : (isTextOnly(context.model) ? (["right"] as const) : (["right", "bottom", "corner"] as const)).map(edge => ({ box, edge, direction }));
-  const naturalHeight = isTextOnly(context.model) || context.model.rows.every(row => row.items.every(item => item.embed.kind === "table"));
-  for (const { box: target, edge, direction: resizeDirection } of controls.filter(control => !naturalHeight || control.edge === "right")) {
+  const tablesOnly = context.model.rows.length > 0 && context.model.rows.every(row => row.items.every(item => item.embed.kind === "table"));
+  for (const { box: target, edge, direction: resizeDirection } of controls.filter(control => !tablesOnly || control.edge !== "bottom")) {
     const handle = target.createDiv({
       cls: `vml-handle vml-frame__handle vml-frame__handle--${edge}`,
       attr: { "aria-label": t(FRAME_LABELS[edge]), role: "separator" },
@@ -642,6 +660,11 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
     const rowWidth = rowEl?.getBoundingClientRect().width ?? 0;
     return row.items.length === 1 && itemEl && rowWidth > 0 ? itemEl.getBoundingClientRect().width / rowWidth : null;
   });
+  const tableScales = context.model.rows.map((row, index) => row.items.map((item, at) => {
+    const el = rowEls.find(el => Number(el.dataset.row) === index)?.querySelectorAll<HTMLElement>(".vml-item")[at];
+    return item.embed.kind === "table" ? el ? tableScaleOf(el) : item.tableScale ?? 1 : null;
+  }));
+  const hasTables = tableScales.some(row => row.some(scale => scale !== null));
 
   let next = context.model;
   let moved = false;
@@ -663,12 +686,13 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
           : keepSingleSizes(context.model, setBlockWidth(context.model, (rect.width + dx) / available), available, inset);
       } else if (edge === "bottom") {
         const scale = clamp(rowsHeight > 0 ? (rowsHeight + dy) / rowsHeight : 1, MIN_SCALE, MAX_SCALE);
-        next = scaleRows(context.model, scale, singleWidths);
+        next = scaleRows(context.model, scale, singleWidths, scale, tableScales);
       } else {
         // The layout's width stays within its limits, so the rows scale by the same factor as it.
         const widest = (outerColumns ? 1 : maxBlockWidth(context.model)) / startWidth;
-        const scale = clamp((rect.width + dx) / rect.width, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, widest));
-        next = scaleRows((outerColumns ? setFrameWidth : setBlockWidth)(context.model, startWidth * scale), scale, singleWidths, 1);
+        const requested = hasTables ? cornerScale(rect.width, rowsHeight, dx, dy) : (rect.width + dx) / rect.width;
+        const scale = clamp(requested, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, widest));
+        next = scaleRows((outerColumns ? setFrameWidth : setBlockWidth)(context.model, startWidth * scale), scale, singleWidths, 1, tableScales);
       }
       applySizing(root, next);
     },
@@ -688,6 +712,10 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
       applySizing(root, context.model);
     },
   });
+}
+
+function tableScaleOf(item: HTMLElement): number {
+  return Number(item.querySelector<HTMLElement>(".vml-table__content")?.style.getPropertyValue("--vml-table-scale")) || 1;
 }
 
 /** `box` is what the layout's width applies to: the layout, or with text beside the media, their column. */

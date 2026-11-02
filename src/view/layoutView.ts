@@ -11,7 +11,7 @@ import { t } from "./messages.ts";
 import { splitTextColumns } from "../markdown/textColumns.ts";
 import { renderExcalidraw, renderExcalidrawMarkdown } from "./excalidraw.ts";
 import { wrapSpacing } from "../layout/wrapAppearance.ts";
-import { fitTable } from "./tableFit.ts";
+import { fitTable, refreshTableFit } from "./tableFit.ts";
 
 export interface LayoutViewOptions {
   app: App;
@@ -196,6 +196,14 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
       continue;
     }
     rowEl.setCssProps({ "--vml-row-height": `${row.height ?? DEFAULT_ROW_HEIGHT}px` });
+    for (const el of Array.from(rowEl.querySelectorAll<HTMLElement>(".vml-item"))) {
+      const current = row.items[Number(el.dataset.index)];
+      const table = current?.embed.kind === "table" ? el.querySelector<HTMLElement>(".vml-item__table") : null;
+      if (table) {
+        table.setCssProps({ "--vml-table-request-scale": current?.tableScale === undefined ? "" : String(current.tableScale) });
+        refreshTableFit(table);
+      }
+    }
 
     const item = row.items[0];
     const itemEl = rowEl.querySelector<HTMLElement>(".vml-item");
