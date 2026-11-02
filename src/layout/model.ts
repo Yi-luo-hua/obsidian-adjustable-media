@@ -47,6 +47,8 @@ export interface LayoutItem {
   embed: V2Embed;
   /** Explicit table magnification. Without it, tables only shrink to fit. */
   tableScale?: number;
+  /** Independent vertical stretch relative to the table's uniform scale. */
+  tableStretch?: number;
   /** Column weight; null means an equal share. */
   weight: number | null;
   caption: string | null;
@@ -58,7 +60,7 @@ export function onlySizingDiffers(before: LayoutModel, after: LayoutModel): bool
     const { width: _width, frameWidth: _frameWidth, align: _align, rows, ...rest } = model;
     return { ...rest, rows: rows.map(row => {
       const { height: _height, width: _rowWidth, align: _rowAlign, offset: _offset, items, ...settings } = row;
-      return { ...settings, items: items.map(({ weight: _weight, tableScale: _tableScale, ...item }) => item) };
+      return { ...settings, items: items.map(({ weight: _weight, tableScale: _tableScale, tableStretch: _tableStretch, ...item }) => item) };
     }) };
   };
   return JSON.stringify(content(before)) === JSON.stringify(content(after));
@@ -141,12 +143,14 @@ export function modelFromBlock(block: V2Block): LayoutModel {
     ...(block.meta.version === 3 ? { version: 3 as const } : {}),
     rows: block.rows.map((row, rowIndex) => {
       const settings = readRowMeta(block.meta.rows[rowIndex] ?? {}, row.embeds.length);
-      const { tableScales, ...extra } = settings.extra;
+      const { tableScales, tableHeightScales, ...extra } = settings.extra;
       const scales = Array.isArray(tableScales) && tableScales.length === row.embeds.length ? tableScales : [];
+      const heights = Array.isArray(tableHeightScales) && tableHeightScales.length === row.embeds.length ? tableHeightScales : [];
       return {
         items: row.embeds.map((embed, index) => ({
           embed,
           ...(embed.kind === "table" && typeof scales[index] === "number" && Number.isFinite(scales[index]) && scales[index] > 0 ? { tableScale: scales[index] } : {}),
+          ...(embed.kind === "table" && typeof heights[index] === "number" && Number.isFinite(heights[index]) && heights[index] > 0 ? { tableStretch: heights[index] } : {}),
           weight: settings.widths?.[index] ?? null,
           caption: settings.captions?.[index] ?? null,
         })),
@@ -232,6 +236,9 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       }
       if (row.items.some(item => item.tableScale !== undefined)) {
         meta.tableScales = row.items.map(item => item.tableScale ?? null);
+      }
+      if (row.items.some(item => item.tableStretch !== undefined)) {
+        meta.tableHeightScales = row.items.map(item => item.tableStretch ?? null);
       }
       return meta;
     }),
@@ -373,6 +380,11 @@ export function setSingleWidth(model: LayoutModel, rowIndex: number, width: numb
 export function setTableScale(model: LayoutModel, rowIndex: number, index: number, scale: number): LayoutModel {
   if (model.rows[rowIndex]?.items[index]?.embed.kind !== "table" || !Number.isFinite(scale) || scale <= 0) return model;
   return updateRow(model, rowIndex, row => ({ ...row, items: row.items.map((item, at) => at === index ? { ...item, tableScale: scale } : item) }));
+}
+
+export function setTableStretch(model: LayoutModel, rowIndex: number, index: number, stretch: number): LayoutModel {
+  if (model.rows[rowIndex]?.items[index]?.embed.kind !== "table" || !Number.isFinite(stretch) || stretch <= 0) return model;
+  return updateRow(model, rowIndex, row => ({ ...row, items: row.items.map((item, at) => at === index ? { ...item, tableStretch: Math.max(0.001, stretch) } : item) }));
 }
 
 export function setAlign(model: LayoutModel, rowIndex: number, align: Align): LayoutModel {
@@ -563,6 +575,20 @@ export function scaleRows(model: LayoutModel, factor: number, singleWidths?: Rea
       return singleWidths && current !== null ? { ...row, width: clampSingleWidth(round(current * singleWidthFactor), row) } : row;
     }),
   };
+}
+
+/** The bottom edge stretches tables vertically; other media keep their existing height-resize behavior. */
+export function scaleRowHeights(model: LayoutModel, factor: number, singleWidths?: ReadonlyArray<number | null>): LayoutModel {
+  if (!Number.isFinite(factor) || factor <= 0) return model;
+  const scaled = scaleRows(model, factor, singleWidths);
+  return { ...scaled, rows: scaled.rows.map((row, index) => {
+    const before = model.rows[index];
+    return { ...row,
+      width: before.items.every(item => item.embed.kind === "table") ? before.width : row.width,
+      items: row.items.map((item, at) => item.embed.kind === "table"
+        ? { ...before.items[at], tableStretch: Math.max(0.001, (before.items[at].tableStretch ?? 1) * factor) } : item),
+    };
+  }) };
 }
 
 /**

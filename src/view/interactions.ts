@@ -17,6 +17,7 @@ import {
   resetWeights,
   rowOffset,
   scaleRows,
+  scaleRowHeights,
   setAlign,
   setBlockWidth,
   setFrameWidth,
@@ -26,6 +27,7 @@ import {
   setRowHeight,
   setSingleWidth,
   setTableScale,
+  setTableStretch,
   setTextLayout,
   setValign,
   setWeights,
@@ -430,6 +432,9 @@ function setUpRow(rowEl: HTMLElement, row: number, context: LayoutContext): void
   if (!layoutRow) {
     return;
   }
+  itemEls.forEach((itemEl, index) => {
+    if (layoutRow.items[index]?.embed.kind === "table") setUpTableHeightHandle(itemEl, row, index, context);
+  });
 
   if (layoutRow.items.length === 1) {
     const itemEl = itemEls[0];
@@ -463,6 +468,7 @@ function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, 
     const rowWidth = rowEl.getBoundingClientRect().width;
     const rect = table ? itemEl.querySelector(".vml-table__content table")?.getBoundingClientRect() : null;
     const startWidth = rect?.width ?? itemEl.getBoundingClientRect().width;
+    const actualOffset = rect && rowWidth - rect.width > 1 ? clamp((rect.left - rowEl.getBoundingClientRect().left) / (rowWidth - rect.width), 0, 1) : offset;
     const startScale = tableScaleOf(itemEl);
     const startWidthProp = itemEl.style.getPropertyValue("--vml-item-width");
     const wasSized = itemEl.hasClass("vml-item--sized");
@@ -475,10 +481,11 @@ function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, 
       onMove(move) {
         moved = true;
         const dx = (move.clientX - event.clientX) * factor;
-        const scale = table ? clamp(cornerScale(startWidth, rect?.height ?? 0, dx, move.clientY - event.clientY), MIN_SCALE, MAX_SCALE) : 1 + dx / startWidth;
+        const scale = table ? cornerScale(startWidth * (onLeft ? actualOffset : 1 - actualOffset), rect?.height ?? 0,
+          (move.clientX - event.clientX) * (onLeft ? -1 : 1), move.clientY - event.clientY) : 1 + dx / startWidth;
         fraction = Math.min(1, Math.max(table ? 0.001 : 0.1, startWidth * scale / rowWidth));
         if (table) {
-          next = setTableScale(setSingleWidth(context.model, row, fraction), row, 0, startScale * fraction * rowWidth / startWidth);
+          next = setTableScale(setSingleWidth(setPosition(context.model, row, actualOffset), row, fraction), row, 0, startScale * fraction * rowWidth / startWidth);
           applySizing(root, next);
         } else {
           itemEl.addClass("vml-item--sized");
@@ -502,6 +509,37 @@ function setUpWidthHandle(rowEl: HTMLElement, itemEl: HTMLElement, row: number, 
           itemEl.toggleClass("vml-item--sized", wasSized);
         }
       },
+    });
+  });
+}
+
+/** The bottom-center table handle changes height without changing width or hiding rows. */
+function setUpTableHeightHandle(itemEl: HTMLElement, row: number, index: number, context: LayoutContext): void {
+  const root = itemEl.closest<HTMLElement>(".vml-layout")!;
+  const handle = itemEl.createDiv({ cls: "vml-handle vml-table__height-handle",
+    attr: { "aria-label": t("resizeTableHeight"), "aria-orientation": "horizontal", role: "separator" } });
+  handle.addEventListener("pointerdown", event => {
+    if (event.button !== 0) return;
+    const height = itemEl.querySelector(".vml-table__content table")?.getBoundingClientRect().height ?? 0;
+    if (height <= 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const stretch = context.model.rows[row]?.items[index]?.tableStretch ?? 1;
+    let next = context.model, moved = false;
+    handle.addClass("is-active");
+    trackPointer(handle, event, {
+      onMove(move) {
+        moved = true;
+        next = setTableStretch(context.model, row, index, stretch * Math.max(1, height + move.clientY - event.clientY) / height);
+        applySizing(root, next);
+      },
+      onEnd() {
+        handle.removeClass("is-active");
+        if (moved) void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, next)], context).then(changed => {
+          if (!changed) applySizing(root, context.model);
+        });
+      },
+      onCancel() { handle.removeClass("is-active"); applySizing(root, context.model); },
     });
   });
 }
@@ -620,8 +658,7 @@ function setUpFrame(root: HTMLElement, context: LayoutContext): void {
       { box: root, edge: "corner", direction: outerDirection },
     ]
     : (isTextOnly(context.model) ? (["right"] as const) : (["right", "bottom", "corner"] as const)).map(edge => ({ box, edge, direction }));
-  const tablesOnly = context.model.rows.length > 0 && context.model.rows.every(row => row.items.every(item => item.embed.kind === "table"));
-  for (const { box: target, edge, direction: resizeDirection } of controls.filter(control => !tablesOnly || control.edge !== "bottom")) {
+  for (const { box: target, edge, direction: resizeDirection } of controls) {
     const handle = target.createDiv({
       cls: `vml-handle vml-frame__handle vml-frame__handle--${edge}`,
       attr: { "aria-label": t(FRAME_LABELS[edge]), role: "separator" },
@@ -685,12 +722,13 @@ function resizeBlock(root: HTMLElement, box: HTMLElement, handle: HTMLElement, e
           ? setFrameWidth(context.model, (rect.width + dx) / available)
           : keepSingleSizes(context.model, setBlockWidth(context.model, (rect.width + dx) / available), available, inset);
       } else if (edge === "bottom") {
-        const scale = clamp(rowsHeight > 0 ? (rowsHeight + dy) / rowsHeight : 1, MIN_SCALE, MAX_SCALE);
-        next = scaleRows(context.model, scale, singleWidths, scale, tableScales);
+        const scale = rowsHeight > 0 ? (rowsHeight + dy) / rowsHeight : 1;
+        next = hasTables ? scaleRowHeights(context.model, Math.max(0.001, scale), singleWidths)
+          : scaleRows(context.model, clamp(scale, MIN_SCALE, MAX_SCALE), singleWidths);
       } else {
         // The layout's width stays within its limits, so the rows scale by the same factor as it.
         const widest = (outerColumns ? 1 : maxBlockWidth(context.model)) / startWidth;
-        const requested = hasTables ? cornerScale(rect.width, rowsHeight, dx, dy) : (rect.width + dx) / rect.width;
+        const requested = hasTables ? cornerScale(rect.width / Math.abs(direction), rowsHeight, dx / Math.abs(direction), dy) : (rect.width + dx) / rect.width;
         const scale = clamp(requested, Math.max(MIN_SCALE, MIN_BLOCK_WIDTH / startWidth), Math.min(MAX_SCALE, widest));
         next = scaleRows((outerColumns ? setFrameWidth : setBlockWidth)(context.model, startWidth * scale), scale, singleWidths, 1, tableScales);
       }
@@ -919,7 +957,7 @@ function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
 
 /** Replace size handles with captured dimensions; media/menu listeners retain their shared context. */
 export function refreshSizingHandles(root: HTMLElement, context: LayoutContext): void {
-  for (const handle of Array.from(root.querySelectorAll(".vml-row__height-handle, .vml-item__col-handle, .vml-item__width-handle, .vml-frame__handle"))) handle.remove();
+  for (const handle of Array.from(root.querySelectorAll(".vml-row__height-handle, .vml-item__col-handle, .vml-item__width-handle, .vml-table__height-handle, .vml-frame__handle"))) handle.remove();
   for (const row of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) setUpRow(row, Number(row.dataset.row), context);
   setUpFrame(root, context);
 }

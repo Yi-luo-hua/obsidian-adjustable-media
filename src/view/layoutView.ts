@@ -178,6 +178,7 @@ function renderMarkdown(el: HTMLElement, markdown: string, options: LayoutViewOp
  * single items. Rendering uses it, and so do resize gestures, to preview a model and to restore it.
  */
 export function applySizing(root: HTMLElement, model: LayoutModel): void {
+  const fittedTables: HTMLElement[] = [];
   const spacing = model.wrap === null && !hasTextColumns(model) ? wrapSpacing(model.extra.spacing) : null;
   root.toggleClass("vml-layout--native-spacing", spacing !== null);
   root.setCssProps({ "--vml-space-before": spacing ? `${spacing[0]}px` : "", "--vml-space-after": spacing ? `${spacing[1]}px` : "" });
@@ -200,8 +201,9 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
       const current = row.items[Number(el.dataset.index)];
       const table = current?.embed.kind === "table" ? el.querySelector<HTMLElement>(".vml-item__table") : null;
       if (table) {
-        table.setCssProps({ "--vml-table-request-scale": current?.tableScale === undefined ? "" : String(current.tableScale) });
-        refreshTableFit(table);
+        table.setCssProps({ "--vml-table-request-scale": current?.tableScale === undefined ? "" : String(current.tableScale),
+          "--vml-table-stretch": current?.tableStretch === undefined ? "" : String(current.tableStretch) });
+        fittedTables.push(table);
       }
     }
 
@@ -228,6 +230,7 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
     itemEl.toggleClass("vml-item--sized", width !== null);
     itemEl.setCssProps({ "--vml-item-width": width ?? "" });
   }
+  fittedTables.forEach(refreshTableFit);
 }
 
 function renderRow(root: HTMLElement, row: LayoutRow, rowIndex: number, options: LayoutViewOptions): void {

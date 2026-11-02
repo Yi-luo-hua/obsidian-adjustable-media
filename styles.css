@@ -167,7 +167,7 @@
   left: 0;
   position: absolute;
   top: 0;
-  transform: scale(var(--vml-table-scale, 1));
+  transform: scale(var(--vml-table-scale, 1)) scaleY(var(--vml-table-scale-y, 1));
   transform-origin: top left;
   width: max-content;
 }
@@ -950,6 +950,26 @@ body.vml-is-dragging * {
 .vml-item--table .vml-item__width-handle:not(.vml-item__width-handle--left) {
   left: max(0px, calc(var(--vml-table-drawn-width, 100%) - 18px));
   right: auto;
+}
+
+.vml-table__height-handle {
+  cursor: ns-resize;
+  height: 14px;
+  left: calc(var(--vml-table-drawn-width, 100%) / 2 - 20px);
+  top: calc(var(--vml-table-drawn-height, 100%) - 7px);
+  width: 40px;
+  z-index: 4;
+}
+
+.vml-table__height-handle::after {
+  background: var(--interactive-accent);
+  border-radius: 2px;
+  content: "";
+  height: 3px;
+  left: 6px;
+  position: absolute;
+  right: 6px;
+  top: 6px;
 }
 
 .vml-item__grip {

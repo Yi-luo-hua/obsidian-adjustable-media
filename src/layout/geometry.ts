@@ -165,11 +165,10 @@ export function wrappedDrop(y: number, targetTop: number, renderedTop: number, c
   return { skip, top: baseTop + skip * lineHeight };
 }
 
-/** Keep proportions while letting either pointer axis drive a corner resize. */
+/** Project pointer movement onto the corner's proportional path, without amplifying the short axis. */
 export function cornerScale(width: number, height: number, dx: number, dy: number): number {
-  const horizontal = width > 0 ? dx / width : 0;
-  const vertical = height > 0 ? dy / height : 0;
-  return 1 + (Math.abs(horizontal) >= Math.abs(vertical) ? horizontal : vertical);
+  const length = width * width + height * height;
+  return length > 0 ? 1 + (width * dx + height * dy) / length : 1;
 }
 
 function beside(box: ItemBox, x: number): MoveTarget {

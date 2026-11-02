@@ -352,6 +352,10 @@ const MESSAGES = {
     zh: "调整表格大小",
     en: "Resize table",
   },
+  resizeTableHeight: {
+    zh: "调整表格高度",
+    en: "Resize table height",
+  },
   resizeBlockWidth: {
     zh: "拖动调整布局块的宽度",
     en: "Drag to resize the layout's width",
