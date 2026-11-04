@@ -1,6 +1,6 @@
 # 项目状态
 
-更新：2026-11-02。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-11-04。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
 
@@ -55,6 +55,8 @@
 - Android 手机、iPhone、iPad 的基础验收保留各自原构建结果；新增正文长按与边缘投放未在这些设备复测。iPhone／iPad 的独立报告和保存内容核对依用户要求跳过，设备细节与历史场景见 [移动记录](plans/layout-redesign/mobile-adaptation.md)。
 
 ## 已知限制与验收范围
+
+- Issue [#37](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/37) 仍打开，未认定修复：报告阅读模式两列图片破图。2026-11-04 在 Windows／Obsidian 1.15.0／默认主题，以 0.9.3 构建检查 6 种含空格附件链接、12 次阅读模式切换及子目录相对路径，图片均加载成功，暂未复现。仍需原始布局 Markdown、笔记／附件路径、版本和主题／CSS 信息；本轮仅记录排查，未修改运行代码，详见[排查记录](archive/2026-11-04-reading-image-issue37.md)。
 
 - 全库批量移除只处理 Markdown 文件中可编辑的顶层布局注释，不扫描 Canvas 文字卡片，也不移除 Callout 图片设置。Canvas 仅支持卡片内部布局，不支持跨卡片布局拖放或 Canvas 内交叉引用导航。
 
