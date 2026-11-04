@@ -1,7 +1,7 @@
 import { MAX_EMBEDS_PER_ROW, blockWrap, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Embed } from "../format/v2.ts";
 import { isEditable, wrapLines, type LineChange } from "../layout/edits.ts";
 import { insertItem, metaFromModel, modelFromBlock, rowEmbeds, type LayoutModel } from "../layout/model.ts";
-import { scanMarkdownLines } from "../markdown/lineContext.ts";
+import { scanMarkdownContainers, scanMarkdownLines } from "../markdown/lineContext.ts";
 
 export interface WrapOptions {
   /** Join an editable block that ends right above the lines, with only blank lines in between. */
@@ -25,6 +25,7 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
   }
 
   const contexts = scanMarkdownLines(lines);
+  const { topLevel } = scanMarkdownContainers(lines);
   const blocks = findV2Blocks(lines, contexts);
   if (blocks.some((block) => block.openLine <= last && block.closeLine >= first)) {
     return null;
@@ -47,6 +48,7 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
     if (!row) {
       return null;
     }
+    if (row.some(embed => embed.kind === "web") && !topLevel[line]) return null;
     embeds.push(...row);
   }
 

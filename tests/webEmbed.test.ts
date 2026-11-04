@@ -11,6 +11,7 @@ import * as format from "../src/format/v2.ts";
 import * as models from "../src/layout/model.ts";
 import { trackPointer } from "../src/view/pointer.ts";
 import { webSectionPlan } from "../src/markdown/webSections.ts";
+import { planWrap } from "../src/input/insertion.ts";
 import { mockedModule } from "./support/mockedModule.ts";
 
 // Public provider examples: docs/features/web-embeds.md records their sources.
@@ -19,6 +20,45 @@ const spotify = '<iframe style="border-radius:12px"\n src="https://open.spotify.
 const map = '<iframe width="425" height="350" src="https://www.openstreetmap.org/export/embed.html?bbox=-0.16%2C51.49%2C-0.10%2C51.52&amp;layer=mapnik"></iframe>';
 const native = '![](https://www.youtube.com/watch?v=NnTvZWp5Q7o)';
 const blockOf = (body: string, rows = [{ items: 3 }]) => findV2Blocks([`<!-- vml ${JSON.stringify({ v: 3, kind: "media", rows })} -->`, ...body.split("\n"), '<!-- /vml -->'])[0];
+
+test("list-owned web embeds cannot be taken, wrapped alone or auto-converted", () => {
+  for (const prefix of ['- Item', '1. Item', '- Parent\n  - Child']) {
+    for (const raw of [map, spotify, native, map + ' ' + map]) {
+      const lines = [...prefix.split('\n'), ...raw.split('\n')], first = prefix.split('\n').length;
+      assert.equal(takePlainWebFrame(lines, first), null);
+      assert.equal(plain.takePlainEmbed(lines, first, 0), null);
+      assert.equal(planWrapSelection(lines, first, lines.length - 1), null);
+      assert.equal(planWrap(lines, [first], { mergeWithPrevious: false }), null);
+    }
+  }
+  const separated = ['- Item', '', ...spotify.split('\n')];
+  assert.equal(takePlainWebFrame(separated, 2)!.embed.raw, spotify);
+  assert.ok(planWrapSelection(separated, 2, separated.length - 1));
+});
+
+test("wrapping a whole list keeps its web embeds as list text", () => {
+  for (const raw of [map, spotify, native]) {
+    const lines = ['- Item', ...raw.split('\n')];
+    const change = planWrapSelection(lines, 0, lines.length - 1)!;
+    assert.ok(change);
+    const block = findV2Blocks(change.replacement)[0];
+    assert.equal(block.meta.extra.type, 'text');
+    assert.equal(block.rows.length, 0);
+    assert.equal(block.leftText!.lines.join('\n'), lines.join('\n'));
+  }
+});
+
+test("compact web rows resize from their current maximum; mixed rows retain ordinary media height", () => {
+  const compact = '<iframe src="https://example.org/a" height="100"></iframe>\n<iframe src="https://example.org/b" height="152"></iframe>';
+  const model = modelFromBlock(blockOf(compact, [{ items: 2 }])), row = model.rows[0];
+  assert.deepEqual(row.items.map(item => webHeight(row, item)), [100, 152]);
+  assert.equal(models.rowHeightForResize(row), 152);
+  const resized = models.setRowHeight(model, 0, models.rowHeightForResize(row) + 1).rows[0];
+  assert.deepEqual(resized.items.map(item => webHeight(resized, item)), [153, 153]);
+  assert.equal(models.rowHeightForResize({ ...row, height: 120 }), 120);
+  const mixed = modelFromBlock(blockOf(compact + '\n![[image.png]]')).rows[0];
+  assert.equal(models.rowHeightForResize(mixed), 220);
+});
 
 test("real provider frames parse without changing permissions, URL escapes or source", () => {
   for (const raw of [youtube, spotify, map]) {

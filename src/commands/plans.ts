@@ -2,7 +2,7 @@ import { findV2Blocks, hasSideText, readEmbedRow, readMediaEmbeds, readStandalon
 import { planWrap } from "../input/insertion.ts";
 import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
-import { fencedCodeBlocks, scanMarkdownLines } from "../markdown/lineContext.ts";
+import { fencedCodeBlocks, scanMarkdownContainers, scanMarkdownLines } from "../markdown/lineContext.ts";
 
 /**
  * Wraps the non-blank lines of a selection (whole lines) in one layout block. Media lines alone are
@@ -35,6 +35,11 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
     return null;
   }
   const hasWeb = targets.some(line => readStandaloneWebFrame(lines, line) !== null || readMediaEmbeds(text(line), line).some(embed => embed.kind === "web"));
+  const containers = hasWeb ? scanMarkdownContainers(lines).topLevel : [];
+  // A whole list can be wrapped as text; selecting only its lazy continuation cannot detach it.
+  if (hasWeb && !containers[first] && !/^(?:[-*+]|\d{1,9}[.)])(?:[ \t]+|$)/.test(text(first))) return null;
+  const containedWeb = hasWeb && targets.some(line => !containers[line]
+    && (readStandaloneWebFrame(lines, line) !== null || readMediaEmbeds(text(line), line).some(embed => embed.kind === "web")));
   if (!hasWeb && targets.every(isMedia)) {
     return planWrap(lines, targets, { mergeWithPrevious: false });
   }
@@ -58,7 +63,7 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
   // as a row it would lose its indentation once rewritten, so it stays text, in a block of text.
   const columns = targets.some(isMedia) && !targets.some((line) => isMedia(line) && INDENTED.test(text(line)));
   const hasDiagram = fencedCodeBlocks(lines).some((fence) => fence.language === "mermaid" && fence.from >= first && fence.to <= last);
-  const attempts = [
+  const attempts = containedWeb ? [wrapLines(body, TEXT_META)] : [
     ...(hasDiagram || hasWeb ? [wrapLines(body, { version: 3, rows: [], extra: { kind: "media" } })] : []),
     ...(columns ? [wrapLines(body), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)]),
   ];

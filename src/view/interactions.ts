@@ -1,6 +1,6 @@
 import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
-import { DEFAULT_ROW_HEIGHT, MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
+import { MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason, type LinesAround } from "../layout/edits.ts";
 import { dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
@@ -26,6 +26,7 @@ import {
   setRowHeight,
   setWebHeight,
   webHeight,
+  rowHeightForResize,
   setSingleWidth,
   setTextLayout,
   setValign,
@@ -465,7 +466,7 @@ function setUpRow(rowEl: HTMLElement, row: number, context: LayoutContext): void
     return;
   }
 
-  setUpHeightHandle(rowEl, row, layoutRow.height ?? Math.max(DEFAULT_ROW_HEIGHT, ...layoutRow.items.filter(item => item.embed.kind === "web").map(item => webHeight(layoutRow, item))), context);
+  setUpHeightHandle(rowEl, row, rowHeightForResize(layoutRow), context);
   itemEls.slice(0, -1).forEach((itemEl, index) => setUpColumnHandle(itemEls, itemEl, index, row, context));
 }
 
@@ -535,6 +536,7 @@ function setUpHeightHandle(rowEl: HTMLElement, row: number, startHeight: number,
     event.preventDefault();
     event.stopPropagation();
     let height = startHeight;
+    const originalHeight = rowEl.style.getPropertyValue("--vml-row-height");
     let moved = false;
     handle.addClass("is-active");
 
@@ -553,7 +555,7 @@ function setUpHeightHandle(rowEl: HTMLElement, row: number, startHeight: number,
       },
       onCancel() {
         handle.removeClass("is-active");
-        rowEl.setCssProps({ "--vml-row-height": `${startHeight}px` });
+        rowEl.setCssProps({ "--vml-row-height": originalHeight });
         previewWeb(null);
       },
     });

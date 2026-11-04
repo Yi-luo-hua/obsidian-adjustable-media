@@ -357,6 +357,11 @@ export function webHeight(row: LayoutRow, item: LayoutItem): number {
   return item.height ?? row.height ?? item.embed.nativeHeight ?? DEFAULT_ROW_HEIGHT;
 }
 
+/** Row resizing starts at the current media viewport height, excluding captions and toolbars. */
+export function rowHeightForResize(row: LayoutRow): number {
+  return row.height ?? Math.max(...row.items.map(item => item.embed.kind === "web" ? webHeight(row, item) : DEFAULT_ROW_HEIGHT));
+}
+
 export function setWeights(model: LayoutModel, rowIndex: number, weights: readonly number[]): LayoutModel {
   const row = model.rows[rowIndex];
   const valid = row !== undefined

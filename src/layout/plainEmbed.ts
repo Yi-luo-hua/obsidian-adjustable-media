@@ -1,5 +1,5 @@
 import { findV2Blocks, mermaidEmbed, readEmbedRow, readStandaloneWebFrame, type V2Embed } from "../format/v2.ts";
-import { fencedCodeBlocks, scanMarkdownLines } from "../markdown/lineContext.ts";
+import { fencedCodeBlocks, scanMarkdownContainers, scanMarkdownLines } from "../markdown/lineContext.ts";
 import type { BlockEdit } from "./edits.ts";
 
 export interface TakenEmbed {
@@ -33,6 +33,7 @@ export function takePlainEmbed(lines: readonly string[], line: number, column: n
   if (!embeds || !embed) {
     return null;
   }
+  if (embed.kind === "web" && !scanMarkdownContainers(lines).topLevel[line]) return null;
 
   const before = text.slice(0, embed.from);
   const after = text.slice(embed.to);
@@ -51,7 +52,7 @@ export function takePlainWebFrame(lines: readonly string[], line: number): Taken
   const contexts = scanMarkdownLines(lines);
   for (let first = line; first >= 0; first--) {
     if (!/^<iframe\b/i.test(lines[first] ?? "")) continue;
-    const embed = contexts[first] === "text" ? readStandaloneWebFrame(lines, first) : null;
+    const embed = contexts[first] === "text" && scanMarkdownContainers(lines).topLevel[first] ? readStandaloneWebFrame(lines, first) : null;
     if (!embed || (embed.endLine ?? first) < line) return null;
     if (findV2Blocks(lines, contexts).some(block => block.openLine <= (embed.endLine ?? first) && first <= block.closeLine)) return null;
     return { embed, edit: { anchorLine: first, anchorLines: embed.raw.split("\n"), start: 0, end: (embed.endLine ?? first) - first, replacement: [] } };
