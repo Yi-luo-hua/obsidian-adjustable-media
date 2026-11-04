@@ -1,4 +1,5 @@
 import { fencedCodeBlocks, scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
+import { IFRAME_TOKEN, isNativeWebEmbed, parseWebFrame } from "./webEmbed.ts";
 
 /**
  * v2 layout format: plain media embeds wrapped in HTML comments.
@@ -16,8 +17,8 @@ import { fencedCodeBlocks, scanMarkdownLines, type LineContext } from "../markdo
  * invalid. See docs/DESIGN.md, section 1.
  */
 
-export type MediaKind = "image" | "video" | "mermaid" | "excalidraw";
-export type EmbedSyntax = "wiki" | "markdown" | "mermaid";
+export type MediaKind = "image" | "video" | "mermaid" | "excalidraw" | "web";
+export type EmbedSyntax = "wiki" | "markdown" | "mermaid" | "iframe";
 export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
 /** The side a layout floats to, with the note's own text wrapping around it. */
@@ -48,6 +49,8 @@ export interface V2Embed {
   kind: MediaKind;
   /** Width written in the embed itself, e.g. the 300 in ![[a.png|300]]. */
   nativeWidth: number | null;
+  /** Original frame height; the layout can override it without editing the embed. */
+  nativeHeight?: number | null;
   line: number;
   /** Last source line of a multiline diagram; ordinary embeds occupy their first line only. */
   endLine?: number;
@@ -329,7 +332,8 @@ export function serializeRow(embeds: readonly V2Embed[]): string {
 
 export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embed[]>): string[] {
   if (meta.version === 3) {
-    return [serializeOpener(meta), ...rows.flatMap((row) => row.flatMap((item) => item.raw.split("\n"))), CLOSE_LINE];
+    return [serializeOpener(meta), ...rows.flatMap((row) => row.flatMap((item) =>
+      [...item.raw.split("\n"), ...(item.syntax === "iframe" ? [""] : [])])), CLOSE_LINE];
   }
   return [serializeOpener(meta), ...rows.map(serializeRow), CLOSE_LINE];
 }
@@ -342,6 +346,7 @@ export function mermaidEmbed(lines: readonly string[], from: number, to: number)
 }
 
 export function mediaKindOf(target: string): MediaKind | null {
+  if (isNativeWebEmbed(target)) return "web";
   const path = target.split(/[?#]/)[0] ?? target;
   if (!isRemoteTarget(target) && /\.excalidraw(?:\.md)?$/i.test(path)) return "excalidraw";
   const name = path.split("/").pop() ?? path;
@@ -387,8 +392,10 @@ function buildBlock(
     }
 
     // Code, math and comments are text, whatever they hold.
+    const frame = !allText && meta.version === 3 && contexts[line] === "text" ? readStandaloneWebFrame(lines, line) : null;
     const diagramEnd = allText ? undefined : diagrams.get(line);
-    const embeds: V2Embed[] | null = diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
+    const itemEnd = frame?.endLine ?? diagramEnd;
+    const embeds: V2Embed[] | null = frame ? [frame] : diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
       : contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
@@ -396,9 +403,9 @@ function buildBlock(
       // The text before this row came after another one: it belongs to neither side.
       invalidLine ??= right[0] ?? line;
     } else {
-      rows.push({ line, ...(diagramEnd === undefined ? {} : { endLine: diagramEnd }), embeds });
+      rows.push({ line, ...(itemEnd === undefined ? {} : { endLine: itemEnd }), embeds });
     }
-    if (diagramEnd !== undefined) line = diagramEnd;
+    if (itemEnd !== undefined) line = itemEnd;
   }
 
   let groupedRows = rows;
@@ -480,8 +487,14 @@ export function readEmbedRow(text: string, line: number): V2Embed[] | null {
 /** Media tokens in source order, including those sharing a line with ordinary text. */
 export function readMediaEmbeds(text: string, line: number): V2Embed[] {
   const embeds: V2Embed[] = [];
+  for (const match of text.matchAll(IFRAME_TOKEN)) {
+    const frame = parseWebFrame(match[0]);
+    if (frame) embeds.push({ raw: match[0], syntax: "iframe", target: frame.url, alt: frame.attributes.title ?? "",
+      kind: "web", nativeWidth: frame.width, nativeHeight: frame.height, line, from: match.index, to: match.index + match[0].length });
+  }
   for (const match of text.matchAll(EMBED_PATTERN)) {
     const from = match.index ?? 0;
+    if (embeds.some(embed => embed.from <= from && from < embed.to)) continue;
 
     const parsed = match[1] !== undefined
       ? { syntax: "wiki" as const, ...parseWikiEmbed(match[1]) }
@@ -494,7 +507,19 @@ export function readMediaEmbeds(text: string, line: number): V2Embed[] {
       embeds.push({ raw: match[0], ...parsed, ...fragment, kind, line, from, to: from + match[0].length });
     }
   }
-  return embeds;
+  return embeds.sort((a, b) => a.from - b.from);
+}
+
+/** A complete, standalone multiline frame is one V3 media item. */
+export function readStandaloneWebFrame(lines: readonly string[], line: number): V2Embed | null {
+  if (!/^<iframe\b/i.test(lines[line] ?? "")) return null;
+  let end = line;
+  while (end < lines.length && !/<\/iframe\s*>/i.test(lines[end])) end++;
+  if (end >= lines.length) return null;
+  const raw = lines.slice(line, end + 1).map(stripCarriageReturn).join("\n");
+  const frame = parseWebFrame(raw);
+  return frame ? { raw, syntax: "iframe", kind: "web", target: frame.url, alt: frame.attributes.title ?? "",
+    nativeWidth: frame.width, nativeHeight: frame.height, line, endLine: end, from: 0, to: stripCarriageReturn(lines[end]).length } : null;
 }
 
 function parseWikiEmbed(inner: string): { target: string; alt: string; nativeWidth: number | null } {

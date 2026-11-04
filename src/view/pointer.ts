@@ -5,6 +5,8 @@ export interface PointerHandlers {
   onCancel(): void;
 }
 
+const tracking = new WeakMap<Document, number>();
+
 /**
  * Follows one pointer gesture that started with `start` on `target`. It always ends exactly once,
  * including when the system cancels the gesture. No text gets selected while it lasts: in live
@@ -18,6 +20,8 @@ export interface PointerHandlers {
  */
 export function trackPointer(target: HTMLElement, start: PointerEvent, handlers: PointerHandlers): () => void {
   const doc = target.ownerDocument;
+  tracking.set(doc, (tracking.get(doc) ?? 0) + 1);
+  doc.body.addClass("vml-pointer-tracking");
   let finished = false;
 
   const finish = (ended: PointerEvent | null): void => {
@@ -25,6 +29,9 @@ export function trackPointer(target: HTMLElement, start: PointerEvent, handlers:
       return;
     }
     finished = true;
+    const remaining = (tracking.get(doc) ?? 1) - 1;
+    tracking.set(doc, remaining);
+    if (remaining === 0) doc.body.removeClass("vml-pointer-tracking");
     doc.removeEventListener("pointermove", onMove);
     doc.removeEventListener("pointerup", onUp);
     doc.removeEventListener("pointercancel", onCancel);

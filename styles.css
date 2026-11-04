@@ -523,6 +523,88 @@
   text-align: center;
 }
 
+/* Web content owns its viewport; external handles remain in the parent document. */
+.vml-item--web {
+  cursor: default;
+}
+
+.vml-row--single .vml-item--web {
+  width: var(--vml-item-width, 100%);
+}
+
+.vml-item .vml-item__web {
+  width: 100%;
+  height: var(--vml-web-height, 220px);
+  overflow: hidden;
+}
+
+.vml-item__web > :is(p, div, span),
+.vml-item__web .external-embed {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.vml-item__web iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border: 0;
+}
+
+.vml-web-toolbar {
+  height: 22px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-smallest);
+}
+
+.vml-web-height-handle {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  top: calc(var(--vml-web-height, 220px) - 4px);
+  height: 8px;
+  cursor: ns-resize;
+}
+
+.vml-pointer-tracking :is(.vml-item__web, .cm-content) iframe {
+  pointer-events: none !important;
+}
+
+.vml-native-web-controls {
+  position: absolute;
+  left: var(--vml-web-x);
+  top: var(--vml-web-y);
+  width: 24px;
+  height: 24px;
+  z-index: 5;
+}
+
+.vml-native-web-grip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 2px;
+  cursor: grab;
+  touch-action: none;
+}
+
+@media print {
+  .vml-item .vml-item__web {
+    height: auto;
+    min-height: 0;
+    padding: 8px;
+    overflow-wrap: anywhere;
+  }
+}
+
 .vml-item__caption {
   color: var(--text-muted);
   font-size: var(--font-ui-small);
@@ -556,12 +638,21 @@
     display: none;
   }
 
+  .is-mobile .vml-native-web-controls,
+  .is-mobile .vml-native-web-grip,
+  .is-mobile .vml-layout--interactive .vml-item--web .vml-item__grip,
   .is-mobile .vml-plain-media__grip,
   .is-mobile .vml-layout--interactive .vml-item--mermaid .vml-item__grip {
     display: flex;
     height: 44px;
     opacity: 1;
     width: 44px;
+  }
+
+  .is-mobile .vml-web-height-handle {
+    height: 24px;
+    top: calc(var(--vml-web-height, 220px) - 12px);
+    opacity: 1;
   }
 
   .is-mobile .vml-plain-media--draggable,

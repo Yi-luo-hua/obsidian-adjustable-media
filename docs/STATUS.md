@@ -1,8 +1,10 @@
 # 项目状态
 
-更新：2026-11-04。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-11-05。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
+
+- **未发布开发功能：Issue #38 外链网页布局**。完整多行 iframe 与原生 YouTube／Twitter 嵌入接入 V3，支持并排、独立高度、列宽、把手拖入、环绕和 PDF 链接回退；保留原文、一步撤销及缩放时的 iframe 实例。Windows／默认主题定向实测和 430px 触摸仿真通过，移动真机与完整 PDF 导出未复测，详见[功能与验证记录](features/web-embeds.md)。公开版本继续为 0.9.3。
 
 - **公开版本：0.9.3**，标签源码 `eeba209`，已设为最新版本；三份公开附件与干净标签构建逐字节一致，摘要及来源证明已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.3)和[发布核验](releases/0.9.3-readiness.md)。
 - **main：已包含 0.9.3 发布代码**。`ed83461` 修复转换布局后的源码展开、光标定位和同行图片误包文字；保留 0.9.1 的缩进续行与图文块缩放修复。

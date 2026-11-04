@@ -4,6 +4,16 @@ import { readingViewHarness } from "./support/readingViewHarness.ts";
 
 const media = '<!-- vml -->\n![[old.png]]\n<!-- /vml -->\n\nBody';
 
+test("native HTML sections that include a V3 closer are hidden after the opening layout renders", async () => {
+  const text = '<!-- vml {"v":3,"kind":"media","rows":[{"items":1}]} -->\n<iframe src="https://example.org"></iframe>\n<!-- /vml -->\n\nBody';
+  const host = await readingViewHarness(text);
+  host.section(text, 0, 0);
+  const body = host.section(text, 1, 2);
+  assert.equal(host.renders.length, 1);
+  assert.equal(body.empties, 1);
+  host.dispose();
+});
+
 test("file-open retires the previous reader before establishing the newly loaded file", async () => {
   const host = await readingViewHarness(media);
   host.section(media); host.frame();

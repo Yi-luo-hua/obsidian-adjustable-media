@@ -1,4 +1,4 @@
-import { findV2Blocks, mermaidEmbed, readEmbedRow, type V2Embed } from "../format/v2.ts";
+import { findV2Blocks, mermaidEmbed, readEmbedRow, readStandaloneWebFrame, type V2Embed } from "../format/v2.ts";
 import { fencedCodeBlocks, scanMarkdownLines } from "../markdown/lineContext.ts";
 import type { BlockEdit } from "./edits.ts";
 
@@ -45,6 +45,18 @@ export function takePlainEmbed(lines: readonly string[], line: number, column: n
 
 function stripCarriageReturn(line: string): string {
   return line.endsWith("\r") ? line.slice(0, -1) : line;
+}
+
+export function takePlainWebFrame(lines: readonly string[], line: number): TakenEmbed | null {
+  const contexts = scanMarkdownLines(lines);
+  for (let first = line; first >= 0; first--) {
+    if (!/^<iframe\b/i.test(lines[first] ?? "")) continue;
+    const embed = contexts[first] === "text" ? readStandaloneWebFrame(lines, first) : null;
+    if (!embed || (embed.endLine ?? first) < line) return null;
+    if (findV2Blocks(lines, contexts).some(block => block.openLine <= (embed.endLine ?? first) && first <= block.closeLine)) return null;
+    return { embed, edit: { anchorLine: first, anchorLines: embed.raw.split("\n"), start: 0, end: (embed.endLine ?? first) - first, replacement: [] } };
+  }
+  return null;
 }
 
 /** Only a complete top-level Mermaid outside every layout can be taken as a standalone item. */

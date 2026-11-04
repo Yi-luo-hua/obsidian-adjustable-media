@@ -50,6 +50,7 @@ for (const scenario of [
       "./src/view/calloutImages.ts": { calloutImageExtension: () => [], registerCalloutImages: () => {} },
       "./src/view/livePreview.ts": { livePreviewExtension: () => [], refreshLayoutHighlights: () => {} },
       "./src/view/plainDrag.ts": { plainMediaDrag: () => [] },
+      "./src/view/plainWebEmbeds.ts": { plainWebEmbeds: () => [] },
       "./src/view/readingView.ts": { registerReadingView: () => {} },
       "./src/guide/guideModal.ts": { GuideModal: Guide },
       "./src/guide/state.ts": { GUIDE_REVISION, shouldShowGuide },

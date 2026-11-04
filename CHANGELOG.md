@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add external web embeds to media layouts ([#38](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/38)): complete multiline HTTP(S) iframes and native YouTube/Twitter embeds, side-by-side placement, independent web heights, column widths, captions, text wrapping and dedicated drag handles.
+- Add standalone web controls for wrapping and dragging into layouts. Preserve original embed source and permissions, reuse loaded frames during sizing edits, support atomic writes and one-step undo, and export web media as links in PDF.
+- Handle native HTML reading sections that include layout closers, neighboring layouts and trailing Markdown without duplicating web content. See [usage, examples and verification](docs/features/web-embeds.md).
+
 ## 0.9.3 - 2026-11-02
 
 - Add local Excalidraw drawings to media layouts ([#36](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/36)), including side-by-side placement, text wrapping, resizing, captions and drag handles. Double-click a preview to open its drawing. Requires the Excalidraw plugin to be enabled.

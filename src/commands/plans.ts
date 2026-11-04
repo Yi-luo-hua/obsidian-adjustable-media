@@ -1,4 +1,4 @@
-import { findV2Blocks, hasSideText, readEmbedRow, readMediaEmbeds, serializeBlock, type V2Block, type V2Meta } from "../format/v2.ts";
+import { findV2Blocks, hasSideText, readEmbedRow, readMediaEmbeds, readStandaloneWebFrame, serializeBlock, MAX_EMBEDS_PER_ROW, type V2Block, type V2Meta } from "../format/v2.ts";
 import { planWrap } from "../input/insertion.ts";
 import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
@@ -34,11 +34,19 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
   if (INDENTED.test(text(first))) {
     return null;
   }
-  if (targets.every(isMedia)) {
+  const hasWeb = targets.some(line => readStandaloneWebFrame(lines, line) !== null || readMediaEmbeds(text(line), line).some(embed => embed.kind === "web"));
+  if (!hasWeb && targets.every(isMedia)) {
     return planWrap(lines, targets, { mergeWithPrevious: false });
   }
 
   const contexts = scanMarkdownLines(lines);
+  for (let line = 0; line <= last; line++) {
+    const frame = contexts[line] === "text" ? readStandaloneWebFrame(lines, line) : null;
+    if (!frame) continue;
+    const end = frame.endLine ?? line;
+    if (first <= end && last >= line && (first > line || last < end)) return null;
+    line = end;
+  }
   const blocks = findV2Blocks(lines, contexts);
   if (blocks.some((block) => block.openLine <= last && block.closeLine >= first)) {
     return null;
@@ -51,7 +59,7 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
   const columns = targets.some(isMedia) && !targets.some((line) => isMedia(line) && INDENTED.test(text(line)));
   const hasDiagram = fencedCodeBlocks(lines).some((fence) => fence.language === "mermaid" && fence.from >= first && fence.to <= last);
   const attempts = [
-    ...(hasDiagram ? [wrapLines(body, { version: 3, rows: [], extra: { kind: "media" } })] : []),
+    ...(hasDiagram || hasWeb ? [wrapLines(body, { version: 3, rows: [], extra: { kind: "media" } })] : []),
     ...(columns ? [wrapLines(body), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)]),
   ];
   for (const replacement of attempts) {
@@ -67,6 +75,13 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
       && isEditable(block)
       && blocks.length === found.length - 1;
     if (fits) {
+      if (hasWeb && block.meta.version === 3 && !hasSideText(block)) {
+        const model = modelFromBlock(block), items = model.rows.flatMap(row => row.items);
+        const prototype = model.rows[0];
+        model.rows = [];
+        for (let index = 0; index < items.length; index += MAX_EMBEDS_PER_ROW) model.rows.push({ ...prototype, items: items.slice(index, index + MAX_EMBEDS_PER_ROW) });
+        return { from: first, to: last, replacement: serializeBlock(metaFromModel(model), rowEmbeds(model)) };
+      }
       return { from: first, to: last, replacement };
     }
   }

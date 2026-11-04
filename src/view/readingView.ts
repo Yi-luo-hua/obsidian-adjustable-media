@@ -1,4 +1,4 @@
-import { MarkdownRenderChild, MarkdownView, TFile, type MarkdownPostProcessorContext, type MarkdownSectionInformation, type Plugin } from "obsidian";
+import { MarkdownRenderChild, MarkdownRenderer, MarkdownView, TFile, type MarkdownPostProcessorContext, type MarkdownSectionInformation, type Plugin } from "obsidian";
 
 import { hasSideText, isDrawable, type V2Block } from "../format/v2.ts";
 import { canvasPreviewHosts, isCanvasPreview, type PreviewHost } from "./canvas.ts";
@@ -8,15 +8,18 @@ import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { ViewProjection, type SourceCoverage } from "../layout/viewProjection.ts";
 import { layoutIsRendered, renderLayout } from "./layoutView.ts";
-import { refContextOf, type RefContext } from "./crossrefView.ts";
+import { refContextOf, numbered, markCaptions, type RefContext } from "./crossrefView.ts";
 import { blockWarning } from "./messages.ts";
 import { sectionNoteText } from "./noteText.ts";
 import { readingSectionsOfView, readingViewOfSection } from "./obsidianInternals.ts";
 import { keepWrapped, keepWrapsBeside, refreshReadingMedia, refreshReadingWrap, readingMeasurementsReady, resetReadingMeasurements } from "./readingWrap.ts";
 import { renderPrintLayouts } from "./printView.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
+import { webSectionPlan } from "../markdown/webSections.ts";
 
 const WRAPPING = "vml-rv-wrapping";
+const memorySections = new WeakSet<HTMLElement>();
+const pendingWebSections = new WeakMap<HTMLElement, object>();
 
 interface Parsed {
   snapshot: DocumentSnapshot;
@@ -121,7 +124,7 @@ export function registerReadingView(plugin: Plugin): void {
       const token = reader.projection.token()!;
       const reading = readingSectionsOfView(reader.view);
       const byElement = new Map(reading?.sections.map(section => [section.el, section]));
-      const installed = connected.filter(([, record]) => record.snapshotId === token.snapshotId);
+      const installed = connected.filter(([el, record]) => !pendingWebSections.has(el) && record.snapshotId === token.snapshotId);
       reader.projection.installed(token, installed.map(([, record]) => record.range));
       const measured: SourceCoverage[] = [];
       const visible = reader.view.previewMode.containerEl.clientWidth > 0 && reader.view.containerEl.doc.fonts.status === "loaded";
@@ -216,7 +219,37 @@ export function registerReadingView(plugin: Plugin): void {
     const { blocks, skips, refs, wrapped, snapshot } = reader.parsed;
     const block = sectionBlock(blocks, info);
     const opening = block?.openLine === info.lineStart && info.lineStart === info.lineEnd;
-    if (block && isDrawable(block)) {
+    const token = crypto.randomUUID();
+    const webPlan = webSectionPlan(reader.parsed.lines, blocks, info.lineStart, info.lineEnd, token);
+    if (webPlan) {
+      el.empty();
+      if (webPlan.markdown.trim()) {
+        const content = el.createDiv(), child = new MarkdownRenderChild(content);
+        ctx.addChild(child);
+        const pending = {};
+        memorySections.add(content); pendingWebSections.set(el, pending);
+        let active = true;
+        child.register(() => { active = false; if (pendingWebSections.get(el) === pending) pendingWebSections.delete(el); });
+        void MarkdownRenderer.render(plugin.app, numbered(webPlan.markdown, refs), content, snapshot.origin.path, child).then(async () => {
+          if (!active || !alive(reader) || reader.parsed.snapshot.id !== snapshot.id) return;
+          markCaptions(content, webPlan.markdown);
+          const tasks: Promise<void>[] = [];
+          webPlan.layouts.forEach((layout, index) => {
+            const slot = content.querySelector<HTMLElement>(`[data-vml-web-section="${token}-${index}"]`);
+            if (!slot) return;
+            const model = modelFromBlock(layout);
+            const root = renderLayout(slot, { app: plugin.app, sourcePath: snapshot.origin.path, model,
+              effectiveSkip: skips[blocks.indexOf(layout)] ?? null, editable: false, warning: blockWarning(layout), component: child, refs, renderTasks: tasks });
+            if (model.wrap !== null) child.register(keepWrapped(plugin.app, el, root, model.wrap));
+          });
+          await Promise.all(tasks);
+        }).catch((error: unknown) => { console.error("Adjustable Media: web section could not be rendered", error); }).finally(() => {
+          if (!active) return;
+          if (pendingWebSections.get(el) === pending) pendingWebSections.delete(el);
+          confirm(reader);
+        });
+      }
+    } else if (block && isDrawable(block)) {
       // A multiline item can share a row with media in another native Markdown section.
       const whole = hasSideText(block) || block.meta.version === 3;
       let rows: number[] | undefined;
@@ -249,6 +282,7 @@ export function registerReadingView(plugin: Plugin): void {
   };
 
   plugin.registerMarkdownPostProcessor((el, ctx) => {
+    for (let parent: HTMLElement | null = el; parent; parent = parent.parentElement) if (memorySections.has(parent)) return;
     const info = ctx.getSectionInfo(el);
     if (!info) return renderPrintLayouts(plugin.app, el, ctx);
     let waitingReader: Reader | null = null;
@@ -382,7 +416,7 @@ function sectionRange(parsed: Parsed, info: MarkdownSectionInformation): SourceC
 function sectionBlock(blocks: readonly V2Block[], info: MarkdownSectionInformation): V2Block | undefined {
   const opening = blocks.find(block => info.lineStart === block.openLine && info.lineEnd === block.openLine);
   return opening && (hasSideText(opening) || opening.meta.version === 3) ? opening
-    : blocks.find(block => info.lineStart > block.openLine && info.lineEnd < block.closeLine);
+    : blocks.find(block => info.lineStart > block.openLine && info.lineEnd <= block.closeLine);
 }
 
 function sectionRows(block: V2Block, info: MarkdownSectionInformation): number[] {

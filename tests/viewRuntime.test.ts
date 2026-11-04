@@ -101,7 +101,7 @@ test("Markdown completion wakes its pane after installing rendered or failed sta
   const rendering = new Promise<void>((done, fail) => { resolve = done; reject = fail; });
   const module = await mockedModule<{ renderLayout(el: unknown, options: unknown): object; layoutRenderState(root: object): string; layoutIsRendered(root: object): boolean }>(new URL("../src/view/layoutView.ts", import.meta.url), {
     obsidian: { MarkdownRenderer: { render: () => rendering } }, "../format/v2.ts": format, "../layout/model.ts": model, "../layout/viewProjection.ts": projections,
-    "../markdown/textColumns.ts": textColumns, "./videoSource.ts": {}, "./excalidraw.ts": {},
+    "../markdown/textColumns.ts": textColumns, "./videoSource.ts": {}, "./excalidraw.ts": {}, "./webEmbed.ts": {},
     "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./mediaControls.ts": {}, "./messages.ts": {},
   }, { console: { error: (...args: unknown[]) => errors.push(args) } });
   renderState = root => module.layoutRenderState(root);
@@ -163,7 +163,7 @@ async function diagramHarness(render = () => Promise.resolve()) {
     applySizing(root: object, model: model.LayoutModel): void }>(new URL("../src/view/layoutView.ts", import.meta.url), {
     obsidian: { MarkdownRenderer: { render } }, "../format/v2.ts": format, "../layout/model.ts": model,
     "../layout/viewProjection.ts": projections, "../markdown/textColumns.ts": textColumns,
-    "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./mediaControls.ts": {}, "./videoSource.ts": {}, "./messages.ts": {}, "./excalidraw.ts": {},
+    "./crossrefView.ts": { numbered: (text: string) => text, markCaptions() {} }, "./media.ts": {}, "./mediaControls.ts": {}, "./videoSource.ts": {}, "./messages.ts": {}, "./excalidraw.ts": {}, "./webEmbed.ts": {},
   });
   const create = (name: string, mixed = false) => {
     const cleanup: Array<() => void> = [];

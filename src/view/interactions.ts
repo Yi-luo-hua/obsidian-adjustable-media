@@ -24,6 +24,8 @@ import {
   setCaptionAlign,
   setPosition,
   setRowHeight,
+  setWebHeight,
+  webHeight,
   setSingleWidth,
   setTextLayout,
   setValign,
@@ -256,6 +258,8 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
     return;
   }
 
+  if (item.embed.kind === "web") setUpWebHeightHandle(itemEl, position, context);
+
   itemEl.tabIndex = 0;
   itemEl.setAttribute("aria-label", item.embed.kind === "mermaid" ? t("mermaidDiagram") : item.embed.alt || item.embed.target);
   itemEl.addEventListener("contextmenu", (event) => {
@@ -273,10 +277,13 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
 
   // Videos keep their controls; touch users move diagrams by a grip and scroll on the diagram body.
   let dragFrom = itemEl;
-  if (item.embed.kind === "video" || item.embed.kind === "mermaid" || item.embed.kind === "excalidraw") {
+  if (item.embed.kind === "video" || item.embed.kind === "mermaid" || item.embed.kind === "excalidraw" || item.embed.kind === "web") {
     const grip = itemEl.createDiv({ cls: "vml-handle vml-item__grip", attr: { "aria-label": t("dragHandle"), role: "button" } });
     setIcon(grip, "grip-vertical");
-    if (item.embed.kind === "video" || item.embed.kind === "excalidraw") dragFrom = grip;
+    if (item.embed.kind === "video" || item.embed.kind === "excalidraw" || item.embed.kind === "web") dragFrom = grip;
+    if (item.embed.kind === "web") grip.addEventListener("contextmenu", event => {
+      event.preventDefault(); event.stopPropagation(); showItemMenu(event, context, position);
+    });
   }
   dragFrom.addEventListener("pointerdown", (event) => {
     const target = eventElement(event);
@@ -387,6 +394,33 @@ function startDrag(
   });
 }
 
+function setUpWebHeightHandle(itemEl: HTMLElement, position: ItemPosition, context: LayoutContext): void {
+  const row = context.model.rows[position.row], item = row.items[position.index];
+  const handle = itemEl.createDiv({ cls: "vml-handle vml-web-height-handle", attr: { role: "separator", "aria-label": t("resizeWebHeight"), "aria-orientation": "horizontal" } });
+  handle.addEventListener("dblclick", event => {
+    event.preventDefault(); event.stopPropagation();
+    void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWebHeight(context.model, position, null))], context);
+  });
+  handle.addEventListener("pointerdown", event => {
+    if (event.button !== 0) return;
+    event.preventDefault(); event.stopPropagation();
+    const start = webHeight(row, item);
+    let height = start;
+    handle.addClass("is-active");
+    trackPointer(handle, event, {
+      onMove(move) {
+        height = Math.round(Math.min(MAX_ROW_HEIGHT, Math.max(MIN_ROW_HEIGHT, start + move.clientY - event.clientY)));
+        itemEl.setCssProps({ "--vml-web-height": `${height}px` });
+      },
+      onEnd() {
+        handle.removeClass("is-active");
+        if (height !== start) void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWebHeight(context.model, position, height))], context);
+      },
+      onCancel() { handle.removeClass("is-active"); itemEl.setCssProps({ "--vml-web-height": `${start}px` }); },
+    });
+  });
+}
+
 function measureSideways(rowEl: HTMLElement, itemEl: HTMLElement): { left: number; free: number } | null {
   const rowRect = rowEl.getBoundingClientRect();
   const itemRect = itemEl.getBoundingClientRect();
@@ -431,7 +465,7 @@ function setUpRow(rowEl: HTMLElement, row: number, context: LayoutContext): void
     return;
   }
 
-  setUpHeightHandle(rowEl, row, layoutRow.height ?? DEFAULT_ROW_HEIGHT, context);
+  setUpHeightHandle(rowEl, row, layoutRow.height ?? Math.max(DEFAULT_ROW_HEIGHT, ...layoutRow.items.filter(item => item.embed.kind === "web").map(item => webHeight(layoutRow, item))), context);
   itemEls.slice(0, -1).forEach((itemEl, index) => setUpColumnHandle(itemEls, itemEl, index, row, context));
 }
 
@@ -486,6 +520,13 @@ function setUpHeightHandle(rowEl: HTMLElement, row: number, startHeight: number,
     cls: "vml-handle vml-row__height-handle",
     attr: { "aria-label": t("resizeRow"), "aria-orientation": "horizontal", role: "separator" },
   });
+  const previewWeb = (height: number | null): void => {
+    const layoutRow = context.model.rows[row];
+    for (const el of Array.from(rowEl.querySelectorAll<HTMLElement>(".vml-item--web"))) {
+      const item = layoutRow.items[Number(el.dataset.index)];
+      if (item.height == null) el.setCssProps({ "--vml-web-height": `${height ?? webHeight(layoutRow, item)}px` });
+    }
+  };
 
   handle.addEventListener("pointerdown", (event) => {
     if (event.button !== 0) {
@@ -502,6 +543,7 @@ function setUpHeightHandle(rowEl: HTMLElement, row: number, startHeight: number,
         moved = true;
         height = Math.min(MAX_ROW_HEIGHT, Math.max(MIN_ROW_HEIGHT, startHeight + move.clientY - event.clientY));
         rowEl.setCssProps({ "--vml-row-height": `${height}px` });
+        previewWeb(height);
       },
       onEnd() {
         handle.removeClass("is-active");
@@ -512,6 +554,7 @@ function setUpHeightHandle(rowEl: HTMLElement, row: number, startHeight: number,
       onCancel() {
         handle.removeClass("is-active");
         rowEl.setCssProps({ "--vml-row-height": `${startHeight}px` });
+        previewWeb(null);
       },
     });
   });
@@ -707,6 +750,10 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
 
   const menu = new Menu();
   addSourceItem(menu, context);
+  if (item.embed.kind === "web") menu.addItem(entry => entry.setTitle(t("resetWebHeight")).setIcon("rotate-ccw")
+    .setSection("vml-size").onClick(() => {
+      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setWebHeight(context.model, position, null))], context);
+    }));
   // Each group has its own section: Obsidian separates sections and lists these before the file
   // actions added at the end.
   menu.addItem((entry) => entry.setTitle(t("editCaption")).setIcon("text").setSection("vml-caption").onClick(() => {
@@ -883,8 +930,11 @@ function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
 
 /** Replace size handles with captured dimensions; media/menu listeners retain their shared context. */
 export function refreshSizingHandles(root: HTMLElement, context: LayoutContext): void {
-  for (const handle of Array.from(root.querySelectorAll(".vml-row__height-handle, .vml-item__col-handle, .vml-item__width-handle, .vml-frame__handle"))) handle.remove();
+  for (const handle of Array.from(root.querySelectorAll(".vml-row__height-handle, .vml-item__col-handle, .vml-item__width-handle, .vml-web-height-handle, .vml-frame__handle"))) handle.remove();
   for (const row of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) setUpRow(row, Number(row.dataset.row), context);
+  for (const item of Array.from(root.querySelectorAll<HTMLElement>(".vml-item--web"))) {
+    setUpWebHeightHandle(item, { row: Number(item.closest<HTMLElement>(".vml-row")?.dataset.row), index: Number(item.dataset.index) }, context);
+  }
   setUpFrame(root, context);
 }
 

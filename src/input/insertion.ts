@@ -57,6 +57,11 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
   }
 
   const rows: string[] = [];
+  if (embeds.some(embed => embed.kind === "web")) {
+    const grouped: V2Embed[][] = [];
+    for (let start = 0; start < embeds.length; start += MAX_EMBEDS_PER_ROW) grouped.push(embeds.slice(start, start + MAX_EMBEDS_PER_ROW));
+    return { from: first, to: last, replacement: serializeBlock({ version: 3, extra: { kind: "media" }, rows: grouped.map(items => ({ items: items.length })) }, grouped) };
+  }
   for (let start = 0; start < embeds.length; start += MAX_EMBEDS_PER_ROW) {
     rows.push(embeds.slice(start, start + MAX_EMBEDS_PER_ROW).map((embed) => embed.raw).join(" "));
   }

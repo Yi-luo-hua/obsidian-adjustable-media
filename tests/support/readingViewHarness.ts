@@ -6,6 +6,7 @@ import * as drawn from "../../src/layout/drawn.ts";
 import * as floatOrder from "../../src/layout/floatOrder.ts";
 import * as model from "../../src/layout/model.ts";
 import * as projections from "../../src/layout/viewProjection.ts";
+import * as webSections from "../../src/markdown/webSections.ts";
 
 interface ElementStub {
   isConnected: boolean;
@@ -69,6 +70,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     MutationObserver: ObserverStub,
   };
   const container = { win, isConnected: true, clientWidth: 720, doc: { fonts: { status: "loaded" } },
+    querySelector: () => null,
     contains(el: ElementStub) { return elements.has(el); },
     addEventListener(name: string, callback: () => void) { if (name === "scroll") { counts.scrollListeners++; scroll = callback; } },
     removeEventListener() {} };
@@ -91,6 +93,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     obsidian: { MarkdownView: ViewStub, MarkdownRenderChild: RenderChild, TFile: FileStub },
     "./canvas.ts": { canvasPreviewHosts: () => kind === "canvas" ? [reader] : [], isCanvasPreview: (view: unknown) => kind === "canvas" && view === reader },
     "../format/v2.ts": format,
+    "../markdown/webSections.ts": webSections,
     "../layout/documentSnapshot.ts": snapshots,
     "../layout/drawn.ts": drawn,
     "../layout/floatOrder.ts": floatOrder,
@@ -110,7 +113,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     "./printView.ts": { renderPrintLayouts() {} },
     "./viewEnvironment.ts": { watchEnvironment: () => { counts.environments++; return () => {}; } },
   };
-  const module = await mockedModule<{ registerReadingView(plugin: unknown): void }>(new URL("../../src/view/readingView.ts", import.meta.url), modules);
+  const module = await mockedModule<{ registerReadingView(plugin: unknown): void }>(new URL("../../src/view/readingView.ts", import.meta.url), modules, { crypto });
   module.registerReadingView(plugin);
   if (startup) onReady!();
   return {
@@ -144,11 +147,11 @@ export async function readingViewHarness(initialText: string, startup = true, in
       for (const callback of callbacks) callback();
     },
     section(text: string, lineStart = 1, lineEnd = lineStart) {
-      let wrapping = false;
+      let wrapping = false, empties = 0;
       let infoAvailable = true;
       const children: RenderChild[] = [];
       const inserted = new Set<() => void>();
-      const el: ElementStub = { isConnected: true, empty() {}, querySelectorAll: () => [],
+      const el: ElementStub = { isConnected: true, empty() { empties++; }, querySelectorAll: () => [],
         toggleClass(_name, enabled) { counts.classWrites++; wrapping = enabled; },
         onNodeInserted(callback) { inserted.add(callback); return () => inserted.delete(callback); } };
       elements.add(el);
@@ -161,7 +164,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
           addChild(child) { children.push(child); } });
       };
       process(text);
-      return { get wrapping() { return wrapping; }, get watchers() { return inserted.size; },
+      return { get wrapping() { return wrapping; }, get empties() { return empties; }, get watchers() { return inserted.size; },
         reprocess: process,
         move(from: number, to = from) { info.lineStart = from; info.lineEnd = to; },
         setInfoAvailable(available: boolean) { infoAvailable = available; },

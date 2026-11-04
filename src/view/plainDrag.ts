@@ -74,7 +74,7 @@ export function plainMediaDrag(app: App): Extension {
         cancelDrag = startPlainDrag(app, view, media, sourcePath, taken, event, () => {
           dragging = null;
           cancelDrag = null;
-        }, hold);
+        }, { hold });
       }
     };
     // While the plugin follows a drag, the browser's own image drag must not start: it would take
@@ -105,7 +105,10 @@ export function plainMediaDrag(app: App): Extension {
   });
 }
 
-function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, start: PointerEvent, onFinish: () => void, hold = false): () => void {
+interface PlainDragOptions { hold?: boolean; captureTarget?: HTMLElement; retake?: () => TakenEmbed | null }
+
+export function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, start: PointerEvent, onFinish: () => void, options: PlainDragOptions = {}): () => void {
+  const { hold = false, captureTarget = media, retake = () => take(view, media) } = options;
   const doc = media.ownerDocument;
   const leaf = media.closest(".workspace-leaf");
   let ghost: DragGhost | null = null;
@@ -137,7 +140,7 @@ function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePa
   const onContextMenu = (event: MouseEvent): void => {
     if (armed && media.contains(eventElement(event))) { event.preventDefault(); event.stopPropagation(); }
   };
-  const cancel = trackPointer(media, start, {
+  const cancel = trackPointer(captureTarget, start, {
     onMove(event) {
       if (!armed) {
         if (Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY) >= DRAG_THRESHOLD) cancel();
@@ -164,7 +167,7 @@ function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePa
       }
       swallowNextClick(doc);
       if (drop) {
-        void dropPlain(app, view, media, sourcePath, initial, drop);
+        void dropPlain(app, view, retake(), sourcePath, initial, drop);
       }
     },
     onCancel: stop,
@@ -177,9 +180,8 @@ function startPlainDrag(app: App, view: EditorView, media: HTMLElement, sourcePa
   return cancel;
 }
 
-async function dropPlain(app: App, view: EditorView, media: HTMLElement, sourcePath: string, initial: TakenEmbed, drop: DropState): Promise<void> {
+async function dropPlain(app: App, view: EditorView, taken: TakenEmbed | null, sourcePath: string, initial: TakenEmbed, drop: DropState): Promise<void> {
   // Located again at drop time, from the note as it is now.
-  const taken = take(view, media);
   if (!taken || taken.embed.raw !== initial.embed.raw) {
     new Notice(t("writeNotFound"));
     return;

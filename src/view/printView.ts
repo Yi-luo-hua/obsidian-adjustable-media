@@ -52,7 +52,7 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
     if (slot) {
       renderLayout(slot, { app, sourcePath: ctx.sourcePath, model: modelFromBlock(block),
         effectiveSkip: skips[index] ?? null, editable: false,
-        warning: blockWarning(block), component: child, refs, renderTasks: tasks });
+        warning: blockWarning(block), component: child, refs, renderTasks: tasks, print: true });
     }
   });
   keepFloatsWithAnchors(content);

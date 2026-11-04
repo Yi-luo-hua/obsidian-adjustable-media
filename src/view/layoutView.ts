@@ -1,7 +1,7 @@
 import { MarkdownRenderer, type App, type Component } from "obsidian";
 
 import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, type TextSide } from "../format/v2.ts";
-import { effectiveFrameWidth, effectiveWidth, hasTextColumns, isTextOnly, rowOffset, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
+import { effectiveFrameWidth, effectiveWidth, hasTextColumns, isTextOnly, rowOffset, webHeight, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
 import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { setBounded } from "../layout/viewProjection.ts";
 import { resolveMedia } from "./media.ts";
@@ -10,6 +10,7 @@ import { videoPreviewUrl } from "./videoSource.ts";
 import { t } from "./messages.ts";
 import { splitTextColumns } from "../markdown/textColumns.ts";
 import { renderExcalidraw, renderExcalidrawMarkdown } from "./excalidraw.ts";
+import { renderWebFrame, renderWebLink } from "./webEmbed.ts";
 
 export interface LayoutViewOptions {
   app: App;
@@ -27,6 +28,7 @@ export interface LayoutViewOptions {
   refs?: RefContext;
   /** Export waits for the Markdown inside the layout before printing. */
   renderTasks?: Promise<void>[];
+  print?: boolean;
 }
 
 interface MediaSize {
@@ -191,6 +193,10 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
       continue;
     }
     rowEl.setCssProps({ "--vml-row-height": `${row.height ?? DEFAULT_ROW_HEIGHT}px` });
+    for (const itemEl of Array.from(rowEl.querySelectorAll<HTMLElement>(".vml-item--web"))) {
+      const item = row.items[Number(itemEl.dataset.index)];
+      if (item) itemEl.setCssProps({ "--vml-web-height": `${webHeight(row, item)}px` });
+    }
 
     const item = row.items[0];
     const itemEl = rowEl.querySelector<HTMLElement>(".vml-item");
@@ -243,7 +249,17 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
   }
 
   const media = item.embed.kind === "mermaid" ? null : resolveMedia(options.app, item.embed, options.sourcePath);
-  if (item.embed.kind === "excalidraw") {
+  if (item.embed.kind === "web") {
+    itemEl.addClass("vml-item--web");
+    const web = itemEl.createDiv({ cls: "vml-item__media vml-item__web markdown-rendered" });
+    if (options.print) renderWebLink(web, item.embed);
+    else {
+      if (item.embed.syntax === "iframe") renderWebFrame(web, item.embed);
+      else renderMarkdown(web, item.embed.raw, options);
+      const toolbar = itemEl.createDiv({ cls: "vml-web-toolbar" });
+      renderWebLink(toolbar, item.embed);
+    }
+  } else if (item.embed.kind === "excalidraw") {
     itemEl.addClass("vml-item--excalidraw");
     const drawing = itemEl.createDiv({ cls: "vml-item__media vml-item__excalidraw" });
     const sizeKey = `excalidraw:${options.sourcePath}\n${item.embed.raw}`;

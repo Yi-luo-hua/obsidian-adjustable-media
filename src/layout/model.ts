@@ -45,6 +45,8 @@ import {
 
 export interface LayoutItem {
   embed: V2Embed;
+  /** Web viewport height; null/absent follows its row, then the original frame height. */
+  height?: number | null;
   /** Column weight; null means an equal share. */
   weight: number | null;
   caption: string | null;
@@ -56,7 +58,7 @@ export function onlySizingDiffers(before: LayoutModel, after: LayoutModel): bool
     const { width: _width, frameWidth: _frameWidth, align: _align, rows, ...rest } = model;
     return { ...rest, rows: rows.map(row => {
       const { height: _height, width: _rowWidth, align: _rowAlign, offset: _offset, items, ...settings } = row;
-      return { ...settings, items: items.map(({ weight: _weight, ...item }) => item) };
+      return { ...settings, items: items.map(({ weight: _weight, height: _height, ...item }) => item) };
     }) };
   };
   return JSON.stringify(content(before)) === JSON.stringify(content(after));
@@ -139,9 +141,13 @@ export function modelFromBlock(block: V2Block): LayoutModel {
     ...(block.meta.version === 3 ? { version: 3 as const } : {}),
     rows: block.rows.map((row, rowIndex) => {
       const settings = readRowMeta(block.meta.rows[rowIndex] ?? {}, row.embeds.length);
+      const { heights, ...extra } = settings.extra;
+      const validHeights = Array.isArray(heights) && heights.length === row.embeds.length
+        && heights.every(value => value === null || (typeof value === "number" && Number.isFinite(value)));
       return {
         items: row.embeds.map((embed, index) => ({
           embed,
+          ...(embed.kind === "web" ? { height: validHeights && typeof heights[index] === "number" ? clampHeight(heights[index]) : null } : {}),
           weight: settings.widths?.[index] ?? null,
           caption: settings.captions?.[index] ?? null,
         })),
@@ -150,7 +156,7 @@ export function modelFromBlock(block: V2Block): LayoutModel {
         align: settings.align,
         offset: settings.offset,
         captionAlign: settings.captionAlign,
-        extra: settings.extra,
+        extra: heights === undefined || row.embeds.some(embed => embed.kind === "web") ? extra : settings.extra,
       };
     }),
     width: readBlockWidth(width),
@@ -198,13 +204,14 @@ export function canAddText(model: LayoutModel): boolean {
 }
 
 export function metaFromModel(model: LayoutModel): V2Meta {
-  const mediaItems = model.version === 3 || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid"));
+  const mediaItems = model.version === 3 || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid" || item.embed.kind === "web"));
   return {
     ...(mediaItems ? { version: 3 as const } : {}),
     rows: model.rows.map((row) => {
       const single = row.items.length === 1;
       const meta: V2RowMeta = { ...row.extra };
       if (mediaItems) meta.items = row.items.length;
+      if (row.items.some(item => item.height != null)) meta.heights = row.items.map(item => item.height ?? null);
       if (row.height !== null) {
         meta.height = row.height;
       }
@@ -338,6 +345,16 @@ export function setRowHeight(model: LayoutModel, rowIndex: number, height: numbe
     return model;
   }
   return updateRow(model, rowIndex, (row) => ({ ...row, height: clampHeight(height) }));
+}
+
+export function setWebHeight(model: LayoutModel, position: ItemPosition, height: number | null): LayoutModel {
+  if (model.rows[position.row]?.items[position.index]?.embed.kind !== "web" || (height !== null && !Number.isFinite(height))) return model;
+  return updateRow(model, position.row, row => ({ ...row, items: row.items.map((item, index) =>
+    index === position.index ? { ...item, height: height === null ? null : clampHeight(height) } : item) }));
+}
+
+export function webHeight(row: LayoutRow, item: LayoutItem): number {
+  return item.height ?? row.height ?? item.embed.nativeHeight ?? DEFAULT_ROW_HEIGHT;
 }
 
 export function setWeights(model: LayoutModel, rowIndex: number, weights: readonly number[]): LayoutModel {
@@ -536,11 +553,12 @@ export function scaleRows(model: LayoutModel, factor: number, singleWidths?: Rea
   return {
     ...model,
     rows: model.rows.map((row, index) => {
+      const items = row.items.map(item => item.embed.kind === "web" ? { ...item, height: clampHeight(webHeight(row, item) * factor) } : item);
       if (row.items.length !== 1) {
-        return { ...row, height: clampHeight((row.height ?? DEFAULT_ROW_HEIGHT) * factor) };
+        return { ...row, items, height: clampHeight((row.height ?? DEFAULT_ROW_HEIGHT) * factor) };
       }
       const current = row.width ?? singleWidths?.[index] ?? null;
-      return singleWidths && current !== null ? { ...row, width: clampSingleWidth(round(current * singleWidthFactor)) } : row;
+      return { ...row, items, ...(singleWidths && current !== null ? { width: clampSingleWidth(round(current * singleWidthFactor)) } : {}) };
     }),
   };
 }

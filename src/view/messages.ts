@@ -4,6 +4,10 @@ import type { V2Block } from "../format/v2.ts";
 
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
+  webEmbed: { zh: "网页嵌入", en: "Web embed" },
+  webEmbedActions: { zh: "网页嵌入：点击打开菜单，拖动加入布局", en: "Web embed: click for menu, drag into a layout" },
+  resizeWebHeight: { zh: "调整网页高度（双击重置）", en: "Resize web height (double-click to reset)" },
+  resetWebHeight: { zh: "重置独立网页高度", en: "Reset independent web height" },
   resizeCalloutImage: { zh: "拖动调整图片大小", en: "Drag to resize the image" },
   insertColumnBreak: { zh: "插入分栏标记", en: "Insert column break" },
   manualColumnsDesc: { zh: "栏数由正文中的 +++ 分栏标记决定；移除标记后恢复自动分栏。", en: "The +++ markers set the column count. Remove them to restore automatic columns." },
