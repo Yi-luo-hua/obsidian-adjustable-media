@@ -56,7 +56,7 @@
 
 ## 已知限制与验收范围
 
-- Issue [#37](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/37) 仍打开，未认定修复：报告阅读模式两列图片破图。2026-11-04 在 Windows／Obsidian 1.15.0／默认主题，以 0.9.3 构建检查 6 种含空格附件链接、12 次阅读模式切换及子目录相对路径，图片均加载成功，暂未复现。仍需原始布局 Markdown、笔记／附件路径、版本和主题／CSS 信息；本轮仅记录排查，未修改运行代码，详见[排查记录](archive/2026-11-04-reading-image-issue37.md)。
+- Issue [#37](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/37) 仍打开，未认定修复：报告阅读模式两列图片破图。2026-11-04 在 Windows／Obsidian 1.15.0／默认主题，以 0.9.3 构建检查 6 种含空格附件链接、12 次阅读模式切换及子目录相对路径，均正常。进一步通过临时覆盖附件为无效内容，复现编辑视图显示缓存旧图、切到阅读模式破图，且附件恢复后当前阅读页不自动恢复；重新切换模式或强制重绘可恢复。该附件事件刷新缺口尚未确认为报告者根因，仍需原始 Markdown、路径、版本和环境信息；未修改运行代码，详见[排查记录](archive/2026-11-04-reading-image-issue37.md)。
 
 - 全库批量移除只处理 Markdown 文件中可编辑的顶层布局注释，不扫描 Canvas 文字卡片，也不移除 Callout 图片设置。Canvas 仅支持卡片内部布局，不支持跨卡片布局拖放或 Canvas 内交叉引用导航。
 
