@@ -2,6 +2,8 @@
 
 [简体中文](Guide.zh-CN.md) · [English](Guide.en.md)
 
+[把世界放进一页](把世界放进一页.md)：可直接复制进 Obsidian 的中文网页布局小画廊，以城市地图和 NASA 月球影像展示并排、独立高度、图文布局、浮动环绕及块外拖入。需要已加入网页嵌入功能的开发版，无额外 CSS 或本地素材依赖。
+
 [外链网页示例 / Web embed examples](WebEmbeds.md)：Issue #38 开发版的 YouTube、Spotify、OpenStreetMap 并排、独立高度和环绕样例，尚未包含在公开 0.9.3 中。
 
 [Mermaid 中文示例](Mermaid.zh-CN.md)／[English example](Mermaid.en.md)：0.8.0 更新弹窗曾提供“在库中创建 Mermaid 示例”按钮；现在也可直接把这里的 Markdown 复制到测试笔记。
