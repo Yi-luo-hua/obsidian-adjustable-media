@@ -4,6 +4,8 @@
 
 ## 版本与交付范围
 
+- **未发布修复：新文档打开时的 editor 初始化异常**。统一处理宿主 `MarkdownView.editor` getter 在 `editMode` 未就绪时抛错的情况，避免实时预览初始化与窗格来源回退中断。558 项测试、生产构建及 Windows／Obsidian 1.15.0 定向验证通过；尚未在反馈者环境确认恢复，详见[排查与验证记录](archive/2026-11-05-editor-initialization.md)。
+
 - **未发布开发功能：Issue #38 外链网页布局**。完整多行 iframe 与原生 YouTube／Twitter 嵌入接入 V3，支持并排、独立高度、列宽、把手拖入、环绕和 PDF 链接回退；保留原文、一步撤销及缩放时的 iframe 实例。Windows／默认主题定向实测和 430px 触摸仿真通过，移动真机与完整 PDF 导出未复测，详见[功能与验证记录](features/web-embeds.md)。公开版本继续为 0.9.3。
 
 - **公开版本：0.9.3**，标签源码 `eeba209`，已设为最新版本；三份公开附件与干净标签构建逐字节一致，摘要及来源证明已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.3)和[发布核验](releases/0.9.3-readiness.md)。

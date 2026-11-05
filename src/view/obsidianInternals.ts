@@ -1,4 +1,5 @@
 import { MarkdownView, type App, type Editor, type Hotkey, type TFile } from "obsidian";
+import { editorOfInfo } from "../editor/editorInfo.ts";
 import { canvasEditor, canvasPreviewHosts, type PreviewHost } from "./canvas.ts";
 import { metadataSections, type MarkdownSection } from "../markdown/paragraphBreaks.ts";
 
@@ -95,7 +96,7 @@ export function fileOfEditor(app: App, editor: Editor | undefined): TFile | null
   if (!editor) return null;
   for (const leaf of app.workspace.getLeavesOfType("markdown")) {
     const view = leaf.view;
-    if (view instanceof MarkdownView && view.getMode() === "source" && view.editor === editor) return view.file;
+    if (view instanceof MarkdownView && view.getMode() === "source" && editorOfInfo(view) === editor) return view.file;
   }
   return canvasEditor(app, editor, false)?.file ?? null;
 }

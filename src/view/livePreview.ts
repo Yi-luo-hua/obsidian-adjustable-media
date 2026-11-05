@@ -2,6 +2,7 @@ import { Component, editorInfoField, editorLivePreviewField, type App } from "ob
 import { Prec, StateEffect, StateField, type ChangeDesc, type EditorState, type Extension, type Range, type SelectionRange, type Transaction } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view";
 
+import { editorOfInfo } from "../editor/editorInfo.ts";
 import { blockWrap, hasTextColumns, isDrawable, type TextSide, type V2Block } from "../format/v2.ts";
 import { blockIdentity } from "../layout/blockIdentity.ts";
 import { cursorBlocks } from "../layout/cursorHighlight.ts";
@@ -121,8 +122,9 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
     update(value, tr) {
       const modeChanged = tr.startState.field(editorLivePreviewField, false) !== tr.state.field(editorLivePreviewField, false);
       const info = tr.state.field(editorInfoField, false);
-      const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, value.snapshot?.origin);
-      const bufferChanged = value.snapshot !== null && value.buffer !== info?.editor;
+      const buffer = editorOfInfo(info);
+      const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, buffer), buffer, value.snapshot?.origin);
+      const bufferChanged = value.snapshot !== null && value.buffer !== buffer;
       const originChanged = value.snapshot !== null && (value.snapshot.origin.file !== origin.file || value.snapshot.origin.path !== origin.path || bufferChanged);
       const environment = tr.effects.find(effect => effect.is(setEnvironment));
       let measurements: Measurements = { heights: value.heights, environmentEpoch: value.environmentEpoch, environmentSpec: value.environmentSpec };
@@ -190,7 +192,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
           if (destroyed) return;
           const doc = view.dom.doc;
           const focused = doc.hasFocus() && view.dom.contains(doc.activeElement)
-            && app.workspace.activeEditor?.editor === view.state.field(editorInfoField, false)?.editor;
+            && editorOfInfo(app.workspace.activeEditor) === editorOfInfo(view.state.field(editorInfoField, false));
           const column = focused ? doc.activeElement?.closest<HTMLElement>(".vml-text-editor") : null;
           const columnId = column?.closest<HTMLElement>("[data-vml-block-id]")?.dataset.vmlBlockId ?? null;
           const next = { cursorOnly: !keepLayoutHighlight(), focused, columnId };
@@ -304,7 +306,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
 
 function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
   const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: PENDING_ENVIRONMENT };
-  const buffer = state.field(editorInfoField, false)?.editor;
+  const buffer = editorOfInfo(state.field(editorInfoField, false));
   if (!state.field(editorLivePreviewField, false)) {
     return { buffer, blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
   }
@@ -315,7 +317,7 @@ function parse(app: App, state: EditorState, previous: DocumentSnapshot | null =
     return { buffer, blocks: [], lines: [], skips: [], breaks: [], refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
-  const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, info?.editor), info?.editor, previous?.origin);
+  const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, buffer), buffer, previous?.origin);
   const snapshot = documentSnapshot(text, origin, previous ?? undefined, changes);
   const blocks = snapshot.blocks.map(ref => ref.block);
   const lines = [...snapshot.lines];
@@ -634,14 +636,14 @@ function drawWidget(
   markHighlightWidget(el, view, block);
   // Resolved when asked: the block may have moved since the widget was drawn.
   const position = (): number => standIn ?? view.posAtDOM(el);
-  const context: LayoutContext & { position: () => number } = { app, sourcePath, block, model, view, editor: view.state.field(editorInfoField, false)?.editor, position };
+  const context: LayoutContext & { position: () => number } = { app, sourcePath, block, model, view, editor: editorOfInfo(view.state.field(editorInfoField, false)), position };
   const host: TextEditHost = {
     el,
     root,
     app,
     sourcePath,
     context,
-    editor: view.state.field(editorInfoField, false)?.editor,
+    editor: editorOfInfo(view.state.field(editorInfoField, false)),
     view,
     // Drawn again from the note as it is now, numbers included.
     redraw: (next, editing) => drawWidget(el, view, app, next, sourcePath, currentRefs(view), effectiveSkip, editing,

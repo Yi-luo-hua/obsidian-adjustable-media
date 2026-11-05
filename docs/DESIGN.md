@@ -225,6 +225,8 @@ $$
 
 ## 4. 实测确认过的 Obsidian 行为
 
+2026-11-05 编辑器初始化兼容：`editorInfoField` 可持有 MarkdownView，`editor` 是读取 `editMode.editor` 的 getter（1.15.0 实测）。初始化期间直接读取尚未就绪的 getter 会抛错，可选链不能保护其内部访问。`editor/editorInfo.ts` 只隔离这一次宿主 getter 读取，实时预览与窗格来源回退使用同一入口，下一次事务重新读取并绑定已就绪的编辑器；不缓存失败，不在渲染中写笔记。反馈边界与定向验证见[记录](archive/2026-11-05-editor-initialization.md)。
+
 2026-10-19 Canvas 本地适配：卡片复用 Markdown 编辑／预览组件，但不属于 MarkdownView 叶子；文字卡片没有文件，编辑器 DOM 还会在创建后迁入 iframe。`canvas.ts` 隔离卡片来源和预览宿主，`writeBack.ts` 只向仍有效的原卡片缓冲提交事务，不将 Canvas JSON 作为 Markdown 改写。资源路径取文字卡片所在 Canvas 或文件卡片的 Markdown 文件。实现及 Windows 定向验证见 [Canvas 记录](archive/2026-10-19-canvas-support.md)。
 
 开发时在测试库（Obsidian 1.13.7）里验证过，设计依赖这些结论：
