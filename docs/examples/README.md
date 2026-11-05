@@ -2,12 +2,6 @@
 
 [简体中文](Guide.zh-CN.md) · [English](Guide.en.md)
 
-[网页嵌入：把资料和笔记放在一起](WebLayouts.zh-CN.md)：精简示例教程。用行程规划、学习记录和资料旁注展示并排、图文布局与环绕，附获取嵌入、拖入／移出和菜单开关教程；可整篇复制到笔记中体验。
-
-[把世界放进一页](把世界放进一页.md)：可直接复制进 Obsidian 的中文网页布局小画廊，以城市地图和作者的 B 站插件介绍视频展示并排、独立高度、图文布局、浮动环绕及块外拖入。需要已加入网页嵌入功能的开发版，无额外 CSS 或本地素材依赖。
-
-[外链网页示例 / Web embed examples](WebEmbeds.md)：Issue #38 开发版的 YouTube、Spotify、OpenStreetMap 并排、独立高度和环绕样例，尚未包含在公开 0.9.3 中。
-
 [Mermaid 中文示例](Mermaid.zh-CN.md)／[English example](Mermaid.en.md)：0.8.0 更新弹窗曾提供“在库中创建 Mermaid 示例”按钮；现在也可直接把这里的 Markdown 复制到测试笔记。
 
 [手动文字分栏样例](ManualColumns.zh-CN.md)：0.7.3 更新弹窗曾提供“在库中创建手动分栏样例”按钮；现在也可直接复制这里的 Markdown 使用。
