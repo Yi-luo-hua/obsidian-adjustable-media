@@ -12,6 +12,7 @@
 | [Excalidraw 布局媒体](features/excalidraw.md) | 0.9.3 已发布功能的用法、API 接入与定向验证 |
 | [表格右键包装](features/tables.md) | 回退表格媒体适配后保留的文字布局块包装入口 |
 | [发布流程](RELEASE.md) | 版本号、构建、标签、附件和公开发布 |
+| [0.9.4 发布准备](releases/0.9.4-readiness.md) | 网页布局、组件菜单和编辑器初始化修复的候选与草稿核验 |
 | [0.9.3 发布核验](releases/0.9.3-readiness.md) | Excalidraw 与表格右键文字包装的发布范围、附件及验证边界 |
 | [0.9.2 发布核验](releases/0.9.2-readiness.md) | 布局转换与同行图片补丁、正式附件、来源证明及验证边界 |
 | [0.9.1 发布核验](releases/0.9.1-readiness.md) | 图文块缩放与缩进续行补丁、正式附件、来源证明及验证边界 |

@@ -2,13 +2,14 @@
 
 ## Unreleased
 
-- Avoid interrupting document opening when Obsidian exposes a Markdown view before its editor getter is ready. Retry editor binding on later transactions and skip initializing panes during file-ownership lookup.
+## 0.9.4 - 2026-11-05
 
-- Preserve list ownership when wrapping or dragging web embeds, including unindented lazy continuations; wrapping a complete list keeps its embeds in the text layout. Start compact web-row resizing from its displayed viewport height instead of jumping to the 220px media default, and restore exact preview settings on cancellation.
+- Add iframe web embeds to media layouts, including videos and maps, independent sizing, captions and text wrapping ([#38](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/38)).
+- Drag web components into layouts or move them out through their handle menu. Click a handle to open the menu; click it again or elsewhere to close it. Preserve original embed code and one-step undo.
+- Fix web layout reading display, list ownership and compact-row resize jumps. Keep web embeds as links in PDF exports.
+- Fix an editor initialization error that could interrupt opening a new document.
 
-- Add external web embeds to media layouts ([#38](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/38)): complete multiline HTTP(S) iframes and native YouTube/Twitter embeds, side-by-side placement, independent web heights, column widths, captions, text wrapping and dedicated drag handles.
-- Add standalone web controls for wrapping and dragging into layouts. Preserve original embed source and permissions, reuse loaded frames during sizing edits, support atomic writes and one-step undo, and export web media as links in PDF.
-- Handle native HTML reading sections that include layout closers, neighboring layouts and trailing Markdown without duplicating web content. See [usage, examples and verification](docs/features/web-embeds.md).
+Validation and platform boundaries: [0.9.4 release preparation](docs/releases/0.9.4-readiness.md).
 
 ## 0.9.3 - 2026-11-02
 
