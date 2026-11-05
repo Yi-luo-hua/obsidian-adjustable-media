@@ -282,9 +282,32 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
     const grip = itemEl.createDiv({ cls: "vml-handle vml-item__grip", attr: { "aria-label": t("dragHandle"), role: "button" } });
     setIcon(grip, "grip-vertical");
     if (item.embed.kind === "video" || item.embed.kind === "excalidraw" || item.embed.kind === "web") dragFrom = grip;
-    if (item.embed.kind === "web") grip.addEventListener("contextmenu", event => {
-      event.preventDefault(); event.stopPropagation(); showItemMenu(event, context, position);
-    });
+    if (item.embed.kind === "web") {
+      let clickStart: { x: number; y: number } | null = null;
+      let moved = false;
+      grip.addEventListener("pointerdown", event => {
+        clickStart = { x: event.clientX, y: event.clientY }; moved = false;
+      });
+      grip.addEventListener("pointermove", event => {
+        if (clickStart && Math.hypot(event.clientX - clickStart.x, event.clientY - clickStart.y) >= DRAG_THRESHOLD) moved = true;
+      });
+      grip.tabIndex = 0;
+      grip.setAttribute("aria-label", t("webLayoutActions"));
+      grip.setAttribute("title", t("webLayoutActions"));
+      grip.addEventListener("contextmenu", event => {
+        event.preventDefault(); event.stopPropagation(); showItemMenu(event, context, position);
+      });
+      grip.addEventListener("click", event => {
+        event.preventDefault(); event.stopPropagation();
+        if (!moved) showItemMenu(event, context, position);
+      });
+      grip.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault(); event.stopPropagation();
+        const rect = grip.getBoundingClientRect();
+        showItemMenu({ x: rect.left, y: rect.bottom }, context, position);
+      });
+    }
   }
   dragFrom.addEventListener("pointerdown", (event) => {
     const target = eventElement(event);

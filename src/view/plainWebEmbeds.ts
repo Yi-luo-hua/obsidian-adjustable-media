@@ -67,7 +67,7 @@ export function plainWebEmbeds(app: App): Extension {
         let control = controls.get(frame);
         if (!control) {
           control = view.dom.createDiv({ cls: "vml-native-web-controls" });
-          const grip = control.createEl("button", { cls: "vml-native-web-grip", attr: { type: "button", "aria-label": t("webEmbedActions") } });
+          const grip = control.createEl("button", { cls: "vml-native-web-grip", attr: { type: "button", "aria-label": t("webEmbedActions"), title: t("webEmbedActions") } });
           setIcon(grip, "grip-vertical");
           grip.addEventListener("contextmenu", event => menu(event, frame));
           grip.addEventListener("click", event => menu(event, frame));

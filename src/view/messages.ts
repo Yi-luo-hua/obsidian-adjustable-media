@@ -6,6 +6,7 @@ import type { V2Block } from "../format/v2.ts";
 const MESSAGES = {
   webEmbed: { zh: "网页嵌入", en: "Web embed" },
   webEmbedActions: { zh: "网页嵌入：点击打开菜单，拖动加入布局", en: "Web embed: click for menu, drag into a layout" },
+  webLayoutActions: { zh: "网页组件：拖动调整位置，点击或右键打开菜单移出布局", en: "Web component: drag to move, click or right-click for the menu to move out of the layout" },
   resizeWebHeight: { zh: "调整网页高度（双击重置）", en: "Resize web height (double-click to reset)" },
   resetWebHeight: { zh: "重置独立网页高度", en: "Reset independent web height" },
   resizeCalloutImage: { zh: "拖动调整图片大小", en: "Drag to resize the image" },
