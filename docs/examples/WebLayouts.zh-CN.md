@@ -25,7 +25,8 @@
 适合在线课程、软件演示和论文讲解：一侧保留播放器，另一侧写自己的理解，不必来回切换页面。
 
 <!-- vml {"v":3,"kind":"media","width":0.6,"rows":[{"items":1,"width":1,"heights":[260]}]} -->
-![NASA · Tour of the Moon in 4K](https://www.youtube.com/watch?v=nr5Pj6GQL2o)
+<iframe src="https://player.bilibili.com/player.html?bvid=BV1Tz4y1x7qz&amp;p=1&amp;autoplay=0&amp;danmaku=0" title="B站 · 月球之旅（中文字幕）" width="560" height="315" allow="fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+
 **观看笔记：月球地貌**
 
 - 观察：记录一处印象最深的地貌。
@@ -50,7 +51,7 @@
 
 ## 自己做一份：三个步骤
 
-1. **获取嵌入。**在网站的「分享 → 嵌入 / Embed」中复制完整的 `<iframe …></iframe>`，粘到笔记正文，前后各留一个空行。YouTube 视频也可写成 `![](视频网址)`。粘贴内容不要放进代码块。
+1. **获取嵌入。**在 B 站视频页的分享区域找到「嵌入代码」，复制完整的 `<iframe …></iframe>`；其他网站可找「分享 → 嵌入 / Embed」。粘到笔记正文，前后各留一个空行，不要放进代码块。B 站示例使用 `player.bilibili.com` 播放地址，并设置 `autoplay=0` 关闭自动播放。
 2. **放进布局。**实时预览中，点击网页右上角的把手，选择「包成布局块」；已有布局时，直接拖动把手，把网页放到另一项旁边或新的一行。也可选中完整嵌入，执行「把选中的内容包成布局块」。
 3. **调整与移出。**拖动分隔线调宽、网页底边调独立高度；点击或右键组件把手，选择「移出布局块」放回正文。移出后还能拖回布局。
 
@@ -60,6 +61,6 @@
 
 ---
 
-地图来自 [OpenStreetMap 及其贡献者](https://www.openstreetmap.org/copyright)，月球影像来自 [NASA 的《Tour of the Moon in 4K》](https://svs.gsfc.nasa.gov/4619/)。
+地图来自 [OpenStreetMap 及其贡献者](https://www.openstreetmap.org/copyright)。月球影像原作来自 [NASA](https://svs.gsfc.nasa.gov/4619/)，本页嵌入 [B 站《NASA - 月球之旅 4K 高清重制版》](https://www.bilibili.com/video/BV1Tz4y1x7qz/)；播放器用法见 [B 站官方说明](https://player.bilibili.com/)。
 
 网站需要允许嵌入，加载与播放取决于网络、登录和地区。笔记保留原始嵌入代码；导出 PDF 时，布局内网页显示为可点击链接。
