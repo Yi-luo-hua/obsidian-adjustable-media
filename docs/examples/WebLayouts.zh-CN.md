@@ -25,13 +25,13 @@
 适合在线课程、软件演示和论文讲解：一侧保留播放器，另一侧写自己的理解，不必来回切换页面。
 
 <!-- vml {"v":3,"kind":"media","width":0.6,"rows":[{"items":1,"width":1,"heights":[260]}]} -->
-<iframe src="https://player.bilibili.com/player.html?bvid=BV1Tz4y1x7qz&amp;p=1&amp;autoplay=0&amp;danmaku=0" title="B站 · 月球之旅（中文字幕）" width="560" height="315" allow="fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+<iframe src="https://player.bilibili.com/player.html?bvid=BV1QLHt6HEk6&amp;p=1&amp;autoplay=0&amp;danmaku=0" title="B站 · Adjustable Media 插件介绍" width="560" height="315" allow="fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
 
-**观看笔记：月球地貌**
+**观看笔记：把排版方法用到自己的笔记里**
 
-- 观察：记录一处印象最深的地貌。
-- 时间点：写下需要回看的播放位置。
-- 待查：把没听懂的术语留在这里。
+- 想试：挑一种适合自己笔记的布局。
+- 时间点：记下需要回看的操作演示。
+- 动手：把本页的一组示例改成自己的排版。
 
 **试一试：**在实时预览中点击这栏文字，换成自己的笔记；播放器内部继续用于播放和暂停。
 
@@ -61,6 +61,6 @@
 
 ---
 
-地图来自 [OpenStreetMap 及其贡献者](https://www.openstreetmap.org/copyright)。月球影像原作来自 [NASA](https://svs.gsfc.nasa.gov/4619/)，本页嵌入 [B 站《NASA - 月球之旅 4K 高清重制版》](https://www.bilibili.com/video/BV1Tz4y1x7qz/)；播放器用法见 [B 站官方说明](https://player.bilibili.com/)。
+地图来自 [OpenStreetMap 及其贡献者](https://www.openstreetmap.org/copyright)，视频为[插件作者发布的 Adjustable Media 介绍](https://www.bilibili.com/video/BV1QLHt6HEk6/)；播放器用法见 [B 站官方说明](https://player.bilibili.com/)。
 
 网站需要允许嵌入，加载与播放取决于网络、登录和地区。笔记保留原始嵌入代码；导出 PDF 时，布局内网页显示为可点击链接。
