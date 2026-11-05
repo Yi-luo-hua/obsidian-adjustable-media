@@ -48,6 +48,7 @@ import { trackPointer } from "./pointer.ts";
 import { TextLayoutModal } from "./textLayoutModal.ts";
 import { splitTextColumns } from "../markdown/textColumns.ts";
 import { eventElement } from "./windows.ts";
+import { menuToggle } from "./menuToggle.ts";
 
 /** A layout drawn in live preview, as its interactions see it. Reading view only shows layouts. */
 export interface LayoutContext extends WriteOptions {
@@ -283,6 +284,7 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
     setIcon(grip, "grip-vertical");
     if (item.embed.kind === "video" || item.embed.kind === "excalidraw" || item.embed.kind === "web") dragFrom = grip;
     if (item.embed.kind === "web") {
+      const toggleMenu = menuToggle(grip);
       let clickStart: { x: number; y: number } | null = null;
       let moved = false;
       grip.addEventListener("pointerdown", event => {
@@ -299,13 +301,14 @@ function setUpItem(root: HTMLElement, itemEl: HTMLElement, position: ItemPositio
       });
       grip.addEventListener("click", event => {
         event.preventDefault(); event.stopPropagation();
-        if (!moved) showItemMenu(event, context, position);
+        const rect = grip.getBoundingClientRect();
+        if (!moved) toggleMenu(() => showItemMenu({ x: rect.right + 4, y: rect.top }, context, position));
       });
       grip.addEventListener("keydown", event => {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault(); event.stopPropagation();
         const rect = grip.getBoundingClientRect();
-        showItemMenu({ x: rect.left, y: rect.bottom }, context, position);
+        toggleMenu(() => showItemMenu({ x: rect.right + 4, y: rect.top }, context, position));
       });
     }
   }
@@ -766,11 +769,11 @@ function movedPast(start: PointerEvent, move: PointerEvent): boolean {
   return Math.hypot(move.clientX - start.clientX, move.clientY - start.clientY) >= RESIZE_THRESHOLD;
 }
 
-function showItemMenu(at: MouseEvent | { x: number; y: number }, context: LayoutContext, position: ItemPosition): void {
+function showItemMenu(at: MouseEvent | { x: number; y: number }, context: LayoutContext, position: ItemPosition): Menu | null {
   const row = context.model.rows[position.row];
   const item = row?.items[position.index];
   if (!row || !item) {
-    return;
+    return null;
   }
 
   const menu = new Menu();
@@ -880,6 +883,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   } else {
     menu.showAtPosition(at);
   }
+  return menu;
 }
 
 /**

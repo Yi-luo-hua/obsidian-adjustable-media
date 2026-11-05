@@ -7,6 +7,7 @@ import { readEmbedRow } from "../format/v2.ts";
 import { writeBlockEdits } from "../layout/writeBack.ts";
 import { reportWriteError, t } from "./messages.ts";
 import { startPlainDrag } from "./plainDrag.ts";
+import { menuToggle } from "./menuToggle.ts";
 
 export function takeNativeWeb(view: EditorView, frame: HTMLElement): TakenEmbed | null {
   try {
@@ -44,18 +45,19 @@ export function plainWebEmbeds(app: App): Extension {
     const controls = new Map<HTMLElement, HTMLElement>();
     let cancelDrag: (() => void) | null = null, pending = 0;
     const win = view.dom.win as Window & typeof window;
-    const menu = (event: MouseEvent, frame: HTMLElement): void => {
+    const menu = (event: MouseEvent, frame: HTMLElement, trigger: HTMLElement): Menu | null => {
       event.preventDefault(); event.stopPropagation();
       const taken = takeNativeWeb(view, frame), info = view.state.field(editorInfoField, false);
-      if (!taken || !info?.file) return;
+      if (!taken || !info?.file) return null;
       const original = view.state.doc.toString(), file = info.file;
-      new Menu().addItem(item => item.setTitle(t("wrapInLayout")).setIcon("layout-grid").onClick(() => {
+      const rect = trigger.getBoundingClientRect();
+      return new Menu().addItem(item => item.setTitle(t("wrapInLayout")).setIcon("layout-grid").onClick(() => {
         const change = view.state.doc.toString() === original && frame.isConnected
           ? planWrapSelection(original.split("\n"), taken.embed.line, taken.embed.endLine ?? taken.embed.line) : null;
         if (!change) { new Notice(t("writeNotFound")); return; }
         void writeBlockEdits(app, file, [lineChangeEdit(original.split("\n"), change)], { view, finishWrapping: true })
           .then(result => { if (!result.ok) new Notice(t("writeNotFound")); }).catch(reportWriteError);
-      })).showAtMouseEvent(event);
+      })).showAtPosition({ x: rect.right + 4, y: rect.top });
     };
     const update = (): void => {
       pending = 0;
@@ -69,8 +71,12 @@ export function plainWebEmbeds(app: App): Extension {
           control = view.dom.createDiv({ cls: "vml-native-web-controls" });
           const grip = control.createEl("button", { cls: "vml-native-web-grip", attr: { type: "button", "aria-label": t("webEmbedActions"), title: t("webEmbedActions") } });
           setIcon(grip, "grip-vertical");
-          grip.addEventListener("contextmenu", event => menu(event, frame));
-          grip.addEventListener("click", event => menu(event, frame));
+          const toggleMenu = menuToggle(grip);
+          grip.addEventListener("contextmenu", event => menu(event, frame, grip));
+          grip.addEventListener("click", event => {
+            event.preventDefault(); event.stopPropagation();
+            toggleMenu(() => menu(event, frame, grip));
+          });
           grip.addEventListener("pointerdown", event => {
             if (event.button !== 0) return;
             event.preventDefault(); event.stopPropagation();

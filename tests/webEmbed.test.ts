@@ -208,7 +208,7 @@ test("wrap transactions preserve surrounding source and refuse stale targets", (
 test("native HTML widgets map duplicate and adjacent frames to their exact source occurrence", async () => {
   const module = await mockedModule<{ takeNativeWeb(view: unknown, frame: unknown): plain.TakenEmbed | null }>(new URL('../src/view/plainWebEmbeds.ts', import.meta.url), {
     obsidian: {}, '@codemirror/view': {}, '../commands/plans.ts': {}, '../format/v2.ts': format,
-    '../layout/plainEmbed.ts': plain, '../layout/writeBack.ts': {}, './messages.ts': {}, './plainDrag.ts': {},
+    '../layout/plainEmbed.ts': plain, '../layout/writeBack.ts': {}, './messages.ts': {}, './plainDrag.ts': {}, './menuToggle.ts': {},
   }, { URL });
   for (const source of [map + ' ' + map, map + '\n' + spotify]) {
     const frames = [0, 1].map(index => ({ src: index === 1 && source.includes('spotify') ? parseWebFrame(spotify)!.url : parseWebFrame(map)!.url,
