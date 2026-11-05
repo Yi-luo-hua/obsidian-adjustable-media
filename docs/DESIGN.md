@@ -4,11 +4,11 @@
 
 2026-11-02 表格回退：以表格适配前的 `2bba25b` 为基础，撤回表格独立媒体项及其缩放／拖入适配，仅保留[表格右键包装](features/tables.md)。右键入口把完整表格交给原有选区包装，生成 V2 `type:"text"` 布局；`markdown/tables.ts` 仅用于菜单定位完整表格，不接入媒体解析或渲染。保留 Excalidraw 支持。
 
-实现范围（2026-11-02）：公开版本为 **0.9.3**，新增 [Excalidraw 布局媒体](features/excalidraw.md)与[表格右键文字包装](features/tables.md)，保留 0.9.2 转换布局后的预览、光标定位及同行图片包装修复，以及既有 Canvas、Callout、Mermaid 和图文块缩放能力。0.9.3 标签源码为 `eeba209`，三份公开附件与干净标签构建一致，摘要和来源证明已核对。原 main 保留为 codex/main-before-080，W02／W03 原型未进入主线。历史设备结果保留各自构建边界；当前状态及发布核验见 [STATUS](STATUS.md)和[0.9.3 核验](releases/0.9.3-readiness.md)。
+0.9.3 历史发布范围（2026-11-02），新增 [Excalidraw 布局媒体](features/excalidraw.md)与[表格右键文字包装](features/tables.md)，保留 0.9.2 转换布局后的预览、光标定位及同行图片包装修复，以及既有 Canvas、Callout、Mermaid 和图文块缩放能力。0.9.3 标签源码为 `eeba209`，三份公开附件与干净标签构建一致，摘要和来源证明已核对。原 main 保留为 codex/main-before-080，W02／W03 原型未进入主线。历史设备结果保留各自构建边界；当前状态及发布核验见 [STATUS](STATUS.md)和[0.9.3 核验](releases/0.9.3-readiness.md)。
 
 ## 1. 存储格式
 
-2026-11-05，未发布开发功能：[外链网页嵌入](features/web-embeds.md)。完整 iframe 和原生 YouTube／Twitter 嵌入可作为 V3 媒体项；`rows[].heights` 保存各网页独立高度，原文及属性保持不变。阅读视图按源码边界消除原生 HTML 对后续内容的吞并；缩放复用 iframe，PDF 输出链接。公开 0.9.3 尚不包含此功能。
+2026-11-05，0.9.4 已发布功能：[外链网页嵌入](features/web-embeds.md)。完整 iframe 和原生 YouTube／Twitter 嵌入可作为 V3 媒体项；`rows[].heights` 保存各网页独立高度，原文及属性保持不变。阅读视图按源码边界消除原生 HTML 对后续内容的吞并；缩放复用 iframe，PDF 输出链接。公开最新版本现为 0.9.4，含组件菜单开关和编辑器初始化兼容修复，见[发布核验](releases/0.9.4-readiness.md)。
 
 0.8.0 已接入 `codex/mermaid-layout` 的 Mermaid 独立布局项。它只对显式新建／接收图表的目标块使用 `v:3, kind:"media"`，不自动迁移旧笔记；单块项数、完整围栏读写和宿主验证见 [37](plans/layout-redesign/37-mermaid-layout-items.md)。触摸通过独立把手搬运整段代码；块外独立图表还支持正文长按 350ms 后拖动，先移动 6px 则取消长按并保留滚动，取消／关闭时释放定时器和预览。投放可落在同一布局组件内行边缘外 40px 的区域，仍校验同笔记、同窗格和可编辑状态。源码变化与过期目标拒绝写入。以下 V2 说明仍适用于旧布局。这个单块格式不是 W06 多块组格式。
 
@@ -370,7 +370,7 @@ iPhone 用户确认的操作范围、未复现的新库冷启动结果与未定�
 
 0.7.3 更新说明中的手动分栏样例入口使用相同按钮样式与 `writeExampleNote` 创建流程。`ManualColumns.zh-CN.md` 和 `ManualColumns.en.md` 随构建打包，按界面语言选择正文、笔记名与按钮文案，点击即可离线创建并打开样例笔记；重复创建使用新的序号目录。中英文更新正文里的对应样例链接在弹窗渲染后替换为此按钮，其他链接保持原行为。
 
-上述按钮只在更新正文包含相应样例链接时出现，Mermaid 样例复用同一流程。当前更新弹窗只打包 0.9.3 正文，不提供浏览旧版更新说明的入口；历史样例可从仓库 [示例索引](examples/README.md) 复制使用。
+上述按钮只在更新正文包含相应样例链接时出现，Mermaid 样例复用同一流程。当前更新弹窗只打包 0.9.4 正文，不提供浏览旧版更新说明的入口；历史样例可从仓库 [示例索引](examples/README.md) 复制使用。
 
 `settings.guideRevision` 记录已展示的文档修订号：旧用户没有该字段、新安装没有数据，都会在布局就绪后展示一次；普通重载、后续版本和降级不重复展示。只有示例发生值得重新介绍的重大变化时才增加 `GUIDE_REVISION`。不随每次插件版本发布递增。
 

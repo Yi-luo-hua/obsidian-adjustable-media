@@ -6,9 +6,9 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-**0.9.3 已发布**，新增 Excalidraw 布局媒体，以及原生表格右键「包成布局块」入口，将整表包装为文字布局。详见[发布核验](docs/releases/0.9.3-readiness.md)。
+**0.9.4 已发布**，新增网页嵌入布局、网页独立尺寸和组件菜单，并修复打开文档时的编辑器初始化异常。详见[发布核验](docs/releases/0.9.4-readiness.md)。
 
-当前最新发布为 **0.9.3**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
+当前最新发布为 **0.9.4**。文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入；0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
 
 0.9.0 已发布，新增 Canvas 卡片布局、Callout 图片缩放和 Mermaid 右键包装，并修复主题样式导致的把手裁剪、布局正文对齐及库外图片显示。已筛查官方目录全部 901 个主题的主 CSS，并对 57 组样式完成 342 种渲染组合检查。详见[发布核验](docs/releases/0.9.0-readiness.md)。
 

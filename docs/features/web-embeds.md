@@ -1,6 +1,6 @@
 # 外链网页嵌入布局
 
-2026-11-05，针对 [Issue #38](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/38) 开发，尚未公开发布。当前公开版仍为 0.9.3。
+2026-11-05，针对 [Issue #38](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/38) 开发，已随 0.9.4 正式发布，见[发布核验](../releases/0.9.4-readiness.md)。
 
 ## 使用
 

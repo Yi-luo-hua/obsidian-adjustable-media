@@ -4,14 +4,14 @@
 
 ## 版本与交付范围
 
-- **0.9.4 发布准备**：候选分支 `codex/release-0.9.4` 包含网页布局、组件菜单开关和编辑器初始化修复，采用简短中英文更新说明，不接入示例文档。公开版本仍为 0.9.3；见[候选与草稿核验](releases/0.9.4-readiness.md)。
+- **公开版本：0.9.4**，标签源码 `0b14059`，已设为最新版本；558 项检查、生产打包和 CI 通过，公开附件与干净标签构建及已审核草稿一致，来源证明已核对。详见[发布核验](releases/0.9.4-readiness.md)。
 
-- **未发布修复：新文档打开时的 editor 初始化异常**。统一处理宿主 `MarkdownView.editor` getter 在 `editMode` 未就绪时抛错的情况，避免实时预览初始化与窗格来源回退中断。558 项测试、生产构建及 Windows／Obsidian 1.15.0 定向验证通过；尚未在反馈者环境确认恢复，详见[排查与验证记录](archive/2026-11-05-editor-initialization.md)。
+- **0.9.4 已发布修复：新文档打开时的 editor 初始化异常**。统一处理宿主 `MarkdownView.editor` getter 在 `editMode` 未就绪时抛错的情况，避免实时预览初始化与窗格来源回退中断。558 项测试、生产构建及 Windows／Obsidian 1.15.0 定向验证通过；尚未在反馈者环境确认恢复，详见[排查与验证记录](archive/2026-11-05-editor-initialization.md)。
 
-- **未发布开发功能：Issue #38 外链网页布局**。完整多行 iframe 与原生 YouTube／Twitter 嵌入接入 V3，支持并排、独立高度、列宽、把手拖入、环绕和 PDF 链接回退；保留原文、一步撤销及缩放时的 iframe 实例。Windows／默认主题定向实测和 430px 触摸仿真通过，移动真机与完整 PDF 导出未复测，详见[功能与验证记录](features/web-embeds.md)。公开版本继续为 0.9.3。
+- **0.9.4 已发布：Issue #38 外链网页布局**。完整多行 iframe 与原生 YouTube／Twitter 嵌入接入 V3，支持并排、独立高度、列宽、把手拖入、环绕和 PDF 链接回退；保留原文、一步撤销及缩放时的 iframe 实例。Windows／默认主题定向实测和 430px 触摸仿真通过，移动真机与完整 PDF 导出未复测，详见[功能与验证记录](features/web-embeds.md)。组件菜单支持点击打开、再次点击或点击外部关闭。
 
-- **公开版本：0.9.3**，标签源码 `eeba209`，已设为最新版本；三份公开附件与干净标签构建逐字节一致，摘要及来源证明已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.3)和[发布核验](releases/0.9.3-readiness.md)。
-- **main：已包含 0.9.3 发布代码**。`ed83461` 修复转换布局后的源码展开、光标定位和同行图片误包文字；保留 0.9.1 的缩进续行与图文块缩放修复。
+- **历史版本：0.9.3**，标签源码 `eeba209`，已设为最新版本；三份公开附件与干净标签构建逐字节一致，摘要及来源证明已核对，详见 [Release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/tag/0.9.3)和[发布核验](releases/0.9.3-readiness.md)。
+- **main：已包含 0.9.4 发布代码**。`ed83461` 修复转换布局后的源码展开、光标定位和同行图片误包文字；保留 0.9.1 的缩进续行与图文块缩放修复。
 - **表格适配已回退**：以 `2bba25b` 检查点为基础，仅保留原生表格右键「包成布局块」，生成原有文字布局块；撤回独立表格媒体、整表缩放和专属操作，Excalidraw 支持保留。详见[表格右键包装](features/tables.md)。
 - **0.9.3 已发布：Issue #36 Excalidraw 布局媒体**。支持多图／图文并排、环绕、调宽、图注、把手拖入及原图保存后的预览更新；修复显式文字块内的空白显示路径。Windows 定向验证通过，详见 [功能与验证记录](features/excalidraw.md)。同时发布原生表格右键文字包装入口。
 - 0.9.3 的 534 项测试、生产打包、main／标签 CI 和 Release 工作流通过。Windows／Obsidian API 1.14.5／Excalidraw 2.29.0 已验证相关功能；本轮发布核对中英文更新弹窗、从 0.9.2 升级与同版重载，68 份笔记 SHA-256 不变。macOS、移动设备、其他主题、旧版 Obsidian 及完整 PDF 导出未复测。
