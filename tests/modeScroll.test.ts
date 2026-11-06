@@ -5,7 +5,8 @@ import * as format from "../src/format/v2.ts";
 
 async function harness() {
   const frames = new Map<number, () => void>(), events = new Map<string, Set<() => void>>();
-  let id = 0, mutation = (): void => {}, nativeScrolled = (): void => {};
+  let id = 0, parses = 0, mutation = (): void => {}, nativeScrolled = (): void => {};
+  const workspaceEvents = new Map<string, (...args: unknown[]) => void>();
   class Observer {
     constructor(callback: () => void) { mutation = callback; }
     observe() {} disconnect() {}
@@ -18,11 +19,13 @@ async function harness() {
     removeEventListener(name: string, callback: () => void) { events.get(name)?.delete(callback); } };
   const surface = (base: number) => {
     const scroller = { scrollTop: 0, getBoundingClientRect: () => ({ top: 0, bottom: 600 }) };
-    const node = { data: "Unique visible text anchor", get length() { return this.data.length; },
+    let node = { data: "Unique visible text anchor", isConnected: true, get length() { return this.data.length; },
       get textContent() { return this.data; }, parentElement: { closest: () => null }, ownerDocument: {} };
-    const result = { base, scroller, root: { clientWidth: 700, doc: {} } };
+    const child = { matches: () => false, getBoundingClientRect: () => ({ top: result.base - scroller.scrollTop, bottom: result.base - scroller.scrollTop + 24 }) };
+    const result = { base, scroller, walks: 0, root: { clientWidth: 700, doc: {}, children: [child], contains: (candidate: unknown) => candidate === node },
+      replaceNode() { node.isConnected = false; node = { ...node, isConnected: true, get length() { return this.data.length; }, get textContent() { return this.data; } }; } };
     const doc = {
-      createTreeWalker() { let read = false; return { nextNode: () => read ? null : (read = true, node) }; },
+      createTreeWalker() { result.walks++; let read = false; return { nextNode: () => read ? null : (read = true, node) }; },
       createRange() { return { setStart() {}, setEnd() {}, getBoundingClientRect: () => ({ top: result.base - scroller.scrollTop }) }; },
     };
     node.ownerDocument = doc; result.root.doc = doc;
@@ -42,9 +45,11 @@ async function harness() {
     setEphemeralState(state: unknown) { this.hints.push(state); }
   }
   const view = new View(), cleanups: Array<() => void> = [];
-  const workspace = { getLeavesOfType: () => [{ view }], on: () => undefined, onLayoutReady: (callback: () => void) => callback() };
+  const workspace = { getLeavesOfType: () => [{ view }],
+    on: (name: string, callback: (...args: unknown[]) => void) => workspaceEvents.set(name, callback),
+    onLayoutReady: (callback: () => void) => callback() };
   const module = await mockedModule<{ registerModeScroll: (plugin: unknown) => void }>(new URL("../src/view/modeScroll.ts", import.meta.url), {
-    obsidian: { MarkdownView: View }, "../format/v2.ts": format, "./obsidianInternals.ts": {
+    obsidian: { MarkdownView: View }, "../format/v2.ts": { ...format, findV2Blocks: (lines: string[]) => { parses++; return format.findV2Blocks(lines); } }, "./obsidianInternals.ts": {
       scrollReadingToLine: () => false, afterReadingScroll: (_view: unknown, callback: () => void) => { nativeScrolled = callback; return () => {}; },
     },
   }, { NodeFilter: { SHOW_TEXT: 4 } });
@@ -52,7 +57,8 @@ async function harness() {
   const frame = (): void => { const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach(callback => callback()); };
   const event = (name: string): void => { for (const callback of events.get(name) ?? []) callback(); };
   frame();
-  return { view, source, reading, frame, event, mutate: () => mutation(), nativeScroll: () => nativeScrolled(),
+  return { view, source, reading, frame, event, mutate: () => mutation(), nativeScroll: () => nativeScrolled(), parses: () => parses,
+    workspaceEvent: (name: string, ...args: unknown[]) => workspaceEvents.get(name)?.(...args),
     stop() { cleanups.forEach(callback => callback()); }, events };
 }
 
@@ -62,6 +68,42 @@ test("mode switches preserve visible text offset and settle later rendering chan
   assert.equal(h.reading.scroller.scrollTop, 180);
   h.reading.base = 360; h.mutate(); h.frame();
   assert.equal(h.reading.scroller.scrollTop, 240);
+  h.stop();
+});
+
+test("capture skips offscreen blocks and repeated corrections reuse their connected text node", async () => {
+  const h = await harness();
+  for (let i = 0; i < 100; i++) h.source.root.children.push({ matches: () => false, getBoundingClientRect: () => ({ top: 10000 + i * 24, bottom: 10024 + i * 24 }) });
+  const initial = h.source.walks;
+  h.event("wheel"); h.frame();
+  assert.equal(h.source.walks - initial, 1, "capture walks only the visible block");
+  h.view.mode = "preview"; h.mutate(); h.frame();
+  const readingWalks = h.reading.walks;
+  for (let i = 0; i < 20; i++) { h.reading.base += 1; h.mutate(); h.frame(); }
+  assert.equal(h.reading.walks, readingWalks);
+  h.view.mode = "source"; h.mutate(); h.frame();
+  assert.equal(h.source.walks, initial + 1, "returning to unchanged DOM reuses the captured target");
+  h.stop();
+});
+
+test("replaced text nodes invalidate the fast target without losing the viewport anchor", async () => {
+  const h = await harness();
+  h.view.mode = "preview"; h.mutate(); h.frame();
+  const walks = h.reading.walks;
+  h.reading.replaceNode(); h.reading.base += 40;
+  h.mutate(); h.frame();
+  assert.equal(h.reading.walks, walks + 1);
+  assert.equal(h.reading.scroller.scrollTop, 220);
+  h.stop();
+});
+
+test("layout-only notifications do not reparse unchanged note contents", async () => {
+  const h = await harness(), initial = h.parses();
+  for (let i = 0; i < 20; i++) h.workspaceEvent("layout-change");
+  assert.equal(h.parses(), initial);
+  h.view.text += "\nNew paragraph";
+  h.workspaceEvent("editor-change", undefined, h.view); h.frame();
+  assert.equal(h.parses(), initial + 1);
   h.stop();
 });
 

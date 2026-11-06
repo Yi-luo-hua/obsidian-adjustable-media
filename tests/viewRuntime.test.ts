@@ -6,6 +6,32 @@ import * as projections from "../src/layout/viewProjection.ts";
 import * as textColumns from "../src/markdown/textColumns.ts";
 import { mockedModule } from "./support/mockedModule.ts";
 
+test("hidden mode surfaces retain their last usable environment until real width or typography changes", async () => {
+  const frames = new Map<number, () => void>(), observers: Array<() => void> = [], fonts = new Map<string, () => void>();
+  let sequence = 0, environments = 0;
+  class Observer { constructor(callback: () => void) { observers.push(callback); } observe() {} disconnect() {} }
+  const win = { HTMLImageElement: class {}, HTMLVideoElement: class {}, ResizeObserver: Observer, MutationObserver: Observer,
+    devicePixelRatio: 1, getComputedStyle: () => ({ fontSize: "16px" }),
+    requestAnimationFrame(callback: () => void) { frames.set(++sequence, callback); return sequence; },
+    cancelAnimationFrame(id: number) { frames.delete(id); }, addEventListener() {}, removeEventListener() {} };
+  const el = { win, doc: { body: { className: "theme-light" }, documentElement: { className: "" }, fonts: {
+    addEventListener(name: string, callback: () => void) { fonts.set(name, callback); }, removeEventListener() {},
+  } }, clientWidth: 0, isConnected: true, addEventListener() {}, removeEventListener() {} };
+  const module = await mockedModule<{ watchEnvironment(el: unknown, changed: () => void): () => void }>(new URL("../src/view/viewEnvironment.ts", import.meta.url), {});
+  const stop = module.watchEnvironment(el, () => environments++);
+  const flush = () => { const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach(callback => callback()); };
+  const resize = (width: number) => { el.clientWidth = width; observers.forEach(callback => callback()); flush(); };
+  flush(); assert.equal(environments, 0);
+  resize(720); assert.equal(environments, 1);
+  for (let index = 0; index < 10; index++) { resize(0); resize(720); }
+  assert.equal(environments, 1);
+  resize(0); el.doc.body.className = "theme-dark"; fonts.get("loadingdone")!(); flush();
+  assert.equal(environments, 1);
+  resize(720); assert.equal(environments, 2);
+  resize(430); assert.equal(environments, 3);
+  stop();
+});
+
 test("media completion requests local measurements without changing the pane environment", async () => {
   const listeners = new Map<string, (event: { target: object }) => void>();
   const frames = new Map<number, () => void>();

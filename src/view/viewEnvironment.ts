@@ -25,7 +25,8 @@ export function watchEnvironment(el: HTMLElement, changed: (signature: string) =
   const seen = new WeakMap<HTMLImageElement | HTMLVideoElement, string>();
   const read = (): void => {
     frame = 0;
-    if (stopped || !el.isConnected) return;
+    // Switching native modes hides one surface. Its zero width is not a new layout environment.
+    if (stopped || !el.isConnected || el.clientWidth === 0) return;
     const style = win.getComputedStyle(el);
     const next = JSON.stringify([el.clientWidth, style.fontFamily, style.fontSize, style.lineHeight,
       style.fontWeight, style.letterSpacing, style.direction, win.devicePixelRatio,

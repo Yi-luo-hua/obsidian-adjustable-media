@@ -4,6 +4,7 @@ import { afterReadingScroll, scrollReadingToLine } from "./obsidianInternals.ts"
 
 interface Anchor { quote: string; offset: number; text: string; line: number }
 const ignored = ".mod-ui, .vml-layout, .vml-rv-proxy, .vml-wrap-proxy, .cm-formatting, .list-bullet, .list-collapse-indicator";
+const targets = new WeakMap<HTMLElement, { quote: string; node: Text; at: number; value: string }>();
 
 function surface(view: MarkdownView): { root: HTMLElement; scroller: HTMLElement } | null {
   const root = view.getMode() === "source" ? view.contentEl.querySelector<HTMLElement>(".cm-content")
@@ -13,10 +14,18 @@ function surface(view: MarkdownView): { root: HTMLElement; scroller: HTMLElement
   return root && scroller ? { root, scroller } : null;
 }
 
-function textNodes(root: HTMLElement): Text[] {
-  const walker = root.doc.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes: Text[] = [];
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    if (node.textContent?.trim() && !node.parentElement?.closest(ignored)) nodes.push(node as Text);
+function textNodes(root: HTMLElement, viewport?: DOMRect): Text[] {
+  const roots = viewport ? Array.from(root.children).filter(el => {
+    if (el.matches(ignored)) return false;
+    const rect = el.getBoundingClientRect();
+    return rect.bottom >= viewport.top && rect.top <= viewport.bottom;
+  }) : [root];
+  const nodes: Text[] = [];
+  for (const part of roots) {
+    const walker = root.doc.createTreeWalker(part, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.textContent?.trim() && !node.parentElement?.closest(ignored)) nodes.push(node as Text);
+    }
   }
   return nodes;
 }
@@ -34,11 +43,14 @@ function capture(view: MarkdownView): Anchor | null {
   const text = view.getViewData();
   const viewport = own.scroller.getBoundingClientRect();
   let best: Anchor | null = null, distance = Number.POSITIVE_INFINITY;
-  for (const node of textNodes(own.root)) {
+  for (const node of textNodes(own.root, viewport)) {
     const value = node.data;
-    if (characterTop(node, value.length - 1) < viewport.top) continue;
+    const last = characterTop(node, value.length - 1);
+    if (last < viewport.top) continue;
+    const first = value.length === 1 ? last : characterTop(node, 0);
+    if (first > viewport.bottom || first >= viewport.top + distance) continue;
     let from = 0, to = value.length - 1;
-    while (from < to) {
+    while (first < viewport.top && from < to) {
       const mid = Math.floor((from + to) / 2);
       if (characterTop(node, mid) < viewport.top) from = mid + 1;
       else to = mid;
@@ -48,10 +60,12 @@ function capture(view: MarkdownView): Anchor | null {
     if (!quote) continue;
     const position = text.indexOf(quote);
     if (position < 0 || text.indexOf(quote, position + 1) >= 0) continue;
-    const top = characterTop(node, from + part.indexOf(quote));
+    const at = from + part.indexOf(quote);
+    const top = at === 0 ? first : characterTop(node, at);
     if (top < viewport.top || top > viewport.bottom || top - viewport.top >= distance) continue;
     distance = top - viewport.top;
     best = { quote, offset: distance, text, line: text.slice(0, position).split("\n").length - 1 };
+    targets.set(own.root, { quote, node, at, value });
   }
   return best;
 }
@@ -59,15 +73,23 @@ function capture(view: MarkdownView): Anchor | null {
 function restore(view: MarkdownView, anchor: Anchor): boolean {
   const own = surface(view);
   if (!own || own.root.clientWidth === 0 || view.getViewData() !== anchor.text) return false;
+  const move = (node: Text, at: number): boolean => {
+    const delta = characterTop(node, at) - own.scroller.getBoundingClientRect().top - anchor.offset;
+    if (Math.abs(delta) > 0.5) own.scroller.scrollTop += delta;
+    return true;
+  };
+  const target = targets.get(own.root);
+  if (target?.quote === anchor.quote && target.node.isConnected && own.root.contains(target.node) && target.node.data === target.value) {
+    return move(target.node, target.at);
+  }
   const nodes = textNodes(own.root), text = nodes.map(node => node.data).join("");
   const at = text.indexOf(anchor.quote);
   if (at < 0 || text.indexOf(anchor.quote, at + 1) >= 0) return false;
   let offset = at;
   for (const node of nodes) {
     if (offset >= node.length) { offset -= node.length; continue; }
-    const delta = characterTop(node, offset) - own.scroller.getBoundingClientRect().top - anchor.offset;
-    if (Math.abs(delta) > 0.5) own.scroller.scrollTop += delta;
-    return true;
+    targets.set(own.root, { quote: anchor.quote, node, at: offset, value: node.data });
+    return move(node, offset);
   }
   return false;
 }
@@ -75,16 +97,23 @@ function restore(view: MarkdownView, anchor: Anchor): boolean {
 /** Keep the same text at the same screen height while the two native modes finish rendering. */
 export function registerModeScroll(plugin: Plugin): void {
   const panes = new Map<MarkdownView, { file: MarkdownView["file"]; update: () => void; stop: () => void }>();
+  const documents = new WeakMap<MarkdownView, { file: MarkdownView["file"]; text: string; enabled: boolean }>();
+  const enabled = (view: MarkdownView): boolean => {
+    const text = view.getViewData(), previous = documents.get(view);
+    if (previous?.file === view.file && previous.text === text) return previous.enabled;
+    const value = text.includes("<!-- vml") && findV2Blocks(text.split("\n")).some(isDrawable);
+    documents.set(view, { file: view.file, text, enabled: value });
+    return value;
+  };
   const refresh = (): void => {
     const views = new Set(plugin.app.workspace.getLeavesOfType("markdown").map(leaf => leaf.view)
       .filter((view): view is MarkdownView => view instanceof MarkdownView));
     for (const [view, pane] of panes) {
-      if (!views.has(view) || view.file !== pane.file || !findV2Blocks(view.getViewData().split("\n")).some(isDrawable)) { pane.stop(); panes.delete(view); }
+      if (!views.has(view) || view.file !== pane.file || !enabled(view)) { pane.stop(); panes.delete(view); }
     }
     for (const view of views) {
       if (panes.has(view) || !view.file) continue;
-      const text = view.getViewData();
-      if (!text.includes("<!-- vml") || !findV2Blocks(text.split("\n")).some(isDrawable)) continue;
+      if (!enabled(view)) continue;
       const win = view.containerEl.win;
       view.previewMode.containerEl.addClass("vml-reading-parity");
       let mode = view.getMode(), anchor: Anchor | null = null, pending: Anchor | null = null, frame = 0, hinted = false;
