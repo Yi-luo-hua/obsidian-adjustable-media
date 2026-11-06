@@ -1325,6 +1325,25 @@ body.vml-is-dragging * {
   color: var(--list-marker-color);
 }
 
+/* Outside markers attach to the row's box, so position ordinals at the measured text prefix instead. */
+.vml-rv-list-numbered {
+  list-style-type: none;
+}
+
+.vml-rv-list-numbered::before {
+  content: counter(list-item) var(--vml-list-number-suffix);
+  position: absolute;
+  inset-inline-start: calc(var(--vml-list-inset) + var(--vml-list-number-end));
+  top: 0;
+  transform: translateX(-100%);
+  color: var(--list-marker-color);
+  font-weight: normal;
+}
+
+.vml-rv-list-numbered--quoted::before {
+  color: inherit;
+}
+
 .markdown-rendered .vml-rv-list-row > .list-bullet {
   margin-inline-start: var(--vml-list-bullet-offset, -0.8em);
 }

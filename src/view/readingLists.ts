@@ -2,6 +2,7 @@ import { listPrefix } from "../markdown/listPrefix.ts";
 import { alignListWhitespace } from "./readingParagraphs.ts";
 
 interface PreparedList { rows: HTMLElement[]; users: number; cleanups: Array<() => void> }
+interface PrefixMetrics { inset: number; bullet: number | null; number: { end: number; suffix: string; quoted: boolean } | null }
 const prepared = new WeakMap<HTMLElement, PreparedList>();
 
 /** Let each list paragraph avoid floats separately, without replacing its native content or controls. */
@@ -13,13 +14,13 @@ export function wrapReadingLists(section: HTMLElement, collapse?: (event: MouseE
     if (previous) { previous.users++; continue; }
     const rows: HTMLElement[] = [];
     const cleanups: Array<() => void> = [];
-    const widths = new Map<string, { inset: number; bullet: number | null }>();
+    const widths = new Map<string, PrefixMetrics>();
     const measure: { el: HTMLElement | null } = { el: null };
     const inherited = source ? getComputedStyle(source.host) : null;
-    const editorInset = (item: HTMLElement, fallback: number): { inset: number; bullet: number | null } => {
+    const editorInset = (item: HTMLElement, fallback: number): PrefixMetrics => {
       const relative = Number(item.getAttribute("data-line"));
       const prefix = source && item.hasAttribute("data-line") ? listPrefix(source.lines[source.from + relative] ?? "", source.tabSize) : null;
-      if (!prefix) return { inset: fallback, bullet: null };
+      if (!prefix) return { inset: fallback, bullet: null, number: null };
       const key = JSON.stringify(prefix);
       const known = widths.get(key);
       if (known !== undefined) return known;
@@ -42,19 +43,22 @@ export function wrapReadingLists(section: HTMLElement, collapse?: (event: MouseE
       // Preserve prefix spaces even while Obsidian is still installing this plugin's stylesheet.
       line.appendText("\u00a0".repeat(prefix.spaces));
       const format = line.createSpan({ cls: prefix.quoted ? "cm-quote-1" : `cm-formatting cm-formatting-list cm-formatting-list-${/^\d/.test(prefix.marker) ? "ol" : "ul"}` });
+      let number: HTMLElement | null = null;
       if (prefix.task) format.createEl("label", { cls: "task-list-label" }).createEl("input", { cls: "task-list-item-checkbox", type: "checkbox" });
-      else if (prefix.quoted || /^\d/.test(prefix.marker)) format.appendText(prefix.marker);
+      else if (/^\d/.test(prefix.marker)) number = format.createSpan({ cls: "vml-list-number-measure", text: prefix.marker });
+      else if (prefix.quoted) format.appendText(prefix.marker);
       else format.createSpan({ cls: "list-bullet", text: prefix.marker });
       format.appendText("\u00a0");
       const range = section.doc.createRange();
       range.selectNodeContents(line);
       const rect = range.getBoundingClientRect(), fontSize = parseFloat(getComputedStyle(line).fontSize);
       const bullet = format.querySelector<HTMLElement>(".list-bullet")?.getBoundingClientRect();
-      const measured = { inset: rect.width / fontSize, bullet: bullet ? (bullet.left + bullet.width / 2 - rect.right) / fontSize : null };
+      const measured = { inset: rect.width / fontSize, bullet: bullet ? (bullet.left + bullet.width / 2 - rect.right) / fontSize : null,
+        number: number ? { end: (number.getBoundingClientRect().right - rect.right) / fontSize, suffix: prefix.marker.slice(-1), quoted: !!prefix.quoted } : null };
       widths.set(key, measured); line.remove();
       return measured;
     };
-    const plans: Array<{ item: HTMLElement; inset: number; bullet: number | null; marker: string; ordinal: number }> = [];
+    const plans: Array<PrefixMetrics & { item: HTMLElement; marker: string; ordinal: number }> = [];
     const visit = (list: HTMLElement, inset: number): void => {
       const style = getComputedStyle(list);
       const padding = (parseFloat(style.paddingInlineStart) || 0) / (parseFloat(style.fontSize) || parseFloat(inherited?.fontSize ?? "16"));
@@ -87,7 +91,7 @@ export function wrapReadingLists(section: HTMLElement, collapse?: (event: MouseE
     // Measure native indentation before installing the classes that move it into the rows.
     visit(root, 0);
     measure.el?.remove();
-    for (const { item, inset, bullet, marker, ordinal } of plans) {
+    for (const { item, inset, bullet, number, marker, ordinal } of plans) {
       let row: HTMLElement | null = null;
       let first = true;
       for (const node of Array.from(item.childNodes)) {
@@ -97,6 +101,11 @@ export function wrapReadingLists(section: HTMLElement, collapse?: (event: MouseE
           row = item.createDiv({ cls: "vml-rv-list-row" });
           row.setCssProps({ "--vml-list-inset": `${inset}em`, "--vml-list-type": first ? marker : "none", "--vml-list-ordinal": String(ordinal) });
           if (bullet !== null) row.setCssProps({ "--vml-list-bullet-offset": `${bullet}em` });
+          if (first && number) {
+            row.addClass("vml-rv-list-numbered");
+            if (number.quoted) row.addClass("vml-rv-list-numbered--quoted");
+            row.setCssProps({ "--vml-list-number-end": `${number.end}em`, "--vml-list-number-suffix": JSON.stringify(number.suffix) });
+          }
           item.insertBefore(row, node);
           rows.push(row);
           first = false;

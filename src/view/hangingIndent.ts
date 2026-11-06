@@ -72,7 +72,7 @@ export const hangingIndent = ViewPlugin.fromClass(class extends HangingIndent {
   constructor(view: EditorView) { super(view); }
 }, { decorations: (plugin) => plugin.decorations });
 
-/** The host rounds and caches hanging indents; use the actual prefix for layout-note list continuations. */
+/** Use the actual prefix width for layout-note list and quote continuations. */
 export function nativeListHanging(enabled: (view: EditorView) => boolean): Extension {
   return ViewPlugin.fromClass(class extends HangingIndent {
     constructor(view: EditorView) { super(view, true, enabled); }
@@ -88,7 +88,7 @@ function markerWidths(view: EditorView, nativeLists = false): Map<number, number
       const line = doc.lineAt(pos);
       if (nativeLists) {
         const { node } = view.domAtPos(line.from);
-        const el = (node.instanceOf(HTMLElement) ? node : node.parentElement)?.closest(".HyperMD-list-line");
+        const el = (node.instanceOf(HTMLElement) ? node : node.parentElement)?.closest(".HyperMD-list-line, .HyperMD-quote");
         if (!el) { pos = line.to + 1; continue; }
       }
       const prefix = hangingPrefix(line.text);

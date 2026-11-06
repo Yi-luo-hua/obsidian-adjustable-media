@@ -23,9 +23,9 @@ class Dom {
   get data(): string { return this.value; }
   set data(value: string) { this.value = value; }
   querySelector(selector: string): Dom | null { return this.children.find(child => child.hasClass(selector.slice(1))) ?? null; }
-  getBoundingClientRect(): { left: number; width: number } {
+  getBoundingClientRect(): { left: number; width: number; right: number } {
     const left = this.parentElement ? this.parentElement.getBoundingClientRect().left + this.parentElement.childNodes.slice(0, this.parentElement.childNodes.indexOf(this)).reduce((sum, child) => sum + measuredWidth(child), 0) : 0;
-    return { left, width: measuredWidth(this) };
+    return { left, width: measuredWidth(this), right: left + measuredWidth(this) };
   }
   hasAttribute(name: string): boolean { return name in this.attributes; }
   getAttribute(name: string): string | null { return this.attributes[name] ?? null; }
@@ -106,6 +106,22 @@ test("ordered starts, reversed lists and explicit item values keep their display
   const root = new Dom("OL", ...items); root.attributes = { start: "7", reversed: "" }; items[1].attributes.value = "3";
   wrapReadingLists(new Dom("DIV", root));
   assert.deepEqual(items.map(item => item.children[0].props["--vml-list-ordinal"]), ["7", "3", "2"]);
+});
+
+test("ordered markers keep their measured end beside text for quoted and multi-digit prefixes", async () => {
+  const { wrapReadingLists } = await load();
+  for (const [line, ordinal, quoted, suffix] of [["> 1. First", 1, true, "."], ["12) Twelfth", 12, false, ")"]] as const) {
+    const item = new Dom("LI", text("Content")); item.attributes["data-line"] = "0";
+    const root = new Dom("OL", item); root.attributes.start = String(ordinal);
+    const section = new Dom("DIV", root), stop = wrapReadingLists(section, undefined, { lines: [line], from: 0, tabSize: 4, host: section });
+    const row = item.children[0];
+    assert.equal(row.hasClass("vml-rv-list-numbered"), true);
+    assert.equal(row.hasClass("vml-rv-list-numbered--quoted"), quoted);
+    assert.equal(row.props["--vml-list-number-end"], "-0.25em");
+    assert.equal(row.props["--vml-list-number-suffix"], JSON.stringify(suffix));
+    assert.equal(row.props["--vml-list-ordinal"], String(ordinal));
+    stop(); assert.equal(item.children.length, 0);
+  }
 });
 
 test("reprocessing a retained list does not double-wrap it or let an old lifecycle remove its rows", async () => {
