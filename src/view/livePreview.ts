@@ -409,12 +409,12 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
 
   // The note's text keeps reading view's paragraph spacing, which is what it lies on there and in the
   // PDF (paragraphBreaks); blank runs anywhere retain each authored line's height.
-  for (const { line, kind } of parsed.breaks) {
+  for (const { line, kind, size } of parsed.breaks) {
     if (floatGaps.has(line) || line >= state.doc.lines) {
       continue;
     }
     const { from } = state.doc.line(line + 1);
-    const cls = kind === "after" ? "vml-break-after" : "vml-break";
+    const cls = (kind === "after" ? "vml-break-after" : "vml-break") + (size === "rule" ? " vml-break-rule" : "");
     ranges.push(Decoration.line({ class: cls }).range(from));
   }
 

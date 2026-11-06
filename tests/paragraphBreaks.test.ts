@@ -105,9 +105,17 @@ test("a blank between a rule and a heading uses paragraph spacing in both parser
   assert.deepEqual(lines(hostParagraphBreaks(text, [], [{ type: "thematicBreak", from: 0, to: 0 }, { type: "heading", from: 2, to: 2 }])), ["1:blank"]);
 });
 
+test("rule margins use two rem, with authored extra blank lines retaining paragraph spacing", () => {
+  const text = ["Body", "", "", "", "---", "", "After"];
+  const expected = [{ line: 1, kind: "blank", size: "rule" }, { line: 2, kind: "blank" }, { line: 3, kind: "blank" }, { line: 5, kind: "blank", size: "rule" }];
+  assert.deepEqual(paragraphBreaks(text, []), expected);
+  assert.deepEqual(hostParagraphBreaks(text, [], [{ type: "paragraph", from: 0, to: 0 }, { type: "thematicBreak", from: 4, to: 4 }, { type: "paragraph", from: 6, to: 6 }]), expected);
+  assert.deepEqual(paragraphBreaks(["Title", "---", "", "After"], []), [{ line: 2, kind: "blank" }]);
+});
+
 test("a heading followed right away by text gets the break below it", () => {
   const text = ["## Heading", "Text.", "# Title", "Text.", "### Next", "#### Sub", "- item", "## Last", "<!-- vml -->", "x", "<!-- /vml -->"];
-  assert.deepEqual(lines(paragraphBreaks(text, [{ openLine: 8, closeLine: 10, floats: false }])), ["0:after", "5:after"]);
+  assert.deepEqual(lines(paragraphBreaks(text, [{ openLine: 8, closeLine: 10, floats: false }])), ["0:after", "2:after", "5:after"]);
 });
 
 test("text right above and below a float is parted by a break below the text above", () => {

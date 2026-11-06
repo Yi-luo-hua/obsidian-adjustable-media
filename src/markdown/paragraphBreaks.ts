@@ -11,6 +11,7 @@ export interface ParagraphBreak {
   /** 0-based line. */
   line: number;
   kind: "blank" | "after";
+  size?: "rule";
 }
 
 export interface BreakBlock {
@@ -56,6 +57,7 @@ export function hostParagraphBreaks(lines: readonly string[], blocks: readonly B
   const layout = new Uint8Array(lines.length);
   for (const block of blocks) layout.fill(1, block.openLine, block.closeLine + 1);
   const breaks = new Map<number, ParagraphBreak["kind"]>();
+  const ruleGaps = new Set<number>();
   const add = (line: number, kind: ParagraphBreak["kind"]): void => {
     if (line >= 0 && line < lines.length && !layout[line] && !breaks.has(line)) breaks.set(line, kind);
   };
@@ -71,6 +73,8 @@ export function hostParagraphBreaks(lines: readonly string[], blocks: readonly B
     const start = line;
     while (line + 1 < lines.length && owner[line + 1] === -1 && !layout[line + 1] && lines[line + 1].trim() === "") line++;
     if (headingAt(line + 1) === 0 || sections[owner[start - 1]]?.type === "thematicBreak") add(start, "blank");
+    if (sections[owner[line + 1]]?.type === "thematicBreak"
+      || (sections[owner[start - 1]]?.type === "thematicBreak" && headingAt(line + 1) === 0)) ruleGaps.add(start);
     for (let extra = start + 1; extra <= line; extra++) add(extra, "blank");
   }
   for (let index = 1; index < sections.length; index++) {
@@ -88,8 +92,9 @@ export function hostParagraphBreaks(lines: readonly string[], blocks: readonly B
     // Comments and frontmatter do not draw paragraph boxes. Their surrounding whitespace keeps
     // the existing policy; drawn code/math blocks retain their own editor height.
     if (["html", "comment", "yaml"].includes(before.type) || ["html", "comment", "yaml"].includes(after.type)) continue;
-    if (sectionHeadingLevel(lines, after) > 0 || sectionHeadingLevel(lines, before) === 1) continue;
+    if (sectionHeadingLevel(lines, after) > 0) continue;
     add(before.to, "after");
+    if (before.type === "thematicBreak" || after.type === "thematicBreak") ruleGaps.add(before.to);
   }
   for (const block of blocks) {
     const above = block.openLine - 1;
@@ -98,7 +103,7 @@ export function hostParagraphBreaks(lines: readonly string[], blocks: readonly B
       && owner[line] >= 0 && !["code", "math", "html", "comment", "yaml", "definition"].includes(sections[owner[line]].type);
     if (block.floats && body(above) && body(below)) add(above, "after");
   }
-  return Array.from(breaks, ([line, kind]) => ({ line, kind })).sort((a, b) => a.line - b.line);
+  return Array.from(breaks, ([line, kind]): ParagraphBreak => ruleGaps.has(line) ? { line, kind, size: "rule" } : { line, kind }).sort((a, b) => a.line - b.line);
 }
 
 const HEADING = /^ {0,3}(#{1,6})(?:\s|$)/;
@@ -133,6 +138,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
   const blank = (line: number): boolean => text(line) && code[line] !== 1 && (lines[line] ?? "").trim() === "";
   const filled = (line: number): boolean => text(line) && (lines[line] ?? "").trim() !== "";
   const breaks: ParagraphBreak[] = [];
+  const ruleGaps = new Set<number>();
   const taken = new Set<number>();
   const add = (line: number, kind: ParagraphBreak["kind"]): void => {
     if (!taken.has(line)) {
@@ -151,7 +157,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
       if (listContents && code[line] !== 1 && /^[ \t]*>/.test(lines[line]) && code[line + 1] === 1) add(line, "after");
       // A heading below which the text goes on right away.
       const level = headingLevel(lines[line]);
-      if (level >= 2 && filled(line + 1) && headingLevel(lines[line + 1]) === 0 && !opens.has(line + 1)) {
+      if (level >= 1 && filled(line + 1) && headingLevel(lines[line + 1]) === 0 && !opens.has(line + 1)) {
         add(line, "after");
       }
       continue;
@@ -166,6 +172,9 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     if (headingLevel(lines[end + 1]) === 0 || THEMATIC_BREAK.test((lines[line - 1] ?? "").trim())) {
       add(line, "blank");
     }
+    if ((contexts[end + 1] === "text" && THEMATIC_BREAK.test((lines[end + 1] ?? "").trim()))
+      || (contexts[line - 1] === "text" && THEMATIC_BREAK.test((lines[line - 1] ?? "").trim())
+        && !(line > 1 && filled(line - 2) && /^-/.test(lines[line - 1].trim())) && headingLevel(lines[end + 1]) === 0)) ruleGaps.add(line);
     for (let extra = line + 1; extra <= end; extra += 1) {
       add(extra, "blank");
     }
@@ -185,7 +194,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
       add(above, "after");
     }
   }
-  return breaks.sort((a, b) => a.line - b.line);
+  return breaks.map((gap): ParagraphBreak => ruleGaps.has(gap.line) ? { ...gap, size: "rule" } : gap).sort((a, b) => a.line - b.line);
 }
 
 const LIST_ITEM = /^([ \t]*)(?:([-*+])|(\d{1,9})([.)]))([ \t]*)/;

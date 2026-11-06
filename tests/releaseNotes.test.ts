@@ -52,6 +52,7 @@ for (const scenario of [
       "./src/view/plainDrag.ts": { plainMediaDrag: () => [] },
       "./src/view/plainWebEmbeds.ts": { plainWebEmbeds: () => [] },
       "./src/view/readingView.ts": { registerReadingView: () => {} },
+      "./src/view/modeScroll.ts": { registerModeScroll: () => {} },
       "./src/guide/guideModal.ts": { GuideModal: Guide },
       "./src/guide/state.ts": { GUIDE_REVISION, shouldShowGuide },
       "./src/guide/releaseModal.ts": { ReleaseNotesModal: Updates },

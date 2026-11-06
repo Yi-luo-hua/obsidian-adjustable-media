@@ -30,6 +30,7 @@ type Listener = (...args: unknown[]) => void;
 class RenderChild {
   cleanups: Array<() => void> = [];
   register(cleanup: () => void): void { this.cleanups.push(cleanup); }
+  unload(): void { const cleanups = this.cleanups.splice(0); for (const cleanup of cleanups) cleanup(); }
 }
 
 class FileStub { path = "note.md"; }
@@ -41,6 +42,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
   let hostText = initialText;
   let diskText = initialDiskText;
   let rerenders = 0;
+  let mode = "preview";
   const renders: string[] = [];
   const renderedRows: Array<Array<number | null>> = [];
   let processor: PostProcessor;
@@ -54,7 +56,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     constructor() { super(); trackedProjections.push(this); }
   }
   const sections: Array<{ el: ElementStub; computed: boolean; rendered: boolean }> = [];
-  const counts = { observers: 0, environments: 0, scrollListeners: 0, sectionLookups: 0, classWrites: 0, remeasurements: 0 };
+  const counts = { observers: 0, environments: 0, scrollListeners: 0, sectionLookups: 0, classWrites: 0, remeasurements: 0, activeWraps: 0 };
   let scroll = (): void => {};
   let mutation = (): void => {};
   class ObserverStub {
@@ -77,7 +79,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     addEventListener(name: string, callback: () => void) { if (name === "scroll") { counts.scrollListeners++; scroll = callback; } },
     removeEventListener() {} };
   const reader = Object.assign(new ViewStub(), { file, containerEl: container,
-    getMode: () => "preview", getViewData: () => hostText,
+    getMode: () => mode, getViewData: () => hostText,
     previewMode: { containerEl: container, rerender() { rerenders++; } } });
   const sourceView = Object.assign(new ViewStub(), { file, getMode: () => "source",
     editor: { getValue: () => diskText } });
@@ -110,10 +112,13 @@ export async function readingViewHarness(initialText: string, startup = true, in
     "./crossrefView.ts": { refContextOf: () => undefined },
     "./messages.ts": { blockWarning: () => undefined },
     "./noteText.ts": { sectionNoteText: (_app: unknown, _ctx: unknown, info: { text: string }) => info.text },
-    "./obsidianInternals.ts": { readingViewOfSection: () => reader, remeasureSections() { counts.remeasurements++; },
+    "./obsidianInternals.ts": { keepReadingFlow: () => () => {}, obsidianSetting: () => 4, collapseReadingList() {}, readingViewOfSection: () => reader, remeasureSections() { counts.remeasurements++; },
       readingSectionsOfView() { counts.sectionLookups++; return { sections, sizer: container }; } },
-    "./readingWrap.ts": { keepWrapped: () => () => {}, keepWrapsBeside() {}, refreshReadingWrap() {}, refreshReadingMedia() {}, readingMeasurementsReady: () => true, resetReadingMeasurements() {} },
+    "./readingWrap.ts": { keepWrapped() { counts.activeWraps++; return () => { counts.activeWraps--; }; }, keepWrapsBeside() {}, refreshReadingWrap() {}, refreshReadingMedia() {}, readingMeasurementsReady: () => true, resetReadingMeasurements() {} },
     "./printView.ts": { renderPrintLayouts() {} },
+    "./readingLists.ts": { wrapReadingLists: () => () => {} },
+    "./readingParagraphs.ts": { alignParagraphWhitespace: () => () => {} },
+    "./readingQuotes.ts": { alignReadingQuote: () => () => {} },
     "./viewEnvironment.ts": { watchEnvironment: () => { counts.environments++; return () => {}; } },
   };
   const module = await mockedModule<{ registerReadingView(plugin: unknown): void }>(new URL("../../src/view/readingView.ts", import.meta.url), modules, { crypto });
@@ -134,6 +139,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     scroll() { scroll(); },
     mutate() { mutation(); },
     layoutChanged() { listeners.get("layout-change")!(); },
+    setMode(next: string) { mode = next; listeners.get("layout-change")!(); },
     frame() { const callbacks = [...frames.values()]; frames.clear(); for (const callback of callbacks) callback(); },
     setHost(text: string) { hostText = text; for (const info of infos.values()) info.text = text; },
     edit(text: string) {

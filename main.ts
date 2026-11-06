@@ -13,6 +13,7 @@ import { livePreviewExtension, refreshLayoutHighlights } from "./src/view/livePr
 import { plainMediaDrag } from "./src/view/plainDrag.ts";
 import { plainWebEmbeds } from "./src/view/plainWebEmbeds.ts";
 import { registerReadingView } from "./src/view/readingView.ts";
+import { registerModeScroll } from "./src/view/modeScroll.ts";
 import { GuideModal } from "./src/guide/guideModal.ts";
 import { GUIDE_REVISION, shouldShowGuide } from "./src/guide/state.ts";
 import { ReleaseNotesModal } from "./src/guide/releaseModal.ts";
@@ -29,6 +30,7 @@ export default class AdjustableMediaPlugin extends Plugin {
     setUiLanguage(() => this.settings.uiLanguage);
 
     registerReadingView(this);
+    registerModeScroll(this);
     registerCrossrefs(this);
     registerCalloutImages(this);
     this.registerEditorExtension([

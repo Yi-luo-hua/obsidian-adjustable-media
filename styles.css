@@ -411,6 +411,18 @@
   padding-bottom: var(--p-spacing, 1rem);
 }
 
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break.vml-break-rule {
+  line-height: 2rem;
+}
+
+.markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break-after.vml-break-rule {
+  padding-bottom: 2rem;
+}
+
+.markdown-source-view.mod-cm6 .cm-content > .HyperMD-list-line.vml-break-after.vml-break-rule {
+  padding-bottom: calc(2rem + var(--list-spacing));
+}
+
 /* A folded rule has the height of its border, rather than a full editor text line. */
 .vml-has-layouts .cm-content > .cm-line.hr {
   line-height: 0;
@@ -427,11 +439,19 @@
 }
 
 /* Keep authored extra paragraph breaks in reading view without doubling the ordinary margin. */
-.markdown-preview-sizer > .vml-rv-spaced:is(.el-p, .el-h1, .el-h2, .el-h3, .el-h4, .el-h5, .el-h6)::after {
+.markdown-preview-sizer > .vml-rv-spaced:is(.el-p, .el-ul, .el-ol, .el-blockquote, .el-h1, .el-h2, .el-h3, .el-h4, .el-h5, .el-h6)::after {
   content: "";
   display: block;
   height: calc(var(--vml-extra-blank-lines) * var(--p-spacing, 1rem));
   margin-top: calc(-1 * var(--p-spacing, 1rem));
+}
+
+.markdown-preview-sizer > .vml-rv-spaced.el-hr::after {
+  content: "";
+  display: block;
+  height: calc(var(--vml-extra-blank-lines) * var(--p-spacing, 1rem));
+  margin-top: -2rem;
+  margin-bottom: 2rem;
 }
 
 .vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout {
@@ -1204,12 +1224,118 @@ body.vml-is-dragging * {
 }
 
 /*
- * Reading view, in a note with a wrapped layout (its sections carry vml-rv-wrapping): lists (so nested
- * ones keep their indent), a quote's bar, a callout's box and display math sit beside a float
+ * Reading view: a quote's bar, a callout's box and display math sit beside a float
  * as a whole.
  */
-.markdown-rendered .vml-rv-wrapping :is(ul, ol, blockquote, .callout, .math-block):not(.vml-layout *) {
+.markdown-rendered .vml-rv-wrapping :is(blockquote, .callout, .math-block):not(.vml-layout *) {
   display: flow-root;
+}
+
+/* Whole lists must span the page: each paragraph, including nested items, avoids floats on its own. */
+.markdown-rendered .vml-rv-list,
+.markdown-rendered .vml-rv-list :is(ul, ol) {
+  display: block;
+  padding-inline-start: 0;
+}
+
+.markdown-rendered .vml-rv-list li {
+  display: block;
+  margin-inline-start: 0;
+}
+
+.markdown-rendered .vml-rv-list li.vml-rv-list-branch {
+  padding-bottom: 0;
+}
+
+.vml-rv-list-branch > :is(ul, ol) {
+  padding-top: var(--list-spacing);
+}
+
+.vml-reading-parity .el-p > p:not(.vml-layout *) {
+  white-space: break-spaces;
+}
+
+.markdown-rendered blockquote.vml-rv-quote {
+  padding-inline-start: calc(var(--vml-quote-prefix) - var(--vml-quote-border));
+}
+
+.vml-rv-quote .vml-rv-list li {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.vml-rv-quote-tight > p {
+  margin-bottom: 0;
+}
+
+.vml-rv-quote-tight > :is(ul, ol) {
+  margin-top: 0;
+}
+
+.vml-reading-parity .markdown-preview-sizer > .el-pre > pre {
+  font-size: var(--code-size);
+  line-height: var(--line-height-normal);
+  padding-block: 1lh;
+}
+
+.vml-reading-parity .markdown-preview-sizer > .el-pre > pre > code {
+  display: block;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.vml-rv-list-row {
+  position: relative;
+  display: flow-root list-item;
+  padding-inline-start: var(--vml-list-inset);
+  list-style-type: var(--vml-list-type);
+  counter-set: list-item var(--vml-list-ordinal);
+}
+
+.vml-rv-list-row::marker {
+  color: var(--list-marker-color);
+}
+
+.vml-rv-list-row > .list-collapse-indicator {
+  inset-inline-start: var(--vml-list-inset);
+}
+
+.vml-list-prefix-measure {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  width: max-content;
+  height: 0;
+  overflow: hidden;
+  font: var(--vml-list-font, inherit);
+}
+
+.vml-list-prefix-measure .cm-line {
+  display: inline-block;
+  width: max-content;
+  white-space: pre;
+}
+
+.markdown-rendered .vml-list-prefix-measure .list-bullet {
+  float: none;
+  margin-inline-start: 0;
+}
+
+.vml-rv-list-row > p:first-child {
+  margin-top: 0;
+}
+
+.vml-rv-list-row > p:last-child {
+  margin-bottom: 0;
+}
+
+.task-list-item > .vml-rv-list-row > .list-bullet {
+  display: none;
+}
+
+.task-list-item > .vml-rv-list-row > .task-list-item-checkbox,
+.task-list-item > .vml-rv-list-row > p > .task-list-item-checkbox {
+  margin-inline-start: calc(var(--checkbox-size) * -1.5);
 }
 
 /*

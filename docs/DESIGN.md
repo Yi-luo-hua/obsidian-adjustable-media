@@ -6,6 +6,8 @@
 
 0.9.3 历史发布范围（2026-11-02），新增 [Excalidraw 布局媒体](features/excalidraw.md)与[表格右键文字包装](features/tables.md)，保留 0.9.2 转换布局后的预览、光标定位及同行图片包装修复，以及既有 Canvas、Callout、Mermaid 和图文块缩放能力。0.9.3 标签源码为 `eeba209`，三份公开附件与干净标签构建一致，摘要和来源证明已核对。原 main 保留为 codex/main-before-080，W02／W03 原型未进入主线。历史设备结果保留各自构建边界；当前状态及发布核验见 [STATUS](STATUS.md)和[0.9.3 核验](releases/0.9.3-readiness.md)。
 
+2026-11-06，原生实时预览／阅读排版修复：阅读列表逐项避让浮动，阅读 DOM 跨未修改内容的模式切换保留，使用可见文字锚点保持滚动位置。跨段浮动笔记临时保留该阅读窗格全部分段；关闭时恢复宿主设置。实现、性能取舍和验证边界见[记录](archive/2026-11-06-reading-list-and-scroll.md)。
+
 ## 1. 存储格式
 
 2026-11-05，0.9.4 已发布功能：[外链网页嵌入](features/web-embeds.md)。完整 iframe 和原生 YouTube／Twitter 嵌入可作为 V3 媒体项；`rows[].heights` 保存各网页独立高度，原文及属性保持不变。阅读视图按源码边界消除原生 HTML 对后续内容的吞并；缩放复用 iframe，PDF 输出链接。公开最新版本现为 0.9.4，含组件菜单开关和编辑器初始化兼容修复，见[发布核验](releases/0.9.4-readiness.md)。

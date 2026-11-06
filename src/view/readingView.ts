@@ -11,12 +11,15 @@ import { layoutIsRendered, renderLayout } from "./layoutView.ts";
 import { refContextOf, numbered, markCaptions, type RefContext } from "./crossrefView.ts";
 import { blockWarning } from "./messages.ts";
 import { sectionNoteText } from "./noteText.ts";
-import { readingSectionsOfView, readingViewOfSection, remeasureSections } from "./obsidianInternals.ts";
+import { collapseReadingList, keepReadingFlow, obsidianSetting, readingSectionsOfView, readingViewOfSection, remeasureSections } from "./obsidianInternals.ts";
 import { keepWrapped, keepWrapsBeside, refreshReadingMedia, refreshReadingWrap, readingMeasurementsReady, resetReadingMeasurements } from "./readingWrap.ts";
 import { renderPrintLayouts } from "./printView.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
 import { webSectionPlan } from "../markdown/webSections.ts";
 import { readingBlankExtras } from "../markdown/readingSpacing.ts";
+import { wrapReadingLists } from "./readingLists.ts";
+import { alignParagraphWhitespace } from "./readingParagraphs.ts";
+import { alignReadingQuote } from "./readingQuotes.ts";
 
 const WRAPPING = "vml-rv-wrapping";
 const memorySections = new WeakSet<HTMLElement>();
@@ -49,7 +52,9 @@ interface Reader {
   frame: number;
   sections: Map<HTMLElement, InstalledSection>;
   pendingSections: Map<HTMLElement, () => boolean>;
+  children: Map<HTMLElement, Set<MarkdownRenderChild>>;
   stopEnvironment: () => void;
+  releaseFlow: () => void;
 }
 
 interface InstalledSection {
@@ -82,6 +87,25 @@ export function registerReadingView(plugin: Plugin): void {
 
   const alive = (reader: Reader): boolean => !unloaded && readers.get(reader.view) === reader
     && reader.view.file === reader.file && reader.view.getMode() === "preview" && reader.view.containerEl.isConnected;
+  const retired = (reader: Reader): boolean => unloaded || readers.get(reader.view) !== reader
+    || reader.view.file !== reader.file || !reader.view.containerEl.isConnected;
+
+  const releaseSection = (reader: Reader, el: HTMLElement): void => {
+    const children = reader.children.get(el);
+    reader.children.delete(el);
+    for (const child of children ?? []) child.unload();
+  };
+  const ownChild = (reader: Reader, el: HTMLElement, ctx: MarkdownPostProcessorContext, container = el): MarkdownRenderChild => {
+    const child = new MarkdownRenderChild(container);
+    const children = reader.children.get(el) ?? new Set<MarkdownRenderChild>();
+    reader.children.set(el, children); children.add(child);
+    ctx.addChild(child);
+    child.register(() => {
+      children.delete(child);
+      if (children.size === 0 && reader.children.get(el) === children) reader.children.delete(el);
+    });
+    return child;
+  };
 
   const markWrapping = (reader: Reader, wrapped: boolean): void => {
     if (reader.markedWrapping === wrapped) return;
@@ -92,9 +116,11 @@ export function registerReadingView(plugin: Plugin): void {
   };
 
   const stop = (reader: Reader): void => {
-    if (reader.markedWrapping) markWrapping(reader, false);
+    if (reader.markedWrapping && (unloaded || reader.view.file !== reader.file || reader.view.getMode() === "preview")) markWrapping(reader, false);
     const win = reader.view.containerEl.win;
     win.clearTimeout(reader.timer); win.cancelAnimationFrame(reader.frame);
+    reader.releaseFlow();
+    for (const el of [...reader.children.keys()]) releaseSection(reader, el);
     // The hidden reading DOM is reused on a mode switch. Keep its spacing for the first visible frame.
     if (unloaded || reader.view.file !== reader.file || reader.view.getMode() === "preview") {
       for (const el of reader.sections.keys()) el.toggleClass("vml-rv-spaced", false);
@@ -153,7 +179,8 @@ export function registerReadingView(plugin: Plugin): void {
   };
 
   const wake = (reader: Reader): void => {
-    if (!alive(reader)) { stop(reader); return; }
+    if (retired(reader)) { stop(reader); return; }
+    if (!alive(reader)) return;
     if (isCanvasPreview(reader.view)) {
       const text = reader.view.getViewData();
       // Canvas can reuse every remaining section, so no postprocessor may announce its new text.
@@ -182,7 +209,8 @@ export function registerReadingView(plugin: Plugin): void {
     const parsed = parse(view, view.getViewData());
     const reader: Reader = { view, file: view.file!, parsed, sourceRequested: false, projection: new ViewProjection(), requested: null,
       needsRender: parsed.blocks.some(block => block.meta.version === 3) && view.previewMode.containerEl.querySelector(".vml-layout") !== null,
-      markedWrapping: null, timer: 0, frame: 0, sections: new Map(), pendingSections: new Map(), stopEnvironment: () => {} };
+      markedWrapping: null, timer: 0, frame: 0, sections: new Map(), pendingSections: new Map(), children: new Map(), stopEnvironment: () => {},
+      releaseFlow: parsed.wrapped ? keepReadingFlow(view) : () => {} };
     reader.projection.request(parsed.snapshot);
     reader.projection.observeHost(view.getViewData());
     readers.set(view, reader);
@@ -197,7 +225,8 @@ export function registerReadingView(plugin: Plugin): void {
       confirm(reader);
     }, () => confirm(reader));
     const scroll = (): void => {
-      if (!alive(reader)) stop(reader);
+      if (retired(reader)) stop(reader);
+      else if (!alive(reader)) return;
       else if (isCanvasPreview(reader.view)) wake(reader);
       else confirm(reader);
     };
@@ -218,6 +247,9 @@ export function registerReadingView(plugin: Plugin): void {
     reader.sourceRequested = true;
     if (text === reader.parsed.snapshot.text && reader.file.path === reader.parsed.snapshot.origin.path) { wake(reader); return; }
     const next = parse(reader.view, text, reader.parsed.snapshot);
+    if (next.wrapped !== reader.parsed.wrapped) {
+      reader.releaseFlow(); reader.releaseFlow = next.wrapped ? keepReadingFlow(reader.view) : () => {};
+    }
     for (const el of reader.sections.keys()) resetReadingMeasurements(el);
     reader.needsRender ||= isStale(reader.parsed.drawn, next.drawn)
       || reader.parsed.snapshot.origin.path !== next.snapshot.origin.path;
@@ -235,16 +267,26 @@ export function registerReadingView(plugin: Plugin): void {
   };
 
   const draw = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
+    releaseSection(reader, el);
     const { blocks, skips, refs, wrapped, snapshot } = reader.parsed;
     const block = sectionBlock(blocks, info);
+    if (blocks.some(isDrawable) && !block) {
+      const child = ownChild(reader, el, ctx);
+      child.register(alignParagraphWhitespace(el));
+      child.register(alignReadingQuote(el, reader.parsed.lines, info.lineStart, info.lineEnd,
+        reader.view.previewMode.containerEl.querySelector<HTMLElement>(".markdown-preview-view") ?? reader.view.previewMode.containerEl));
+      child.register(wrapReadingLists(el, (event, indicator) => collapseReadingList(plugin.app, el, event, indicator), {
+        lines: reader.parsed.lines, from: info.lineStart, tabSize: obsidianSetting(plugin.app, "tabSize", 4),
+        host: reader.view.previewMode.containerEl.querySelector<HTMLElement>(".markdown-preview-view") ?? reader.view.previewMode.containerEl,
+      }));
+    }
     const opening = block?.openLine === info.lineStart && info.lineStart === info.lineEnd;
     const token = crypto.randomUUID();
     const webPlan = webSectionPlan(reader.parsed.lines, blocks, info.lineStart, info.lineEnd, token);
     if (webPlan) {
       el.empty();
       if (webPlan.markdown.trim()) {
-        const content = el.createDiv(), child = new MarkdownRenderChild(content);
-        ctx.addChild(child);
+        const content = el.createDiv(), child = ownChild(reader, el, ctx, content);
         const pending = {};
         memorySections.add(content); pendingWebSections.set(el, pending);
         let active = true;
@@ -276,8 +318,7 @@ export function registerReadingView(plugin: Plugin): void {
       else {
         rows = whole ? undefined : sectionRows(block, info);
         if (rows === undefined || rows.length > 0) {
-          const child = new MarkdownRenderChild(el);
-          ctx.addChild(child);
+          const child = ownChild(reader, el, ctx);
           el.empty();
           const model = modelFromBlock(block);
           const root = renderLayout(el, { app: plugin.app, sourcePath: snapshot.origin.path, model,
@@ -295,8 +336,7 @@ export function registerReadingView(plugin: Plugin): void {
       source: sectionSource(reader.parsed, info), sourcePath: snapshot.origin.path, drawn: reader.parsed.drawn,
       layoutKey: sectionLayoutKey(reader.parsed, info), context: ctx };
     reader.sections.set(el, record);
-    const lifecycle = new MarkdownRenderChild(el);
-    ctx.addChild(lifecycle);
+    const lifecycle = ownChild(reader, el, ctx);
     lifecycle.register(() => { if (reader.sections.get(el) === record) reader.sections.delete(el); });
     confirm(reader);
   };
@@ -313,6 +353,7 @@ export function registerReadingView(plugin: Plugin): void {
       unwatch();
     };
     const process = (): boolean => {
+      if (unloaded) { finish(); return true; }
       const view = readingViewOfSection(plugin.app, el);
       if (!view?.file || (!isCanvasPreview(view) && view.file.path !== ctx.sourcePath)) return false;
       const text = sectionNoteText(plugin.app, ctx, info, el);
@@ -384,11 +425,13 @@ export function registerReadingView(plugin: Plugin): void {
   const layoutChanged = (): void => {
     // A MarkdownView is reused for another file. Retire its old reader before testing whether
     // the new file already has one; the completed file-open may be the host's final event.
-    for (const reader of readers.values()) if (!alive(reader)) stop(reader);
+    for (const reader of readers.values()) if (retired(reader)) stop(reader);
     // On mobile a mode switch may process sections before the pane reports preview mode.
     // Once the host announces the completed layout, establish its reader and install those sections.
     for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
       const view = leaf.view;
+      const retained = view instanceof MarkdownView ? readers.get(view) : undefined;
+      if (retained && view instanceof MarkdownView && view.getMode() === "preview") desire(retained, view.getViewData());
       if (view instanceof MarkdownView && view.file && view.getMode() === "preview" && !readers.has(view)
         && view.getViewData().includes("<!-- vml")) {
         const reader = getReader(view);

@@ -597,9 +597,7 @@
         "to": 3
       }
     ],
-    "expected": [
-      "0:after"
-    ]
+    "expected": ["0:after", "2:after"]
   },
   {
     "name": "indented code",

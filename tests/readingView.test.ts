@@ -4,6 +4,39 @@ import { readingViewHarness } from "./support/readingViewHarness.ts";
 
 const media = '<!-- vml -->\n![[old.png]]\n<!-- /vml -->\n\nBody';
 
+test("reprocessing and unloading a section release the previous float before installing its replacement", async () => {
+  const text = media.replace("<!-- vml -->", '<!-- vml {"wrap":"right"} -->');
+  const host = await readingViewHarness(text, false), section = host.section(text);
+  assert.equal(host.counts.activeWraps, 1);
+  for (let n = 0; n < 5; n++) { section.reprocess(text); assert.equal(host.counts.activeWraps, 1); }
+  host.dispose();
+  assert.equal(host.counts.activeWraps, 0);
+});
+
+test("resuming a hidden reader reconciles edits instead of reusing an older layout snapshot", async () => {
+  const text = media.replace("<!-- vml -->", '<!-- vml {"wrap":"right"} -->');
+  const host = await readingViewHarness(text, false), section = host.section(text);
+  host.frame(); host.setMode("source");
+  const next = text.replace('"right"', '"left"');
+  host.setHost(next); host.setMode("preview");
+  assert.equal(host.rerenders, 1);
+  section.reprocess(next); host.frame();
+  assert.equal(host.counts.activeWraps, 1);
+  host.dispose();
+  assert.equal(host.counts.activeWraps, 0);
+});
+
+test("unchanged reading DOM and its projection survive mode round trips without a blank full rerender", async () => {
+  const host = await readingViewHarness(media, false);
+  host.section(media); host.section(media, 4); host.frame();
+  const projection = host.projection;
+  for (let n = 0; n < 4; n++) { host.setMode("source"); host.setMode("preview"); host.frame(); }
+  assert.equal(host.projection, projection);
+  assert.equal(host.rerenders, 0);
+  assert.equal(host.renders.length, 1);
+  host.dispose();
+});
+
 test("retained paragraph sections refresh authored blank spacing without reinstalling layouts", async () => {
   const host = await readingViewHarness(media, false);
   host.section(media);

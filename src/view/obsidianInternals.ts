@@ -89,6 +89,37 @@ interface Renderer {
   sections?: unknown;
   sizerEl?: unknown;
   queueRender?: unknown;
+  onListCollapseClick?: unknown;
+  applyScroll?: unknown;
+  renderExtraMinPx?: unknown;
+}
+
+/** Floating content crosses native section boundaries; keep its anchors in the reading DOM. */
+export function keepReadingFlow(view: PreviewHost): () => void {
+  const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
+  if (!renderer || typeof renderer.renderExtraMinPx !== "number") return () => {};
+  const previous = renderer.renderExtraMinPx;
+  renderer.renderExtraMinPx = Number.POSITIVE_INFINITY;
+  if (typeof renderer.queueRender === "function") (renderer as { queueRender(): void }).queueRender();
+  return () => {
+    renderer.renderExtraMinPx = previous;
+    if (typeof renderer.queueRender === "function") (renderer as { queueRender(): void }).queueRender();
+  };
+}
+
+/** Try the current renderer now; do not enqueue a delayed scroll that could outlive user input. */
+export function scrollReadingToLine(view: MarkdownView, line: number): boolean {
+  const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
+  return typeof renderer?.applyScroll === "function"
+    && (renderer as { applyScroll(line: number): boolean }).applyScroll(line);
+}
+
+/** Reuse the host's list-fold transaction after a list paragraph gains a flow wrapper. */
+export function collapseReadingList(app: App, section: HTMLElement, event: MouseEvent, indicator: HTMLElement): void {
+  const found = rendererOf(app, section);
+  if (found && typeof found.renderer.onListCollapseClick === "function") {
+    (found.renderer as { onListCollapseClick(event: MouseEvent, indicator: HTMLElement): void }).onListCollapseClick(event, indicator);
+  }
 }
 
 /** File ownership comes from the exact editor pane when editorInfoField omits its file. */
