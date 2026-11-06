@@ -1220,9 +1220,12 @@ body.vml-is-dragging * {
   display: flow-root;
 }
 
-/* Rules end text wrapping on both sides; fenced code also starts below floats. */
+/*
+ * Rules end text wrapping on both sides; fenced code also starts below floats.
+ * Reading rules must clear even before the postprocessor installs the wrapping classes on a mode switch.
+ */
 .vml-has-wraps .cm-content > .cm-line:is(.hr, .HyperMD-hr),
-.markdown-rendered .vml-rv-wrapping > hr,
+.markdown-preview-sizer > .el-hr > hr,
 .vml-print-content > hr,
 .vml-has-wraps .cm-content > .cm-line.HyperMD-codeblock-begin,
 .markdown-rendered .vml-rv-wrapping pre,
