@@ -1,6 +1,6 @@
 import { MarkdownView, type Plugin } from "obsidian";
 import { findV2Blocks, isDrawable } from "../format/v2.ts";
-import { scrollReadingToLine } from "./obsidianInternals.ts";
+import { afterReadingScroll, scrollReadingToLine } from "./obsidianInternals.ts";
 
 interface Anchor { quote: string; offset: number; text: string; line: number }
 const ignored = ".mod-ui, .vml-layout, .vml-rv-proxy, .vml-wrap-proxy, .cm-formatting, .list-bullet, .list-collapse-indicator";
@@ -103,11 +103,19 @@ export function registerModeScroll(plugin: Plugin): void {
         });
       };
       const input = (): void => { pending = null; anchor = capture(view); };
-      const mutation = new (win as Window & typeof window).MutationObserver(() => {
+      const changeMode = (): boolean => {
         if (mode !== view.getMode()) {
           mode = view.getMode(); pending = anchor; hinted = false;
-          if (pending) restore(view, pending);
+          return true;
         }
+        return false;
+      };
+      const stopNativeScroll = afterReadingScroll(view, () => {
+        changeMode();
+        if (pending) restore(view, pending);
+      });
+      const mutation = new (win as Window & typeof window).MutationObserver(() => {
+        if (changeMode() && pending) restore(view, pending);
         if (pending) schedule();
       });
       mutation.observe(view.containerEl, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-mode", "class", "style"] });
@@ -120,6 +128,7 @@ export function registerModeScroll(plugin: Plugin): void {
       schedule();
       panes.set(view, { file: view.file, update: schedule, stop: () => {
         view.previewMode.containerEl.removeClass("vml-reading-parity");
+        stopNativeScroll();
         win.cancelAnimationFrame(frame); mutation.disconnect();
         view.containerEl.removeEventListener("scroll", schedule, true);
         view.containerEl.removeEventListener("load", schedule, true);

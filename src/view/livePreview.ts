@@ -27,6 +27,7 @@ import { watchEnvironment } from "./viewEnvironment.ts";
 import { fileOfEditor, parseBufferSections } from "./obsidianInternals.ts";
 import { eventElement } from "./windows.ts";
 import { guardWidgetWhitespace } from "./widgetWhitespace.ts";
+import { nativeListHanging } from "./hangingIndent.ts";
 
 /** The pane's environment as viewEnvironment.ts reads it: width, fonts and page classes that change layout. */
 export const setEnvironment = StateEffect.define<string>();
@@ -177,6 +178,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
     highlightField,
     layoutHistory(),
     Prec.high(field),
+    nativeListHanging(view => view.state.field(field).blocks.some(isDrawable)),
     ViewPlugin.define(view => {
       let destroyed = false;
       let queued = false;

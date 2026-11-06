@@ -1,4 +1,4 @@
-import { StateEffect, type Range } from "@codemirror/state";
+import { StateEffect, type Extension, type Range } from "@codemirror/state";
 import { Decoration, ViewPlugin, type DecorationSet, type EditorView, type ViewUpdate } from "@codemirror/view";
 
 import { hangingPrefix } from "../markdown/columnStyle.ts";
@@ -20,9 +20,13 @@ class HangingIndent {
   private widths = new Map<number, number>();
   private destroyed = false;
   private readonly view: EditorView;
+  private readonly nativeLists: boolean;
+  private readonly enabled: (view: EditorView) => boolean;
 
-  constructor(view: EditorView) {
+  constructor(view: EditorView, nativeLists = false, enabled: (view: EditorView) => boolean = () => true) {
     this.view = view;
+    this.nativeLists = nativeLists;
+    this.enabled = enabled;
     this.measure();
   }
 
@@ -43,7 +47,7 @@ class HangingIndent {
   private measure(): void {
     this.view.requestMeasure({
       key: this,
-      read: (view) => markerWidths(view),
+      read: (view) => this.enabled(view) ? markerWidths(view, this.nativeLists) : new Map<number, number>(),
       write: (widths, view) => {
         if (sameWidths(widths, this.widths)) {
           return;
@@ -51,7 +55,7 @@ class HangingIndent {
         this.widths = widths;
         const ranges: Array<Range<Decoration>> = [];
         for (const [from, width] of widths) {
-          ranges.push(Decoration.line({ class: "vml-hanging", attributes: { style: `--vml-hanging: ${width}px` } }).range(from));
+          ranges.push(Decoration.line({ class: this.nativeLists ? "vml-list-hanging" : "vml-hanging", attributes: { style: `--vml-hanging: ${width}px` } }).range(from));
         }
         this.decorations = Decoration.set(ranges, true);
         queueMicrotask(() => {
@@ -64,21 +68,35 @@ class HangingIndent {
   }
 }
 
-export const hangingIndent = ViewPlugin.fromClass(HangingIndent, { decorations: (plugin) => plugin.decorations });
+export const hangingIndent = ViewPlugin.fromClass(class extends HangingIndent {
+  constructor(view: EditorView) { super(view); }
+}, { decorations: (plugin) => plugin.decorations });
+
+/** The host rounds and caches hanging indents; use the actual prefix for layout-note list continuations. */
+export function nativeListHanging(enabled: (view: EditorView) => boolean): Extension {
+  return ViewPlugin.fromClass(class extends HangingIndent {
+    constructor(view: EditorView) { super(view, true, enabled); }
+  }, { decorations: plugin => plugin.decorations });
+}
 
 /** How wide the markers of each visible line that has any are drawn, by where the line starts. */
-function markerWidths(view: EditorView): Map<number, number> {
+function markerWidths(view: EditorView, nativeLists = false): Map<number, number> {
   const widths = new Map<number, number>();
   const { doc } = view.state;
   for (const { from, to } of view.visibleRanges) {
     for (let pos = from; pos <= to;) {
       const line = doc.lineAt(pos);
+      if (nativeLists) {
+        const { node } = view.domAtPos(line.from);
+        const el = (node.instanceOf(HTMLElement) ? node : node.parentElement)?.closest(".HyperMD-list-line");
+        if (!el) { pos = line.to + 1; continue; }
+      }
       const prefix = hangingPrefix(line.text);
       const start = prefix > 0 ? rowStart(view, line.from) : null;
       const end = start ? view.coordsAtPos(line.from + prefix, -1) : null;
       // Markers that wrap on their own leave the line as it is.
       if (start && end && end.top < start.bottom && end.bottom > start.top && end.left > start.left) {
-        widths.set(line.from, Math.round((end.left - start.left) * 10) / 10);
+        widths.set(line.from, nativeLists ? end.left - start.left : Math.round((end.left - start.left) * 10) / 10);
       }
       pos = line.to + 1;
     }

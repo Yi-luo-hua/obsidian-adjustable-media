@@ -411,6 +411,12 @@
   padding-bottom: var(--p-spacing, 1rem);
 }
 
+/* Native cached/rounded indents must not move continuation rows between render modes. */
+.vml-has-layouts .cm-content > .cm-line.vml-list-hanging {
+  padding-inline-start: var(--vml-hanging) !important;
+  text-indent: calc(-1 * var(--vml-hanging)) !important;
+}
+
 .markdown-source-view.mod-cm6 .cm-content > .cm-line.vml-break.vml-break-rule {
   line-height: 2rem;
 }
@@ -1251,6 +1257,15 @@ body.vml-is-dragging * {
   padding-top: var(--list-spacing);
 }
 
+.markdown-rendered.show-indentation-guide .vml-rv-list li > :is(ul, ol)::before {
+  display: none;
+}
+
+.markdown-rendered.show-indentation-guide .vml-rv-list li > .vml-rv-list-guided::before {
+  display: block;
+  inset-inline-start: calc(var(--vml-guide-level) * var(--list-indent) + var(--indentation-guide-editing-indent) + 1px);
+}
+
 .vml-reading-parity .el-p > p:not(.vml-layout *) {
   white-space: break-spaces;
 }
@@ -1294,6 +1309,10 @@ body.vml-is-dragging * {
 
 .vml-rv-list-row::marker {
   color: var(--list-marker-color);
+}
+
+.markdown-rendered .vml-rv-list-row > .list-bullet {
+  margin-inline-start: var(--vml-list-bullet-offset, -0.8em);
 }
 
 .vml-rv-list-row > .list-collapse-indicator {

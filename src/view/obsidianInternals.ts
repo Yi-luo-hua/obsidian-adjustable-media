@@ -114,6 +114,20 @@ export function scrollReadingToLine(view: MarkdownView, line: number): boolean {
     && (renderer as { applyScroll(line: number): boolean }).applyScroll(line);
 }
 
+/** Finish a native mode-scroll restore in the same call, before its animation frame can paint. */
+export function afterReadingScroll(view: MarkdownView, settled: () => void): () => void {
+  const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
+  if (typeof renderer?.applyScroll !== "function") return () => {};
+  const original = renderer.applyScroll as (line: number) => boolean;
+  const apply = function(this: Renderer, line: number): boolean {
+    const result = original.call(this, line);
+    settled();
+    return result;
+  };
+  renderer.applyScroll = apply;
+  return () => { if (renderer.applyScroll === apply) renderer.applyScroll = original; };
+}
+
 /** Reuse the host's list-fold transaction after a list paragraph gains a flow wrapper. */
 export function collapseReadingList(app: App, section: HTMLElement, event: MouseEvent, indicator: HTMLElement): void {
   const found = rendererOf(app, section);

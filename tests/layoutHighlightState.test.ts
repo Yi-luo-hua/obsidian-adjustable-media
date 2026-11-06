@@ -31,7 +31,7 @@ test("source hints follow caret heads and pane focus while toggles preserve widg
     "../markdown/crossref.ts": crossref,
     "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": {}, "./interactions.ts": {}, "./layoutView.ts": {},
-    "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {}, "./textEditing.ts": {},
+    "./layoutHistory.ts": { layoutHistory: () => [] }, "./hangingIndent.ts": { nativeListHanging: () => [] }, "./messages.ts": {}, "./textEditing.ts": {},
     "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {}, "../editor/editorInfo.ts": editorInfo, "./obsidianInternals.ts": {}, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   const doc = 'Intro\n\n<!-- vml -->\n![[a.png]]\n<!-- /vml -->\n\nTail';

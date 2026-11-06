@@ -5,7 +5,7 @@ import * as format from "../src/format/v2.ts";
 
 async function harness() {
   const frames = new Map<number, () => void>(), events = new Map<string, Set<() => void>>();
-  let id = 0, mutation = (): void => {};
+  let id = 0, mutation = (): void => {}, nativeScrolled = (): void => {};
   class Observer {
     constructor(callback: () => void) { mutation = callback; }
     observe() {} disconnect() {}
@@ -44,13 +44,15 @@ async function harness() {
   const view = new View(), cleanups: Array<() => void> = [];
   const workspace = { getLeavesOfType: () => [{ view }], on: () => undefined, onLayoutReady: (callback: () => void) => callback() };
   const module = await mockedModule<{ registerModeScroll: (plugin: unknown) => void }>(new URL("../src/view/modeScroll.ts", import.meta.url), {
-    obsidian: { MarkdownView: View }, "../format/v2.ts": format, "./obsidianInternals.ts": { scrollReadingToLine: () => false },
+    obsidian: { MarkdownView: View }, "../format/v2.ts": format, "./obsidianInternals.ts": {
+      scrollReadingToLine: () => false, afterReadingScroll: (_view: unknown, callback: () => void) => { nativeScrolled = callback; return () => {}; },
+    },
   }, { NodeFilter: { SHOW_TEXT: 4 } });
   module.registerModeScroll({ app: { workspace }, registerEvent() {}, register(callback: () => void) { cleanups.push(callback); } });
   const frame = (): void => { const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach(callback => callback()); };
   const event = (name: string): void => { for (const callback of events.get(name) ?? []) callback(); };
   frame();
-  return { view, source, reading, frame, event, mutate: () => mutation(),
+  return { view, source, reading, frame, event, mutate: () => mutation(), nativeScroll: () => nativeScrolled(),
     stop() { cleanups.forEach(callback => callback()); }, events };
 }
 
@@ -60,6 +62,18 @@ test("mode switches preserve visible text offset and settle later rendering chan
   assert.equal(h.reading.scroller.scrollTop, 180);
   h.reading.base = 360; h.mutate(); h.frame();
   assert.equal(h.reading.scroller.scrollTop, 240);
+  h.stop();
+});
+
+test("a late native reading scroll settles before another frame or mutation callback", async () => {
+  const h = await harness();
+  h.view.mode = "preview"; h.mutate(); h.frame();
+  h.reading.scroller.scrollTop = 90;
+  h.nativeScroll();
+  assert.equal(h.reading.scroller.scrollTop, 180);
+  h.event("wheel");
+  h.reading.scroller.scrollTop = 90; h.nativeScroll();
+  assert.equal(h.reading.scroller.scrollTop, 90);
   h.stop();
 });
 

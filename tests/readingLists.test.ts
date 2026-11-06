@@ -11,7 +11,7 @@ class Dom {
   classes = new Set<string>();
   props: Record<string, string> = {};
   attributes: Record<string, string> = {};
-  native = { fontSize: "16px", paddingInlineStart: "0px", marginInlineStart: "0px", listStyleType: "disc" };
+  native = { fontSize: "16px", font: "16px sans-serif", paddingInlineStart: "0px", marginInlineStart: "0px", listStyleType: "disc", getPropertyValue: () => "" };
   value = "";
   constructor(tag: string, ...children: Dom[]) { this.tagName = tag; children.forEach(child => this.appendChild(child)); }
   get children(): Dom[] { return this.childNodes.filter(node => node.nodeType === 1); }
@@ -19,6 +19,11 @@ class Dom {
   instanceOf(type: unknown): boolean { return this.nodeType === 1 && type === Dom; }
   matches(selector: string): boolean { return selector.split(",").some(tag => tag.trim().toUpperCase() === this.tagName); }
   querySelectorAll(): Dom[] { return this.children.filter(child => child.matches("ul,ol")); }
+  querySelector(selector: string): Dom | null { return this.children.find(child => child.hasClass(selector.slice(1))) ?? null; }
+  getBoundingClientRect(): { left: number; width: number } {
+    const left = this.parentElement ? this.parentElement.getBoundingClientRect().left + this.parentElement.childNodes.slice(0, this.parentElement.childNodes.indexOf(this)).reduce((sum, child) => sum + measuredWidth(child), 0) : 0;
+    return { left, width: measuredWidth(this) };
+  }
   hasAttribute(name: string): boolean { return name in this.attributes; }
   getAttribute(name: string): string | null { return this.attributes[name] ?? null; }
   addClass(name: string): void { this.classes.add(name); }
@@ -26,6 +31,12 @@ class Dom {
   removeClass(name: string): void { this.classes.delete(name); }
   setCssProps(props: Record<string, string>): void { Object.assign(this.props, props); }
   createDiv({ cls }: { cls: string }): Dom { const el = new Dom("DIV"); el.addClass(cls); return this.appendChild(el); }
+  createSpan({ cls, text: value }: { cls: string; text?: string }): Dom {
+    const el = new Dom("SPAN"); el.addClass(cls); if (value) el.appendText(value); return this.appendChild(el);
+  }
+  appendText(value: string): void { this.appendChild(text(value)); }
+  remove(): void { if (this.parentElement) this.parentElement.childNodes.splice(this.parentElement.childNodes.indexOf(this), 1); this.parentElement = null; }
+  get doc() { return measurementDocument; }
   appendChild(node: Dom): Dom { return this.insertBefore(node, null); }
   insertBefore(node: Dom, before: Dom | null): Dom {
     if (node.parentElement) node.parentElement.childNodes.splice(node.parentElement.childNodes.indexOf(node), 1);
@@ -40,8 +51,30 @@ class Dom {
 }
 
 const text = (value: string): Dom => { const node = new Dom(""); node.nodeType = 3; node.value = value; return node; };
-const load = () => mockedModule<{ wrapReadingLists: (section: unknown) => () => void }>(new URL("../src/view/readingLists.ts", import.meta.url), { "../markdown/listPrefix.ts": { listPrefix } }, {
+// During stylesheet installation a Range omits collapsed whitespace inside an otherwise wide indent span.
+const measuredWidth = (el: Dom): number => el.hasClass("cm-indent") ? (/^[ \t\n]*$/.test(el.textContent) ? 0 : 36)
+  : el.hasClass("list-bullet") ? 20 : el.nodeType === 3 ? el.value.length * 4 : el.childNodes.reduce((sum, child) => sum + measuredWidth(child), 0);
+const measurementDocument = { body: new Dom("BODY"), createRange() {
+  let node: Dom;
+  return { selectNodeContents(el: Dom) { node = el; }, getBoundingClientRect: () => ({ width: measuredWidth(node), right: measuredWidth(node) }) };
+} };
+const load = () => mockedModule<{ wrapReadingLists: (section: unknown, collapse?: undefined, source?: unknown) => () => void }>(new URL("../src/view/readingLists.ts", import.meta.url), { "../markdown/listPrefix.ts": { listPrefix } }, {
   HTMLElement: Dom, getComputedStyle: (el: Dom) => el.native,
+});
+
+test("complete source indent units survive reading-view measurement before plugin CSS is installed", async () => {
+  const { wrapReadingLists } = await load();
+  const child = new Dom("LI", text("Nested")); child.attributes["data-line"] = "1";
+  const parent = new Dom("LI", text("Root"), new Dom("UL", child)); parent.attributes["data-line"] = "0";
+  const section = new Dom("DIV", new Dom("UL", parent));
+  const stop = wrapReadingLists(section, undefined, { lines: ["- Root", "    - Nested"], from: 0, tabSize: 4, host: section });
+  assert.equal(parent.children[0].props["--vml-list-inset"], "1.5em");
+  assert.equal(parent.children[0].props["--vml-list-bullet-offset"], "-0.875em");
+  assert.equal(child.children[0].props["--vml-list-inset"], "3.75em");
+  assert.equal(child.parentElement!.hasClass("vml-rv-list-guided"), true);
+  assert.equal(measurementDocument.body.children.length, 0);
+  stop();
+  assert.equal(child.parentElement!.hasClass("vml-rv-list-guided"), false);
 });
 
 test("nested list paragraphs flow independently while native checkbox and text nodes survive cleanup", async () => {

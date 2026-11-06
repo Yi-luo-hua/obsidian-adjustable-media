@@ -42,7 +42,7 @@ test("editor initialization recovers from an unavailable getter and preserves su
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
-    "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
+    "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./hangingIndent.ts": { nativeListHanging: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
     "../editor/editorInfo.ts": editorInfo, "./obsidianInternals.ts": { fileOfEditor: (_app: unknown, buffer: object | undefined) => buffer ? sourceView.file : null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
@@ -126,7 +126,7 @@ test("a wrapped text box whose source shows still floats with its text drawn bes
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => refs }, "./interactions.ts": {},
     "./layoutView.ts": { renderLayout: (_el: unknown, options: (typeof drawn)[number]) => drawn.push(options) },
-    "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
+    "./layoutHistory.ts": { layoutHistory: () => [] }, "./hangingIndent.ts": { nativeListHanging: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
     "../editor/editorInfo.ts": editorInfo, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   }, { createSpan: () => ({ dataset: {} }) });
@@ -164,7 +164,7 @@ test("a note without layouts is not parsed while typing, until a layout is writt
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
-    "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
+    "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./hangingIndent.ts": { nativeListHanging: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {},
     "../editor/editorInfo.ts": editorInfo, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
@@ -190,7 +190,7 @@ test("the first reading of a pane's environment draws nothing again; a later cha
     "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
-    "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {},
+    "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] }, "./hangingIndent.ts": { nativeListHanging: () => [] }, "./messages.ts": {},
     "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [], resetWrapGaps: stateApi.StateEffect.define<null>() }, "./viewEnvironment.ts": {},
     "../editor/editorInfo.ts": editorInfo, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
@@ -238,7 +238,7 @@ test("host paragraph results install only in the exact buffer version; structura
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
     "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": {}, "./interactions.ts": {}, "./layoutView.ts": {},
-    "./layoutHistory.ts": { layoutHistory: () => [] }, "./messages.ts": {}, "./textEditing.ts": {},
+    "./layoutHistory.ts": { layoutHistory: () => [] }, "./hangingIndent.ts": { nativeListHanging: () => [] }, "./messages.ts": {}, "./textEditing.ts": {},
     "./wrapGuard.ts": { wrapGuard: () => [] }, "./viewEnvironment.ts": {}, "../editor/editorInfo.ts": editorInfo, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
   });
   let state = stateApi.EditorState.create({ doc: media + '\n> quote\n    code one\n\n    code two',
