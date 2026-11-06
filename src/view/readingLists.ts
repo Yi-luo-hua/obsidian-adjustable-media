@@ -1,4 +1,5 @@
 import { listPrefix } from "../markdown/listPrefix.ts";
+import { alignListWhitespace } from "./readingParagraphs.ts";
 
 interface PreparedList { rows: HTMLElement[]; users: number; cleanups: Array<() => void> }
 const prepared = new WeakMap<HTMLElement, PreparedList>();
@@ -118,6 +119,7 @@ export function wrapReadingLists(section: HTMLElement, collapse?: (event: MouseE
         }
       }
     }
+    for (const row of rows) cleanups.push(alignListWhitespace(row));
     root.addClass("vml-rv-list");
     prepared.set(root, { rows, users: 1, cleanups });
   }

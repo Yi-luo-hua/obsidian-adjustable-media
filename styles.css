@@ -1268,6 +1268,9 @@ body.vml-is-dragging * {
 
 .vml-reading-parity .el-p > p:not(.vml-layout *) {
   white-space: break-spaces;
+  line-break: after-white-space;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .markdown-rendered blockquote.vml-rv-quote {
@@ -1300,11 +1303,22 @@ body.vml-is-dragging * {
 }
 
 .vml-rv-list-row {
+  white-space: break-spaces;
+  line-break: after-white-space;
+  word-break: break-word;
+  overflow-wrap: anywhere;
   position: relative;
   display: flow-root list-item;
   padding-inline-start: var(--vml-list-inset);
   list-style-type: var(--vml-list-type);
   counter-set: list-item var(--vml-list-ordinal);
+}
+
+.vml-rv-list-row code,
+.vml-reading-parity .el-p > p:not(.vml-layout *) code {
+  white-space: break-spaces;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .vml-rv-list-row::marker {

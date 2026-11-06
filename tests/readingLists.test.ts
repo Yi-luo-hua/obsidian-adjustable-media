@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { mockedModule } from "./support/mockedModule.ts";
 import { listPrefix } from "../src/markdown/listPrefix.ts";
+import { alignListWhitespace } from "../src/view/readingParagraphs.ts";
 
 class Dom {
   nodeType = 1;
@@ -18,7 +19,9 @@ class Dom {
   get textContent(): string { return this.value + this.childNodes.map(child => child.textContent).join(""); }
   instanceOf(type: unknown): boolean { return this.nodeType === 1 && type === Dom; }
   matches(selector: string): boolean { return selector.split(",").some(tag => tag.trim().toUpperCase() === this.tagName); }
-  querySelectorAll(): Dom[] { return this.children.filter(child => child.matches("ul,ol")); }
+  querySelectorAll(selector = "ul,ol"): Dom[] { return this.children.filter(child => child.matches(selector === ":scope > p" ? "p" : "ul,ol")); }
+  get data(): string { return this.value; }
+  set data(value: string) { this.value = value; }
   querySelector(selector: string): Dom | null { return this.children.find(child => child.hasClass(selector.slice(1))) ?? null; }
   getBoundingClientRect(): { left: number; width: number } {
     const left = this.parentElement ? this.parentElement.getBoundingClientRect().left + this.parentElement.childNodes.slice(0, this.parentElement.childNodes.indexOf(this)).reduce((sum, child) => sum + measuredWidth(child), 0) : 0;
@@ -58,7 +61,7 @@ const measurementDocument = { body: new Dom("BODY"), createRange() {
   let node: Dom;
   return { selectNodeContents(el: Dom) { node = el; }, getBoundingClientRect: () => ({ width: measuredWidth(node), right: measuredWidth(node) }) };
 } };
-const load = () => mockedModule<{ wrapReadingLists: (section: unknown, collapse?: undefined, source?: unknown) => () => void }>(new URL("../src/view/readingLists.ts", import.meta.url), { "../markdown/listPrefix.ts": { listPrefix } }, {
+const load = () => mockedModule<{ wrapReadingLists: (section: unknown, collapse?: undefined, source?: unknown) => () => void }>(new URL("../src/view/readingLists.ts", import.meta.url), { "../markdown/listPrefix.ts": { listPrefix }, "./readingParagraphs.ts": { alignListWhitespace } }, {
   HTMLElement: Dom, getComputedStyle: (el: Dom) => el.native,
 });
 
