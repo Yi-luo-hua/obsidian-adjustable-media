@@ -11,11 +11,12 @@ import { layoutIsRendered, renderLayout } from "./layoutView.ts";
 import { refContextOf, numbered, markCaptions, type RefContext } from "./crossrefView.ts";
 import { blockWarning } from "./messages.ts";
 import { sectionNoteText } from "./noteText.ts";
-import { readingSectionsOfView, readingViewOfSection } from "./obsidianInternals.ts";
+import { readingSectionsOfView, readingViewOfSection, remeasureSections } from "./obsidianInternals.ts";
 import { keepWrapped, keepWrapsBeside, refreshReadingMedia, refreshReadingWrap, readingMeasurementsReady, resetReadingMeasurements } from "./readingWrap.ts";
 import { renderPrintLayouts } from "./printView.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
 import { webSectionPlan } from "../markdown/webSections.ts";
+import { readingBlankExtras } from "../markdown/readingSpacing.ts";
 
 const WRAPPING = "vml-rv-wrapping";
 const memorySections = new WeakSet<HTMLElement>();
@@ -31,6 +32,7 @@ interface Parsed {
   drawn: Drawn;
   wrapped: boolean;
   refs: RefContext | undefined;
+  blankExtras: Map<number, number>;
 }
 
 interface Reader {
@@ -51,6 +53,7 @@ interface Reader {
 }
 
 interface InstalledSection {
+  blankExtra: number;
   snapshotId: string;
   range: SourceCoverage;
   source: string;
@@ -74,7 +77,7 @@ export function registerReadingView(plugin: Plugin): void {
     const blocks = snapshot.blocks.map(ref => ref.block);
     const refs = blocks.length > 0 ? refContextOf(text) : undefined;
     return { snapshot, lines, offsets, blocks, skips: effectiveWrapSkips(lines, blocks), refs, drawn: drawnFrom(blocks, numbersOf(refs), lines),
-      wrapped: blocks.some(block => isDrawable(block) && modelFromBlock(block).wrap !== null) };
+      wrapped: blocks.some(block => isDrawable(block) && modelFromBlock(block).wrap !== null), blankExtras: readingBlankExtras(lines, blocks) };
   };
 
   const alive = (reader: Reader): boolean => !unloaded && readers.get(reader.view) === reader
@@ -92,6 +95,10 @@ export function registerReadingView(plugin: Plugin): void {
     if (reader.markedWrapping) markWrapping(reader, false);
     const win = reader.view.containerEl.win;
     win.clearTimeout(reader.timer); win.cancelAnimationFrame(reader.frame);
+    // The hidden reading DOM is reused on a mode switch. Keep its spacing for the first visible frame.
+    if (unloaded || reader.view.file !== reader.file || reader.view.getMode() === "preview") {
+      for (const el of reader.sections.keys()) el.toggleClass("vml-rv-spaced", false);
+    }
     reader.stopEnvironment(); reader.projection.dispose(); reader.sections.clear(); reader.pendingSections.clear();
     readers.delete(reader.view);
   };
@@ -102,6 +109,7 @@ export function registerReadingView(plugin: Plugin): void {
       reader.frame = 0;
       if (!alive(reader) || !reader.projection.observeHost(reader.view.getViewData())) return;
       const connected = [...reader.sections].filter(([el]) => el.isConnected && reader.view.containerEl.contains(el));
+      const spacingChanged = new Set<HTMLElement>();
       for (const [el, record] of connected) {
         if (record.snapshotId === reader.parsed.snapshot.id) continue;
         // The host can retain a section without calling its postprocessors again. Its current
@@ -119,10 +127,14 @@ export function registerReadingView(plugin: Plugin): void {
         }
         record.snapshotId = reader.parsed.snapshot.id;
         record.range = sectionRange(reader.parsed, info);
+        const extra = applyBlankSpacing(reader, el, info);
+        if (extra !== record.blankExtra) { record.blankExtra = extra; spacingChanged.add(el); }
       }
       reader.projection.viewportChanged(connected.map(([, record]) => record.range));
       const token = reader.projection.token()!;
       const reading = readingSectionsOfView(reader.view);
+      const changed = reading?.sections.flatMap((section, index) => spacingChanged.has(section.el) ? [index] : []) ?? [];
+      if (changed.length > 0) remeasureSections(plugin.app, connected[0][0], changed[0], changed[changed.length - 1]);
       const byElement = new Map(reading?.sections.map(section => [section.el, section]));
       const installed = connected.filter(([el, record]) => !pendingWebSections.has(el) && record.snapshotId === token.snapshotId);
       reader.projection.installed(token, installed.map(([, record]) => record.range));
@@ -215,6 +227,13 @@ export function registerReadingView(plugin: Plugin): void {
     wake(reader);
   };
 
+  const applyBlankSpacing = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation): number => {
+    const extra = sectionBlock(reader.parsed.blocks, info) ? 0 : reader.parsed.blankExtras.get(info.lineEnd) ?? 0;
+    el.toggleClass("vml-rv-spaced", extra > 0);
+    if (extra > 0) el.setCssProps({ "--vml-extra-blank-lines": String(extra) });
+    return extra;
+  };
+
   const draw = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
     const { blocks, skips, refs, wrapped, snapshot } = reader.parsed;
     const block = sectionBlock(blocks, info);
@@ -268,10 +287,11 @@ export function registerReadingView(plugin: Plugin): void {
         }
       }
     }
+    const blankExtra = applyBlankSpacing(reader, el, info);
     el.toggleClass(WRAPPING, wrapped);
     markWrapping(reader, wrapped);
     if (wrapped) keepWrapsBeside(plugin.app, el);
-    const record: InstalledSection = { snapshotId: snapshot.id, range: sectionRange(reader.parsed, info),
+    const record: InstalledSection = { blankExtra, snapshotId: snapshot.id, range: sectionRange(reader.parsed, info),
       source: sectionSource(reader.parsed, info), sourcePath: snapshot.origin.path, drawn: reader.parsed.drawn,
       layoutKey: sectionLayoutKey(reader.parsed, info), context: ctx };
     reader.sections.set(el, record);

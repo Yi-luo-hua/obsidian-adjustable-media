@@ -4,6 +4,23 @@ import { readingViewHarness } from "./support/readingViewHarness.ts";
 
 const media = '<!-- vml -->\n![[old.png]]\n<!-- /vml -->\n\nBody';
 
+test("retained paragraph sections refresh authored blank spacing without reinstalling layouts", async () => {
+  const host = await readingViewHarness(media, false);
+  host.section(media);
+  const body = host.section(media, 4);
+  host.frame();
+  const spaced = media + "\n\n\n\nNext";
+  host.setHost(spaced); host.edit(spaced); host.frame();
+  assert.equal(body.spaced, true);
+  assert.equal(body.cssProps["--vml-extra-blank-lines"], "2");
+  assert.equal(host.counts.remeasurements, 1);
+  host.setHost(media); host.edit(media); host.frame();
+  assert.equal(body.spaced, false);
+  assert.equal(host.counts.remeasurements, 2);
+  assert.equal(host.rerenders, 0);
+  host.dispose();
+});
+
 test("native HTML sections that include a V3 closer are hidden after the opening layout renders", async () => {
   const text = '<!-- vml {"v":3,"kind":"media","rows":[{"items":1}]} -->\n<iframe src="https://example.org"></iframe>\n<!-- /vml -->\n\nBody';
   const host = await readingViewHarness(text);

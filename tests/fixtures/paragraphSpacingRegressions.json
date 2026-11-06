@@ -42,7 +42,7 @@
       }
     ],
     "blocks": [],
-    "expected": []
+    "expected": ["2:blank"]
   },
   {
     "name": "setext h2",

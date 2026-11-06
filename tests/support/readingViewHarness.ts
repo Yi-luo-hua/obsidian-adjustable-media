@@ -7,11 +7,13 @@ import * as floatOrder from "../../src/layout/floatOrder.ts";
 import * as model from "../../src/layout/model.ts";
 import * as projections from "../../src/layout/viewProjection.ts";
 import * as webSections from "../../src/markdown/webSections.ts";
+import * as readingSpacing from "../../src/markdown/readingSpacing.ts";
 
 interface ElementStub {
   isConnected: boolean;
   empty(): void;
   toggleClass(name: string, enabled: boolean): void;
+  setCssProps(props: Record<string, string>): void;
   onNodeInserted(callback: () => void): () => void;
   querySelectorAll(): never[];
 }
@@ -52,7 +54,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     constructor() { super(); trackedProjections.push(this); }
   }
   const sections: Array<{ el: ElementStub; computed: boolean; rendered: boolean }> = [];
-  const counts = { observers: 0, environments: 0, scrollListeners: 0, sectionLookups: 0, classWrites: 0 };
+  const counts = { observers: 0, environments: 0, scrollListeners: 0, sectionLookups: 0, classWrites: 0, remeasurements: 0 };
   let scroll = (): void => {};
   let mutation = (): void => {};
   class ObserverStub {
@@ -94,6 +96,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     "./canvas.ts": { canvasPreviewHosts: () => kind === "canvas" ? [reader] : [], isCanvasPreview: (view: unknown) => kind === "canvas" && view === reader },
     "../format/v2.ts": format,
     "../markdown/webSections.ts": webSections,
+    "../markdown/readingSpacing.ts": readingSpacing,
     "../layout/documentSnapshot.ts": snapshots,
     "../layout/drawn.ts": drawn,
     "../layout/floatOrder.ts": floatOrder,
@@ -107,7 +110,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     "./crossrefView.ts": { refContextOf: () => undefined },
     "./messages.ts": { blockWarning: () => undefined },
     "./noteText.ts": { sectionNoteText: (_app: unknown, _ctx: unknown, info: { text: string }) => info.text },
-    "./obsidianInternals.ts": { readingViewOfSection: () => reader,
+    "./obsidianInternals.ts": { readingViewOfSection: () => reader, remeasureSections() { counts.remeasurements++; },
       readingSectionsOfView() { counts.sectionLookups++; return { sections, sizer: container }; } },
     "./readingWrap.ts": { keepWrapped: () => () => {}, keepWrapsBeside() {}, refreshReadingWrap() {}, refreshReadingMedia() {}, readingMeasurementsReady: () => true, resetReadingMeasurements() {} },
     "./printView.ts": { renderPrintLayouts() {} },
@@ -147,12 +150,14 @@ export async function readingViewHarness(initialText: string, startup = true, in
       for (const callback of callbacks) callback();
     },
     section(text: string, lineStart = 1, lineEnd = lineStart) {
-      let wrapping = false, empties = 0;
+      let wrapping = false, spaced = false, empties = 0;
+      const cssProps: Record<string, string> = {};
       let infoAvailable = true;
       const children: RenderChild[] = [];
       const inserted = new Set<() => void>();
       const el: ElementStub = { isConnected: true, empty() { empties++; }, querySelectorAll: () => [],
-        toggleClass(_name, enabled) { counts.classWrites++; wrapping = enabled; },
+        toggleClass(name, enabled) { counts.classWrites++; if (name === "vml-rv-wrapping") wrapping = enabled; if (name === "vml-rv-spaced") spaced = enabled; },
+        setCssProps(props) { Object.assign(cssProps, props); },
         onNodeInserted(callback) { inserted.add(callback); return () => inserted.delete(callback); } };
       elements.add(el);
       const info = { text, lineStart, lineEnd };
@@ -164,7 +169,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
           addChild(child) { children.push(child); } });
       };
       process(text);
-      return { get wrapping() { return wrapping; }, get empties() { return empties; }, get watchers() { return inserted.size; },
+      return { get wrapping() { return wrapping; }, get spaced() { return spaced; }, cssProps, get empties() { return empties; }, get watchers() { return inserted.size; },
         reprocess: process,
         move(from: number, to = from) { info.lineStart = from; info.lineEnd = to; },
         setInfoAvailable(available: boolean) { infoAvailable = available; },

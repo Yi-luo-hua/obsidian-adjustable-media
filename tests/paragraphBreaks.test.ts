@@ -94,9 +94,15 @@ test("every blank between paragraphs becomes a visible break", () => {
     ["1:blank", "3:blank", "4:blank", "5:blank"]);
 });
 
-test("a heading keeps the spacing above it, and a first-level one below it too", () => {
+test("a heading keeps the spacing above it; blank lines below every level use paragraph spacing", () => {
   const text = ["Text.", "", "## Heading", "", "", "Text.", "", "# Title", "", "Text.", "", "#Tag is text", "", "   ### Indented"];
-  assert.deepEqual(lines(paragraphBreaks(text, [])), ["3:blank", "4:blank", "10:blank"]);
+  assert.deepEqual(lines(paragraphBreaks(text, [])), ["3:blank", "4:blank", "8:blank", "10:blank"]);
+});
+
+test("a blank between a rule and a heading uses paragraph spacing in both parsers", () => {
+  const text = ["---", "", "## Heading"];
+  assert.deepEqual(lines(paragraphBreaks(text, [])), ["1:blank"]);
+  assert.deepEqual(lines(hostParagraphBreaks(text, [], [{ type: "thematicBreak", from: 0, to: 0 }, { type: "heading", from: 2, to: 2 }])), ["1:blank"]);
 });
 
 test("a heading followed right away by text gets the break below it", () => {

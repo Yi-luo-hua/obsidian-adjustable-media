@@ -70,7 +70,7 @@ export function hostParagraphBreaks(lines: readonly string[], blocks: readonly B
     if (owner[line] !== -1 || layout[line] || lines[line].trim() !== "") continue;
     const start = line;
     while (line + 1 < lines.length && owner[line + 1] === -1 && !layout[line + 1] && lines[line + 1].trim() === "") line++;
-    if (headingAt(line + 1) === 0 && headingAt(start - 1) !== 1) add(start, "blank");
+    if (headingAt(line + 1) === 0 || sections[owner[start - 1]]?.type === "thematicBreak") add(start, "blank");
     for (let extra = start + 1; extra <= line; extra++) add(extra, "blank");
   }
   for (let index = 1; index < sections.length; index++) {
@@ -119,8 +119,8 @@ function sectionHeadingLevel(lines: readonly string[], section: MarkdownSection 
  * the note's text, and what of it sits beside a float, lies where reading view and the PDF put it
  * (docs/DESIGN.md, section 4.3).
  *
- * The spacing above a heading, and below a first-level one, is the heading's own: it differs between
- * the two modes by level and theme, and a whole blank line there already comes out close. Lines in
+ * The spacing above a heading is the heading's own; below every level, a blank uses paragraph spacing.
+ * A blank between a rule and a heading also uses paragraph spacing. Lines in
  * layouts, code, math, comments and frontmatter are left alone.
  */
 export function paragraphBreaks(lines: readonly string[], blocks: readonly BreakBlock[], listContents = false): ParagraphBreak[] {
@@ -163,7 +163,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     while (end + 1 < lines.length && blank(end + 1)) {
       end += 1;
     }
-    if (headingLevel(lines[end + 1]) === 0 && headingLevel(lines[line - 1]) !== 1) {
+    if (headingLevel(lines[end + 1]) === 0 || THEMATIC_BREAK.test((lines[line - 1] ?? "").trim())) {
       add(line, "blank");
     }
     for (let extra = line + 1; extra <= end; extra += 1) {

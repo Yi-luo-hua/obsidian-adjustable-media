@@ -411,6 +411,29 @@
   padding-bottom: var(--p-spacing, 1rem);
 }
 
+/* A folded rule has the height of its border, rather than a full editor text line. */
+.vml-has-layouts .cm-content > .cm-line.hr {
+  line-height: 0;
+}
+
+/* Invisible caret buffers must not enlarge a heading's line box. Keep their native dimensions. */
+.vml-has-layouts .cm-content > .HyperMD-header > .cm-widgetBuffer {
+  vertical-align: top;
+}
+
+/* Reading view gives the first body heading no extra space above it. */
+.vml-has-layouts .cm-content > .HyperMD-header:first-child {
+  padding-top: 0;
+}
+
+/* Keep authored extra paragraph breaks in reading view without doubling the ordinary margin. */
+.markdown-preview-sizer > .vml-rv-spaced:is(.el-p, .el-h1, .el-h2, .el-h3, .el-h4, .el-h5, .el-h6)::after {
+  content: "";
+  display: block;
+  height: calc(var(--vml-extra-blank-lines) * var(--p-spacing, 1rem));
+  margin-top: calc(-1 * var(--p-spacing, 1rem));
+}
+
 .vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout {
   margin: 0;
 }
