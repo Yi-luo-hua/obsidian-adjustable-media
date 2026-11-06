@@ -1182,10 +1182,10 @@ body.vml-is-dragging * {
 
 /*
  * Reading view, in a note with a wrapped layout (its sections carry vml-rv-wrapping): lists (so nested
- * ones keep their indent), a quote's bar, a callout's box, a rule and display math sit beside a float
+ * ones keep their indent), a quote's bar, a callout's box and display math sit beside a float
  * as a whole.
  */
-.markdown-rendered .vml-rv-wrapping :is(ul, ol, blockquote, .callout, hr, .math-block):not(.vml-layout *) {
+.markdown-rendered .vml-rv-wrapping :is(ul, ol, blockquote, .callout, .math-block):not(.vml-layout *) {
   display: flow-root;
 }
 
@@ -1206,7 +1206,7 @@ body.vml-is-dragging * {
   z-index: 1;
 }
 
-/* In a note with wrapped layouts no line clears floats: headings wrap too. */
+/* Ordinary lines, including headings, continue beside wrapped layouts. */
 .vml-has-wraps .cm-content > .cm-line {
   clear: none;
 }
@@ -1220,7 +1220,10 @@ body.vml-is-dragging * {
   display: flow-root;
 }
 
-/* A fenced code block is one unit in reading/print view, not independently wrapping lines. */
+/* Rules end text wrapping on both sides; fenced code also starts below floats. */
+.vml-has-wraps .cm-content > .cm-line:is(.hr, .HyperMD-hr),
+.markdown-rendered .vml-rv-wrapping > hr,
+.vml-print-content > hr,
 .vml-has-wraps .cm-content > .cm-line.HyperMD-codeblock-begin,
 .markdown-rendered .vml-rv-wrapping pre,
 .vml-print-content pre {
@@ -1231,7 +1234,7 @@ body.vml-is-dragging * {
   display: block;
 }
 
-.vml-print-content :is(ul, ol, blockquote, .callout, hr, .math-block):not(.vml-layout *) {
+.vml-print-content :is(ul, ol, blockquote, .callout, .math-block):not(.vml-layout *) {
   display: flow-root;
 }
 

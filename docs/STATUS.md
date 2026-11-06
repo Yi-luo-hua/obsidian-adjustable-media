@@ -1,8 +1,10 @@
 # 项目状态
 
-更新：2026-11-05。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-11-06。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
+
+- **main 未发布：水平线结束环绕**。正文顶层水平线清除左右浮动，排在图片布局下方并恢复全宽，下一节从线下开始。Windows／Obsidian 1.15.0 默认主题验证左右浮动的实时预览／阅读视图、模式切换及滚动，558 项测试与生产构建通过；打印样式同步，完整 PDF 与移动设备未复测，见[记录](archive/2026-11-06-horizontal-rule-wrap.md)。
 
 - **公开版本：0.9.4**，标签源码 `0b14059`，已设为最新版本；558 项检查、生产打包和 CI 通过，公开附件与干净标签构建及已审核草稿一致，来源证明已核对。详见[发布核验](releases/0.9.4-readiness.md)。
 
