@@ -667,7 +667,7 @@
 
 .vml-item__caption {
   color: var(--text-muted);
-  font-size: var(--font-ui-small);
+  font-size: calc(var(--font-ui-small) * var(--vml-caption-scale, 1));
   margin-top: 4px;
   overflow-wrap: anywhere;
   white-space: pre-wrap;

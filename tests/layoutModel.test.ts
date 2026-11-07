@@ -96,6 +96,22 @@ test("moving to a new row removes the emptied row and inherits the source row he
   assert.deepEqual(names(lastOut), [["c.png"], ["a.png", "b.png"]]);
 });
 
+test("caption size follows the item through a move and round trip, and clears with the caption", () => {
+  const position = { row: 0, index: 1 };
+  const enlarged = setCaption(model(sample), position, "B", 1.5);
+  assert.deepEqual(metaFromModel(enlarged).rows[0]?.captionScales, [null, 1.5]);
+
+  const moved = moveItem(enlarged, position, { kind: "newRow", beforeRow: 0 });
+  const reparsed = model(serializeBlock(metaFromModel(moved), rowEmbeds(moved)));
+  assert.deepEqual(metaFromModel(reparsed).rows[0], { height: 240, captions: ["B"], captionScales: [1.5] });
+  assert.equal(reparsed.rows[1]?.items[0]?.captionScale, null);
+
+  const movedPosition = { row: 0, index: 0 };
+  assert.deepEqual(metaFromModel(setCaption(reparsed, movedPosition, "New text")).rows[0]?.captionScales, [1.5]);
+  assert.equal(metaFromModel(setCaption(reparsed, movedPosition, "New text", null)).rows[0]?.captionScales, undefined);
+  assert.equal(metaFromModel(setCaption(reparsed, movedPosition, "")).rows[0]?.captionScales, undefined);
+});
+
 test("a row never holds more than four items", () => {
   const layout = model(["<!-- vml -->", "![[a.png]] ![[b.png]] ![[c.png]] ![[d.png]]", "![[e.png]]", "<!-- /vml -->"]);
   const moved = moveItem(setRowHeight(layout, 0, 300), { row: 1, index: 0 }, { kind: "beside", position: { row: 0, index: 0 }, side: "before" });

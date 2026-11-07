@@ -324,6 +324,14 @@ const MESSAGES = {
     zh: "居中",
     en: "Center",
   },
+  captionSize: {
+    zh: "图注字号",
+    en: "Caption size",
+  },
+  captionSizeDefault: {
+    zh: "默认（100%）",
+    en: "Default (100%)",
+  },
   save: {
     zh: "保存",
     en: "Save",

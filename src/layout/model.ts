@@ -25,6 +25,7 @@ import {
   readTextSize,
   type Align,
   type CaptionAlign,
+  type CaptionScale,
   type TextAlign,
   type TextJustify,
   type V2Block,
@@ -50,6 +51,7 @@ export interface LayoutItem {
   /** Column weight; null means an equal share. */
   weight: number | null;
   caption: string | null;
+  captionScale?: CaptionScale | null;
 }
 
 /** Size/position settings can update existing media; content and other presentation need a redraw. */
@@ -150,6 +152,7 @@ export function modelFromBlock(block: V2Block): LayoutModel {
           ...(embed.kind === "web" ? { height: validHeights && typeof heights[index] === "number" ? clampHeight(heights[index]) : null } : {}),
           weight: settings.widths?.[index] ?? null,
           caption: settings.captions?.[index] ?? null,
+          captionScale: settings.captions?.[index] ? settings.captionScales?.[index] ?? null : null,
         })),
         height: settings.height,
         width: settings.width,
@@ -228,6 +231,9 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       }
       if (row.items.some((item) => item.caption !== null)) {
         meta.captions = row.items.map((item) => item.caption);
+      }
+      if (row.items.some((item) => item.captionScale != null)) {
+        meta.captionScales = row.items.map((item) => item.captionScale ?? null);
       }
       if (row.captionAlign !== null) {
         meta.captionAlign = row.captionAlign;
@@ -579,14 +585,16 @@ export function resetWeights(model: LayoutModel, rowIndex: number): LayoutModel 
   return updateRow(model, rowIndex, (row) => ({ ...row, items: row.items.map((item) => ({ ...item, weight: null })) }));
 }
 
-export function setCaption(model: LayoutModel, position: ItemPosition, caption: string | null): LayoutModel {
+export function setCaption(model: LayoutModel, position: ItemPosition, caption: string | null, scale?: CaptionScale | null): LayoutModel {
   const text = caption?.trim() || null;
-  if (!model.rows[position.row]?.items[position.index]) {
+  const item = model.rows[position.row]?.items[position.index];
+  if (!item) {
     return model;
   }
+  const captionScale = text ? (scale === undefined ? item.captionScale ?? null : scale) : null;
   return updateRow(model, position.row, (row) => ({
     ...row,
-    items: row.items.map((item, index) => (index === position.index ? { ...item, caption: text } : item)),
+    items: row.items.map((current, index) => (index === position.index ? { ...current, caption: text, captionScale } : current)),
   }));
 }
 

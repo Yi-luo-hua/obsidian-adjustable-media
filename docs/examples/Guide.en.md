@@ -7,7 +7,7 @@
 - **Adjust image width**: Drag the divider between images to adjust width distribution.
 - **Resize layout block**: Drag the bottom edge of the block to adjust height; drag the bottom-right corner to scale proportionally.
 - **Adjust media arrangement**: Click and drag an image to reorder media within the layout (left/right/up/down); if a row has only one image, drag horizontally to adjust its offset.
-- **Add / edit caption**: Right-click an image and choose "Edit caption…" to edit text and alignment.
+- **Add / edit caption**: Right-click an image and choose "Edit caption…" to change the text, alignment, and font size. Use `**bold**` to emphasize part of the caption.
 - **Layout block position**: Drag the handle in the center of the block to move it; drag left/right to position it left or right.
 ---
 

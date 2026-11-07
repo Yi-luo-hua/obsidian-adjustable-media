@@ -21,6 +21,8 @@ export type MediaKind = "image" | "video" | "mermaid" | "excalidraw" | "web";
 export type EmbedSyntax = "wiki" | "markdown" | "mermaid" | "iframe";
 export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
+export const CAPTION_SCALES = [1.25, 1.5, 2] as const;
+export type CaptionScale = typeof CAPTION_SCALES[number];
 /** The side a layout floats to, with the note's own text wrapping around it. */
 export type WrapSide = "left" | "right";
 /** How the text beside a layout's media lines up with them vertically. */
@@ -231,11 +233,12 @@ export interface RowSettings {
   offset: number | null;
   captions: Array<string | null> | null;
   captionAlign: CaptionAlign | null;
+  captionScales: Array<CaptionScale | null> | null;
   /** Keys this version does not understand, written back unchanged. */
   extra: V2RowMeta;
 }
 
-const ROW_KEYS = new Set(["height", "widths", "width", "align", "offset", "captions", "captionAlign"]);
+const ROW_KEYS = new Set(["height", "widths", "width", "align", "offset", "captions", "captionAlign", "captionScales"]);
 
 export function readRowMeta(meta: V2RowMeta, embedCount: number): RowSettings {
   const height = finiteNumber(meta.height);
@@ -250,6 +253,9 @@ export function readRowMeta(meta: V2RowMeta, embedCount: number): RowSettings {
     offset: embedCount === 1 && offset !== null && offset >= 0 && offset <= 1 ? offset : null,
     captions: captionList(meta.captions, embedCount),
     captionAlign: meta.captionAlign === "left" || meta.captionAlign === "center" ? meta.captionAlign : null,
+    captionScales: Array.isArray(meta.captionScales) && meta.captionScales.length === embedCount
+      ? meta.captionScales.map((value: unknown) => CAPTION_SCALES.find((scale) => scale === value) ?? null)
+      : null,
     extra: Object.fromEntries(Object.entries(meta).filter(([key]) => !ROW_KEYS.has(key))),
   };
 }

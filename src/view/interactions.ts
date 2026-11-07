@@ -786,8 +786,8 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
   // actions added at the end.
   menu.addItem((entry) => entry.setTitle(t("editCaption")).setIcon("text").setSection("vml-caption").onClick(() => {
     const currentAlign = row.captionAlign ?? "left";
-    new CaptionModal(context.app, item.caption ?? "", currentAlign, (caption, align) => {
-      let model = setCaption(context.model, position, caption);
+    new CaptionModal(context.app, { text: item.caption ?? "", align: currentAlign, scale: item.captionScale ?? null }, ({ text, align, scale }) => {
+      let model = setCaption(context.model, position, text, scale);
       if (align !== currentAlign) {
         model = setCaptionAlign(model, position.row, align);
       }

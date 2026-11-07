@@ -1,17 +1,21 @@
-import { Modal, type App } from "obsidian";
+import { Modal, Setting, type App } from "obsidian";
 
-import type { CaptionAlign } from "../format/v2.ts";
+import { CAPTION_SCALES, type CaptionAlign, type CaptionScale } from "../format/v2.ts";
 import { t } from "./messages.ts";
 
-export class CaptionModal extends Modal {
-  private readonly caption: string;
-  private readonly align: CaptionAlign;
-  private readonly onSave: (caption: string, align: CaptionAlign) => void;
+interface CaptionSettings {
+  text: string;
+  align: CaptionAlign;
+  scale: CaptionScale | null;
+}
 
-  constructor(app: App, caption: string, align: CaptionAlign, onSave: (caption: string, align: CaptionAlign) => void) {
+export class CaptionModal extends Modal {
+  private readonly initial: CaptionSettings;
+  private readonly onSave: (settings: CaptionSettings) => void;
+
+  constructor(app: App, initial: CaptionSettings, onSave: (settings: CaptionSettings) => void) {
     super(app);
-    this.caption = caption;
-    this.align = align;
+    this.initial = initial;
     this.onSave = onSave;
   }
 
@@ -21,9 +25,9 @@ export class CaptionModal extends Modal {
       cls: "vml-caption-modal__text",
       attr: { placeholder: t("captionPlaceholder"), rows: "4" },
     });
-    textarea.value = this.caption;
+    textarea.value = this.initial.text;
 
-    let align = this.align;
+    let align = this.initial.align;
     const alignRow = this.contentEl.createDiv({ cls: "vml-caption-modal__align" });
     const choices = ([["left", "captionAlignLeft"], ["center", "captionAlignCenter"]] as const).map(([value, label]) => {
       const button = alignRow.createEl("button", { text: t(label) });
@@ -40,8 +44,20 @@ export class CaptionModal extends Modal {
     };
     refresh();
 
+    let scale = this.initial.scale;
+    new Setting(this.contentEl).setName(t("captionSize")).addDropdown((dropdown) => {
+      dropdown.addOption("", t("captionSizeDefault"));
+      for (const value of CAPTION_SCALES) {
+        dropdown.addOption(String(value), `${value * 100}%`);
+      }
+      dropdown.setValue(scale === null ? "" : String(scale));
+      dropdown.onChange((value) => {
+        scale = CAPTION_SCALES.find((choice) => String(choice) === value) ?? null;
+      });
+    });
+
     const save = (): void => {
-      this.onSave(textarea.value, align);
+      this.onSave({ text: textarea.value, align, scale });
       this.close();
     };
     textarea.addEventListener("keydown", (event) => {

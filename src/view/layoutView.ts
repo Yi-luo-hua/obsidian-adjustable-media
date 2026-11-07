@@ -326,6 +326,9 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
   if (item.caption) {
     // A caption is Markdown, drawn as such where the layout can own what Obsidian draws.
     const captionEl = itemEl.createDiv({ cls: "vml-item__caption", attr: { "data-align": row.captionAlign ?? "left" } });
+    if (item.captionScale != null) {
+      captionEl.setCssProps({ "--vml-caption-scale": String(item.captionScale) });
+    }
     if (renderMarkdown(captionEl, item.caption, options)) {
       captionEl.addClass("vml-item__caption--markdown");
     } else {
