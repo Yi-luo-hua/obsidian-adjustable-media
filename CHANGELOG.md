@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.9.5 - 2026-11-07
+
+- Fix horizontal rules failing to end text wrapping after image-only floating layouts.
+- Align paragraph spacing, list indentation, ordered markers and narrow-column wrapping between Live Preview and Reading View while preserving native editing.
+- Improve reading-position stability during view switches and reduce image and rule flicker, redundant rendering and pauses.
+- Fix unfinished web layouts during mode switches and subsequent navigation from outlines or search results.
+
+Validation and platform boundaries: [0.9.5 release preparation](docs/releases/0.9.5-readiness.md).
+
 ## 0.9.4 - 2026-11-05
 
 - Add iframe web embeds to media layouts, including videos and maps, independent sizing, captions and text wrapping ([#38](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/38)).

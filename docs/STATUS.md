@@ -1,8 +1,10 @@
 # 项目状态
 
-更新：2026-11-06。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新：2026-11-07。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
+
+- **0.9.5 发布准备**：已审查 `0.9.4...a6973dd` 全部代码更新，补修隐藏网页任务过期后的重绘和切换锚点覆盖显式导航两个问题，复核无未解决项。600 项测试与生产打包通过；版本、中英文说明和弹窗已同步，公开版本仍为 0.9.4。详见[发布准备与审查](releases/0.9.5-readiness.md)。
 
 - **main 未发布：抵消阅读视图 0.1px 原生占位**。保留虚拟化占位，以外边距抵消其额外高度；原笔记分隔线、标题、表格及此前正文／窄列／引用的纵坐标复核差异为 0。四次切换逐帧无位移，591 项检查通过，测试库已更新，见[补充记录](archive/2026-11-06-reading-list-and-scroll.md)。
 
