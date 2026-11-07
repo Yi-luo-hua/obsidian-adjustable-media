@@ -240,6 +240,12 @@
   margin-bottom: 0;
 }
 
+/* Keep images in the same paragraph inline when a theme centers every image as a block. */
+.markdown-preview-view.markdown-rendered .vml-layout .vml-layout__text
+  p:has(> :is(img, .image-embed) ~ :is(img, .image-embed)) img {
+  display: inline;
+}
+
 /* A wide mobile table scrolls within its own box; its text column and the note keep their width. */
 @media screen {
   .is-mobile .vml-layout__text table {

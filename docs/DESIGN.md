@@ -227,6 +227,8 @@ $$
 
 ## 4. 实测确认过的 Obsidian 行为
 
+2026-11-07 Underwater 主题兼容：主题的图片居中会把文字布局和图文布局文字栏内的同行图片各排一行。阅读模式仅恢复含多张同行图片的段落内图片的行内显示。Windows／Obsidian 1.15.0／[Underwater 1.6.70](https://github.com/Seniblue/Underwater/releases/tag/1.6.70) 下，正式 0.9.4 和 0.9.5 均可复现；用 0.9.5 脚本搭配修复样式，已核对文字块、图文布局、普通媒体行、单图与块外图片。旧版可在 Style Settings 的 Underwater 设置中打开「Disable image/videos/embeds/etc. + Tables centering」临时恢复。
+
 2026-11-06 水平线结束环绕：笔记正文的顶层水平线清除左右浮动，排在此前布局下方并恢复全宽，后续标题与正文从新节开始。实时预览兼容宿主的 `.hr` 与 `.HyperMD-hr` 行类；阅读视图和打印应用同一边界，不改变布局内部的水平线。Windows／Obsidian 1.15.0 默认主题定向复现与验证见[记录](archive/2026-11-06-horizontal-rule-wrap.md)。
 
 2026-11-05 编辑器初始化兼容：`editorInfoField` 可持有 MarkdownView，`editor` 是读取 `editMode.editor` 的 getter（1.15.0 实测）。初始化期间直接读取尚未就绪的 getter 会抛错，可选链不能保护其内部访问。`editor/editorInfo.ts` 只隔离这一次宿主 getter 读取，实时预览与窗格来源回退使用同一入口，下一次事务重新读取并绑定已就绪的编辑器；不缓存失败，不在渲染中写笔记。反馈边界与定向验证见[记录](archive/2026-11-05-editor-initialization.md)。
