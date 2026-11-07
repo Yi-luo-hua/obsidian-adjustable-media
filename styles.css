@@ -1687,8 +1687,14 @@ body.vml-is-dragging * {
 
 .vml-caption-modal__align {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-top: 10px;
+}
+
+.vml-caption-modal__align > select {
+  margin-inline-start: auto;
+  min-width: 0;
 }
 
 .vml-caption-modal__align button.is-active {

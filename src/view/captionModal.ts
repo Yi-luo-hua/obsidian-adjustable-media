@@ -1,4 +1,4 @@
-import { Modal, Setting, type App } from "obsidian";
+import { DropdownComponent, Modal, type App } from "obsidian";
 
 import { CAPTION_SCALES, type CaptionAlign, type CaptionScale } from "../format/v2.ts";
 import { t } from "./messages.ts";
@@ -45,15 +45,15 @@ export class CaptionModal extends Modal {
     refresh();
 
     let scale = this.initial.scale;
-    new Setting(this.contentEl).setName(t("captionSize")).addDropdown((dropdown) => {
-      dropdown.addOption("", t("captionSizeDefault"));
-      for (const value of CAPTION_SCALES) {
-        dropdown.addOption(String(value), `${value * 100}%`);
-      }
-      dropdown.setValue(scale === null ? "" : String(scale));
-      dropdown.onChange((value) => {
-        scale = CAPTION_SCALES.find((choice) => String(choice) === value) ?? null;
-      });
+    const dropdown = new DropdownComponent(alignRow);
+    dropdown.selectEl.setAttribute("aria-label", t("captionSize"));
+    dropdown.addOption("", t("captionSizeDefault"));
+    for (const value of CAPTION_SCALES) {
+      dropdown.addOption(String(value), `${value * 100}%`);
+    }
+    dropdown.setValue(scale === null ? "" : String(scale));
+    dropdown.onChange((value) => {
+      scale = CAPTION_SCALES.find((choice) => String(choice) === value) ?? null;
     });
 
     const save = (): void => {
