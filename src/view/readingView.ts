@@ -292,7 +292,12 @@ export function registerReadingView(plugin: Plugin): void {
         let active = true;
         child.register(() => { active = false; if (pendingWebSections.get(el) === pending) pendingWebSections.delete(el); });
         void MarkdownRenderer.render(plugin.app, numbered(webPlan.markdown, refs), content, snapshot.origin.path, child).then(async () => {
-          if (!active || !alive(reader) || reader.parsed.snapshot.id !== snapshot.id) return;
+          if (!active || retired(reader)) return;
+          if (reader.parsed.snapshot.id !== snapshot.id || reader.view.getViewData() !== snapshot.text) {
+            // A retained section must not settle with an empty slot after its async result expires.
+            reader.needsRender = true; reader.requested = null; wake(reader);
+            return;
+          }
           markCaptions(content, webPlan.markdown);
           const tasks: Promise<void>[] = [];
           webPlan.layouts.forEach((layout, index) => {

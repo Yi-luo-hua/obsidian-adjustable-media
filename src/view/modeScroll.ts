@@ -132,6 +132,14 @@ export function registerModeScroll(plugin: Plugin): void {
         });
       };
       const input = (): void => { pending = null; anchor = capture(view); };
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- Preserve method identity for teardown; call with its receiver below.
+      const setEphemeralState = view.setEphemeralState;
+      const navigate = function(this: MarkdownView, state: unknown): void {
+        // Outline/search navigation supersedes a mode switch's retained viewport anchor.
+        if (state && typeof state === "object" && ("line" in state || "match" in state)) pending = null;
+        setEphemeralState.call(this, state);
+      };
+      view.setEphemeralState = navigate;
       const changeMode = (): boolean => {
         if (mode !== view.getMode()) {
           mode = view.getMode(); pending = anchor; hinted = false;
@@ -157,6 +165,7 @@ export function registerModeScroll(plugin: Plugin): void {
       schedule();
       panes.set(view, { file: view.file, update: schedule, stop: () => {
         view.previewMode.containerEl.removeClass("vml-reading-parity");
+        if (view.setEphemeralState === navigate) view.setEphemeralState = setEphemeralState;
         stopNativeScroll();
         win.cancelAnimationFrame(frame); mutation.disconnect();
         view.containerEl.removeEventListener("scroll", schedule, true);

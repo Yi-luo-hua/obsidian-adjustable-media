@@ -131,6 +131,19 @@ test("user scrolling releases the old anchor and the return trip preserves the n
   assert.ok([...h.events.values()].every(listeners => listeners.size === 0));
 });
 
+for (const state of [{ line: 50 }, { match: { matches: [[0, 6]] } }]) {
+  test(`explicit navigation releases the mode anchor: ${JSON.stringify(state)}`, async () => {
+    const h = await harness();
+    h.view.mode = "preview"; h.mutate(); h.frame();
+    assert.equal(h.reading.scroller.scrollTop, 180);
+    h.view.setEphemeralState(state);
+    h.reading.scroller.scrollTop = 90; h.nativeScroll(); h.mutate(); h.frame();
+    assert.equal(h.reading.scroller.scrollTop, 90);
+    assert.deepEqual(h.view.hints, [state]);
+    h.stop();
+  });
+}
+
 test("a changed note cannot restore an anchor from an older source snapshot", async () => {
   const h = await harness();
   h.view.mode = "preview"; h.view.text = "Different contents"; h.mutate(); h.frame();

@@ -16,6 +16,8 @@ interface ElementStub {
   setCssProps(props: Record<string, string>): void;
   onNodeInserted(callback: () => void): () => void;
   querySelectorAll(): never[];
+  createDiv(): ElementStub;
+  querySelector(selector: string): ElementStub | null;
 }
 
 interface SectionContext {
@@ -44,6 +46,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
   let rerenders = 0;
   let mode = "preview";
   const renders: string[] = [];
+  const webRenders: Array<() => void> = [];
   const renderedRows: Array<Array<number | null>> = [];
   let processor: PostProcessor;
   let onReady: () => void;
@@ -79,6 +82,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     addEventListener(name: string, callback: () => void) { if (name === "scroll") { counts.scrollListeners++; scroll = callback; } },
     removeEventListener() {} };
   const reader = Object.assign(new ViewStub(), { file, containerEl: container,
+    editor: { getValue: () => hostText },
     getMode: () => mode, getViewData: () => hostText,
     previewMode: { containerEl: container, rerender() { rerenders++; } } });
   const sourceView = Object.assign(new ViewStub(), { file, getMode: () => "source",
@@ -87,14 +91,15 @@ export async function readingViewHarness(initialText: string, startup = true, in
   const on = (name: string, callback: Listener): void => { listeners.set(name, callback); };
   const app = {
     workspace: { getLeavesOfType: (type: string) => type === "markdown" && kind === "markdown" ? leaves : [], on, onLayoutReady(callback: () => void) { onReady = callback; } },
-    vault: { on, cachedRead: () => Promise.resolve(diskText) },
+    vault: { on, cachedRead: () => Promise.resolve(diskText), getAbstractFileByPath: () => reader.file },
     metadataCache: { on },
   };
   const plugin = { app,
     registerMarkdownPostProcessor(callback: PostProcessor) { processor = callback; },
     registerEvent() {}, register(callback: () => void) { cleanups.push(callback); } };
   const modules: Record<string, unknown> = {
-    obsidian: { MarkdownView: ViewStub, MarkdownRenderChild: RenderChild, TFile: FileStub },
+    obsidian: { MarkdownView: ViewStub, MarkdownRenderChild: RenderChild, TFile: FileStub,
+      MarkdownRenderer: { render: () => new Promise<void>(resolve => webRenders.push(resolve)) } },
     "./canvas.ts": { canvasPreviewHosts: () => kind === "canvas" ? [reader] : [], isCanvasPreview: (view: unknown) => kind === "canvas" && view === reader },
     "../format/v2.ts": format,
     "../markdown/webSections.ts": webSections,
@@ -109,7 +114,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
       renderedRows.push(rows.map(index => options.model.rows[index].height));
       renders.push(rows.flatMap(index => options.model.rows[index].items.map(item => item.embed.raw)).join(" ")); return {};
     }, layoutIsRendered: () => true },
-    "./crossrefView.ts": { refContextOf: () => undefined },
+    "./crossrefView.ts": { refContextOf: () => undefined, numbered: (text: string) => text, markCaptions() {} },
     "./messages.ts": { blockWarning: () => undefined },
     "./noteText.ts": { sectionNoteText: (_app: unknown, _ctx: unknown, info: { text: string }) => info.text },
     "./obsidianInternals.ts": { keepReadingFlow: () => () => {}, obsidianSetting: () => 4, collapseReadingList() {}, readingViewOfSection: () => reader, remeasureSections() { counts.remeasurements++; },
@@ -130,6 +135,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     renders,
     renderedRows,
     counts,
+    async finishWebRender() { webRenders.shift()!(); await new Promise<void>(resolve => setTimeout(resolve, 0)); },
     fileOpened() { listeners.get("file-open")!(); },
     openFile(text: string) {
       reader.file = new FileStub(); sourceView.file = reader.file;
@@ -162,6 +168,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
       const children: RenderChild[] = [];
       const inserted = new Set<() => void>();
       const el: ElementStub = { isConnected: true, empty() { empties++; }, querySelectorAll: () => [],
+        createDiv: () => ({ ...el, querySelector: () => el }), querySelector: () => null,
         toggleClass(name, enabled) { counts.classWrites++; if (name === "vml-rv-wrapping") wrapping = enabled; if (name === "vml-rv-spaced") spaced = enabled; },
         setCssProps(props) { Object.assign(cssProps, props); },
         onNodeInserted(callback) { inserted.add(callback); return () => inserted.delete(callback); } };

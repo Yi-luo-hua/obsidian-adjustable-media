@@ -4,6 +4,50 @@ import { readingViewHarness } from "./support/readingViewHarness.ts";
 
 const media = '<!-- vml -->\n![[old.png]]\n<!-- /vml -->\n\nBody';
 
+const web = '<!-- vml {"v":3,"kind":"media","rows":[{"items":1}]} -->\n<iframe src="https://example.org"></iframe>\n<!-- /vml -->\n\nBody';
+
+test("a hidden retained web section finishes its pending layout before returning to reading", async () => {
+  const host = await readingViewHarness(web, false);
+  host.section(web, 0, 4);
+  host.setMode("source");
+  await host.finishWebRender();
+  assert.deepEqual(host.renders, ['<iframe src="https://example.org"></iframe>']);
+  host.setMode("preview"); host.frame();
+  assert.equal(host.rerenders, 0);
+  assert.equal(host.renders.length, 1);
+  host.dispose();
+});
+
+for (const stale of ["buffer", "snapshot", "file", "section", "plugin"]) {
+  test(`a hidden web completion rejects a stale ${stale}`, async () => {
+    const host = await readingViewHarness(web, false), section = host.section(web, 0, 4);
+    host.setMode("source");
+    if (stale === "buffer" || stale === "snapshot") host.setHost(web + " changed");
+    if (stale === "snapshot") { host.setMode("preview"); host.edit(web + " changed"); host.setMode("source"); }
+    if (stale === "file") host.openFile("Other note");
+    if (stale === "section") section.dispose();
+    if (stale === "plugin") host.dispose();
+    await host.finishWebRender();
+    assert.deepEqual(host.renders, []);
+    if (stale !== "plugin") host.dispose();
+  });
+}
+
+test("an expired hidden web render retries even when only unrelated body text changed", async () => {
+  const host = await readingViewHarness(web, false), section = host.section(web, 0, 4);
+  host.setMode("source");
+  const next = web + "\n\nUnrelated paragraph";
+  host.setHost(next);
+  await host.finishWebRender();
+  assert.deepEqual(host.renders, []);
+  host.setMode("preview"); host.frame();
+  assert.equal(host.rerenders, 1);
+  section.reprocess(next);
+  await host.finishWebRender(); host.frame();
+  assert.deepEqual(host.renders, ['<iframe src="https://example.org"></iframe>']);
+  host.dispose();
+});
+
 test("reprocessing and unloading a section release the previous float before installing its replacement", async () => {
   const text = media.replace("<!-- vml -->", '<!-- vml {"wrap":"right"} -->');
   const host = await readingViewHarness(text, false), section = host.section(text);
