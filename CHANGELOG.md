@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.9.6 - 2026-11-09
+
+- Set the font size of each image caption to Default, 125%, 150%, or 200% from the caption editor ([#40](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/40)).
+- Fix images on the same line stacking vertically inside Reading View layouts when using the Underwater theme.
+- Keep Obsidian's row, column, and sort actions alongside **Wrap in a layout** when right-clicking a table cell in Live Preview, including while editing or selecting text in the cell ([#41](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/41)).
+
 ## 0.9.5 - 2026-11-07
 
 - Fix horizontal rules failing to end text wrapping after image-only floating layouts.
