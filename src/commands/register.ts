@@ -5,6 +5,7 @@ import { isEditable, planUnwrap, planUnwrapAll, type LineChange } from "../layou
 import { writeBlockEdits } from "../layout/writeBack.ts";
 import { fileOfEditor } from "../view/obsidianInternals.ts";
 import { reportWriteError, t } from "../view/messages.ts";
+import { addTableCellWrapItem } from "../view/tableMenu.ts";
 import { lineChangeEdit, blockAt, planMergeWithNext, planWrapSelection, selectedLines } from "./plans.ts";
 import { planTextColumnBreak } from "./textColumnBreak.ts";
 
@@ -22,7 +23,7 @@ export function registerCommands(plugin: Plugin): void {
     },
   });
   plugin.registerEvent(plugin.app.workspace.on("editor-menu", (menu, editor, view) => {
-    if (!editor.somethingSelected()) {
+    if (addTableCellWrapItem(plugin, menu, editor) || !editor.somethingSelected()) {
       return;
     }
     const original = editor.getValue();
