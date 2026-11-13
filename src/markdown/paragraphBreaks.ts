@@ -1,3 +1,5 @@
+import type { Transaction } from "@codemirror/state";
+
 import { scanMarkdownConstructs } from "./lineContext.ts";
 
 /**
@@ -19,6 +21,28 @@ export interface BreakBlock {
   closeLine: number;
   /** A drawn layout that floats: its widget is an anchor of no height between the lines around it. */
   floats: boolean;
+}
+
+/** Keep host-confirmed spacing while a line-local edit awaits parsing, if the fallback agrees
+ * that its paragraph boundaries stayed put. New lines or a changed fallback take effect at once. */
+export function provisionalParagraphBreaks(
+  tr: Transaction,
+  previous: { breaks: ParagraphBreak[]; fallbackBreaks: ParagraphBreak[] },
+  fallback: ParagraphBreak[],
+): ParagraphBreak[] {
+  const { breaks, fallbackBreaks } = previous;
+  if (breaks === fallbackBreaks || fallback.length !== fallbackBreaks.length
+    || fallback.some((item, index) => {
+      const old = fallbackBreaks[index];
+      return item.line !== old.line || item.kind !== old.kind || item.size !== old.size;
+    })) return fallback;
+
+  let withinLines = true;
+  const { doc } = tr.startState;
+  tr.changes.iterChanges((from, to, _fromB, _toB, inserted) => {
+    if (inserted.lines > 1 || to > doc.lineAt(from).to) withinLines = false;
+  });
+  return withinLines ? breaks : fallback;
 }
 
 /** Top-level blocks from the host parser, with inclusive, zero-based line ranges. */

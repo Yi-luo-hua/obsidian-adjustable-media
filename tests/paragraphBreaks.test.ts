@@ -1,10 +1,41 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { EditorState } from "@codemirror/state";
 
-import { hostParagraphBreaks, paragraphBreaks, type BreakBlock, type MarkdownSection, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
+import { hostParagraphBreaks, paragraphBreaks, provisionalParagraphBreaks, type BreakBlock, type MarkdownSection, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
 
 const lines = (breaks: ParagraphBreak[]): string[] => breaks.map((item) => `${item.line}:${item.kind}`);
+
+test("typing before a fence retains the host paragraph spacing across successive revisions", () => {
+  const text = ["<!-- vml -->", "![[a.png]] ![[b.png]]", "<!-- /vml -->", "", "Body", "```js", "x", "```"];
+  const blocks = [{ openLine: 0, closeLine: 2, floats: false }];
+  const sections = [{ type: "paragraph", from: 4, to: 4 }, { type: "code", from: 5, to: 7 }];
+  const fallbackBreaks = paragraphBreaks(text, blocks);
+  const hostBreaks = hostParagraphBreaks(text, blocks, sections);
+  assert.deepEqual(lines(hostBreaks), ["3:blank", "4:after"]);
+  assert.deepEqual(lines(fallbackBreaks), ["3:blank"]);
+  let state = EditorState.create({ doc: text.join("\n") });
+  let previous = { breaks: hostBreaks, fallbackBreaks };
+  for (let index = 0; index < 4; index++) {
+    const tr = state.update({ changes: { from: state.doc.line(5).to, insert: "x" } });
+    const fallback = paragraphBreaks(tr.newDoc.toJSON(), blocks);
+    assert.equal(provisionalParagraphBreaks(tr, previous, fallback), hostBreaks);
+    previous = { breaks: hostBreaks, fallbackBreaks: fallback };
+    state = tr.state;
+  }
+
+  const body = state.doc.line(5);
+  for (const changes of [
+    { from: body.from, to: body.to, insert: "" },
+    { from: body.to, insert: "\n" },
+    { from: body.from - 1, to: body.from + 1, insert: "x\n" },
+  ]) {
+    const tr = state.update({ changes });
+    const fallback = paragraphBreaks(tr.newDoc.toJSON(), blocks);
+    assert.equal(provisionalParagraphBreaks(tr, previous, fallback), fallback);
+  }
+});
 
 test("every blank beside and far from a layout keeps its height while layout contents stay untouched", () => {
   const text = ["Before", "", "", "", "<!-- vml -->", "Layout text", "", "", "<!-- /vml -->", "", "", "", "After", "", "", "Other"];
