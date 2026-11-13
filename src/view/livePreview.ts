@@ -41,7 +41,7 @@ const OPENING = "<!-- vml";
 interface HighlightState { cursorOnly: boolean; focused: boolean; columnId: string | null }
 export const setLayoutHighlight = StateEffect.define<HighlightState>();
 const highlightField = StateField.define<HighlightState>({
-  create: () => ({ cursorOnly: false, focused: false, columnId: null }),
+  create: () => ({ cursorOnly: true, focused: false, columnId: null }),
   update(value, tr) {
     for (const effect of tr.effects) if (effect.is(setLayoutHighlight)) return effect.value;
     return value;
@@ -110,7 +110,7 @@ interface Parsed extends Measurements {
  * the layouts can then be dragged into them, and show a grab cursor. One showing a note with
  * wrapped layouts gets `vml-has-wraps`, which lets the note's lines wrap around them.
  */
-export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolean = () => true): Extension {
+export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolean = () => false): Extension {
   const field = StateField.define<LivePreviewState>({
     create: (state) => withDecorations(app, state, parse(app, state), false),
     update(value, tr) {
@@ -173,7 +173,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
     return `${path}\n${pane.heights.key(anchor.id ?? anchor.key, 0, `${anchor.numbers}\n${anchor.skip}`, "proxy")}`;
   };
   return [
-    highlightField,
+    highlightField.init(() => ({ cursorOnly: !keepLayoutHighlight(), focused: false, columnId: null })),
     layoutHistory(),
     Prec.high(field),
     nativeListHanging(view => view.state.field(field).blocks.some(isDrawable)),

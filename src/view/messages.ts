@@ -393,8 +393,8 @@ const MESSAGES = {
     en: "Keep layout borders highlighted",
   },
   settingCursorHighlightDesc: {
-    zh: "默认开启，保持实时预览中的布局块边框高亮。关闭后，鼠标悬停在布局块内或编辑光标进入布局块源码、内部文字栏时高亮；离开后隐藏。不改变布局大小或笔记内容。",
-    en: "On by default: keep layout borders highlighted in live preview. When off, highlight while the mouse is over a layout or the editing caret is in its source or text column. Layout size and note content stay unchanged.",
+    zh: "默认关闭。悬停在布局块上，或编辑其源码和文字栏时显示高亮。开启后，实时预览中的布局块边框持续高亮。",
+    en: "Off by default. Layout borders highlight on hover or while editing their source or text columns. Turn this on to keep the borders highlighted in live preview.",
   },
   settingRefLanguageDesc: {
     zh: "图注、表注和引用（@fig:名字、@tbl:名字、@eq:名字）显示成“图 1”还是“Figure 1”。改动后重新打开笔记生效。",

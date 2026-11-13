@@ -20,7 +20,7 @@ export interface VmlSettings {
 
 export const DEFAULT_SETTINGS: VmlSettings = {
   autoConvert: false,
-  keepLayoutHighlight: true,
+  keepLayoutHighlight: false,
   refLanguage: "auto",
   uiLanguage: "auto",
   guideRevision: 0,

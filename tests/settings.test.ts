@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { mockedModule } from "./support/mockedModule.ts";
 import { readGuideRevision } from "../src/guide/state.ts";
 
-test("old settings keep layout highlights; both toggle values survive save and read", async () => {
+test("persistent layout highlighting defaults off and both saved choices survive", async () => {
   const settings = await mockedModule<{
     readSettings(saved: unknown): { keepLayoutHighlight: boolean; lastSeenReleaseNotes: string };
     VmlSettingTab: new (app: unknown, host: unknown) => {
@@ -15,7 +15,7 @@ test("old settings keep layout highlights; both toggle values survive save and r
     "./guide/guideModal.ts": {}, "./guide/state.ts": { readGuideRevision }, "./view/messages.ts": {},
   });
   for (const saved of [undefined, {}, { autoConvert: true }, { keepLayoutHighlight: "false" }]) {
-    assert.equal(settings.readSettings(saved).keepLayoutHighlight, true);
+    assert.equal(settings.readSettings(saved).keepLayoutHighlight, false);
     assert.equal(settings.readSettings(saved).lastSeenReleaseNotes, "");
   }
   assert.equal(settings.readSettings({ lastSeenReleaseNotes: "0.7.2" }).lastSeenReleaseNotes, "0.7.2");

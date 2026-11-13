@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.9.7 - 2026-11-13
+
+- Fix Live Preview jumping when typing directly before a fenced code block in a note with image layouts. Paragraph spacing updates immediately when editing a Setext heading underline or a closing fence, and line breaks keep spacing at untouched boundaries stable ([#43](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/43)).
+- Align spacing above image layouts at the start of a note and after floating layouts between Live Preview and Reading View.
+- Turn off persistent layout border highlighting by default. Borders still highlight on hover or while editing a layout. Saved choices are respected.
+
 ## 0.9.6 - 2026-11-09
 
 - Set the font size of each image caption to Default, 125%, 150%, or 200% from the caption editor ([#40](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/40)).
