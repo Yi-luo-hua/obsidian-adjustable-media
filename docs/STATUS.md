@@ -1,10 +1,12 @@
 # 项目状态
 
-更新于 2026-11-09。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见[任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新于 2026-11-13。当前工作树与恢复位置见 [WORKTREES](WORKTREES.md)，未完成任务见[任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付范围
 
-- **公开最新版本为 0.9.6**。新增单张图片的图注字号设置，修复 Underwater 主题下同行图片竖排，以及实时预览的表格单元格右键菜单。603 项测试、生产打包、main 和标签 CI 及 Release 工作流通过，三个公开附件与已验签的草稿一致。详见[发布核验](releases/0.9.6-readiness.md)。
+- **公开最新版本为 0.9.7**。修复围栏旁输入抖动，对齐普通与环绕布局附近的留白，默认关闭边框常亮。607 项测试、生产打包、main 和标签 CI 及 Release 工作流通过。详见[发布核验](releases/0.9.7-readiness.md)。
+
+- **0.9.6 已发布**。新增单张图片的图注字号设置，修复 Underwater 主题下同行图片竖排，以及实时预览的表格单元格右键菜单。详见[发布核验](releases/0.9.6-readiness.md)。
 
 - **0.9.5 已发布**。发布前补修隐藏网页任务过期后的重绘和切换锚点覆盖显式导航两个问题。600 项测试、生产打包及 CI 和 Release 工作流通过，详见[发布准备与审查](releases/0.9.5-readiness.md)。
 
