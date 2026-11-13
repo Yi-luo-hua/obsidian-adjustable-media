@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { EditorState } from "@codemirror/state";
 
-import { hostParagraphBreaks, paragraphBreaks, provisionalParagraphBreaks, type BreakBlock, type MarkdownSection, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
+import { estimateParagraphSpacing, hostParagraphBreaks, paragraphBreaks, provisionalParagraphBreaks, type BreakBlock, type MarkdownSection, type ParagraphBreak } from "../src/markdown/paragraphBreaks.ts";
 
 const lines = (breaks: ParagraphBreak[]): string[] => breaks.map((item) => `${item.line}:${item.kind}`);
 
@@ -11,17 +11,19 @@ test("typing before a fence retains the host paragraph spacing across successive
   const text = ["<!-- vml -->", "![[a.png]] ![[b.png]]", "<!-- /vml -->", "", "Body", "```js", "x", "```"];
   const blocks = [{ openLine: 0, closeLine: 2, floats: false }];
   const sections = [{ type: "paragraph", from: 4, to: 4 }, { type: "code", from: 5, to: 7 }];
-  const fallbackBreaks = paragraphBreaks(text, blocks);
+  const spacing = estimateParagraphSpacing(text, blocks);
   const hostBreaks = hostParagraphBreaks(text, blocks, sections);
   assert.deepEqual(lines(hostBreaks), ["3:blank", "4:after"]);
-  assert.deepEqual(lines(fallbackBreaks), ["3:blank"]);
+  assert.deepEqual(spacing.breaks, hostBreaks);
   let state = EditorState.create({ doc: text.join("\n") });
-  let previous = { breaks: hostBreaks, fallbackBreaks };
+  let previous = spacing;
+  let displayed = hostBreaks;
   for (let index = 0; index < 4; index++) {
     const tr = state.update({ changes: { from: state.doc.line(5).to, insert: "x" } });
-    const fallback = paragraphBreaks(tr.newDoc.toJSON(), blocks);
-    assert.equal(provisionalParagraphBreaks(tr, previous, fallback), hostBreaks);
-    previous = { breaks: hostBreaks, fallbackBreaks: fallback };
+    const current = estimateParagraphSpacing(tr.newDoc.toJSON(), blocks);
+    displayed = provisionalParagraphBreaks(tr, displayed, previous, current);
+    assert.deepEqual(displayed, hostBreaks);
+    previous = current;
     state = tr.state;
   }
 
@@ -32,9 +34,41 @@ test("typing before a fence retains the host paragraph spacing across successive
     { from: body.from - 1, to: body.from + 1, insert: "x\n" },
   ]) {
     const tr = state.update({ changes });
-    const fallback = paragraphBreaks(tr.newDoc.toJSON(), blocks);
-    assert.equal(provisionalParagraphBreaks(tr, previous, fallback), fallback);
+    const current = estimateParagraphSpacing(tr.newDoc.toJSON(), blocks);
+    assert.deepEqual(provisionalParagraphBreaks(tr, displayed, previous, current), current.breaks);
   }
+});
+
+test("editing Setext or fence markers updates affected spacing immediately", () => {
+  for (const { text, marker, oldBreaks, newBreaks } of [
+    { text: ["Lead", "", "Title", "===", "Text"], marker: 4, oldBreaks: ["3:after"], newBreaks: ["1:blank"] },
+    { text: ["Body", "```js", "x", "```", "More"], marker: 4, oldBreaks: ["0:after", "3:after"], newBreaks: ["0:after"] },
+  ]) {
+    const state = EditorState.create({ doc: text.join("\n") });
+    const previous = estimateParagraphSpacing(text, []);
+    assert.deepEqual(lines(previous.breaks), oldBreaks);
+    const tr = state.update({ changes: { from: state.doc.line(marker).to, insert: "x" } });
+    const current = estimateParagraphSpacing(tr.newDoc.toJSON(), []);
+    assert.deepEqual(lines(provisionalParagraphBreaks(tr, [...previous.breaks], previous, current)), newBreaks);
+  }
+});
+
+test("inserting and removing a line keeps host corrections at unchanged, shifted boundaries", () => {
+  const text = ["Intro", "", "Paragraph", "| A | B |", "| - | - |", "| 1 | 2 |", "After", "", "End"];
+  const sections = [
+    { type: "paragraph", from: 0, to: 0 }, { type: "paragraph", from: 2, to: 2 },
+    { type: "table", from: 3, to: 5 }, { type: "paragraph", from: 6, to: 6 },
+    { type: "paragraph", from: 8, to: 8 },
+  ];
+  const state = EditorState.create({ doc: text.join("\n") });
+  const previous = estimateParagraphSpacing(text, []);
+  const host = hostParagraphBreaks(text, [], sections);
+  const enter = state.update({ changes: { from: state.doc.line(1).to, insert: "\n" } });
+  const current = estimateParagraphSpacing(enter.newDoc.toJSON(), []);
+  const displayed = provisionalParagraphBreaks(enter, host, previous, current);
+  assert.deepEqual(lines(displayed), ["1:blank", "2:blank", "3:after", "6:after", "8:blank"]);
+  const undo = enter.state.update({ changes: enter.changes.invert(state.doc) });
+  assert.deepEqual(provisionalParagraphBreaks(undo, displayed, current, previous), host);
 });
 
 test("every blank beside and far from a layout keeps its height while layout contents stay untouched", () => {
@@ -96,6 +130,9 @@ const spacingCases = JSON.parse(readFileSync(new URL("./fixtures/paragraphSpacin
 for (const fixture of spacingCases) {
   test(`host paragraph spacing: ${fixture.name}`, () => {
     assert.deepEqual(lines(hostParagraphBreaks(fixture.lines, fixture.blocks, fixture.sections)), fixture.expected);
+    if (/setext|multiline h1/.test(fixture.name)) {
+      assert.deepEqual(lines(paragraphBreaks(fixture.lines, fixture.blocks)), fixture.expected);
+    }
   });
 }
 
@@ -260,7 +297,8 @@ test("indented code may start right below a quote, as Obsidian draws it", () => 
 
 test("fenced code at the margin ends a list, and fenced code in an item keeps it", () => {
   // At the margin: a list, the fence, and indented code at the margin, its blank lines left alone.
-  assert.deepEqual(lines(paragraphBreaks(["- a", "```", "x", "```", "    code one", "", "", "    code two"], [])), []);
+  assert.deepEqual(lines(paragraphBreaks(["- a", "```", "x", "```", "    code one", "", "", "    code two"], [])),
+    ["0:after", "3:after"]);
   // In the item: indented code there is indented past the item's text, text only as far is text.
   assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "", "      code one", "", "      code two"], [])),
     ["1:blank", "5:blank"]);
@@ -272,7 +310,7 @@ test("a fence right after another one is judged by its own opening line", () => 
   // The first fence is in the item, the second at the margin ends the list: the indented code after
   // it is code at the margin, its blank lines left alone.
   assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "```", "y", "```", "    code one", "", "", "    code two"], [])),
-    ["1:blank"]);
+    ["1:blank", "7:after"]);
   // Two fences in the item keep it.
   assert.deepEqual(lines(paragraphBreaks(["- a", "", "  ```", "  x", "  ```", "  ```", "  y", "  ```", "    para one", "", "    para two"], [])),
     ["1:blank", "9:blank"]);

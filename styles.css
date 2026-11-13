@@ -455,6 +455,16 @@
   margin-top: -0.1px;
 }
 
+/* Keep the next paragraph's margin below a float when the source separates them with a blank. */
+.markdown-preview-sizer > .vml-rv-float-blank {
+  padding-bottom: 0.05px;
+}
+
+/* A paragraph touching the first float starts at the top of the body, as in live preview. */
+.markdown-preview-sizer > .vml-rv-first-float-tight + .el-p > p {
+  margin-top: 0;
+}
+
 /* Keep authored extra paragraph breaks in reading view without doubling the ordinary margin. */
 .markdown-preview-sizer > .vml-rv-spaced:is(.el-p, .el-ul, .el-ol, .el-blockquote, .el-h1, .el-h2, .el-h3, .el-h4, .el-h5, .el-h6)::after {
   content: "";

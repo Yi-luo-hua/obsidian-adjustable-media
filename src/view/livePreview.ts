@@ -13,7 +13,7 @@ import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock, onlySizingDiffers } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
-import { hostParagraphBreaks, paragraphBreaks, provisionalParagraphBreaks, type MarkdownSection, type ParagraphBreak } from "../markdown/paragraphBreaks.ts";
+import { estimateParagraphSpacing, hostParagraphBreaks, provisionalParagraphBreaks, type MarkdownSection, type ParagraphBreak, type ParagraphSpacing } from "../markdown/paragraphBreaks.ts";
 import { ParagraphParser } from "../markdown/paragraphParser.ts";
 import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
@@ -75,23 +75,12 @@ interface Measurements {
   environmentSpec: string;
 }
 
-interface LivePreviewState extends Measurements {
-  buffer: object | undefined;
-  snapshot: DocumentSnapshot | null;
-  blocks: V2Block[];
-  lines: string[];
-  /** Each block's spacer skip, found once per parse: cursor moves redraw decorations, not these. */
-  skips: Array<number | null>;
-  /** Current paragraph spacing, including host-confirmed breaks retained during typing. */
-  breaks: ParagraphBreak[];
-  fallbackBreaks: ParagraphBreak[];
+interface LivePreviewState extends Parsed {
   decorations: DecorationSet;
   /** Wrapped layouts drawn as widgets. */
   anchors: WrapAnchor[];
   /** Whether any layout of the note wraps text, drawn or showing its source. */
   hasWraps: boolean;
-  /** The note's numbered figures, tables and equations, if it has any labels or references. */
-  refs: RefContext | undefined;
   /**
    * Whether the user put the cursor where it is: clicked, pressed a key or typed. A note opens with
    * its cursor at its very start, where it touches a layout written first; that cursor shows no source.
@@ -104,9 +93,11 @@ interface Parsed extends Measurements {
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
   lines: string[];
+  /** Each block's spacer skip, found once per parse: cursor moves redraw decorations, not these. */
   skips: Array<number | null>;
+  /** Current spacing and the local estimate from the same document revision. */
   breaks: ParagraphBreak[];
-  fallbackBreaks: ParagraphBreak[];
+  spacing: ParagraphSpacing;
   refs: RefContext | undefined;
 }
 
@@ -153,14 +144,14 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
       if (tr.docChanged || modeChanged || originChanged) {
         const parsed = parse(app, tr.state, bufferChanged ? null : value.snapshot, tr.changes);
         if (!modeChanged && !originChanged && parsed.blocks.some(isDrawable)) {
-          parsed.breaks = provisionalParagraphBreaks(tr, value, parsed.fallbackBreaks);
+          parsed.breaks = provisionalParagraphBreaks(tr, value.breaks, value.spacing, parsed.spacing);
         }
         return withDecorations(app, tr.state, { ...parsed, ...measurements }, placedCursor);
       }
       const paragraphs = tr.effects.find(effect => effect.is(setParagraphSections));
       if (paragraphs?.is(setParagraphSections) && paragraphs.value.snapshot === value.snapshot) {
         const { sections } = paragraphs.value;
-        const breaks = sections ? hostParagraphBreaks(value.lines, breakBlocks(value.blocks), sections) : value.fallbackBreaks;
+        const breaks = sections ? hostParagraphBreaks(value.lines, breakBlocks(value.blocks), sections) : value.spacing.breaks;
         return withDecorations(app, tr.state, { ...value, ...measurements, breaks }, placedCursor);
       }
       if (tr.selection || environment || placedCursor !== value.placedCursor || tr.effects.some(effect => effect.is(setLayoutHighlight))) {
@@ -266,7 +257,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
         snapshot => parseBufferSections(app, snapshot.text, snapshot.lines.length),
         (snapshot, sections) => {
           const current = view.state.field(field);
-          if (current.snapshot === snapshot && (sections || current.breaks !== current.fallbackBreaks)) {
+          if (current.snapshot === snapshot && (sections || current.breaks !== current.spacing.breaks)) {
             view.dispatch({ effects: setParagraphSections.of({ snapshot, sections }) });
           }
         }, view.contentDOM.win);
@@ -316,25 +307,27 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
   ];
 }
 
+const emptySpacing: ParagraphSpacing = { breaks: [], structure: [] };
+
 function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
   const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: PENDING_ENVIRONMENT };
   const buffer = editorOfInfo(state.field(editorInfoField, false));
   if (!state.field(editorLivePreviewField, false)) {
-    return { buffer, blocks: [], lines: [], skips: [], breaks: [], fallbackBreaks: [], refs: undefined, snapshot: null, ...measurements };
+    return { buffer, blocks: [], lines: [], skips: [], breaks: emptySpacing.breaks, spacing: emptySpacing, refs: undefined, snapshot: null, ...measurements };
   }
   // Runs on every change of a note with layouts; one without them is only read in full when a change
   // may have written an opening comment (the field's update).
   const text = state.doc.toString();
   if (!text.includes(OPENING)) {
-    return { buffer, blocks: [], lines: [], skips: [], breaks: [], fallbackBreaks: [], refs: undefined, snapshot: null, ...measurements };
+    return { buffer, blocks: [], lines: [], skips: [], breaks: emptySpacing.breaks, spacing: emptySpacing, refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
   const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, buffer), buffer, previous?.origin);
   const snapshot = documentSnapshot(text, origin, previous ?? undefined, changes);
   const blocks = snapshot.blocks.map(ref => ref.block);
   const lines = [...snapshot.lines];
-  const fallbackBreaks = blocks.some(isDrawable) ? paragraphBreaks(lines, breakBlocks(blocks)) : [];
-  return { buffer, snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks), breaks: fallbackBreaks, fallbackBreaks,
+  const spacing = blocks.some(isDrawable) ? estimateParagraphSpacing(lines, breakBlocks(blocks)) : emptySpacing;
+  return { buffer, snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks), breaks: spacing.breaks, spacing,
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
 }
 
@@ -441,7 +434,7 @@ interface BlankEdges {
 }
 
 function blankEdges(lines: readonly string[], block: V2Block): BlankEdges {
-  return { above: lines[block.openLine - 1]?.trim() === "", below: lines[block.closeLine + 1]?.trim() === "" };
+  return { above: block.openLine === 0 || lines[block.openLine - 1]?.trim() === "", below: lines[block.closeLine + 1]?.trim() === "" };
 }
 
 /**

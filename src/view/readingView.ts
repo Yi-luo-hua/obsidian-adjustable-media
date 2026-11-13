@@ -1,6 +1,6 @@
 import { MarkdownRenderChild, MarkdownRenderer, MarkdownView, TFile, type MarkdownPostProcessorContext, type MarkdownSectionInformation, type Plugin } from "obsidian";
 
-import { hasSideText, isDrawable, type V2Block } from "../format/v2.ts";
+import { blockWrap, hasSideText, isDrawable, type V2Block } from "../format/v2.ts";
 import { canvasPreviewHosts, isCanvasPreview, type PreviewHost } from "./canvas.ts";
 import { documentSnapshot, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { drawnFrom, isStale, type Drawn } from "../layout/drawn.ts";
@@ -22,6 +22,8 @@ import { alignParagraphWhitespace } from "./readingParagraphs.ts";
 import { alignReadingQuote } from "./readingQuotes.ts";
 
 const WRAPPING = "vml-rv-wrapping";
+const FLOAT_BLANK = "vml-rv-float-blank";
+const FIRST_FLOAT_TIGHT = "vml-rv-first-float-tight";
 const memorySections = new WeakSet<HTMLElement>();
 const pendingWebSections = new WeakMap<HTMLElement, object>();
 
@@ -59,6 +61,7 @@ interface Reader {
 
 interface InstalledSection {
   blankExtra: number;
+  floatBoundary: string;
   snapshotId: string;
   range: SourceCoverage;
   source: string;
@@ -123,7 +126,10 @@ export function registerReadingView(plugin: Plugin): void {
     for (const el of [...reader.children.keys()]) releaseSection(reader, el);
     // The hidden reading DOM is reused on a mode switch. Keep its spacing for the first visible frame.
     if (unloaded || reader.view.file !== reader.file || reader.view.getMode() === "preview") {
-      for (const el of reader.sections.keys()) el.toggleClass("vml-rv-spaced", false);
+      for (const [el, { floatBoundary: boundary }] of reader.sections) {
+        el.toggleClass("vml-rv-spaced", false);
+        if (boundary) el.toggleClass(boundary, false);
+      }
     }
     reader.stopEnvironment(); reader.projection.dispose(); reader.sections.clear(); reader.pendingSections.clear();
     readers.delete(reader.view);
@@ -266,7 +272,15 @@ export function registerReadingView(plugin: Plugin): void {
     return extra;
   };
 
+  const floatBoundary = (reader: Reader, info: MarkdownSectionInformation): string => {
+    const block = reader.parsed.blocks.find(block => info.lineEnd === block.closeLine);
+    if (!block || !isDrawable(block) || blockWrap(block) === null) return "";
+    if (reader.parsed.lines[block.closeLine + 1]?.trim() === "") return FLOAT_BLANK;
+    return block.openLine === 0 ? FIRST_FLOAT_TIGHT : "";
+  };
+
   const draw = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
+    const previousBoundary = reader.sections.get(el)?.floatBoundary;
     releaseSection(reader, el);
     const { blocks, skips, refs, wrapped, snapshot } = reader.parsed;
     const block = sectionBlock(blocks, info);
@@ -333,11 +347,14 @@ export function registerReadingView(plugin: Plugin): void {
         }
       }
     }
+    const boundary = floatBoundary(reader, info);
+    if (previousBoundary && previousBoundary !== boundary) el.toggleClass(previousBoundary, false);
+    if (boundary) el.toggleClass(boundary, true);
     const blankExtra = applyBlankSpacing(reader, el, info);
     el.toggleClass(WRAPPING, wrapped);
     markWrapping(reader, wrapped);
     if (wrapped) keepWrapsBeside(plugin.app, el);
-    const record: InstalledSection = { blankExtra, snapshotId: snapshot.id, range: sectionRange(reader.parsed, info),
+    const record: InstalledSection = { blankExtra, floatBoundary: boundary, snapshotId: snapshot.id, range: sectionRange(reader.parsed, info),
       source: sectionSource(reader.parsed, info), sourcePath: snapshot.origin.path, drawn: reader.parsed.drawn,
       layoutKey: sectionLayoutKey(reader.parsed, info), context: ctx };
     reader.sections.set(el, record);

@@ -77,7 +77,11 @@ export function fencedCodeBlocks(lines: readonly string[]): FencedCodeBlock[] {
 }
 
 /** Shared top-level ownership for multiline media; lazy list continuations stay in the list. */
-export function scanMarkdownContainers(lines: readonly string[]): { fences: FencedCodeBlock[]; topLevel: boolean[] } {
+export function scanMarkdownContainers(lines: readonly string[]): {
+  fences: FencedCodeBlock[];
+  unclosedFenceFrom: number | undefined;
+  topLevel: boolean[];
+} {
   const blocks: FencedCodeBlock[] = [];
   const topLevel: boolean[] = [];
   let state: ScanState = hasFrontmatter(lines) ? { kind: "frontmatter" } : TEXT;
@@ -87,7 +91,7 @@ export function scanMarkdownContainers(lines: readonly string[]): { fences: Fenc
   let listIndent = 0;
   let afterBlank = true;
   let paragraph = false;
-  lines.forEach((line, index) => {
+  for (const [index, line] of lines.entries()) {
     const text = stripCarriageReturn(line);
     const [, next] = classifyLine(text, index, state);
     if (state.kind === "text") {
@@ -121,8 +125,8 @@ export function scanMarkdownContainers(lines: readonly string[]): { fences: Fenc
       opening = null;
     }
     state = next;
-  });
-  return { fences: blocks, topLevel };
+  }
+  return { fences: blocks, unclosedFenceFrom: opening?.from, topLevel };
 }
 
 function classifyLine(line: string, index: number, state: ScanState): [LineContext, ScanState] {

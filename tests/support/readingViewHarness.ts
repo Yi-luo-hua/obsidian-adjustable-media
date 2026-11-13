@@ -163,13 +163,20 @@ export async function readingViewHarness(initialText: string, startup = true, in
     },
     section(text: string, lineStart = 1, lineEnd = lineStart) {
       let wrapping = false, spaced = false, empties = 0;
+      const classes = new Set<string>();
       const cssProps: Record<string, string> = {};
       let infoAvailable = true;
       const children: RenderChild[] = [];
       const inserted = new Set<() => void>();
       const el: ElementStub = { isConnected: true, empty() { empties++; }, querySelectorAll: () => [],
         createDiv: () => ({ ...el, querySelector: () => el }), querySelector: () => null,
-        toggleClass(name, enabled) { counts.classWrites++; if (name === "vml-rv-wrapping") wrapping = enabled; if (name === "vml-rv-spaced") spaced = enabled; },
+        toggleClass(name, enabled) {
+          counts.classWrites++;
+          if (name === "vml-rv-wrapping") wrapping = enabled;
+          if (name === "vml-rv-spaced") spaced = enabled;
+          if (enabled) classes.add(name);
+          else classes.delete(name);
+        },
         setCssProps(props) { Object.assign(cssProps, props); },
         onNodeInserted(callback) { inserted.add(callback); return () => inserted.delete(callback); } };
       elements.add(el);
@@ -182,7 +189,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
           addChild(child) { children.push(child); } });
       };
       process(text);
-      return { get wrapping() { return wrapping; }, get spaced() { return spaced; }, cssProps, get empties() { return empties; }, get watchers() { return inserted.size; },
+      return { get wrapping() { return wrapping; }, get spaced() { return spaced; }, classes, cssProps, get empties() { return empties; }, get watchers() { return inserted.size; },
         reprocess: process,
         move(from: number, to = from) { info.lineStart = from; info.lineEnd = to; },
         setInfoAvailable(available: boolean) { infoAvailable = available; },

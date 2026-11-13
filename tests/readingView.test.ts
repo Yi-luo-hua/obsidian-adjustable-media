@@ -98,6 +98,22 @@ test("retained paragraph sections refresh authored blank spacing without reinsta
   host.dispose();
 });
 
+test("a float's closing section applies spacing for the current source boundary", async () => {
+  const text = media.replace("<!-- vml -->", '<!-- vml {"wrap":"right"} -->');
+  const host = await readingViewHarness(text, false);
+  host.section(text, 1);
+  const closing = host.section(text, 2);
+  host.frame();
+  assert.equal(closing.classes.has("vml-rv-float-blank"), true);
+  const tight = text.replace("\n\nBody", "\nBody");
+  host.setHost(tight); host.edit(tight); host.frame();
+  closing.reprocess(tight); host.frame();
+  assert.equal(closing.classes.has("vml-rv-float-blank"), false);
+  assert.equal(closing.classes.has("vml-rv-first-float-tight"), true);
+  assert.equal(host.renders.length, 1);
+  host.dispose();
+});
+
 test("native HTML sections that include a V3 closer are hidden after the opening layout renders", async () => {
   const text = '<!-- vml {"v":3,"kind":"media","rows":[{"items":1}]} -->\n<iframe src="https://example.org"></iframe>\n<!-- /vml -->\n\nBody';
   const host = await readingViewHarness(text);

@@ -1,6 +1,6 @@
 import type { Transaction } from "@codemirror/state";
 
-import { scanMarkdownConstructs } from "./lineContext.ts";
+import { scanMarkdownConstructs, scanMarkdownContainers } from "./lineContext.ts";
 
 /**
  * A line live preview draws with reading view's break between two paragraphs:
@@ -23,26 +23,48 @@ export interface BreakBlock {
   floats: boolean;
 }
 
-/** Keep host-confirmed spacing while a line-local edit awaits parsing, if the fallback agrees
- * that its paragraph boundaries stayed put. New lines or a changed fallback take effect at once. */
+export interface ParagraphSpacing {
+  breaks: ParagraphBreak[];
+  structure: string[];
+}
+
+/** Carry the host's corrections only across mapped boundaries whose local structure survived. */
 export function provisionalParagraphBreaks(
   tr: Transaction,
-  previous: { breaks: ParagraphBreak[]; fallbackBreaks: ParagraphBreak[] },
-  fallback: ParagraphBreak[],
+  breaks: ParagraphBreak[],
+  previous: ParagraphSpacing,
+  current: ParagraphSpacing,
 ): ParagraphBreak[] {
-  const { breaks, fallbackBreaks } = previous;
-  if (breaks === fallbackBreaks || fallback.length !== fallbackBreaks.length
-    || fallback.some((item, index) => {
-      const old = fallbackBreaks[index];
-      return item.line !== old.line || item.kind !== old.kind || item.size !== old.size;
-    })) return fallback;
+  if (breaks === previous.breaks) return current.breaks;
 
-  let withinLines = true;
   const { doc } = tr.startState;
-  tr.changes.iterChanges((from, to, _fromB, _toB, inserted) => {
-    if (inserted.lines > 1 || to > doc.lineAt(from).to) withinLines = false;
-  });
-  return withinLines ? breaks : fallback;
+  const mapLine = (index: number): number => {
+    if (index < 0) return -1;
+    if (index >= doc.lines) return tr.newDoc.lines;
+    const line = doc.line(index + 1);
+    const start = tr.newDoc.lineAt(tr.changes.mapPos(line.from, 1)).number;
+    const end = tr.newDoc.lineAt(tr.changes.mapPos(line.to, -1)).number;
+    return start === end ? start - 1 : -2;
+  };
+  const byLine = (items: ParagraphBreak[]) => new Map(items.map(item => [item.line, item]));
+  const estimated = byLine(previous.breaks);
+  const displayed = byLine(breaks);
+  const next = byLine(current.breaks);
+  const same = (a: ParagraphBreak | undefined, b: ParagraphBreak | undefined): boolean =>
+    a?.kind === b?.kind && a?.size === b?.size;
+
+  for (const index of new Set([...estimated.keys(), ...displayed.keys()])) {
+    const prior = estimated.get(index);
+    const confirmed = displayed.get(index);
+    if (same(prior, confirmed)) continue;
+    const mapped = mapLine(index);
+    if (mapped < 0 || !same(prior, next.get(mapped))) continue;
+    if ([-1, 0, 1].some(offset => mapLine(index + offset) !== mapped + offset
+      || previous.structure[index + offset] !== current.structure[mapped + offset])) continue;
+    if (confirmed) next.set(mapped, { ...confirmed, line: mapped });
+    else next.delete(mapped);
+  }
+  return Array.from(next.values()).sort((a, b) => a.line - b.line);
 }
 
 /** Top-level blocks from the host parser, with inclusive, zero-based line ranges. */
@@ -131,6 +153,10 @@ export function hostParagraphBreaks(lines: readonly string[], blocks: readonly B
 }
 
 const HEADING = /^ {0,3}(#{1,6})(?:\s|$)/;
+// Obsidian's worker recognizes a Setext underline only at the margin, with no trailing spaces.
+const SETEXT = /^(=+|-+)$/;
+const DEFINITION = /^ {0,3}\[[^\]]+\]:/;
+const BLOCK_MARKUP = /^(?:$|[#>~`<%$[!+=*_|-]|\d{1,9}[.)](?:\s|$))|\|/;
 
 /** The level of a heading line, else 0. */
 function headingLevel(line: string | undefined): number {
@@ -153,6 +179,10 @@ function sectionHeadingLevel(lines: readonly string[], section: MarkdownSection 
  * layouts, code, math, comments and frontmatter are left alone.
  */
 export function paragraphBreaks(lines: readonly string[], blocks: readonly BreakBlock[], listContents = false): ParagraphBreak[] {
+  return estimateParagraphSpacing(lines, blocks, listContents).breaks;
+}
+
+export function estimateParagraphSpacing(lines: readonly string[], blocks: readonly BreakBlock[], listContents = false): ParagraphSpacing {
   const { contexts, opens: constructs } = scanMarkdownConstructs(lines);
   const inBlock = new Uint8Array(lines.length);
   for (const block of blocks) {
@@ -173,6 +203,22 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
   const opens = new Set(blocks.map((block) => block.openLine));
   const code = indentedCode(lines, text, (line) => inBlock[line] === 1, (line) => constructs[line] === true
     && (contexts[line] === "code" || (contexts[line] === "comment" && (lines[line] ?? "").trimStart().startsWith("%%"))));
+  const containers = !listContents && (contexts.includes("code") || lines.some(line => SETEXT.test(line)))
+    ? scanMarkdownContainers(lines) : undefined;
+  const setextStarts = new Set<number>();
+  const setextEnds = new Set<number>();
+  if (containers) {
+    const title = (line: number): boolean => filled(line) && containers.topLevel[line] && !code[line]
+      && !headingLevel(lines[line]) && !THEMATIC_BREAK.test(lines[line].trim()) && !DEFINITION.test(lines[line]);
+    for (let line = 1; line < lines.length; line++) {
+      if (text(line) && containers.topLevel[line] && SETEXT.test(lines[line])
+        && title(line - 1) && (!title(line - 2) || setextEnds.has(line - 2))) {
+        setextStarts.add(line - 1);
+        setextEnds.add(line);
+      }
+    }
+  }
+  const startsHeading = (line: number): boolean => headingLevel(lines[line]) > 0 || setextStarts.has(line);
 
   for (let line = 0; line < lines.length; line += 1) {
     if (filled(line)) {
@@ -180,8 +226,7 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
       // The code keeps its own blank lines; the quote's bottom margin still parts the two blocks.
       if (listContents && code[line] !== 1 && /^[ \t]*>/.test(lines[line]) && code[line + 1] === 1) add(line, "after");
       // A heading below which the text goes on right away.
-      const level = headingLevel(lines[line]);
-      if (level >= 1 && filled(line + 1) && headingLevel(lines[line + 1]) === 0 && !opens.has(line + 1)) {
+      if ((headingLevel(lines[line]) > 0 || setextEnds.has(line)) && filled(line + 1) && !startsHeading(line + 1) && !opens.has(line + 1)) {
         add(line, "after");
       }
       continue;
@@ -193,12 +238,12 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     while (end + 1 < lines.length && blank(end + 1)) {
       end += 1;
     }
-    if (headingLevel(lines[end + 1]) === 0 || THEMATIC_BREAK.test((lines[line - 1] ?? "").trim())) {
+    if (!startsHeading(end + 1) || THEMATIC_BREAK.test((lines[line - 1] ?? "").trim())) {
       add(line, "blank");
     }
     if ((contexts[end + 1] === "text" && THEMATIC_BREAK.test((lines[end + 1] ?? "").trim()))
       || (contexts[line - 1] === "text" && THEMATIC_BREAK.test((lines[line - 1] ?? "").trim())
-        && !(line > 1 && filled(line - 2) && /^-/.test(lines[line - 1].trim())) && headingLevel(lines[end + 1]) === 0)) ruleGaps.add(line);
+        && !(line > 1 && filled(line - 2) && /^-/.test(lines[line - 1].trim())) && !startsHeading(end + 1))) ruleGaps.add(line);
     for (let extra = line + 1; extra <= end; extra += 1) {
       add(extra, "blank");
     }
@@ -210,6 +255,22 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
     add(line - 1, "after");
   }
 
+  if (containers) {
+    const { fences, unclosedFenceFrom, topLevel } = containers;
+    // Closed or still being typed, a top-level fence separates adjacent paragraphs.
+    const beforeFence = (line: number): void => {
+      if (filled(line) && !DEFINITION.test(lines[line])) add(line, "after");
+    };
+    for (const { from, to } of fences) {
+      if (inBlock[from] || inBlock[to]) continue;
+      beforeFence(from - 1);
+      if (filled(to + 1) && topLevel[to + 1] && !startsHeading(to + 1) && !DEFINITION.test(lines[to + 1])
+        && !THEMATIC_BREAK.test(lines[to + 1].trim())) add(to, "after");
+      if (contexts[to + 1] === "code" && constructs[to + 1] && topLevel[to + 1]) add(to, "after");
+    }
+    if (unclosedFenceFrom !== undefined && !inBlock[unclosedFenceFrom]) beforeFence(unclosedFenceFrom - 1);
+  }
+
   // Text right above and right below a float: reading view parts the two by a break, the float's
   // anchor between them takes no room.
   for (const block of blocks) {
@@ -218,7 +279,18 @@ export function paragraphBreaks(lines: readonly string[], blocks: readonly Break
       add(above, "after");
     }
   }
-  return breaks.map((gap): ParagraphBreak => ruleGaps.has(gap.line) ? { ...gap, size: "rule" } : gap).sort((a, b) => a.line - b.line);
+  const structure = lines.map((line, index) => {
+    if (inBlock[index]) return "layout";
+    const context = contexts[index];
+    if (context !== "text" || code[index]) return `${context}:${constructs[index]}:${line}`;
+    if (setextStarts.has(index)) return "setext-start";
+    const indent = INDENT.exec(line)![0];
+    const content = line.slice(indent.length);
+    // Keep syntax-sensitive lines exact. Prose edits can retain the surrounding boundary.
+    return BLOCK_MARKUP.test(content) ? `syntax:${line}` : `prose:${indent}`;
+  });
+  return { structure, breaks: breaks.map((gap): ParagraphBreak => ruleGaps.has(gap.line) ? { ...gap, size: "rule" } : gap)
+    .sort((a, b) => a.line - b.line) };
 }
 
 const LIST_ITEM = /^([ \t]*)(?:([-*+])|(\d{1,9})([.)]))([ \t]*)/;
