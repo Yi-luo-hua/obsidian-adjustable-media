@@ -22,6 +22,7 @@ import { setUiLanguage, t } from "./src/view/messages.ts";
 
 export default class AdjustableMediaPlugin extends Plugin {
   settings: VmlSettings = { ...DEFAULT_SETTINGS };
+  private refreshReadingHighlights = (): void => {};
 
   override async onload(): Promise<void> {
     this.settings = readSettings(await this.loadData());
@@ -29,7 +30,7 @@ export default class AdjustableMediaPlugin extends Plugin {
     setRefLanguage(() => this.settings.refLanguage);
     setUiLanguage(() => this.settings.uiLanguage);
 
-    registerReadingView(this);
+    this.refreshReadingHighlights = registerReadingView(this, () => this.settings.showReadingLayoutHighlight);
     registerModeScroll(this);
     registerCrossrefs(this);
     registerCalloutImages(this);
@@ -84,6 +85,7 @@ export default class AdjustableMediaPlugin extends Plugin {
 
   async saveSettings(): Promise<void> {
     refreshLayoutHighlights();
+    this.refreshReadingHighlights();
     await this.saveData(this.settings);
   }
 }

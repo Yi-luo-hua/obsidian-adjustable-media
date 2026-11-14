@@ -396,6 +396,14 @@ const MESSAGES = {
     zh: "默认关闭。悬停在布局块上，或编辑其源码和文字栏时显示高亮。开启后，实时预览中的布局块边框持续高亮。",
     en: "Off by default. Layout borders highlight on hover or while editing their source or text columns. Turn this on to keep the borders highlighted in live preview.",
   },
+  settingReadingHighlight: {
+    zh: "阅读模式显示布局块边框",
+    en: "Show layout borders in reading view",
+  },
+  settingReadingHighlightDesc: {
+    zh: "开启后，阅读模式中的布局块会显示描边与光晕。默认关闭。",
+    en: "Show an outline and glow around layout blocks in reading view. Off by default.",
+  },
   settingRefLanguageDesc: {
     zh: "图注、表注和引用（@fig:名字、@tbl:名字、@eq:名字）显示成“图 1”还是“Figure 1”。改动后重新打开笔记生效。",
     en: "Whether captions and references (@fig:name, @tbl:name, @eq:name) read \u201cFigure 1\u201d or \u201c图 1\u201d. Takes effect when a note is opened again.",

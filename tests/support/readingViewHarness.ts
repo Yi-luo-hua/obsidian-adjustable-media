@@ -77,6 +77,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     MutationObserver: ObserverStub,
   };
   const container = { win, isConnected: true, clientWidth: 720, doc: { fonts: { status: "loaded" } },
+    toggleClass() {}, removeClass() {},
     querySelector: () => null,
     contains(el: ElementStub) { return elements.has(el); },
     addEventListener(name: string, callback: () => void) { if (name === "scroll") { counts.scrollListeners++; scroll = callback; } },
@@ -126,8 +127,8 @@ export async function readingViewHarness(initialText: string, startup = true, in
     "./readingQuotes.ts": { alignReadingQuote: () => () => {} },
     "./viewEnvironment.ts": { watchEnvironment: () => { counts.environments++; return () => {}; } },
   };
-  const module = await mockedModule<{ registerReadingView(plugin: unknown): void }>(new URL("../../src/view/readingView.ts", import.meta.url), modules, { crypto });
-  module.registerReadingView(plugin);
+  const module = await mockedModule<{ registerReadingView(plugin: unknown, showLayoutHighlight: () => boolean): () => void }>(new URL("../../src/view/readingView.ts", import.meta.url), modules, { crypto });
+  module.registerReadingView(plugin, () => false);
   if (startup) onReady!();
   return {
     get rerenders() { return rerenders; },

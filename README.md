@@ -47,7 +47,7 @@ Text boxes, multi-column text and numbered figures, tables and equations with cr
 ### ⚡ Intuitive Editing Workflow
 
 - **WYSIWYG with Instant Source Switching**: Features an illuminated control frame in editing mode; moving the cursor inside or clicking "Edit source" smoothly switches to plain Markdown text for effortless transitions between visual and handwritten editing.
-- **Layout border highlighting**: Keep layout borders highlighted is enabled by default. Turn it off to show the full border on mouse hover or while editing the layout.
+- **Layout border highlighting**: Live Preview highlights borders on hover or while editing the layout. Enable **Keep layout borders highlighted** to show them continuously in Live Preview. A separate **Show layout borders in reading view** setting adds the same outline and glow to Reading View. Both settings default to off.
 - **Automatic Layouts (Optional)**: When enabled in settings, multiple images or videos dropped from your computer or pasted will automatically be packaged into layout blocks.
 - **Validated Writes**: Layout gestures in an active editor use one transaction with native Undo/Redo. Markdown file operations without an active editor use `vault.process`; bulk removal validates and updates each file separately. Every write checks the expected source and preserves unrelated text and line endings.
 

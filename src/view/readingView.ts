@@ -22,6 +22,7 @@ import { alignParagraphWhitespace } from "./readingParagraphs.ts";
 import { alignReadingQuote } from "./readingQuotes.ts";
 
 const WRAPPING = "vml-rv-wrapping";
+const HIGHLIGHT = "vml-reading-highlight";
 const FLOAT_BLANK = "vml-rv-float-blank";
 const FIRST_FLOAT_TIGHT = "vml-rv-first-float-tight";
 const memorySections = new WeakSet<HTMLElement>();
@@ -72,7 +73,7 @@ interface InstalledSection {
 }
 
 /** Each reader waits for its own host and confirms only sections actually installed in that pane. */
-export function registerReadingView(plugin: Plugin): void {
+export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => boolean): () => void {
   const readers = new Map<PreviewHost, Reader>();
   const generations = new WeakMap<TFile, number>();
   let unloaded = false;
@@ -132,6 +133,7 @@ export function registerReadingView(plugin: Plugin): void {
       }
     }
     reader.stopEnvironment(); reader.projection.dispose(); reader.sections.clear(); reader.pendingSections.clear();
+    reader.view.previewMode.containerEl.removeClass(HIGHLIGHT);
     readers.delete(reader.view);
   };
 
@@ -220,6 +222,7 @@ export function registerReadingView(plugin: Plugin): void {
     reader.projection.request(parsed.snapshot);
     reader.projection.observeHost(view.getViewData());
     readers.set(view, reader);
+    view.previewMode.containerEl.toggleClass(HIGHLIGHT, showLayoutHighlight());
     reader.stopEnvironment = watchEnvironment(view.previewMode.containerEl, () => {
       if (!alive(reader)) return;
       reader.projection.environmentChanged();
@@ -485,6 +488,10 @@ export function registerReadingView(plugin: Plugin): void {
     }
   });
   plugin.register(() => { unloaded = true; for (const reader of readers.values()) stop(reader); });
+  return () => {
+    const enabled = showLayoutHighlight();
+    for (const reader of readers.values()) reader.view.previewMode.containerEl.toggleClass(HIGHLIGHT, enabled);
+  };
 }
 
 function numbersOf(refs: RefContext | undefined): string { return refs ? `${refs.language} ${refs.index.signature}` : ""; }

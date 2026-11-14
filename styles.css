@@ -485,12 +485,18 @@
   margin: 0;
 }
 
-/* In live preview a glowing frame shows where a layout begins and ends; its edges resize it. */
+/* The glowing frame uses an outline so it does not change layout geometry. */
+@media screen {
+  .vml-live-preview .vml-layout,
+  .vml-reading-highlight .vml-layout {
+    outline: 1.5px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
+    box-shadow:
+      0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.1),
+      0 0 14px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
+  }
+}
+
 .vml-live-preview .vml-layout {
-  outline: 1.5px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
-  box-shadow:
-    0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.1),
-    0 0 14px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
   position: relative;
   transition: outline-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
 }

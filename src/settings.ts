@@ -10,6 +10,7 @@ export interface VmlSettings {
   autoConvert: boolean;
   /** Keep the normal editing frame visible even when the caret is elsewhere. */
   keepLayoutHighlight: boolean;
+  showReadingLayoutHighlight: boolean;
   /** The language of the numbers of figures, tables and equations; auto follows Obsidian's. */
   refLanguage: RefLanguageSetting;
   /** The display language of plugin menus and UI; auto follows Obsidian's. */
@@ -21,6 +22,7 @@ export interface VmlSettings {
 export const DEFAULT_SETTINGS: VmlSettings = {
   autoConvert: false,
   keepLayoutHighlight: false,
+  showReadingLayoutHighlight: false,
   refLanguage: "auto",
   uiLanguage: "auto",
   guideRevision: 0,
@@ -38,6 +40,7 @@ export function readSettings(saved: unknown): VmlSettings {
   return {
     autoConvert: typeof record.autoConvert === "boolean" ? record.autoConvert : DEFAULT_SETTINGS.autoConvert,
     keepLayoutHighlight: typeof record.keepLayoutHighlight === "boolean" ? record.keepLayoutHighlight : DEFAULT_SETTINGS.keepLayoutHighlight,
+    showReadingLayoutHighlight: record.showReadingLayoutHighlight === true,
     refLanguage: refLanguage ?? DEFAULT_SETTINGS.refLanguage,
     uiLanguage: uiLanguage ?? DEFAULT_SETTINGS.uiLanguage,
     guideRevision: readGuideRevision(record.guideRevision),
@@ -93,6 +96,11 @@ export class VmlSettingTab extends PluginSettingTab {
         control: { type: "toggle", key: "keepLayoutHighlight", defaultValue: DEFAULT_SETTINGS.keepLayoutHighlight },
       },
       {
+        name: t("settingReadingHighlight"),
+        desc: t("settingReadingHighlightDesc"),
+        control: { type: "toggle", key: "showReadingLayoutHighlight", defaultValue: DEFAULT_SETTINGS.showReadingLayoutHighlight },
+      },
+      {
         name: t("settingOpenGuide"),
         desc: t("settingOpenGuideDesc"),
         render: (setting) => {
@@ -111,7 +119,7 @@ export class VmlSettingTab extends PluginSettingTab {
     if (key === "autoConvert") {
       return this.host.settings.autoConvert;
     }
-    if (key === "keepLayoutHighlight") return this.host.settings.keepLayoutHighlight;
+    if (key === "keepLayoutHighlight" || key === "showReadingLayoutHighlight") return this.host.settings[key];
     return key === "refLanguage" ? this.host.settings.refLanguage : undefined;
   }
 
@@ -131,8 +139,8 @@ export class VmlSettingTab extends PluginSettingTab {
       this.host.settings.autoConvert = value;
       await this.host.saveSettings();
     }
-    if (key === "keepLayoutHighlight" && typeof value === "boolean") {
-      this.host.settings.keepLayoutHighlight = value;
+    if ((key === "keepLayoutHighlight" || key === "showReadingLayoutHighlight") && typeof value === "boolean") {
+      this.host.settings[key] = value;
       await this.host.saveSettings();
     }
     const language = REF_LANGUAGES.find((candidate) => candidate === value);
@@ -190,6 +198,13 @@ export class VmlSettingTab extends PluginSettingTab {
       .addToggle((toggle) => toggle
         .setValue(this.host.settings.keepLayoutHighlight)
         .onChange(async (value) => { await this.setControlValue("keepLayoutHighlight", value); }));
+
+    new Setting(this.containerEl)
+      .setName(t("settingReadingHighlight"))
+      .setDesc(t("settingReadingHighlightDesc"))
+      .addToggle((toggle) => toggle
+        .setValue(this.host.settings.showReadingLayoutHighlight)
+        .onChange(async (value) => { await this.setControlValue("showReadingLayoutHighlight", value); }));
 
     new Setting(this.containerEl)
       .setName(t("settingOpenGuide"))
