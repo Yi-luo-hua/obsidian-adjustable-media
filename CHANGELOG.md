@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 0.9.8 - 2026-11-15
+
 - Add a caption below an entire media layout from its context menu. Layout captions support Markdown, numbering, alignment, and font size.
+- Add an option to show layout borders in Reading View. It is off by default.
 
 ## 0.9.7 - 2026-11-13
 
