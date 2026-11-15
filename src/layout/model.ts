@@ -13,6 +13,7 @@ import {
   MIN_TEXT_SIZE,
   hasTextColumns as blockHasTextColumns,
   readBlockAlign,
+  readBlockCaption,
   readBlockSkip,
   readBlockType,
   readBlockValign,
@@ -26,6 +27,7 @@ import {
   type Align,
   type CaptionAlign,
   type CaptionScale,
+  type CaptionSettings,
   type TextAlign,
   type TextJustify,
   type V2Block,
@@ -91,6 +93,8 @@ export interface LayoutText {
 export interface LayoutModel {
   version?: 3;
   rows: LayoutRow[];
+  /** Caption belonging to the entire media layout. */
+  caption: CaptionSettings | null;
   /**
    * The block's share of the container width, taken by its media, or by its text in a layout without
    * media; null means full width, or DEFAULT_WRAP_WIDTH with text beside the layout (wrapped, or
@@ -135,7 +139,7 @@ export type MoveTarget =
 const ALIGN_OFFSETS: ReadonlyArray<readonly [Align, number]> = [["left", 0], ["center", 0.5], ["right", 1]];
 
 export function modelFromBlock(block: V2Block): LayoutModel {
-  const { width, frameWidth, wrap, skip, valign, type, cols, gap, textAlign, size, align, ...rest } = block.meta.extra;
+  const { width, frameWidth, wrap, skip, valign, type, cols, gap, textAlign, size, align, caption, ...rest } = block.meta.extra;
   // A layout with text beside its media does not float; its wrap settings are kept as written.
   const columns = blockHasTextColumns(block);
   const extra = columns ? { ...definedOnly({ wrap, skip }), ...rest } : rest;
@@ -162,6 +166,7 @@ export function modelFromBlock(block: V2Block): LayoutModel {
         extra: heights === undefined || row.embeds.some(embed => embed.kind === "web") ? extra : settings.extra,
       };
     }),
+    caption: readBlockCaption(caption),
     width: readBlockWidth(width),
     frameWidth: readBlockWidth(frameWidth),
     wrap: columns ? null : readBlockWrap(wrap),
@@ -208,6 +213,7 @@ export function canAddText(model: LayoutModel): boolean {
 
 export function metaFromModel(model: LayoutModel): V2Meta {
   const mediaItems = model.version === 3 || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid" || item.embed.kind === "web"));
+  const { caption } = model;
   return {
     ...(mediaItems ? { version: 3 as const } : {}),
     rows: model.rows.map((row) => {
@@ -254,6 +260,11 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       ...(model.textAlign === null ? {} : { textAlign: model.textAlign }),
       ...(model.size === null ? {} : { size: model.size }),
       ...(model.align === null ? {} : { align: model.align }),
+      ...(caption === null ? {} : { caption: {
+        text: caption.text,
+        ...(caption.align === "center" ? {} : { align: caption.align }),
+        ...(caption.scale === null ? {} : { scale: caption.scale }),
+      } }),
       ...model.extra,
     },
   };
@@ -600,6 +611,11 @@ export function setCaption(model: LayoutModel, position: ItemPosition, caption: 
 
 export function setCaptionAlign(model: LayoutModel, rowIndex: number, captionAlign: CaptionAlign): LayoutModel {
   return updateRow(model, rowIndex, (row) => ({ ...row, captionAlign }));
+}
+
+export function setBlockCaption(model: LayoutModel, caption: CaptionSettings): LayoutModel {
+  const text = caption.text.trim();
+  return { ...model, caption: text ? { ...caption, text } : null };
 }
 
 /** Splits rows with more than MAX_EMBEDS_PER_ROW items; the extra rows keep the row's height. */

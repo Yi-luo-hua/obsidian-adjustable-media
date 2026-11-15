@@ -1,26 +1,22 @@
 import { DropdownComponent, Modal, type App } from "obsidian";
 
-import { CAPTION_SCALES, type CaptionAlign, type CaptionScale } from "../format/v2.ts";
+import { CAPTION_SCALES, type CaptionSettings } from "../format/v2.ts";
 import { t } from "./messages.ts";
-
-interface CaptionSettings {
-  text: string;
-  align: CaptionAlign;
-  scale: CaptionScale | null;
-}
 
 export class CaptionModal extends Modal {
   private readonly initial: CaptionSettings;
   private readonly onSave: (settings: CaptionSettings) => void;
+  private readonly title: string;
 
-  constructor(app: App, initial: CaptionSettings, onSave: (settings: CaptionSettings) => void) {
+  constructor(app: App, initial: CaptionSettings, onSave: (settings: CaptionSettings) => void, title = t("captionTitle")) {
     super(app);
     this.initial = initial;
     this.onSave = onSave;
+    this.title = title;
   }
 
   override onOpen(): void {
-    this.titleEl.setText(t("captionTitle"));
+    this.titleEl.setText(this.title);
     const textarea = this.contentEl.createEl("textarea", {
       cls: "vml-caption-modal__text",
       attr: { placeholder: t("captionPlaceholder"), rows: "4" },

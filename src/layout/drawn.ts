@@ -1,4 +1,4 @@
-import { hasSideText, type V2Block } from "../format/v2.ts";
+import { hasSideText, readBlockCaption, type V2Block } from "../format/v2.ts";
 import { layoutDependencies } from "./documentSnapshot.ts";
 
 /**
@@ -10,17 +10,21 @@ import { layoutDependencies } from "./documentSnapshot.ts";
 export interface Drawn {
   /** The layout comment lines of the note, and the numbers of its figures, tables and equations. */
   comments: string;
-  /** Every line of layouts drawn in their opening section (text columns or V3 items). */
+  /** Every line of layouts drawn in their opening section. */
   texts: Array<string | null>;
   /** Full body dependency while a float's influence has no proven end. */
   dependencies?: string;
+}
+
+export function drawsInOpeningSection(block: V2Block): boolean {
+  return hasSideText(block) || block.meta.version === 3 || readBlockCaption(block.meta.extra.caption) !== null;
 }
 
 /** What layouts drawn from `blocks` show; `numbers` tells the numbers their text and captions show. */
 export function drawnFrom(blocks: readonly V2Block[], numbers = "", lines: readonly string[] = []): Drawn {
   return {
     comments: [...(numbers === "" ? [] : [numbers]), ...blocks.map((block) => `${block.lines[0] ?? ""}\n${block.lines[block.lines.length - 1] ?? ""}`)].join("\n"),
-    texts: blocks.filter(block => hasSideText(block) || block.meta.version === 3).map((block) => block.lines.join("\n")),
+    texts: blocks.filter(drawsInOpeningSection).map((block) => block.lines.join("\n")),
     dependencies: layoutDependencies(lines, blocks),
   };
 }

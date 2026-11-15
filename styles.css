@@ -22,6 +22,16 @@
   gap: 1.5em;
 }
 
+.vml-layout--columns.vml-layout--captioned {
+  flex-wrap: wrap;
+  row-gap: 0;
+}
+
+.vml-layout__caption {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
 /* The text lines up with the media at the top, in the middle or at the bottom. */
 .vml-layout--valign-center {
   align-items: center;
@@ -203,15 +213,15 @@
 }
 
 /* A caption drawn as Markdown takes no paragraph spacing. */
-.vml-item__caption--markdown {
+:is(.vml-item__caption--markdown, .vml-layout__caption--markdown) {
   white-space: normal;
 }
 
-.vml-item__caption--markdown > :first-child {
+:is(.vml-item__caption--markdown, .vml-layout__caption--markdown) > :first-child {
   margin-top: 0;
 }
 
-.vml-item__caption--markdown > :last-child {
+:is(.vml-item__caption--markdown, .vml-layout__caption--markdown) > :last-child {
   margin-bottom: 0;
 }
 
@@ -681,7 +691,7 @@
   }
 }
 
-.vml-item__caption {
+:is(.vml-item__caption, .vml-layout__caption) {
   color: var(--text-muted);
   font-size: calc(var(--font-ui-small) * var(--vml-caption-scale, 1));
   margin-top: 4px;
@@ -689,7 +699,7 @@
   white-space: pre-wrap;
 }
 
-.vml-item__caption[data-align="center"] {
+:is(.vml-item__caption, .vml-layout__caption)[data-align="center"] {
   text-align: center;
 }
 

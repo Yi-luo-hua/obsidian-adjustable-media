@@ -23,6 +23,11 @@ export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
 export const CAPTION_SCALES = [1.25, 1.5, 2] as const;
 export type CaptionScale = typeof CAPTION_SCALES[number];
+export interface CaptionSettings {
+  text: string;
+  align: CaptionAlign;
+  scale: CaptionScale | null;
+}
 /** The side a layout floats to, with the note's own text wrapping around it. */
 export type WrapSide = "left" | "right";
 /** How the text beside a layout's media lines up with them vertically. */
@@ -313,6 +318,16 @@ export function readTextSize(value: unknown): number | null {
 /** Where a layout narrower than its container and not floating sits (top-level `align`); null when unset, invalid or left. */
 export function readBlockAlign(value: unknown): Exclude<Align, "left"> | null {
   return value === "center" || value === "right" ? value : null;
+}
+
+export function readBlockCaption(value: unknown): CaptionSettings | null {
+  if (!isRecord(value) || typeof value.text !== "string") return null;
+  const text = value.text.trim();
+  return text ? {
+    text,
+    align: value.align === "left" ? "left" : "center",
+    scale: CAPTION_SCALES.find(scale => scale === value.scale) ?? null,
+  } : null;
 }
 
 /** Writes the opening comment. Settings are omitted entirely when there are none, to keep the line short. */

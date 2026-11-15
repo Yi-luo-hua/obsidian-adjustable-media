@@ -1,9 +1,9 @@
 import { MarkdownRenderChild, MarkdownRenderer, MarkdownView, TFile, type MarkdownPostProcessorContext, type MarkdownSectionInformation, type Plugin } from "obsidian";
 
-import { blockWrap, hasSideText, isDrawable, type V2Block } from "../format/v2.ts";
+import { blockWrap, isDrawable, type V2Block } from "../format/v2.ts";
 import { canvasPreviewHosts, isCanvasPreview, type PreviewHost } from "./canvas.ts";
 import { documentSnapshot, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
-import { drawnFrom, isStale, type Drawn } from "../layout/drawn.ts";
+import { drawnFrom, drawsInOpeningSection, isStale, type Drawn } from "../layout/drawn.ts";
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { ViewProjection, type SourceCoverage } from "../layout/viewProjection.ts";
@@ -333,8 +333,7 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
         });
       }
     } else if (block && isDrawable(block)) {
-      // A multiline item can share a row with media in another native Markdown section.
-      const whole = hasSideText(block) || block.meta.version === 3;
+      const whole = drawsInOpeningSection(block);
       let rows: number[] | undefined;
       if (whole && !opening) el.empty();
       else {
@@ -507,7 +506,7 @@ function sectionRange(parsed: Parsed, info: MarkdownSectionInformation): SourceC
 
 function sectionBlock(blocks: readonly V2Block[], info: MarkdownSectionInformation): V2Block | undefined {
   const opening = blocks.find(block => info.lineStart === block.openLine && info.lineEnd === block.openLine);
-  return opening && (hasSideText(opening) || opening.meta.version === 3) ? opening
+  return opening && drawsInOpeningSection(opening) ? opening
     : blocks.find(block => info.lineStart > block.openLine && info.lineEnd <= block.closeLine);
 }
 
@@ -518,6 +517,6 @@ function sectionRows(block: V2Block, info: MarkdownSectionInformation): number[]
 function sectionLayoutKey(parsed: Parsed, info: MarkdownSectionInformation): string {
   const block = sectionBlock(parsed.blocks, info);
   if (!block || !isDrawable(block)) return "";
-  const rows = hasSideText(block) || block.meta.version === 3 ? info.lineStart === block.openLine ? "whole" : "hidden" : sectionRows(block, info);
+  const rows = drawsInOpeningSection(block) ? info.lineStart === block.openLine ? "whole" : "hidden" : sectionRows(block, info);
   return JSON.stringify([block.lines[0], rows, parsed.skips[parsed.blocks.indexOf(block)] ?? null]);
 }

@@ -48,6 +48,14 @@ test("changing a V3 diagram body invalidates the retained opening-section layout
   assert.equal(isStale(recordDrawn(drawn, after, 0), after), false);
 });
 
+test("changing a later row invalidates the retained reading view of a captioned layout", () => {
+  const lines = ['<!-- vml {"v":2,"caption":{"text":"Both rows"}} -->', "![[a.png]]", "", "![[b.png]]", "<!-- /vml -->"];
+  const before = state(lines);
+  const after = state(replace(lines, 3, "![[c.png]]"));
+  assert.equal(before.comments, after.comments);
+  assert.equal(isStale(before, after), true);
+});
+
 test("drawn layouts show the comments of every layout and every line of those with text", () => {
   const drawn = state(note);
   assert.equal(drawn.comments, ['<!-- vml {"v":2,"width":0.5} -->', "<!-- /vml -->", "<!-- vml -->", "<!-- /vml -->", "<!-- vml -->", "<!-- /vml -->"].join("\n"));

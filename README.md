@@ -79,7 +79,7 @@ Text boxes, multi-column text and numbered figures, tables and equations with cr
 | **Move the whole layout** | Drag the grip on top of the frame: the left or right third of the text floats it there from the line you point at, the middle places it between paragraphs |
 | **Move a video** | Drag the dedicated handle in the top-left corner of the video |
 | **Full-screen image viewer** | Double-click an image in Live Preview (scroll to zoom, drag to pan, arrow keys to switch); single-click in Reading View |
-| **Captions** | Right-click an item to edit captions and alignment |
+| **Captions** | Right-click an item to edit its caption, or choose **Edit layout caption** to add a caption below the whole layout |
 | **Move out of layout block** | Right-click an item and choose to remove it from the layout block |
 | **Cancel drag gesture** | Press <kbd>Esc</kbd> anytime during a drag to cancel |
 | **View/edit source** | Click the "Edit source" button in the top-right corner of the layout block (of its media, when there is text beside them) |

@@ -19,6 +19,7 @@ import {
   scaleRows,
   setAlign,
   setBlockWidth,
+  setBlockCaption,
   setFrameWidth,
   setCaption,
   setCaptionAlign,
@@ -114,7 +115,7 @@ export function attachInteractions(root: HTMLElement, context: LayoutContext): v
   contexts.set(root, context);
   setUpViewer(root, context);
   if (!isEditable(context.block)) {
-    setUpSourceMenu(root, context);
+    setUpLayoutMenu(root, context);
     return;
   }
 
@@ -130,7 +131,7 @@ export function attachInteractions(root: HTMLElement, context: LayoutContext): v
   if (isTextOnly(context.model)) {
     setUpTextBlockMenu(root, context);
   }
-  setUpSourceMenu(root, context);
+  setUpLayoutMenu(root, context);
 }
 
 /** Where an item dragged from `leaf` would land in a layout of the note at (x, y), if anywhere. */
@@ -794,6 +795,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
       void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, model)], context);
     }).open();
   }));
+  addBlockCaptionItem(menu, context);
 
   // Alignment only means something for a row with a single item.
   if (row.items.length === 1) {
@@ -973,13 +975,24 @@ function addSourceItem(menu: Menu, context: LayoutContext): void {
     .setSection("vml-source").onClick(editSource));
 }
 
-function setUpSourceMenu(root: HTMLElement, context: LayoutContext): void {
+function addBlockCaptionItem(menu: Menu, context: LayoutContext): void {
+  menu.addItem(entry => entry.setTitle(t("editBlockCaption")).setIcon("text").setSection("vml-caption").onClick(() => {
+    const initial = context.model.caption ?? { text: "", align: "center", scale: null };
+    new CaptionModal(context.app, initial, caption => {
+      const model = setBlockCaption(context.model, caption);
+      void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, model)], context);
+    }, t("blockCaptionTitle")).open();
+  }));
+}
+
+function setUpLayoutMenu(root: HTMLElement, context: LayoutContext): void {
   root.addEventListener("contextmenu", event => {
     if (event.defaultPrevented || eventElement(event)?.closest(".vml-text-editor")) return;
     event.preventDefault();
     event.stopPropagation();
     const menu = new Menu();
     addSourceItem(menu, context);
+    if (context.model.rows.length > 0 && isEditable(context.block)) addBlockCaptionItem(menu, context);
     menu.showAtMouseEvent(event);
   });
 }

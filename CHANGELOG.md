@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add a caption below an entire media layout from its context menu. Layout captions support Markdown, numbering, alignment, and font size.
+
 ## 0.9.7 - 2026-11-13
 
 - Fix Live Preview jumping when typing directly before a fenced code block in a note with image layouts. Paragraph spacing updates immediately when editing a Setext heading underline or a closing fence, and line breaks keep spacing at untouched boundaries stable ([#43](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/43)).

@@ -109,6 +109,10 @@ const MESSAGES = {
     zh: "编辑图注…",
     en: "Edit caption…",
   },
+  editBlockCaption: {
+    zh: "编辑整组图注…",
+    en: "Edit layout caption…",
+  },
   alignLeft: {
     zh: "左对齐",
     en: "Align left",
@@ -311,6 +315,10 @@ const MESSAGES = {
   captionTitle: {
     zh: "图注",
     en: "Caption",
+  },
+  blockCaptionTitle: {
+    zh: "整组图注",
+    en: "Layout caption",
   },
   captionPlaceholder: {
     zh: "输入图注…（Ctrl+Enter 保存）",

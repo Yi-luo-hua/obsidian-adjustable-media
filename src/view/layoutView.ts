@@ -1,6 +1,6 @@
 import { MarkdownRenderer, type App, type Component } from "obsidian";
 
-import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, type TextSide } from "../format/v2.ts";
+import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, type CaptionSettings, type TextSide } from "../format/v2.ts";
 import { effectiveFrameWidth, effectiveWidth, hasTextColumns, isTextOnly, rowOffset, webHeight, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
 import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { setBounded } from "../layout/viewProjection.ts";
@@ -122,6 +122,10 @@ export function renderLayout(container: HTMLElement, options: LayoutViewOptions)
   }
   if (model.text.right !== null) {
     renderText(root, "right", model.text.right, options);
+  }
+  if (model.caption && model.rows.length > 0) {
+    root.addClass("vml-layout--captioned");
+    renderCaption(root, "vml-layout__caption", model.caption, options);
   }
   applySizing(root, model);
   renderTasks?.push(...tasks);
@@ -324,16 +328,17 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
   }
 
   if (item.caption) {
-    // A caption is Markdown, drawn as such where the layout can own what Obsidian draws.
-    const captionEl = itemEl.createDiv({ cls: "vml-item__caption", attr: { "data-align": row.captionAlign ?? "left" } });
-    if (item.captionScale != null) {
-      captionEl.setCssProps({ "--vml-caption-scale": String(item.captionScale) });
-    }
-    if (renderMarkdown(captionEl, item.caption, options)) {
-      captionEl.addClass("vml-item__caption--markdown");
-    } else {
-      captionEl.setText(item.caption);
-    }
+    renderCaption(itemEl, "vml-item__caption", { text: item.caption, align: row.captionAlign ?? "left", scale: item.captionScale ?? null }, options);
+  }
+}
+
+function renderCaption(parent: HTMLElement, cls: string, { text, align, scale }: CaptionSettings, options: LayoutViewOptions): void {
+  const el = parent.createDiv({ cls, attr: { "data-align": align } });
+  if (scale !== null) el.setCssProps({ "--vml-caption-scale": String(scale) });
+  if (renderMarkdown(el, text, options)) {
+    el.addClass(`${cls}--markdown`);
+  } else {
+    el.setText(text);
   }
 }
 

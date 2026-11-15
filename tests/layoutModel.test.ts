@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { findV2Blocks, serializeBlock, type V2Block } from "../src/format/v2.ts";
+import { applyEditsToText, planModelEdit } from "../src/layout/edits.ts";
 import {
   canAddText,
   insertItem,
@@ -11,6 +12,7 @@ import {
   removeItem,
   rowEmbeds,
   setAlign,
+  setBlockCaption,
   setCaption,
   setRowHeight,
   setSingleWidth,
@@ -110,6 +112,26 @@ test("caption size follows the item through a move and round trip, and clears wi
   assert.deepEqual(metaFromModel(setCaption(reparsed, movedPosition, "New text")).rows[0]?.captionScales, [1.5]);
   assert.equal(metaFromModel(setCaption(reparsed, movedPosition, "New text", null)).rows[0]?.captionScales, undefined);
   assert.equal(metaFromModel(setCaption(reparsed, movedPosition, "")).rows[0]?.captionScales, undefined);
+});
+
+test("a layout caption saves in the opening comment independently of item captions", () => {
+  const lines = [sample[0], "![[a.png]]  ![[b.png]]  ", "", ...sample.slice(2)];
+  const block = parse(lines);
+  const caption = { text: "**Layout** -- 50%\n{#fig:layout}", align: "left", scale: 1.5 } as const;
+  const updated = setBlockCaption(modelFromBlock(block), { ...caption, text: `  ${caption.text}  ` });
+  const edit = planModelEdit(block, updated);
+  assert.ok(edit);
+  const saved = applyEditsToText(lines.join("\r\n"), [edit]);
+  assert.ok(saved.ok);
+  const savedLines = saved.text.split("\r\n");
+  assert.deepEqual(savedLines.slice(1), lines.slice(1));
+  const restored = model(savedLines);
+  assert.deepEqual(restored.caption, caption);
+  assert.equal(restored.rows[0].items[1].caption, "B");
+
+  const moved = moveItem(restored, { row: 0, index: 1 }, { kind: "newRow", beforeRow: 0 });
+  assert.deepEqual(model(serializeBlock(metaFromModel(moved), rowEmbeds(moved))).caption, caption);
+  assert.equal(metaFromModel(setBlockCaption(restored, { ...caption, text: " " })).extra.caption, undefined);
 });
 
 test("a row never holds more than four items", () => {
