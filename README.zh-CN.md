@@ -6,7 +6,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-**0.9.7 已发布**。修复实时预览在代码围栏旁输入时的抖动，对齐两种视图的布局留白，并默认关闭布局块边框常亮。详见[发布核验](docs/releases/0.9.7-readiness.md)。
+**0.9.8 已发布**。支持在整个媒体布局下方添加图注，阅读模式可选择显示布局块边框。详见[发布核验](docs/releases/0.9.8-readiness.md)。
 
 文字块、分栏排版，以及图、表、公式的编号与交叉引用从 0.4.0 引入。0.3 起已有文字环绕、整块移动和文字栏编辑。安装包见 [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)，文档入口见[文档索引](docs/README.md)，验证范围和已知限制见[项目状态](docs/STATUS.md)，剩余布局改进见[布局改进进度与后续安排](docs/plans/layout-redesign/09-progress-and-next-steps.md)。
 
