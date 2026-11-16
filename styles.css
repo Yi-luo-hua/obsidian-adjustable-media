@@ -477,6 +477,11 @@
   margin-top: -0.1px;
 }
 
+/* Keep section geometry measurable while the edited note is being projected. */
+.vml-rv-waiting-for-render .markdown-preview-sizer {
+  opacity: 0;
+}
+
 /* Keep the next paragraph's margin below a float when the source separates them with a blank. */
 .markdown-preview-sizer > .vml-rv-float-blank {
   padding-bottom: calc(0.05px + var(--vml-extra-blank-lines, 0) * var(--p-spacing, 1rem));

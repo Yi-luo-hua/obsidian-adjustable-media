@@ -87,6 +87,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     getMode: () => mode, getViewData: () => hostText,
     previewMode: { containerEl: container, rerender() { rerenders++; } } });
   const sourceView = Object.assign(new ViewStub(), { file, getMode: () => "source",
+    containerEl: container, previewMode: { containerEl: container },
     editor: { getValue: () => diskText } });
   const leaves = [{ view: reader }];
   const on = (name: string, callback: Listener): void => { listeners.set(name, callback); };
