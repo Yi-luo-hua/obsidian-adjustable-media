@@ -2,37 +2,29 @@
 
 ## From Community plugins
 
-1. Open Settings → Community plugins and turn off Restricted mode if it's on.
-2. Click Browse, search for Adjustable Media, then click Install and Enable.
+1. Open **Settings → Community plugins** and turn off Restricted mode if it's on.
+2. Click **Browse**, search for **Adjustable Media**, then click **Install** and **Enable**.
 3. If you want automatic conversion of dropped and pasted media, turn it on in the plugin's settings.
 
-Obsidian tells you when an update is available, under Settings → Community plugins.
+Obsidian notifies you when an update is available under **Settings → Community plugins**.
 
 ## From GitHub releases
 
-1. Open the latest release of this repository.
-2. Download `main.js`, `manifest.json` and `styles.css`. To check that they were built from this repository, see [Verifying a release](../SECURITY.md#verifying-a-release).
-3. Create this folder in your vault:
-
-   ```text
-   <your vault>/.obsidian/plugins/adjustable-media
-   ```
-
-4. Move the three files into it.
-5. Restart Obsidian.
-6. Open Settings → Community plugins, turn off Restricted mode if it's on, and enable Adjustable Media.
-7. If you want automatic conversion of dropped and pasted media, turn it on in the plugin's settings.
+1. Open the [latest release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest) of this repository.
+2. Download `main.js`, `manifest.json`, and `styles.css`. To verify build provenance, see [Verifying a release](../SECURITY.md#verifying-a-release).
+3. Place the three files into `<your vault>/.obsidian/plugins/adjustable-media/`.
+4. Restart Obsidian, turn off Restricted mode if needed, and enable **Adjustable Media** in **Settings → Community plugins**.
 
 ## Compatibility
 
-| | |
+| Item | Support |
 | --- | --- |
-| Obsidian | 1.5.0 or newer is required; recent Windows checks used 1.14.4 |
+| Obsidian | **1.5.0** or newer (`1.6.0+` for the Markdown table cell menu) |
 | Desktop | Supported |
-| Mobile | Android, iPhone and iPad are supported from 0.8.0; the current public release is 0.9.1. |
+| Mobile | Android, iPhone, and iPad (`isDesktopOnly: false`) |
 
-The minimum version is a compatibility declaration, not a claim that every host version, theme and device was tested. See [project status](STATUS.md) and the [mobile validation record](plans/layout-redesign/mobile-adaptation.md) for each build's coverage. Standalone Mermaid hold-and-drop gestures were verified on an Android tablet; those gestures have not been retested on Android phones or iOS. Mobile devices were not retested for 0.9.0 or 0.9.1.
+`minAppVersion` is a compatibility baseline rather than a guarantee across all themes, host versions, and devices. Recent desktop updates (0.9.0–1.0.0) have not all been retested on mobile; see [project status](STATUS.md) and the [mobile adaptation record](plans/layout-redesign/mobile-adaptation.md) for tested coverage.
 
 ## Updating
 
-Replace the three files with the ones from the new release, then turn the plugin off and on again in Settings → Community plugins, or restart Obsidian.
+Replace the three plugin files with those from the new release, then disable and re-enable the plugin (or restart Obsidian).

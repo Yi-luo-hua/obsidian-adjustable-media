@@ -1,94 +1,68 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Adjustable Media" width="460" />
+</p>
+
 # Adjustable Media
 
-Arrange, resize, and lay out images and videos in Obsidian like a modern canvas using layout blocks — stored via lightweight HTML comments, keeping 100% native Markdown with zero format lock-in.
+An Obsidian plugin for arranging and resizing media and text in layout blocks, stored as standard Markdown wrapped in HTML comments (`<!-- vml ... -->`).
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-**1.0.0 is released.** Position entire layouts horizontally, customize border colors, and switch to Reading View more smoothly after editing floating layouts. See [release verification](docs/releases/1.0.0-readiness.md).
-
-0.9.0 adds Canvas card layouts, Callout image resizing and Mermaid context-menu wrapping, and fixes theme-related handle clipping, layout alignment and external file URL images. Theme compatibility checks screened all 901 official themes' main CSS and 342 rendering combinations from 57 theme styles. See [release verification](docs/releases/0.9.0-readiness.md).
-
-0.8.2 fixes disappearing blank lines and overlapping line numbers away from layouts in live preview, plus reference clicks and navigation. See [patch verification](docs/releases/0.8.2-readiness.md).
-
-0.8.0 adds Mermaid layout items and Android, iPhone and iPad support, alongside recent fixes. Android tablet Mermaid regression and the reported hold-to-drag problem have passed automatic and user checks; new gestures have not been retested on phones or iOS. See [release verification](docs/releases/0.8.0-readiness.md) and [status](docs/STATUS.md).
-
-[Feature examples](docs/examples/Guide.en.md) · [功能示例](docs/examples/Guide.zh-CN.md). In Obsidian, run **Feature examples** for an offline preview and a button to create a working copy with its media. The guide opens once when first available, including for existing users upgrading to the release that adds it.
-
-Text boxes, multi-column text and numbered figures, tables and equations with cross-references were introduced in 0.4.0, following the text wrapping, movable layouts and editable text columns of 0.3. Download from [GitHub Releases](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest). See the [documentation index](docs/README.md) and [project status and validation](docs/STATUS.md) for test coverage and known limitations, and [layout improvement progress and next steps](docs/plans/layout-redesign/09-progress-and-next-steps.md) for the remaining layout work.
+Latest release: **[1.0.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [Changelog](CHANGELOG.md) · [Feature examples](docs/examples/Guide.en.md) · [FAQ](docs/FAQ.md) · [Docs](docs/README.md)
 
 ![Adjustable Media Preview](assets/demo.jpg)
+
+In Obsidian, run **Feature examples** from the command palette for an interactive offline preview and sample notes.
 
 ---
 
 ## Features
 
-### 🎨 Fluid, Intuitive Mouse-Driven Layout
-
-- **Side-by-Side & Grids**: Place images and videos side by side (up to 4 per row) with automatic height equalization.
-- **Direct Mouse Resizing**: Drag the gap between two images to adjust column widths (double-click it to share the row by the images' proportions again), drag a row's bottom edge to change height, or drag the outer frame to scale the entire layout block.
-- **Free Single-Image Placement**: Slide a single image left or right across its row, with smooth magnetic snapping to left, center, and right.
-- **Text Wrap, like LaTeX's `wrapfigure`**: Float a layout to the left or right and let the note's own paragraphs, lists, quotes, headings and code flow around it, then continue at full width below it. The text beside it is ordinary note text: type right next to the image and it reflows as you go.
-- **Text Beside Images, like Side-by-Side Minipages**: Write text in a layout block before its media for a column on their left, after them for a column on their right, or both. It is ordinary Markdown (headings, lists, quotes, links), and the media keep the layout's width in the middle. The text lines up with the media at the top, in the middle or at the bottom. In Live Preview, click the text to edit it right in the layout, where it keeps the look of Live Preview (headings, bold text, bullets, task boxes, links, rendered math and images, wrapped list items lined up under their text) and the keys work as in the note: <kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, brackets pair up, typing `[[` suggests links, and Obsidian's formatting, link, list, task and heading commands work on the hotkeys you gave them (<kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>I</kbd>, <kbd>Ctrl</kbd>+<kbd>K</kbd> and <kbd>Ctrl</kbd>+<kbd>L</kbd> by default). Or right-click an image and choose **Add text on the left** or **Add text on the right** to start one.
-- **Two-Column Text and Paper Drafts**: A text box can flow its text through 2–4 columns that balance themselves, like `multicols`, with its own column gap, alignment (including justified) and text size, and a narrow box can sit in the middle (right-click the box and choose **Text settings…**). Code, math and figures go inside the text, so a whole paper section can be one box.
-- **Numbered Figures, Tables and Equations**: End a caption with `{#fig:name}` or `{#tbl:name}`, put `\label{eq:name}` in an equation, and write `@fig:name`, `@tbl:name` or `@eq:name` in the text. Captions start with "Figure 1.", equations get their number, and references read "Figure 1" and jump to their target when clicked. The syntax is pandoc-crossref's, so the draft converts to LaTeX as it is. Choose English or Chinese numbers in the settings.
-- **Text Boxes**: A layout block can hold text alone, without media. It is drawn as one column of Markdown at the layout's width and can float left or right like an image, with the note's text wrapping around it: a sidebar or margin note. Select some lines and run the wrap command to make one; click the text to edit it, drag the frame's edge to set its width, and right-click it to float it or to remove the box and keep its text.
-- **Move Whole Layouts**: Drag a narrow, non-floating frame's top grip sideways to place the whole block anywhere across the note at its current height. Start by dragging up or down to move it through the note. For layouts that can float, dropping in the left or right third wraps text from the line you point at, and the middle places the block between paragraphs.
-- **Flexible Drag-and-Drop Reordering**: Drag an item to reorder within a row, drop between rows to start a new row, or drag loose images from your note directly into an existing layout block.
-- **Double-Click Image Viewer**: In editing mode, double-click any image in a layout block to inspect it up close; supports mouse wheel zoom, click-and-drag panning, and left/right arrow keys to switch between images in the block.
-- **Video Playback**: Videos feature a dedicated drag button in the top-left corner, ensuring layout drags never accidentally trigger playback or the timeline scrubber.
-
-### 🛡️ Zero Lock-in, Permanent Data Safety
-
-- **Native Markdown Syntax**: Notes store standard Obsidian media embeds (`![[...]]` or `![...](...)`).
-- **Minimal Comment Storage**: Layout block settings are stored compactly inside a pair of HTML comments (`<!-- vml ... -->` ... `<!-- /vml -->`).
-- **Seamless Multi-Platform & Publishing Compatibility**: Even with the plugin disabled, on mobile, pushed to GitHub, or published to Hexo / Quartz / personal blogs, media still renders cleanly as ordinary embeds without clutter or broken tags.
-- **Refactor-Proof**: Renaming or moving image and video files in Obsidian automatically updates links, keeping layouts completely intact.
-
-### ⚡ Intuitive Editing Workflow
-
-- **WYSIWYG with Instant Source Switching**: Features an illuminated control frame in editing mode; moving the cursor inside or clicking "Edit source" smoothly switches to plain Markdown text for effortless transitions between visual and handwritten editing.
-- **Layout border highlighting**: Live Preview highlights borders on hover or while editing the layout. Enable **Keep layout borders highlighted** to show them continuously in Live Preview. A separate **Show layout borders in reading view** setting adds the same outline and glow to Reading View. Both settings default to off.
-- **Automatic Layouts (Optional)**: When enabled in settings, multiple images or videos dropped from your computer or pasted will automatically be packaged into layout blocks.
-- **Validated Writes**: Layout gestures in an active editor use one transaction with native Undo/Redo. Markdown file operations without an active editor use `vault.process`; bulk removal validates and updates each file separately. Every write checks the expected source and preserves unrelated text and line endings.
+- **Side-by-side media grids**: Arrange images, videos, Mermaid diagrams, local Excalidraw drawings (requires the Excalidraw plugin), and web embeds (`<iframe>`, YouTube, Twitter/X) up to 4 items per row with automatic row height equalization.
+- **Direct resizing**: Drag the divider between items to adjust column widths (double-click to reset to aspect ratios), drag a row's bottom edge to change row height, drag a web embed's bottom edge for an independent height, or drag the outer frame to scale the whole block.
+- **Positioning & text wrapping**: Slide the item in a single-item row horizontally (snaps to left, center, right, or any offset). Drag the top grip of a narrow, non-floating block sideways to position the entire layout horizontally across the line (preserved in Reading View and PDF exports). Float a media or text block left or right so surrounding paragraphs, lists, quotes, headings, and code wrap around it; a top-level horizontal rule (`---`) ends wrapping below.
+- **Text columns beside media**: Add Markdown columns on the left, right, or both sides of media, aligned to the top, middle, or bottom. Click the text in Live Preview to edit in place with Live Preview styling, hanging list indents, <kbd>Tab</kbd>/<kbd>Enter</kbd>, `[[` link suggestions, and your formatting hotkeys. Drag the outer frame independently of the media column width.
+- **Text boxes & multi-column text**: Wrap text alone into a floatable sidebar box, or enable 2–4 balanced columns via **Text settings…** with custom gap, alignment (including justify), and font size. Put `+++` on its own unindented line (or run **Insert column break**) for up to 4 manual equal-width columns.
+- **Captions & academic cross-references**: Add per-item captions and a layout-wide caption below the block (both support Markdown, numbering, left/center alignment, and Default / 125% / 150% / 200% font sizes). End a caption with `{#fig:name}` or `{#tbl:name}`, add `\label{eq:name}` in display math, and reference `@fig:name`, `@tbl:name`, or `@eq:name` for automatic English/Chinese numbering and click-to-scroll navigation (pandoc-crossref syntax).
+- **Drag-and-drop & viewers**: Reorder items within or across rows, or drag standalone media from the same note and pane into an existing layout. Double-click an image in Live Preview to open a zoomable, pannable viewer with arrow-key navigation; double-click an Excalidraw preview to open the drawing. Videos, Mermaid, Excalidraw, and web embeds use dedicated drag handles so dragging doesn't trigger playback or inner controls.
+- **Canvas, Callouts & Markdown tables**: Canvas text and Markdown file cards support layouts inside each card. Standalone image lines in native Callouts have a bottom-right resize handle (`scope:"callout-image"`). Right-click a top-level Markdown table (Obsidian 1.6.0+) to wrap it in a text layout while keeping native row/column/sort actions.
+- **Plain Markdown storage**: Original embeds (`![[...]]`, `![...](...)`), Mermaid fences, and `<iframe>` tags stay untouched inside `<!-- vml ... -->` comments, so links update on file rename and notes remain readable without the plugin.
 
 ---
 
-## Quick Start
+## Usage
 
-### 1. Create a Layout Block
+### Creating a layout
 
-- **Right-Click Menu**: In Live Preview, right-click a standalone image, video or Mermaid diagram and choose **Wrap in a layout**. For a diagram, keep its complete top-level Mermaid fence.
-- **Excalidraw and tables**: With Excalidraw enabled, right-click its preview to wrap a local drawing, or drag its handle into an existing layout. Right-click a top-level Markdown table to wrap the whole table in a text layout; its native row, column and sorting actions remain available (table menu requires Obsidian 1.6.0+).
-- **Command / Hotkey**: Select one or more lines and run `Adjustable Media: Wrap selection in a layout` (assign a dedicated hotkey in Settings → Hotkeys). Lines of media embeds are gathered into rows; lines with text are wrapped as they are, making a text box, or text columns beside the media.
-- **Selected text menu**: In Live Preview or Source mode, select text, right-click and choose **Wrap selection in a layout**. The command wraps the whole lines touched by the selection. It appears only when the selection can form a layout. To choose your own shortcut, open **Settings → Hotkeys**, search for **Wrap selection in a layout**, and assign a key combination; no shortcut is assigned by default.
-- **Drag & Drop**: When a layout block already exists in your note, drag standalone images or Mermaid diagrams from the same note and pane directly into it. On touch devices, diagrams have a drag handle; holding a standalone diagram's body also starts a drag, while a quick swipe scrolls.
-- **Canvas cards**: Text and Markdown file cards support layouts within each card. Edit the card in Live Preview to wrap content or adjust its layout; each card keeps its own preview and edits. Cross-card layout dragging and Canvas cross-reference navigation are outside this release.
-- **Callout images**: Drag the bottom-right handle of a standalone image line in a native Callout. This saves a width setting without changing the original embed; it does not turn the Callout into a layout block.
+- **Context menu**: In Live Preview, right-click a standalone image, video, Mermaid diagram, Excalidraw drawing, web embed handle, or top-level Markdown table and select **Wrap in a layout**. If an image shares a normal paragraph line with text, only that image is wrapped.
+- **Selection / command**: Select lines and run **Wrap selection in a layout** from the right-click menu or command palette (no default hotkey; bind one in **Settings → Hotkeys**).
+- **Drag into a layout**: Drag standalone images, Mermaid diagrams, Excalidraw handles, or web embed handles from the same note and pane into an existing layout. On touch devices, long-press a standalone Mermaid diagram to drag.
+- **Auto-convert (optional)**: Enable **Convert dropped and pasted media** in settings to automatically wrap newly dropped or pasted images/videos.
 
-### 2. Common Interactions
+### Controls
 
-| Goal | Action |
+| Action | How |
 | :--- | :--- |
-| **Adjust column width ratio** | Drag the gap between two items; double-click it to share the row by the images' proportions again |
-| **Change row height** | Drag the bottom edge of the row |
-| **Resize the entire layout block** | Drag the outer glowing frame (right edge for width, bottom edge for height, corner to scale; a layout floating right uses its left edge and bottom-left corner). From 0.9.1, media-and-text layouts can shrink too: outer edge/corner handles resize the entire layout, while media-column edge/bottom handles adjust its share/media sizes |
-| **Position a single item** | Drag the image horizontally; snaps smoothly to left, center, and right |
-| **Reorder or move items** | Drag and drop onto adjacent spots, between rows (to split into a new row), or into another layout block |
-| **Wrap text around a layout** | Right-click an item and choose **Float left, wrap text** or **Float right, wrap text**; **No text wrap** takes it back |
-| **Put text beside the media** | Right-click an item and choose **Add text on the left** or **Add text on the right**, then type right there; later, click the text to edit it in place (<kbd>Tab</kbd> indents, <kbd>Enter</kbd> continues lists, `[[` suggests links, and your formatting hotkeys such as <kbd>Ctrl</kbd>+<kbd>B</kbd>/<kbd>I</kbd>/<kbd>K</kbd> work; <kbd>Esc</kbd> or a click elsewhere finishes). The same menu lines the text up with the media at the top, in the middle or at the bottom |
-| **Move the whole layout** | Drag the top grip sideways on a narrow, non-floating block to position it horizontally. Start up or down to move it through the note |
-| **Move a video** | Drag the dedicated handle in the top-left corner of the video |
-| **Full-screen image viewer** | Double-click an image in Live Preview (scroll to zoom, drag to pan, arrow keys to switch); single-click in Reading View |
-| **Captions** | Right-click an item to edit its caption, or choose **Edit layout caption** to add a caption below the whole layout |
-| **Move out of layout block** | Right-click an item and choose to remove it from the layout block |
-| **Cancel drag gesture** | Press <kbd>Esc</kbd> anytime during a drag to cancel |
-| **View/edit source** | Click the "Edit source" button in the top-right corner of the layout block (of its media, when there is text beside them) |
+| Adjust column widths | Drag the gap between two items; double-click to reset to aspect ratios |
+| Adjust row height / web height | Drag the row's bottom edge, or a web embed's own bottom edge (double-click web handle or use menu to reset) |
+| Resize the whole block | Drag the outer frame edges or corner (in media+text blocks, outer handles resize the block, media-column handles adjust its share) |
+| Position a single-item row | Drag the item horizontally within its row |
+| Position a narrow layout horizontally | Drag the top grip sideways |
+| Move a layout through the note | Drag the top grip up or down (drop in the left/right third of text to wrap from that line) |
+| Reorder / move items | Drag items within a row, between rows to split, or into another layout (use corner/top handles on videos, Mermaid, Excalidraw, and web embeds) |
+| Text wrap / text columns / captions | Right-click an item or the frame for wrap, left/right text columns, vertical alignment, item/layout captions, or **Move out of layout** |
+| Edit source / cancel / undo | Move cursor into the block or click **Edit source**; press <kbd>Esc</kbd> to cancel a drag; every action supports one-step undo |
+
+### Settings & commands
+
+- **Settings**: Interface language, numbering language (English / Chinese / auto), auto-convert dropped/pasted media, keep layout borders highlighted (off by default), show layout borders in reading view (off by default), layout border color (defaults to Obsidian accent color), and **Feature overview**.
+- **Commands**: `Wrap selection in a layout`, `Merge with the next layout`, `Insert column break`, `Remove the layout comments here`, `Remove layout comments from all notes…`, `Feature examples`, and `View release notes`.
 
 ---
 
-## How It Works
+## Storage Format
 
-Adjustable Media introduces no custom syntax. Your notes contain only standard embeds wrapped in clean HTML comments:
+Layouts wrap standard Markdown in HTML comments:
 
 ```markdown
 <!-- vml {"v":2,"rows":[{"height":240,"widths":[1,1.4]}]} -->
@@ -97,69 +71,50 @@ Adjustable Media introduces no custom syntax. Your notes contain only standard e
 <!-- /vml -->
 ```
 
-- The opening comment stores only essential parameters (row height, width ratios, captions, alignment), with zero unnecessary overhead.
-- A layout that wraps text sits right above the text that wraps around it, and says which side it floats to:
+**Text wrap** sits directly above the wrapped paragraph (`wrap: "left" | "right"`, optional `skip` lines):
 
-  ```markdown
-  <!-- vml {"v":2,"width":0.4,"wrap":"left"} -->
-  ![[portrait.png]]
-  <!-- /vml -->
-  This paragraph flows around the image, then continues at full width below it.
-  ```
+```markdown
+<!-- vml {"v":2,"width":0.4,"wrap":"left"} -->
+![[portrait.png]]
+<!-- /vml -->
+This paragraph wraps around the image and returns to full width below it.
+```
 
-  Without the plugin, the image simply shows above that paragraph.
-- Text written in a layout before its media shows in a column on their left, text after them in a column on their right:
+**Text beside media** puts text before media on the left and after media on the right:
 
-  ```markdown
-  <!-- vml {"v":2,"width":0.4} -->
-  Text on the left: several lines or paragraphs, lists, quotes.
-  ![[beach.png]]
-  Text on the right.
-  <!-- /vml -->
-  ```
+```markdown
+<!-- vml {"v":2,"width":0.4} -->
+Left column text, lists, quotes, or math.
+![[beach.png]]
+Right column text.
+<!-- /vml -->
+```
 
-  Without the plugin, the text and the image show one after the other.
-- Embed syntax remains completely untouched, fully compatible with file renaming and moving.
-- To remove editable top-level layout comments from Markdown files, run `Remove layout comments from all notes…` and review the confirmation. This does not scan Canvas text cards or remove Callout image settings; unreadable layouts are preserved. Their comments can be removed manually while keeping the original content.
+**Mermaid & web embeds (`v:3`)** keep full fences/`<iframe>` tags and optional per-item `heights`; **Callout images** use quote-prefixed `<!-- vml {"v":2,"scope":"callout-image","rows":[{"width":0.5}]} -->`.
+
+To strip all editable top-level layout comments from Markdown files, run **Remove layout comments from all notes…** (Canvas cards, Callout image settings, and unreadable blocks are left untouched).
 
 ---
 
-## Installation & Requirements
+## Installation
 
-- **Requirements**: Obsidian 1.5.0 or newer; desktop, Android, iPhone and iPad. Device and build-specific validation is recorded in [project status](docs/STATUS.md) and the [mobile record](docs/plans/layout-redesign/mobile-adaptation.md). Recent desktop fixes have not all been retested on mobile.
+Requires Obsidian **1.5.0+** (`1.6.0+` for table menu). Supports desktop, Android, iPhone, and iPad (`isDesktopOnly: false`; see [project status](docs/STATUS.md) and [mobile record](docs/plans/layout-redesign/mobile-adaptation.md) for tested coverage).
 
-### Method 1: Community Plugins (Recommended)
-
-1. In Obsidian, open **Settings → Community plugins** and turn off Restricted mode.
-2. Click **Browse**, search for **Adjustable Media**.
-3. Click **Install**, then **Enable**.
-
-### Method 2: Manual Installation
-
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest).
-2. Place them into `<your vault>/.obsidian/plugins/adjustable-media/`.
-3. Restart Obsidian and enable **Adjustable Media** in Community plugins.
+1. **Community plugins**: Open **Settings → Community plugins**, search for **Adjustable Media**, install and enable.
+2. **Manual**: Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest) into `<vault>/.obsidian/plugins/adjustable-media/` and enable the plugin.
 
 ---
 
-## Notes
+## Limitations & Notes
 
-- Full layout blocks must start at the beginning of a top-level line, outside quotes, Callouts and lists. Resizing a standalone Callout image uses separate settings and does not enable full layouts inside Callouts.
-- Reading View only shows layout blocks; change them in Live Preview.
-- In a media layout, text goes before its first row of media (left column) or after its last row (right column); text between two media rows makes that layout invalid. A text-only block, or a block marked `type:"text"`, treats all its content as text and can contain embedded media anywhere. A layout with text beside its media does not wrap the note's text.
-- No telemetry or analytics. Local media work offline; remote media embedded in a note still load from their source URLs.
+- Full layout blocks must start at column 0 at the top level (not inside quotes, Callouts, or lists).
+- Reading View is read-only; edit layouts in Live Preview.
+- In a media layout, text between two media rows makes the block invalid (ignored by the plugin). Use `"type":"text"` for text blocks that embed media anywhere; media+text layouts do not float/wrap surrounding text.
+- No telemetry or analytics; remote media/web embeds load directly from their source URLs.
 
 ---
 
-## License & Acknowledgments
+## License & Links
 
-- Released under the [MIT License](LICENSE).
-- Originally inspired by [Fall-Makito/visual-media-layout](https://github.com/Fall-Makito/visual-media-layout), and rewritten from the ground up with a resilient comment-based storage model and safe transactional pipeline.
-
-## 0.7.3: manual text columns
-
-Inside a text layout, write `+++` on its own unindented line to start the next column. Up to four equal-width columns align at the top, and each keeps its own content, including empty columns. Without markers, automatic columns continue to work. Type the marker while editing layout text, or use the Insert column break command in the layout source. Code, math and comments are left alone; more than four columns triggers a warning and falls back to automatic columns without changing the source.
-
-This version also fixes clicks between text editors and on frame padding unexpectedly revealing source. Its release notes can create offline [English](docs/examples/ManualColumns.en.md) or [Chinese](docs/examples/ManualColumns.zh-CN.md) examples to match the interface language, using a fresh folder for each creation.
-
-User acceptance, bilingual Windows/Obsidian 1.14.4 checks, all 327 automated tests and release packaging are complete. Version 0.7.3 is tagged from `codex/text-column-breaks`, based on the published 0.7.2 source and retaining its features. Version 0.7.3 was published at that stage; its three attested build files and the merged release index are verified. See [status](docs/STATUS.md) and the [implementation record](docs/plans/layout-redesign/34-text-column-breaks.md) for validation details. Version 0.7.3 was desktop only and used V2. Current mobile support and version information are recorded above.
+- [MIT License](LICENSE) · Originally inspired by [Fall-Makito/visual-media-layout](https://github.com/Fall-Makito/visual-media-layout)
+- [Documentation index](docs/README.md) · [Project status](docs/STATUS.md) · [Design notes](docs/DESIGN.md) · [Support the developer](https://yi-luo-hua.github.io/sponsor-me/)

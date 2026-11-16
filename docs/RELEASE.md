@@ -2,17 +2,17 @@
 
 ## 1. 更新版本号
 
-三处必须一致，`npm run release` 会检查：
+三处必须一致，`npm run release` 会自动校验：
 
 - `manifest.json` 的 `version`
 - `package.json` 的 `version`
 - `versions.json`：新增一行，把新版本映射到 `manifest.json` 里的 `minAppVersion`
 
-同时在 `CHANGELOG.md` 写好这一版的条目，标题写成 `## 0.1.0 - 2026-09-12` 的形式。Release 的说明由 `scripts/release-notes.mjs` 生成：先是这一条目，后面接 `docs/RELEASE_NOTES_TEMPLATE.md` 里的安装说明。可以用 `node scripts/release-notes.mjs` 预览。
+同时在 `CHANGELOG.md` 写好这一版的条目，标题格式为 `## X.Y.Z - YYYY-MM-DD`。GitHub Release 说明由 `scripts/release-notes.mjs` 生成（提取当前版本的 `CHANGELOG.md` 条目 + `docs/RELEASE_NOTES_TEMPLATE.md`），可用 `node scripts/release-notes.mjs` 预览。
 
-插件内的更新弹窗正文单独放在 `docs/releases/<版本>.zh-CN.md` 和 `<版本>.en.md`，由 `src/guide/releaseContent.ts` 打包；`releaseState.ts` 中的版本也需与本次更新一致。中文和英文应对应最终功能范围与用户确认的文案。0.7.3 的手动分栏样例在 `docs/examples/ManualColumns.zh-CN.md` 和 `ManualColumns.en.md`，0.8.0 的 Mermaid 样例在 `docs/examples/Mermaid.zh-CN.md` 和 `Mermaid.en.md`；更新弹窗按界面语言离线创建对应笔记。说明与样例随 `main.js` 分发，不增加发布附件。
+插件内的更新弹窗正文放在 `docs/releases/<版本>.zh-CN.md` 和 `<版本>.en.md`，由 `src/guide/releaseContent.ts` 引入打包；同步更新 `src/guide/releaseState.ts` 中的版本。未发布的改动先放在 `CHANGELOG.md` 的 `Unreleased` 节，准备发版时再移入对应版本节。
 
-## 2. 本地检查
+## 2. 本地检查与构建
 
 ```bash
 npm run check
@@ -22,42 +22,25 @@ npm run check
 npm run release
 ```
 
-`npm run release` 会做生产构建，并在 `dist/adjustable-media/` 里生成 `main.js`、`manifest.json`、`styles.css`。只放 Obsidian 会下载的这三个文件，多余的文件会被社区目录的审核标出来。
+`npm run release` 会做生产构建，并在 `dist/adjustable-media/` 下生成 `main.js`、`manifest.json`、`styles.css`。不要附加额外文件，避免被社区目录审核标记。
 
-本地发布包就绪、标签推送、GitHub 草稿创建和公开发布是不同状态。准备发布时，README 与项目状态应继续标明当前公开版本；正式发布后再更新公开版本及链接。验证按实际改动范围进行，移动端未复测不记为通过；普通桌面更新不要求重复全量设备矩阵。
-
-当前公开版本为 **1.0.0**，标签源码 `02b4f8f`。公开的 `main.js` 已用 `dc0917f` 的生产构建覆盖，附件来源和校验值见 [1.0.0 核验](releases/1.0.0-readiness.md)。历史版本见[文档索引](README.md)。
-
-Issue #27（`616ac5b`）和 #34（`8b29023`）均已随 0.9.1 正式发布；准备分支已合入 main，中英文包内公告保留用户确认的旧版结尾原文。后续未发布条目放在 `CHANGELOG.md` 的 `Unreleased` 节，准备新版本时移入对应版本节；`release-notes.mjs` 只提取 manifest 所指版本，不能把开发构建当作已公开的标签附件。当前开发状态见 [STATUS](STATUS.md)。
-
-0.9.0 的附件、来源与未复测范围见 [发布记录](releases/0.9.0-readiness.md)；0.8.2 补丁保留于 [历史核验](releases/0.8.2-readiness.md)；0.8.0 的集成与设备范围保留在 [历史发布记录](releases/0.8.0-readiness.md)。正式三份附件由标签工作流生成并签名，本地原包及校验和保留，公开附件校验和另记；正式附件只包含三个文件，不能把本地校验和当作来源证明。
+本地打包完成、推送标签、创建草稿和正式发布属于不同阶段：正式发布前 README 与 [项目状态](STATUS.md) 保持标注当前公开版本；发版后再同步更新，并在 `docs/releases/<版本>-readiness.md` 记录本次验证范围与附件校验值。当前公开版本为 **1.0.0**（见 [1.0.0 核验](releases/1.0.0-readiness.md)）。
 
 ## 3. 推送版本标签
 
-标签就是版本号本身，不带 `v`，例如 `0.1.0`（官方插件库要求如此）：
+标签为版本号本身，不带 `v`（例如 `1.0.0`）：
 
 ```bash
-git tag 0.1.0
+git tag 1.0.0
+git push origin 1.0.0
 ```
 
-```bash
-git push origin 0.1.0
-```
-
-推送后，`.github/workflows/release.yml` 会检查标签和 `manifest.json` 的版本是否一致，运行测试和构建，然后创建一个**草稿** Release，附上上面三个文件和生成好的说明，并为这三个文件生成构建来源证明（artifact attestation）。用户可以用 `gh attestation verify main.js --repo Yi-luo-hua/obsidian-adjustable-media` 验证文件确实是从这个仓库构建的。
+推送后，`.github/workflows/release.yml` 会核对标签与 `manifest.json` 一致性，运行测试与构建，生成草稿 Release，并为三个附件生成构建来源证明（artifact attestation）。
 
 ## 4. 发布
 
-在 GitHub 上打开草稿 Release，核对说明和附件，确认无误后手动点「Publish release」。
+在 GitHub 打开草稿 Release，核对正文与三个附件后点击 **Publish release**。
 
-## 5. 提交到社区插件目录（只在第一次）
+## 5. 社区插件目录说明
 
-插件现在不再通过给 `obsidianmd/obsidian-releases` 发 PR 提交，而是在 [community.obsidian.md](https://community.obsidian.md) 提交（官方文档：[Submit your plugin](https://docs.obsidian.md/Plugins/Releasing/Submit+your+plugin)）：
-
-1. 用 Obsidian 账号登录 community.obsidian.md。
-2. 在个人资料的 **GitHub** 一栏点 **Connect**，关联 GitHub 账号。这是只读授权，用来验证仓库归属。
-3. 在侧栏的 **Plugins** 页点 **New plugin**，**GitHub repository URL** 填 `https://github.com/Yi-luo-hua/obsidian-adjustable-media`，**Owner** 选自己，同意开发者政策后点 **Submit**。
-
-目录读取默认分支 HEAD 上的 `manifest.json`，安装时下载标签与其中 `version` 相同的 Release，所以提交前两者都要就绪。提交后会自动审核，需要修改的地方会显示在目录页面上；改完后发布一个版本号更高的新 Release。插件上架后，之后的版本只要发布新的 Release 即可。
-
-建议在个人资料里打开 **Action required notifications**：插件检查失败或需要处理时会收到邮件。
+社区目录通过 [community.obsidian.md](https://community.obsidian.md) 提交并审核（官方文档：[Submit your plugin](https://docs.obsidian.md/Plugins/Releasing/Submit+your+plugin)）。目录读取默认分支 HEAD 上的 `manifest.json`，安装时下载同名 tag 的 Release；插件上架后，后续版本只需发布新 Release 即可。

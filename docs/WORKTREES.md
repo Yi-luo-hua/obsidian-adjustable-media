@@ -1,38 +1,21 @@
 # 工作树与分支
 
-核对日期：2026-10-22。下表来自本机 `git worktree list` 和各目录的 `git status`，只描述该日期的目录状态；分支后续检出和提交以 Git 为准。公开版本与功能范围见 [STATUS](STATUS.md)，未完成工作见 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md)。
+核对日期：2026-11-16（基于 `git worktree list` 与 `git branch`）。当前公开状态与已知限制见 [项目状态](STATUS.md)，未完成任务见 [待办与路线图](plans/layout-redesign/09-progress-and-next-steps.md)。
 
-## 当前目录快照
+## 当前工作树
 
-Git 登记 6 棵工作树。PR #35 已压缩合入 main（`8b29023`）；`codex/prepare-0.9.1` 的准备提交已快进合入 main，0.9.1 标签指向 `dc3f3ed` 并已正式公开发布。主目录现检出 main，继续同步发布记录。此前的 `codex/fix-issue-34-layout-frame` 为 `a4b279f`，已合入 PR #35。其余 5 棵工作树在核对时均无未提交修改。
-
-| 目录 | 分支／HEAD | 用途与状态 |
+| 目录 | 分支 / HEAD | 状态与说明 |
 | --- | --- | --- |
-| `E:/TOOLS/obsidian-adjustable-media` | `main`，包含 0.9.1 标签源码 `dc3f3ed` | 0.9.1 已正式发布；Issue #27／#34 修复及用户确认的双语公告已交付，本次同步公开版本与核验记录 |
-| `C:/Users/丁家宝/.codex/worktrees/independent-features/obsidian-adjustable-media` | `codex/w02-candidate-measurement` · `d680ce6` | W02 缓存／会话与 W03 约束原型已提交，工作树干净；未进入 main，不视为完整规划器交付 |
-| `C:/Users/丁家宝/.codex/worktrees/callout-review-fixes/obsidian-adjustable-media` | `codex/callout-review-fixes` · `5d145bd` | 0.9.0 Callout 来源树，干净，目录保留 |
-| `C:/Users/丁家宝/.codex/worktrees/canvas-support/obsidian-adjustable-media` | `codex/canvas-support` · `d05b012` | 0.9.0 Canvas 来源树，干净，目录保留 |
-| `C:/Users/丁家宝/.codex/worktrees/fix-external-file-urls/obsidian-adjustable-media` | `codex/fix-external-file-urls` · `5f2ee62` | 0.9.0 库外媒体来源树，干净，目录保留 |
-| `C:/Users/丁家宝/.codex/worktrees/fix-layout-body-alignment/obsidian-adjustable-media` | `codex/fix-layout-body-alignment` · `e3d4bf0` | 0.9.0 布局正文对齐来源树，干净，目录保留 |
+| `E:/TOOLS/obsidian-adjustable-media` | `main` | 主仓库；当前已发布 **1.0.0** |
+| `C:/Users/丁家宝/.codex/worktrees/independent-features/obsidian-adjustable-media` | `codex/w02-candidate-measurement` · `d680ce6` | **未合入原型**：W02 候选测量缓存与 W03 浮动约束原型 |
 
-旧文档中 W02／W03 的“17 个修改文件＋16 个新增文件”属于提交前快照，不能继续作为当前未提交计数。其后续实现与证据仍在原型工作树；main 未复制完整候选测量／规划器模块。
+## 需关注的未合入 / 保留分支
 
-## 保留分支与历史清理
+- **`codex/w02-candidate-measurement`**（`d680ce6`）：唯一尚未合入的逻辑原型，对应 [任务队列](plans/layout-redesign/09-progress-and-next-steps.md) 中的 W02/W03。
+- **`docs/readme-demo`**（`d197c2f`）：早期未合入的 README 动图分支（仅本地保留）。
+- **`codex/main-before-080`**（`3f31feb`）：`0.8.0` 切换主线前的旧 `main` 历史备份分支。
+- 其余约 40 个 `codex/*` 分支（如 `codex/prepare-0.9.1`、`codex/release-0.9.4`、`codex/excalidraw-layout` 等）均为已合入 `main` 并已发布的特性或发版分支，后续可按需统一清理。
 
-- `codex/main-before-080`：原 main 的完整历史，`3f31feb`。
-- `docs/readme-demo`：未合入的 README 动图与素材，`d197c2f`，无独立工作树。
-- 已集成的来源分支和当前目录未在本次文档任务中清理；保留目录不表示其功能尚未发布。
+## 历史备份位置
 
-2026-10-14 的 8 棵工作树、5 项应用归档排队请求及当时分支数量已移至 [清理快照](archive/2026-10-14-worktree-cleanup.md)。其中部分目录不再出现在当前 Git 清单；本次没有查询原任务的应用归档回执，不能据此认定归档快照已成功生成。不要再把旧排队清单作为当前待处理目录。
-
-## 恢复入口
-
-历史完整备份位置为 `E:/TOOLS/obsidian-adjustable-media-backups/cleanup-20261012/`：`repository-before.bundle` 保存分支、标签与 stash，ZIP 保存当时工作树及必要的忽略文件。逐文件核验属于原清理批次，本次未重新校验备份内容；恢复步骤见备份目录 README 及 [清理快照](archive/2026-10-14-worktree-cleanup.md)。
-
-应用管理的工作树优先从原任务的归档记录恢复；其他历史内容按备份 README 恢复。stash 应按固定提交身份查找，序号会变化；本次核对仍存在：
-
-- `ce9f46e7d726d56548b8db111360241d370d64e9`：切换主目录前的文档。
-- `276052785e29b2b26ead891092c9932bd63b3353`：W02／W03 的旧恢复状态。
-- `a33cddee8591186f84cceae4681f608d0aa4731c`：同步 PR #28／#30 前保留的主目录本地更新。
-
-本次完成 0.9.1 发布、文档同步与专用测试库公告预览；没有移动或删除工作树、清理分支或恢复 stash。测试范围、设置恢复与后续预览状态见 [0.9.1 核验](releases/0.9.1-readiness.md)。
+- 2026-10-14 工作树清理快照及旧恢复流程见 [工作树清理快照](archive/2026-10-14-worktree-cleanup.md)；完整历史 bundle 与 ZIP 备份保存在 `E:/TOOLS/obsidian-adjustable-media-backups/cleanup-20261012/`。

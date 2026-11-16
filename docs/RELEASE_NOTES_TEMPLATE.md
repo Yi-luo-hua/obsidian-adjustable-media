@@ -1,24 +1,24 @@
 ## Installation
 
-Download `main.js`, `manifest.json` and `styles.css` from this release and put them in:
+Download `main.js`, `manifest.json`, and `styles.css` from this release and put them in:
 
 ```text
 <your vault>/.obsidian/plugins/adjustable-media
 ```
 
-Restart Obsidian and enable Adjustable Media in Settings → Community plugins.
+Restart Obsidian and enable **Adjustable Media** in **Settings → Community plugins**.
 
 ## Compatibility
 
-- Obsidian 1.5.0 or newer
-- Desktop, Android, iPhone and iPad
+- Obsidian **1.5.0** or newer (`1.6.0+` for the Markdown table cell menu)
+- Desktop, Android, iPhone, and iPad (`isDesktopOnly: false`)
 - Plugin ID: `adjustable-media`
 
-Device and build-specific validation is recorded in the repository's `docs/plans/layout-redesign/mobile-adaptation.md`. The latest standalone Mermaid hold-and-drop gestures were verified on an Android tablet; those new gestures have not been retested on Android phones or iOS.
+See `docs/STATUS.md` and `docs/plans/layout-redesign/mobile-adaptation.md` for tested builds and unverified mobile ranges.
 
 ## Verifying the files
 
-These files are built by GitHub Actions from the tagged source and come with build provenance attestations. To check a downloaded file with the GitHub CLI:
+These files are built by GitHub Actions from the tagged source and include build provenance attestations. Verify a downloaded file with the GitHub CLI:
 
 ```bash
 gh attestation verify main.js --repo Yi-luo-hua/obsidian-adjustable-media
