@@ -1917,6 +1917,22 @@ body.vml-is-dragging * {
   margin-top: 24px;
 }
 
+.vml-update__body a[href="https://yi-luo-hua.github.io/sponsor-me/"] {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--button-radius, 5px);
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-weight: var(--font-medium);
+  text-decoration: none;
+}
+
+.vml-update__body a[href="https://yi-luo-hua.github.io/sponsor-me/"]:is(:hover, :focus-visible) {
+  background-color: var(--interactive-accent-hover);
+  color: var(--text-on-accent);
+}
+
 /* Hiding the editing outline keeps layout geometry and hover handles unchanged. */
 .vml-cursor-highlights .vml-live-preview:not(.vml-cursor-in-block) .vml-layout:not(:hover):not(.vml-layout--drop-target) {
   outline-color: transparent;

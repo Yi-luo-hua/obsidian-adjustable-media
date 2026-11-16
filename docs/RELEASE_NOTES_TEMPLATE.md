@@ -23,3 +23,11 @@ These files are built by GitHub Actions from the tagged source and come with bui
 ```bash
 gh attestation verify main.js --repo Yi-luo-hua/obsidian-adjustable-media
 ```
+
+If the plugin helps you, a star is appreciated!\
+Found a bug or have a feature idea? Open an issue in the repository.\
+[Adjustable Media repository](https://github.com/Yi-luo-hua/obsidian-adjustable-media)
+
+Thanks for supporting my work!
+
+[**Support the developer**](https://yi-luo-hua.github.io/sponsor-me/)
