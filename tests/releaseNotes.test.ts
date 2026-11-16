@@ -23,7 +23,12 @@ for (const scenario of [
     let updates = 0, guides = 0;
     const settings = { guideRevision: scenario.guide, lastSeenReleaseNotes: scenario.seen };
     class Plugin {
-      app = { workspace: { onLayoutReady(callback: () => void) { ready = callback; } } };
+      app = { workspace: {
+        containerEl: { ownerDocument: { body: { setCssProps() {} } } },
+        onLayoutReady(callback: () => void) { ready = callback; },
+        on() {},
+        iterateAllLeaves() {},
+      } };
       manifest = { version: "0.9.8" };
       persisted: typeof settings | null = null;
       cleanups: Array<() => void> = [];
@@ -32,6 +37,7 @@ for (const scenario of [
       async saveData(value: typeof settings): Promise<void> { this.persisted = { ...value }; }
       addSettingTab(): void {}
       registerEditorExtension(): void {}
+      registerEvent(): void {}
       register(callback: () => void): void { this.cleanups.push(callback); }
       addCommand(command: { id: string; callback: () => void }): void { this.commands.push(command); }
     }

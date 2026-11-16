@@ -1,4 +1,5 @@
 .vml-layout {
+  --vml-frame-color: var(--vml-custom-border-color, hsl(var(--accent-h), var(--accent-s), var(--accent-l)));
   /* Content shares the note's horizontal edges in every view; the editing outline takes no width. */
   border: 1.5px solid transparent;
   border-inline-width: 0;
@@ -510,10 +511,10 @@
 @media screen {
   .vml-live-preview .vml-layout,
   .vml-reading-highlight .vml-layout {
-    outline: 1.5px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
+    outline: 1.5px solid color-mix(in srgb, var(--vml-frame-color) 70%, transparent);
     box-shadow:
-      0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.1),
-      0 0 14px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
+      0 0 0 3px color-mix(in srgb, var(--vml-frame-color) 10%, transparent),
+      0 0 14px color-mix(in srgb, var(--vml-frame-color) 30%, transparent);
   }
 }
 
@@ -524,10 +525,10 @@
 
 .vml-live-preview .vml-layout:hover,
 .vml-live-preview .vml-layout--resizing {
-  outline-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.9);
+  outline-color: color-mix(in srgb, var(--vml-frame-color) 90%, transparent);
   box-shadow:
-    0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.14),
-    0 0 18px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.4);
+    0 0 0 3px color-mix(in srgb, var(--vml-frame-color) 14%, transparent),
+    0 0 18px color-mix(in srgb, var(--vml-frame-color) 40%, transparent);
 }
 
 .vml-live-preview .vml-layout--readonly {
@@ -536,11 +537,11 @@
 }
 
 .vml-live-preview .vml-layout.vml-layout--drop-target {
-  background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.06);
-  outline-color: var(--interactive-accent);
+  background-color: color-mix(in srgb, var(--vml-frame-color) 6%, transparent);
+  outline-color: var(--vml-custom-border-color, var(--interactive-accent));
   box-shadow:
-    0 0 0 4px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.25),
-    0 0 24px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.55);
+    0 0 0 4px color-mix(in srgb, var(--vml-frame-color) 25%, transparent),
+    0 0 24px color-mix(in srgb, var(--vml-frame-color) 55%, transparent);
 }
 
 .vml-layout__warning {
@@ -1905,10 +1906,10 @@ body.vml-is-dragging * {
 }
 
 .vml-cursor-highlights .vml-cursor-in-block .vml-layout {
-  outline-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.7);
+  outline-color: color-mix(in srgb, var(--vml-frame-color) 70%, transparent);
   box-shadow:
-    0 0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.1),
-    0 0 14px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
+    0 0 0 3px color-mix(in srgb, var(--vml-frame-color) 10%, transparent),
+    0 0 14px color-mix(in srgb, var(--vml-frame-color) 30%, transparent);
 }
 
 /* Source expansion keeps its existing widgets; the actual source range gets an inset guide. */

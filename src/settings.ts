@@ -11,6 +11,7 @@ export interface VmlSettings {
   /** Keep the normal editing frame visible even when the caret is elsewhere. */
   keepLayoutHighlight: boolean;
   showReadingLayoutHighlight: boolean;
+  layoutBorderColor: string | null;
   /** The language of the numbers of figures, tables and equations; auto follows Obsidian's. */
   refLanguage: RefLanguageSetting;
   /** The display language of plugin menus and UI; auto follows Obsidian's. */
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: VmlSettings = {
   autoConvert: false,
   keepLayoutHighlight: false,
   showReadingLayoutHighlight: false,
+  layoutBorderColor: null,
   refLanguage: "auto",
   uiLanguage: "auto",
   guideRevision: 0,
@@ -41,6 +43,9 @@ export function readSettings(saved: unknown): VmlSettings {
     autoConvert: typeof record.autoConvert === "boolean" ? record.autoConvert : DEFAULT_SETTINGS.autoConvert,
     keepLayoutHighlight: typeof record.keepLayoutHighlight === "boolean" ? record.keepLayoutHighlight : DEFAULT_SETTINGS.keepLayoutHighlight,
     showReadingLayoutHighlight: record.showReadingLayoutHighlight === true,
+    layoutBorderColor: typeof record.layoutBorderColor === "string" && /^#[0-9a-f]{6}$/i.test(record.layoutBorderColor)
+      ? record.layoutBorderColor
+      : null,
     refLanguage: refLanguage ?? DEFAULT_SETTINGS.refLanguage,
     uiLanguage: uiLanguage ?? DEFAULT_SETTINGS.uiLanguage,
     guideRevision: readGuideRevision(record.guideRevision),
@@ -101,6 +106,11 @@ export class VmlSettingTab extends PluginSettingTab {
         control: { type: "toggle", key: "showReadingLayoutHighlight", defaultValue: DEFAULT_SETTINGS.showReadingLayoutHighlight },
       },
       {
+        name: t("settingLayoutBorderColor"),
+        desc: t("settingLayoutBorderColorDesc"),
+        render: (setting) => this.renderLayoutBorderColor(setting),
+      },
+      {
         name: t("settingOpenGuide"),
         desc: t("settingOpenGuideDesc"),
         render: (setting) => {
@@ -158,6 +168,44 @@ export class VmlSettingTab extends PluginSettingTab {
     return { auto: t("refLanguageAuto"), zh: "中文 (图 1)", en: "English (Figure 1)" };
   }
 
+  private renderLayoutBorderColor(setting: Setting): void {
+    const body = this.app.workspace.containerEl.ownerDocument.body;
+    const accent = () => {
+      const style = body.win.getComputedStyle(body);
+      return {
+        h: parseFloat(style.getPropertyValue("--accent-h")),
+        s: parseFloat(style.getPropertyValue("--accent-s")),
+        l: parseFloat(style.getPropertyValue("--accent-l")),
+      };
+    };
+    setting.addColorPicker((picker) => {
+      let updatingPicker = false;
+      const resetPicker = () => {
+        updatingPicker = true;
+        picker.setValueHsl(accent());
+        updatingPicker = false;
+      };
+      if (this.host.settings.layoutBorderColor) picker.setValue(this.host.settings.layoutBorderColor);
+      else resetPicker();
+      setting.addButton((button) => {
+        button.setButtonText(t("settingLayoutBorderColorReset"))
+          .setDisabled(this.host.settings.layoutBorderColor === null)
+          .onClick(async () => {
+            this.host.settings.layoutBorderColor = null;
+            resetPicker();
+            button.setDisabled(true);
+            await this.host.saveSettings();
+          });
+        picker.onChange(async (value) => {
+          if (updatingPicker) return;
+          this.host.settings.layoutBorderColor = value;
+          button.setDisabled(false);
+          await this.host.saveSettings();
+        });
+      });
+    });
+  }
+
   /** Render the settings tab. */
   display(): void {
     this.containerEl.empty();
@@ -205,6 +253,10 @@ export class VmlSettingTab extends PluginSettingTab {
       .addToggle((toggle) => toggle
         .setValue(this.host.settings.showReadingLayoutHighlight)
         .onChange(async (value) => { await this.setControlValue("showReadingLayoutHighlight", value); }));
+
+    this.renderLayoutBorderColor(new Setting(this.containerEl)
+      .setName(t("settingLayoutBorderColor"))
+      .setDesc(t("settingLayoutBorderColorDesc")));
 
     new Setting(this.containerEl)
       .setName(t("settingOpenGuide"))

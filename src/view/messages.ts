@@ -416,6 +416,18 @@ const MESSAGES = {
     zh: "开启后，阅读模式中的布局块会显示描边与光晕。默认关闭。",
     en: "Show an outline and glow around layout blocks in reading view. Off by default.",
   },
+  settingLayoutBorderColor: {
+    zh: "布局块边框颜色",
+    en: "Layout border color",
+  },
+  settingLayoutBorderColorDesc: {
+    zh: "设置实时预览和阅读模式中布局块的描边与光晕颜色。默认跟随 Obsidian 的强调色。",
+    en: "Set the outline and glow color for layout blocks in live preview and reading view. Defaults to Obsidian’s accent color.",
+  },
+  settingLayoutBorderColorReset: {
+    zh: "使用强调色",
+    en: "Use accent color",
+  },
   settingRefLanguageDesc: {
     zh: "图注、表注和引用（@fig:名字、@tbl:名字、@eq:名字）显示成“图 1”还是“Figure 1”。改动后重新打开笔记生效。",
     en: "Whether captions and references (@fig:name, @tbl:name, @eq:name) read \u201cFigure 1\u201d or \u201c图 1\u201d. Takes effect when a note is opened again.",

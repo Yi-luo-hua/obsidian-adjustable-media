@@ -26,6 +26,11 @@ export default class AdjustableMediaPlugin extends Plugin {
 
   override async onload(): Promise<void> {
     this.settings = readSettings(await this.loadData());
+    this.updateLayoutBorderColor(this.settings.layoutBorderColor);
+    this.registerEvent(this.app.workspace.on("window-open", (_workspace, win) => {
+      win.document.body.setCssProps({ "--vml-custom-border-color": this.settings.layoutBorderColor ?? "" });
+    }));
+    this.register(() => this.updateLayoutBorderColor(null));
     this.addSettingTab(new VmlSettingTab(this.app, this));
     setRefLanguage(() => this.settings.refLanguage);
     setUiLanguage(() => this.settings.uiLanguage);
@@ -84,8 +89,15 @@ export default class AdjustableMediaPlugin extends Plugin {
   }
 
   async saveSettings(): Promise<void> {
+    this.updateLayoutBorderColor(this.settings.layoutBorderColor);
     refreshLayoutHighlights();
     this.refreshReadingHighlights();
     await this.saveData(this.settings);
+  }
+
+  private updateLayoutBorderColor(color: string | null): void {
+    const bodies = new Set([this.app.workspace.containerEl.ownerDocument.body]);
+    this.app.workspace.iterateAllLeaves((leaf) => bodies.add(leaf.view.containerEl.ownerDocument.body));
+    for (const body of bodies) body.setCssProps({ "--vml-custom-border-color": color ?? "" });
   }
 }
