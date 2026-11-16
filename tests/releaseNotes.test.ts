@@ -1,20 +1,20 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { shouldShowReleaseNotes } from "../src/guide/releaseState.ts";
+import { RELEASE_NOTES_VERSION, shouldShowReleaseNotes } from "../src/guide/releaseState.ts";
 import { GUIDE_REVISION, shouldShowGuide } from "../src/guide/state.ts";
 import { mockedModule } from "./support/mockedModule.ts";
 
 test("update notes appear once for their bundled version", () => {
-  assert.equal(shouldShowReleaseNotes("", "0.9.8"), true);
-  assert.equal(shouldShowReleaseNotes("0.9.7", "0.9.8"), true);
-  assert.equal(shouldShowReleaseNotes("0.9.8", "0.9.8"), false);
-  assert.equal(shouldShowReleaseNotes("0.9.8", "0.9.7"), false);
+  assert.equal(shouldShowReleaseNotes("", RELEASE_NOTES_VERSION), true);
+  assert.equal(shouldShowReleaseNotes("0.9.8", RELEASE_NOTES_VERSION), true);
+  assert.equal(shouldShowReleaseNotes(RELEASE_NOTES_VERSION, RELEASE_NOTES_VERSION), false);
+  assert.equal(shouldShowReleaseNotes(RELEASE_NOTES_VERSION, "0.9.8"), false);
 });
 
 for (const scenario of [
   { name: "existing users see update notes and persist the version", seen: "", guide: GUIDE_REVISION, updates: 1, guides: 0, unload: false },
-  { name: "upgrading from 0.9.7 shows the patch notes", seen: "0.9.7", guide: GUIDE_REVISION, updates: 1, guides: 0, unload: false },
-  { name: "reloading the same release does not show update notes again", seen: "0.9.8", guide: GUIDE_REVISION, updates: 0, guides: 0, unload: false },
+  { name: "upgrading from 0.9.8 shows the release notes", seen: "0.9.8", guide: GUIDE_REVISION, updates: 1, guides: 0, unload: false },
+  { name: "reloading the same release does not show update notes again", seen: RELEASE_NOTES_VERSION, guide: GUIDE_REVISION, updates: 0, guides: 0, unload: false },
   { name: "first-use guide does not stack an update modal", seen: "", guide: 0, updates: 0, guides: 1, unload: false },
   { name: "unloading before layout readiness prevents automatic modals", seen: "", guide: GUIDE_REVISION, updates: 0, guides: 0, unload: true },
 ]) {
@@ -29,7 +29,7 @@ for (const scenario of [
         on() {},
         iterateAllLeaves() {},
       } };
-      manifest = { version: "0.9.8" };
+      manifest = { version: RELEASE_NOTES_VERSION };
       persisted: typeof settings | null = null;
       cleanups: Array<() => void> = [];
       commands: Array<{ id: string; callback: () => void }> = [];
@@ -72,7 +72,7 @@ for (const scenario of [
     await Promise.resolve();
     assert.equal(updates, scenario.updates);
     assert.equal(guides, scenario.guides);
-    if (updates || guides) assert.equal(plugin.persisted?.lastSeenReleaseNotes, "0.9.8");
+    if (updates || guides) assert.equal(plugin.persisted?.lastSeenReleaseNotes, RELEASE_NOTES_VERSION);
     else assert.equal(plugin.persisted, null);
     if (!scenario.unload) {
       plugin.commands.find(command => command.id === "show-release-notes")!.callback();

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 1.0.0 - 2026-11-16
+
+- Freely position a narrow, non-floating layout horizontally in Live Preview by dragging its top handle. The position is saved with the layout and used in Reading View and PDF exports ([#42](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/42)).
+- Set a custom outline and glow color under **Layout border color**, or restore Obsidian’s accent color.
+- Preserve consecutive blank lines after floating layouts in Reading View so the following text wraps around the media the same way as in Live Preview.
+- Keep the editor visible while Reading View lays out an edited note with floats, avoiding a brief blank or partially rendered frame on the first switch.
+- Fix decorated horizontal rules in Live Preview being clipped or covered by the next active line in Maple. Keep the caret at normal text height on empty lines whose height follows paragraph spacing, including with Cursor-Smith ([#44](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/44)).
+
 ## 0.9.8 - 2026-11-15
 
 - Add a caption below an entire media layout from its context menu. Layout captions support Markdown, numbering, alignment, and font size.
