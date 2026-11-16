@@ -234,6 +234,8 @@ $$
 
 ## 4. 实测确认过的 Obsidian 行为
 
+2026-11-16 [Issue #44](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/44)：实时预览只对布局笔记中折叠的水平线解除绘制裁剪，保留行高，让 Maple 的星形图标完整显示。参与段距计算的空行没有字符时，显式设置行盒高度并垂直居中光标，文字行高由编辑器继承。Windows／Obsidian 1.15.1／Maple 1.5.19／Cursor-Smith 1.8.4 测试库实测，空行仍为 8px，Cursor-Smith 光标与正文同为 28.8px。方向键、点击、Enter、中文组字及撤销通过，笔记恢复后 SHA-256 一致。默认主题的实时预览和阅读视图均确认水平线结束浮动环绕。
+
 2026-11-07 Underwater 主题兼容：主题的图片居中会把文字布局和图文布局文字栏内的同行图片各排一行。阅读模式仅恢复含多张同行图片的段落内图片的行内显示。Windows／Obsidian 1.15.0／[Underwater 1.6.70](https://github.com/Seniblue/Underwater/releases/tag/1.6.70) 下，正式 0.9.4 和 0.9.5 均可复现；用 0.9.5 脚本搭配修复样式，已核对文字块、图文布局、普通媒体行、单图与块外图片。旧版可在 Style Settings 的 Underwater 设置中打开「Disable image/videos/embeds/etc. + Tables centering」临时恢复。
 
 2026-11-06 水平线结束环绕：笔记正文的顶层水平线清除左右浮动，排在此前布局下方并恢复全宽，后续标题与正文从新节开始。实时预览兼容宿主的 `.hr` 与 `.HyperMD-hr` 行类；阅读视图和打印应用同一边界，不改变布局内部的水平线。Windows／Obsidian 1.15.0 默认主题定向复现与验证见[记录](archive/2026-11-06-horizontal-rule-wrap.md)。

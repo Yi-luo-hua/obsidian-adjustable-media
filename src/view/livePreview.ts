@@ -416,8 +416,9 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     if (floatGaps.has(line) || line >= state.doc.lines) {
       continue;
     }
-    const { from } = state.doc.line(line + 1);
-    const cls = (kind === "after" ? "vml-break-after" : "vml-break") + (size === "rule" ? " vml-break-rule" : "");
+    const { from, length } = state.doc.line(line + 1);
+    const className = kind === "after" ? "vml-break-after" : length === 0 ? "vml-break vml-break-empty" : "vml-break";
+    const cls = className + (size === "rule" ? " vml-break-rule" : "");
     ranges.push(Decoration.line({ class: cls }).range(from));
   }
 
