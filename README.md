@@ -4,7 +4,7 @@ Arrange, resize, and lay out images and videos in Obsidian like a modern canvas 
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-**0.9.8 is released.** Add captions below whole media layouts and optionally show layout borders in Reading View. See [release verification](docs/releases/0.9.8-readiness.md).
+**1.0.0 is released.** Position entire layouts horizontally, customize border colors, and switch to Reading View more smoothly after editing floating layouts. See [release verification](docs/releases/1.0.0-readiness.md).
 
 0.9.0 adds Canvas card layouts, Callout image resizing and Mermaid context-menu wrapping, and fixes theme-related handle clipping, layout alignment and external file URL images. Theme compatibility checks screened all 901 official themes' main CSS and 342 rendering combinations from 57 theme styles. See [release verification](docs/releases/0.9.0-readiness.md).
 
