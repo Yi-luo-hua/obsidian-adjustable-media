@@ -456,6 +456,11 @@
   contain: none !important;
 }
 
+/* Maple's decorated rule needs its native row height beside an active line that paints a background. */
+.hr-enable .vml-has-layouts .cm-content > .cm-line.hr[contenteditable="false"] {
+  line-height: inherit;
+}
+
 /* Invisible caret buffers must not enlarge a heading's line box. Keep their native dimensions. */
 .vml-has-layouts .cm-content > .HyperMD-header > .cm-widgetBuffer {
   vertical-align: top;
