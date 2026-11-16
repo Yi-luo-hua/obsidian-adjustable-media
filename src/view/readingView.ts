@@ -198,9 +198,14 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
         const view = reader.view;
         waitForReading(view);
         const current = new Set(installed.map(([el]) => el));
-        if (!reader.needsRender && reading?.sections.length && reading.sections.every(section =>
-          section.shown === false || (section.rendered && reading.sizer.contains(section.el)
-            && (current.has(section.el) || section.el.matches(".mod-ui"))))) revealReading(view);
+        // Non-floating notes keep Obsidian's section virtualization. Only floating notes
+        // need detached sections to finish before revealing the reading pane.
+        if (!reader.needsRender && current.size > 0 && reading?.sections.every(section => {
+          if (section.shown === false) return true;
+          const mounted = reading.sizer.contains(section.el);
+          return !mounted ? !reader.parsed.wrapped
+            : section.rendered && (current.has(section.el) || section.el.matches(".mod-ui"));
+        })) revealReading(view);
       }
       reader.projection.installed(token, installed.map(([, record]) => record.range));
       const measured: SourceCoverage[] = [];
@@ -453,7 +458,7 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
     const file = view.file;
     if (view.getMode() === "source" && !editedPanes.has(view)) {
       const text = editor.getValue();
-      if (text.includes("<!-- vml") && findV2Blocks(text.split("\n")).some(block => isDrawable(block) && blockWrap(block) !== null)) {
+      if (text.includes("<!-- vml") && findV2Blocks(text.split("\n")).some(isDrawable)) {
         editedPanes.set(view, { file, timer: 0 });
         view.previewMode.containerEl.toggleClass(WAITING_FOR_READING, true);
       }
