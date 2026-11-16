@@ -7,11 +7,11 @@ import { drawnFrom, drawsInOpeningSection, isStale, type Drawn } from "../layout
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { ViewProjection, type SourceCoverage } from "../layout/viewProjection.ts";
-import { layoutIsRendered, renderLayout } from "./layoutView.ts";
+import { layoutIsRendered, layoutRenderState, renderLayout } from "./layoutView.ts";
 import { refContextOf, numbered, markCaptions, type RefContext } from "./crossrefView.ts";
 import { blockWarning } from "./messages.ts";
 import { sectionNoteText } from "./noteText.ts";
-import { collapseReadingList, keepReadingFlow, obsidianSetting, readingSectionsOfView, readingViewOfSection, remeasureSections } from "./obsidianInternals.ts";
+import { collapseReadingList, keepReadingFlow, obsidianSetting, readingSectionSource, readingSectionsOfView, readingViewOfSection, remeasureSections } from "./obsidianInternals.ts";
 import { keepWrapped, keepWrapsBeside, refreshReadingMedia, refreshReadingWrap, readingMeasurementsReady, resetReadingMeasurements } from "./readingWrap.ts";
 import { renderPrintLayouts } from "./printView.ts";
 import { watchEnvironment } from "./viewEnvironment.ts";
@@ -77,7 +77,7 @@ interface InstalledSection {
 export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => boolean): () => void {
   const readers = new Map<PreviewHost, Reader>();
   const generations = new WeakMap<TFile, number>();
-  const editedPanes = new Map<MarkdownView, { file: TFile; timer: number }>();
+  const editedPanes = new Map<MarkdownView, { file: TFile; previousText: string | null; previousHadLayout: boolean; timer: number }>();
   let unloaded = false;
 
   const revealReading = (view: MarkdownView): void => {
@@ -92,7 +92,30 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
     const pending = editedPanes.get(view);
     if (pending && !pending.timer) {
       // Bound the wait if a host or another plugin prevents section installation.
-      pending.timer = view.containerEl.win.setTimeout(() => revealReading(view), 250);
+      pending.timer = view.containerEl.win.setTimeout(() => {
+        revealReading(view);
+        const reader = readers.get(view);
+        if (reader && !reader.parsed.snapshot.text.includes("<!-- vml")) wake(reader);
+      }, 250);
+    }
+  };
+
+  const hasLayout = (text: string | null): boolean =>
+    text !== null && text.includes("<!-- vml") && findV2Blocks(text.split("\n")).some(isDrawable);
+
+  const trackReadingEdit = (view: MarkdownView, file: TFile, text: string): void => {
+    const pending = editedPanes.get(view);
+    if (pending?.file === file) {
+      if (text === pending.previousText && text === readingSectionSource(view)) revealReading(view);
+      return;
+    }
+    const previousText = readingSectionSource(view);
+    if (text === previousText) return;
+    const previousHadLayout = hasLayout(previousText);
+    if (previousHadLayout || hasLayout(text)) {
+      revealReading(view);
+      editedPanes.set(view, { file, previousText, previousHadLayout, timer: 0 });
+      view.previewMode.containerEl.toggleClass(WAITING_FOR_READING, true);
     }
   };
 
@@ -197,15 +220,29 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
       if (reader.view instanceof MarkdownView && editedPanes.has(reader.view)) {
         const view = reader.view;
         waitForReading(view);
-        const current = new Set(installed.map(([el]) => el));
-        // Non-floating notes keep Obsidian's section virtualization. Only floating notes
-        // need detached sections to finish before revealing the reading pane.
-        if (!reader.needsRender && current.size > 0 && reading?.sections.every(section => {
-          if (section.shown === false) return true;
-          const mounted = reading.sizer.contains(section.el);
-          return !mounted ? !reader.parsed.wrapped
-            : section.rendered && (current.has(section.el) || section.el.matches(".mod-ui"));
-        })) revealReading(view);
+        const pending = editedPanes.get(view)!;
+        if (!reader.needsRender && reading && readingSectionSource(view) === reader.parsed.snapshot.text) {
+          const visibleBody = reading.sections.filter(section => section.shown !== false && !section.el.matches(".mod-ui"));
+          const mounted = visibleBody.filter(section => reading.sizer.contains(section.el));
+          if ((mounted.length > 0 || visibleBody.length === 0) && mounted.every(section => section.rendered)
+            && (!reader.parsed.wrapped || mounted.length === visibleBody.length)) {
+            const hasDrawable = reader.parsed.blocks.some(isDrawable);
+            const current = new Set(installed.map(([el]) => el));
+            const complete = mounted.length > 0 && mounted.every(({ el }) => current.has(el)
+              && Array.from(el.querySelectorAll<HTMLElement>(".vml-layout")).every(root => layoutRenderState(root) !== "pending"));
+            if (hasDrawable && !pending.previousHadLayout && reader.requested !== token.snapshotId
+              && mounted.some(({ el }) => !reader.sections.has(el))) {
+              // The host reuses ordinary Markdown from the plain note without running its postprocessor.
+              reader.needsRender = true;
+              wake(reader);
+              return;
+            }
+            if (hasDrawable ? complete : !reading.sizer.querySelector(".vml-layout")) {
+              revealReading(view);
+              if (!reader.parsed.snapshot.text.includes("<!-- vml")) { stop(reader); return; }
+            }
+          }
+        }
       }
       reader.projection.installed(token, installed.map(([, record]) => record.range));
       const measured: SourceCoverage[] = [];
@@ -242,7 +279,8 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
       reader.view.previewMode.rerender(true);
     }
     for (const process of [...reader.pendingSections.values()]) process();
-    if (!reader.parsed.snapshot.text.includes("<!-- vml")) { stop(reader); return; }
+    if (!reader.parsed.snapshot.text.includes("<!-- vml")
+      && !(reader.view instanceof MarkdownView && editedPanes.has(reader.view))) { stop(reader); return; }
     confirm(reader);
   };
 
@@ -417,7 +455,8 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
       const view = readingViewOfSection(plugin.app, el);
       if (!view?.file || (!isCanvasPreview(view) && view.file.path !== ctx.sourcePath)) return false;
       const text = sectionNoteText(plugin.app, ctx, info, el);
-      if (!text.includes("<!-- vml") && !readers.has(view)) return true;
+      if (!text.includes("<!-- vml") && !readers.has(view)
+        && !(view instanceof MarkdownView && editedPanes.has(view))) return true;
       const reader = getReader(view);
       if ((!reader.sourceRequested || isCanvasPreview(view)) && text === view.getViewData()) {
         // Only this pane's matching section confirms initial data. A requested source from an
@@ -454,18 +493,11 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
   plugin.registerEvent(plugin.app.workspace.on("editor-change", (editor, view) => {
     if (!(view instanceof MarkdownView) || !view.file) return;
     generations.set(view.file, (generations.get(view.file) ?? 0) + 1);
-    // Fired on each keystroke in every note: read the note only when a reading view shows it too.
     const file = view.file;
-    if (view.getMode() === "source" && !editedPanes.has(view)) {
-      const text = editor.getValue();
-      if (text.includes("<!-- vml") && findV2Blocks(text.split("\n")).some(isDrawable)) {
-        editedPanes.set(view, { file, timer: 0 });
-        view.previewMode.containerEl.toggleClass(WAITING_FOR_READING, true);
-      }
-    }
+    const text = editor.getValue();
+    if (view.getMode() === "source") trackReadingEdit(view, file, text);
     if (!plugin.app.workspace.getLeavesOfType("markdown").some(leaf => leaf.view instanceof MarkdownView
       && leaf.view.file === file && leaf.view.getMode() === "preview")) return;
-    const text = editor.getValue();
     if (!text.includes("<!-- vml") && ![...readers.values()].some(reader => reader.file === view.file)) return;
     for (const reader of currentReaders(view.file)) desire(reader, text);
   }));
@@ -496,6 +528,10 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
     for (const [view, pending] of editedPanes) {
       if (view.file !== pending.file || !view.containerEl.isConnected) revealReading(view);
       else if (view.getMode() === "preview") waitForReading(view);
+      else if (pending.timer) {
+        view.containerEl.win.clearTimeout(pending.timer);
+        pending.timer = 0;
+      }
     }
     // On mobile a mode switch may process sections before the pane reports preview mode.
     // Once the host announces the completed layout, establish its reader and install those sections.
@@ -504,7 +540,7 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
       const retained = view instanceof MarkdownView ? readers.get(view) : undefined;
       if (retained && view instanceof MarkdownView && view.getMode() === "preview") desire(retained, view.getViewData());
       if (view instanceof MarkdownView && view.file && view.getMode() === "preview" && !readers.has(view)
-        && view.getViewData().includes("<!-- vml")) {
+        && (view.getViewData().includes("<!-- vml") || editedPanes.has(view))) {
         const reader = getReader(view);
         reader.needsRender = reader.parsed.blocks.some(isDrawable);
       }

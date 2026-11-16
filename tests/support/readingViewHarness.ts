@@ -18,6 +18,7 @@ interface ElementStub {
   querySelectorAll(): never[];
   createDiv(): ElementStub;
   querySelector(selector: string): ElementStub | null;
+  matches(selector: string): boolean;
 }
 
 interface SectionContext {
@@ -42,6 +43,7 @@ class ViewStub {}
 export async function readingViewHarness(initialText: string, startup = true, initialDiskText = initialText, kind: "markdown" | "canvas" = "markdown") {
   const file = new FileStub();
   let hostText = initialText;
+  let sectionText = initialText;
   let diskText = initialDiskText;
   let rerenders = 0;
   let mode = "preview";
@@ -76,8 +78,10 @@ export async function readingViewHarness(initialText: string, startup = true, in
     setTimeout(callback: () => void) { timers.set(++timerId, callback); return timerId; },
     MutationObserver: ObserverStub,
   };
+  const paneClasses = new Set<string>();
   const container = { win, isConnected: true, clientWidth: 720, doc: { fonts: { status: "loaded" } },
-    toggleClass() {}, removeClass() {},
+    toggleClass(name: string, enabled: boolean) { if (enabled) paneClasses.add(name); else paneClasses.delete(name); },
+    removeClass(name: string) { paneClasses.delete(name); },
     querySelector: () => null,
     contains(el: ElementStub) { return elements.has(el); },
     addEventListener(name: string, callback: () => void) { if (name === "scroll") { counts.scrollListeners++; scroll = callback; } },
@@ -115,11 +119,12 @@ export async function readingViewHarness(initialText: string, startup = true, in
       const rows = options.rowIndices ?? options.model.rows.map((_row, index) => index);
       renderedRows.push(rows.map(index => options.model.rows[index].height));
       renders.push(rows.flatMap(index => options.model.rows[index].items.map(item => item.embed.raw)).join(" ")); return {};
-    }, layoutIsRendered: () => true },
+    }, layoutIsRendered: () => true, layoutRenderState: () => "rendered" },
     "./crossrefView.ts": { refContextOf: () => undefined, numbered: (text: string) => text, markCaptions() {} },
     "./messages.ts": { blockWarning: () => undefined },
     "./noteText.ts": { sectionNoteText: (_app: unknown, _ctx: unknown, info: { text: string }) => info.text },
     "./obsidianInternals.ts": { keepReadingFlow: () => () => {}, obsidianSetting: () => 4, collapseReadingList() {}, readingViewOfSection: () => reader, remeasureSections() { counts.remeasurements++; },
+      readingSectionSource: (view: ViewStub) => view === reader ? sectionText : null,
       readingSectionsOfView() { counts.sectionLookups++; return { sections, sizer: container }; } },
     "./readingWrap.ts": { keepWrapped() { counts.activeWraps++; return () => { counts.activeWraps--; }; }, keepWrapsBeside() {}, refreshReadingWrap() {}, refreshReadingMedia() {}, readingMeasurementsReady: () => true, resetReadingMeasurements() {} },
     "./printView.ts": { renderPrintLayouts() {} },
@@ -133,6 +138,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
   if (startup) onReady!();
   return {
     get rerenders() { return rerenders; },
+    get readingHeld() { return paneClasses.has("vml-rv-waiting-for-render"); },
     get projection() { return trackedProjections.at(-1); },
     renders,
     renderedRows,
@@ -141,7 +147,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
     fileOpened() { listeners.get("file-open")!(); },
     openFile(text: string) {
       reader.file = new FileStub(); sourceView.file = reader.file;
-      hostText = text; diskText = text;
+      hostText = text; sectionText = text; diskText = text;
       listeners.get("file-open")!();
     },
     scroll() { scroll(); },
@@ -150,6 +156,11 @@ export async function readingViewHarness(initialText: string, startup = true, in
     setMode(next: string) { mode = next; listeners.get("layout-change")!(); },
     frame() { const callbacks = [...frames.values()]; frames.clear(); for (const callback of callbacks) callback(); },
     setHost(text: string) { hostText = text; for (const info of infos.values()) info.text = text; },
+    setSectionSource(text: string) { sectionText = text; },
+    editInPane(text: string) {
+      hostText = text;
+      listeners.get("editor-change")!(reader.editor, reader);
+    },
     edit(text: string) {
       diskText = text;
       listeners.get("editor-change")!(sourceView.editor, sourceView);
@@ -172,6 +183,7 @@ export async function readingViewHarness(initialText: string, startup = true, in
       const inserted = new Set<() => void>();
       const el: ElementStub = { isConnected: true, empty() { empties++; }, querySelectorAll: () => [],
         createDiv: () => ({ ...el, querySelector: () => el }), querySelector: () => null,
+        matches: selector => classes.has(selector.slice(1)),
         toggleClass(name, enabled) {
           counts.classWrites++;
           if (name === "vml-rv-wrapping") wrapping = enabled;
@@ -184,7 +196,8 @@ export async function readingViewHarness(initialText: string, startup = true, in
       elements.add(el);
       const info = { text, lineStart, lineEnd };
       infos.set(el, info);
-      sections.push({ el, computed: true, rendered: true });
+      const section = { el, computed: true, rendered: true };
+      sections.push(section);
       const process = (sourceText: string): void => {
         info.text = sourceText;
         processor!(el, { sourcePath: file.path, getSectionInfo: () => infoAvailable ? { ...info } : null,
@@ -197,7 +210,12 @@ export async function readingViewHarness(initialText: string, startup = true, in
         setInfoAvailable(available: boolean) { infoAvailable = available; },
         unloadChild(index: number) { for (const cleanup of children[index].cleanups) cleanup(); },
         insert() { for (const callback of [...inserted]) callback(); },
-        dispose() { el.isConnected = false; for (const child of children) for (const cleanup of child.cleanups) cleanup(); } };
+        dispose() {
+          el.isConnected = false;
+          elements.delete(el);
+          sections.splice(sections.indexOf(section), 1);
+          for (const child of children) for (const cleanup of child.cleanups) cleanup();
+        } };
     },
     dispose() { for (const cleanup of cleanups) cleanup(); },
   };

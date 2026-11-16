@@ -92,6 +92,13 @@ interface Renderer {
   onListCollapseClick?: unknown;
   applyScroll?: unknown;
   renderExtraMinPx?: unknown;
+  lastText?: unknown;
+}
+
+/** The exact source that produced the host's current section list, even in a hidden pane. */
+export function readingSectionSource(view: PreviewHost): string | null {
+  const renderer = (view.previewMode as unknown as { renderer?: Renderer }).renderer;
+  return typeof renderer?.lastText === "string" ? renderer.lastText : null;
 }
 
 /** Floating content crosses native section boundaries; keep its anchors in the reading DOM. */

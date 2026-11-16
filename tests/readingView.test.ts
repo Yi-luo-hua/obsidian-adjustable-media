@@ -81,6 +81,54 @@ test("unchanged reading DOM and its projection survive mode round trips without 
   host.dispose();
 });
 
+test("deleting the last layout holds the editor until reading parses the new plain text", async () => {
+  const plain = "Body";
+  const host = await readingViewHarness(media, false);
+  const oldImage = host.section(media), oldBody = host.section(media, 4);
+  host.frame(); host.setMode("source");
+  host.editInPane(plain);
+  assert.equal(host.readingHeld, true);
+  host.setMode("preview"); host.frame();
+  assert.equal(host.readingHeld, true);
+  host.setMode("source"); host.tick();
+  assert.equal(host.readingHeld, true, "returning to the editor cancels the reveal timeout");
+  host.setMode("preview"); host.frame();
+  oldImage.dispose(); oldBody.dispose();
+  host.setSectionSource(plain);
+  host.section(plain, 0); host.frame();
+  assert.equal(host.readingHeld, false);
+  host.dispose();
+});
+
+test("adding the first layout reprocesses reused plain sections and reveals before timeout", async () => {
+  const plain = "Body";
+  const host = await readingViewHarness(plain, false);
+  const body = host.section(plain, 0);
+  host.setMode("source"); host.editInPane(media);
+  host.section(media); host.setSectionSource(media);
+  host.setMode("preview"); host.frame();
+  assert.equal(host.rerenders, 1);
+  assert.equal(host.readingHeld, true);
+  body.move(4); body.reprocess(media);
+  host.frame();
+  assert.equal(host.rerenders, 1);
+  assert.equal(host.readingHeld, false);
+  host.dispose();
+});
+
+test("undoing the edit reuses the exact retained reading DOM without a hold or rerender", async () => {
+  const host = await readingViewHarness(media, false);
+  host.section(media); host.section(media, 4); host.frame();
+  host.setMode("source"); host.editInPane(media + " changed");
+  assert.equal(host.readingHeld, true);
+  host.editInPane(media);
+  assert.equal(host.readingHeld, false);
+  host.setMode("preview"); host.frame();
+  assert.equal(host.rerenders, 0);
+  assert.equal(host.renders.length, 1);
+  host.dispose();
+});
+
 test("retained paragraph sections refresh authored blank spacing without reinstalling layouts", async () => {
   const host = await readingViewHarness(media, false);
   host.section(media);
