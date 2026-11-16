@@ -1917,7 +1917,20 @@ body.vml-is-dragging * {
   margin-top: 24px;
 }
 
-.vml-update__body a[href="https://yi-luo-hua.github.io/sponsor-me/"] {
+.vml-update__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vml-update__hint {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller, 11px);
+  line-height: 1.4;
+}
+
+.vml-update__sponsor {
   display: inline-flex;
   align-items: center;
   padding: 6px 14px;
@@ -1928,7 +1941,7 @@ body.vml-is-dragging * {
   text-decoration: none;
 }
 
-.vml-update__body a[href="https://yi-luo-hua.github.io/sponsor-me/"]:is(:hover, :focus-visible) {
+.vml-update__sponsor:is(:hover, :focus-visible) {
   background-color: var(--interactive-accent-hover);
   color: var(--text-on-accent);
 }

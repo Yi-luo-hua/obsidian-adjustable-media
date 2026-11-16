@@ -14,14 +14,22 @@ export class ReleaseNotesModal extends Modal {
     const { contentEl } = this;
     contentEl.createEl("h2", { text: t("releaseNotesTitle", { version: RELEASE_NOTES_VERSION }) });
     const body = contentEl.createDiv({ cls: "vml-update__body" });
+    const actions = contentEl.createDiv({ cls: "vml-update__actions" });
+    const close = actions.createEl("button", { text: t("releaseNotesClose") });
+    close.addEventListener("click", () => this.close());
+    contentEl.createEl("p", { cls: "vml-update__hint", text: t("releaseNotesAgain") });
     this.rendering = new Component();
     this.rendering.load();
     void MarkdownRenderer.render(this.app, RELEASE_NOTES_TEXT[currentLanguage()], body, "", this.rendering)
-      .then(() => attachReleaseExamples(body, this.app, () => this.close()));
-    contentEl.createEl("p", { cls: "vml-guide__subtitle", text: t("releaseNotesAgain") });
-    const footer = contentEl.createDiv({ cls: "vml-guide__footer" });
-    footer.createEl("button", { cls: "mod-cta", text: t("releaseNotesClose") })
-      .addEventListener("click", () => this.close());
+      .then(() => {
+        attachReleaseExamples(body, this.app, () => this.close());
+        const sponsor = body.querySelector('a[href="https://yi-luo-hua.github.io/sponsor-me/"]');
+        if (!sponsor) return;
+        const paragraph = sponsor.closest("p");
+        sponsor.addClass("vml-update__sponsor");
+        close.before(sponsor);
+        if (paragraph && !paragraph.textContent?.trim()) paragraph.remove();
+      });
   }
 
   override onClose(): void {
