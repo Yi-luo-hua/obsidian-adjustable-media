@@ -6,5 +6,6 @@
   "description": "Arrange images, videos and Mermaid diagrams side by side, then drag to reorder and resize them. Notes keep their original Markdown plus layout comments.",
   "author": "Yi-luo-hua",
   "authorUrl": "https://github.com/Yi-luo-hua",
+  "fundingUrl": "https://yi-luo-hua.github.io/sponsor-me/",
   "isDesktopOnly": false
 }
