@@ -477,7 +477,20 @@
   margin-top: -0.1px;
 }
 
-/* Keep section geometry measurable while the edited note is being projected. */
+/* Keep the outgoing editor visible until reading sections have been installed. */
+[data-mode="preview"] > .view-content:has(> .vml-rv-waiting-for-render) {
+  position: relative;
+}
+
+[data-mode="preview"] > .view-content:has(> .vml-rv-waiting-for-render) > .markdown-source-view {
+  display: flex !important;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Keep reading geometry measurable while the outgoing editor covers it. */
 .vml-rv-waiting-for-render .markdown-preview-sizer {
   opacity: 0;
 }
