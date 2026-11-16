@@ -479,7 +479,7 @@
 
 /* Keep the next paragraph's margin below a float when the source separates them with a blank. */
 .markdown-preview-sizer > .vml-rv-float-blank {
-  padding-bottom: 0.05px;
+  padding-bottom: calc(0.05px + var(--vml-extra-blank-lines, 0) * var(--p-spacing, 1rem));
 }
 
 /* A paragraph touching the first float starts at the top of the body, as in live preview. */

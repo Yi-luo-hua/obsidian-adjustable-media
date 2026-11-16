@@ -1,7 +1,8 @@
 import { scanMarkdownLines } from "./lineContext.ts";
 
 /** Extra authored blank lines that Markdown would otherwise collapse into one paragraph break. */
-export function readingBlankExtras(lines: readonly string[], blocks: readonly { openLine: number; closeLine: number }[]): Map<number, number> {
+export function readingBlankExtras(lines: readonly string[], blocks: readonly { openLine: number; closeLine: number }[],
+  floatEnds: ReadonlySet<number> = new Set()): Map<number, number> {
   const extras = new Map<number, number>();
   if (blocks.length === 0) return extras;
   const contexts = scanMarkdownLines(lines);
@@ -12,7 +13,8 @@ export function readingBlankExtras(lines: readonly string[], blocks: readonly { 
     if (!blank(line)) continue;
     const start = line;
     while (line + 1 < lines.length && blank(line + 1)) line++;
-    if (line > start && line + 1 < lines.length && !layout[start - 1]) extras.set(start - 1, line - start);
+    const before = start - 1;
+    if (line > start && line + 1 < lines.length && (!layout[before] || floatEnds.has(before))) extras.set(before, line - start);
   }
   return extras;
 }

@@ -25,3 +25,10 @@ test("ordinary notes and trailing whitespace keep their host rendering", () => {
   assert.deepEqual(gaps("One\n\n\n\nTwo"), []);
   assert.deepEqual(gaps(prefix + "One\n\n\n\n"), []);
 });
+
+test("reading retains extra blank lines between a float and following text", () => {
+  const lines = (prefix + "\n\nTwo").split("\n");
+  const blocks = findV2Blocks(lines);
+  assert.deepEqual([...readingBlankExtras(lines, blocks, new Set([2]))], [[2, 2]]);
+  assert.deepEqual([...readingBlankExtras(lines, blocks)], []);
+});

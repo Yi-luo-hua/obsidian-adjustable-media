@@ -84,9 +84,10 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
     let offset = 0;
     const offsets = lines.map(line => { const start = offset; offset += line.length + 1; return start; });
     const blocks = snapshot.blocks.map(ref => ref.block);
+    const floatEnds = new Set(blocks.filter(block => isDrawable(block) && blockWrap(block) !== null).map(block => block.closeLine));
     const refs = blocks.length > 0 ? refContextOf(text) : undefined;
     return { snapshot, lines, offsets, blocks, skips: effectiveWrapSkips(lines, blocks), refs, drawn: drawnFrom(blocks, numbersOf(refs), lines),
-      wrapped: blocks.some(block => isDrawable(block) && modelFromBlock(block).wrap !== null), blankExtras: readingBlankExtras(lines, blocks) };
+      wrapped: floatEnds.size > 0, blankExtras: readingBlankExtras(lines, blocks, floatEnds) };
   };
 
   const alive = (reader: Reader): boolean => !unloaded && readers.get(reader.view) === reader
@@ -161,8 +162,12 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
         }
         record.snapshotId = reader.parsed.snapshot.id;
         record.range = sectionRange(reader.parsed, info);
-        const extra = applyBlankSpacing(reader, el, info);
-        if (extra !== record.blankExtra) { record.blankExtra = extra; spacingChanged.add(el); }
+        const { blankExtra, floatBoundary } = applySectionSpacing(reader, el, info, record.floatBoundary);
+        if (blankExtra !== record.blankExtra || floatBoundary !== record.floatBoundary) {
+          record.blankExtra = blankExtra;
+          record.floatBoundary = floatBoundary;
+          spacingChanged.add(el);
+        }
       }
       reader.projection.viewportChanged(connected.map(([, record]) => record.range));
       const token = reader.projection.token()!;
@@ -268,18 +273,21 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
     wake(reader);
   };
 
-  const applyBlankSpacing = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation): number => {
-    const extra = sectionBlock(reader.parsed.blocks, info) ? 0 : reader.parsed.blankExtras.get(info.lineEnd) ?? 0;
-    el.toggleClass("vml-rv-spaced", extra > 0);
-    if (extra > 0) el.setCssProps({ "--vml-extra-blank-lines": String(extra) });
-    return extra;
-  };
-
   const floatBoundary = (reader: Reader, info: MarkdownSectionInformation): string => {
     const block = reader.parsed.blocks.find(block => info.lineEnd === block.closeLine);
     if (!block || !isDrawable(block) || blockWrap(block) === null) return "";
     if (reader.parsed.lines[block.closeLine + 1]?.trim() === "") return FLOAT_BLANK;
     return block.openLine === 0 ? FIRST_FLOAT_TIGHT : "";
+  };
+
+  const applySectionSpacing = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation, previousBoundary = "") => {
+    const boundary = floatBoundary(reader, info);
+    if (previousBoundary && previousBoundary !== boundary) el.toggleClass(previousBoundary, false);
+    if (boundary) el.toggleClass(boundary, true);
+    const blankExtra = reader.parsed.blankExtras.get(info.lineEnd) ?? 0;
+    el.toggleClass("vml-rv-spaced", blankExtra > 0 && boundary !== FLOAT_BLANK);
+    el.setCssProps({ "--vml-extra-blank-lines": String(blankExtra) });
+    return { blankExtra, floatBoundary: boundary };
   };
 
   const draw = (reader: Reader, el: HTMLElement, info: MarkdownSectionInformation, ctx: MarkdownPostProcessorContext): void => {
@@ -349,14 +357,11 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
         }
       }
     }
-    const boundary = floatBoundary(reader, info);
-    if (previousBoundary && previousBoundary !== boundary) el.toggleClass(previousBoundary, false);
-    if (boundary) el.toggleClass(boundary, true);
-    const blankExtra = applyBlankSpacing(reader, el, info);
+    const spacing = applySectionSpacing(reader, el, info, previousBoundary);
     el.toggleClass(WRAPPING, wrapped);
     markWrapping(reader, wrapped);
     if (wrapped) keepWrapsBeside(plugin.app, el);
-    const record: InstalledSection = { blankExtra, floatBoundary: boundary, snapshotId: snapshot.id, range: sectionRange(reader.parsed, info),
+    const record: InstalledSection = { ...spacing, snapshotId: snapshot.id, range: sectionRange(reader.parsed, info),
       source: sectionSource(reader.parsed, info), sourcePath: snapshot.origin.path, drawn: reader.parsed.drawn,
       layoutKey: sectionLayoutKey(reader.parsed, info), context: ctx };
     reader.sections.set(el, record);
