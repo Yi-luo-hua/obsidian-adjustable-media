@@ -77,12 +77,13 @@ export class TextLayoutModal extends Modal {
 
     if (this.options.placeable) {
       new Setting(this.contentEl).setName(t("blockPlace")).addDropdown((dropdown) => {
-        const choices: Array<[Align, string]> = [["left", t("alignLeft")], ["center", t("alignCenter")], ["right", t("alignRight")]];
+        const choices: Array<[Align | "free", string]> = [["left", t("alignLeft")], ["center", t("alignCenter")], ["right", t("alignRight")]];
+        if (layout.align === undefined) choices.unshift(["free", t("placeFree")]);
         for (const [value, label] of choices) {
           dropdown.addOption(value, label);
         }
-        dropdown.setValue(layout.align).onChange((value) => {
-          layout.align = value as Align;
+        dropdown.setValue(layout.align ?? "free").onChange((value) => {
+          layout.align = value === "free" ? undefined : value as Align;
         });
       });
     }

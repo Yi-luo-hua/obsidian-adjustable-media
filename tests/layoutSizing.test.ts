@@ -15,8 +15,12 @@ import {
   setFrameWidth,
   effectiveFrameWidth,
   effectiveWidth,
+  frameOffset,
   onlySizingDiffers,
+  setFramePosition,
   setPosition,
+  setTextLayout,
+  textLayoutOf,
   type LayoutModel,
 } from "../src/layout/model.ts";
 import { applyEditsToText, planModelEdit } from "../src/layout/edits.ts";
@@ -78,6 +82,34 @@ test("a single item's position reads offset first, then align, and is centered b
 
   assert.deepEqual(layout.rows.slice(0, 4).map(rowOffset), [1, 0.25, 0.5, 0.5]);
   assert.equal(layout.rows[4]?.offset, null);
+});
+
+test("moving a whole frame writes only its opener and keeps the row's independent position", () => {
+  const lines = ["Before  ", "", '<!-- vml {"v":2,"frameWidth":0.6,"align":"right","future":"keep","rows":[{"offset":0.2}]} -->',
+    "Text  ", "![[a.png|alias|200]]  ", "<!-- /vml -->", "", "After  "];
+  const [block] = findV2Blocks(lines);
+  const before = modelFromBlock(block);
+  const after = setFramePosition(before, 0.327);
+  assert.equal(frameOffset(before), 1);
+  assert.ok(onlySizingDiffers(before, after));
+
+  const result = applyEditsToText(lines.join("\r\n"), [planModelEdit(block, after)!]);
+  assert.ok(result.ok);
+  const changed = result.text.split("\r\n");
+  const expected = [...lines];
+  expected[2] = '<!-- vml {"v":2,"frameWidth":0.6,"frameOffset":0.327,"future":"keep","rows":[{"offset":0.2}]} -->';
+  assert.deepEqual(changed, expected);
+  const reread = model(changed);
+  assert.equal(frameOffset(reread), 0.327);
+  assert.equal(rowOffset(reread.rows[0]), 0.2);
+  assert.equal(frameOffset(setTextLayout(reread, { ...textLayoutOf(reread), size: 1.5 })), 0.327);
+  assert.equal(setTextLayout(reread, { align: "center" }).frameOffset, null);
+
+  for (const [offset, align] of [[-0.1, null], [0.5, "center"], [1.1, "right"]] as const) {
+    const placed = setFramePosition(reread, offset);
+    assert.equal(placed.align, align);
+    assert.equal(placed.frameOffset, null);
+  }
 });
 
 test("left, center and right are stored as align; any other position as offset", () => {

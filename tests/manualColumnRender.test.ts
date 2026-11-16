@@ -67,8 +67,12 @@ test("shared sizing separates the outer frame from the media share and restores 
   module.applySizing(root, model.setFrameWidth(layout, 0.6));
   assert.equal(root.props["--vml-block-width"], "60%");
   assert.equal(root.props["--vml-media-width"], "50%");
-  assert.ok(root.classes.has("vml-layout--align-right"));
+  assert.ok(root.classes.has("vml-layout--positioned"));
+  assert.equal(root.props["--vml-frame-offset"], "1");
+  module.applySizing(root, model.setFramePosition(model.setFrameWidth(layout, 0.6), 0.28));
+  assert.equal(root.props["--vml-frame-offset"], "0.28");
   module.applySizing(root, layout);
   assert.equal(root.props["--vml-block-width"], "");
-  assert.equal(root.classes.has("vml-layout--align-right"), false);
+  assert.equal(root.classes.has("vml-layout--positioned"), false);
+  assert.equal(root.props["--vml-frame-offset"], "");
 });

@@ -47,17 +47,10 @@
   position: relative;
 }
 
-/* A narrow layout that does not float sits in the middle or on the right. */
-.vml-layout.vml-layout--align-center,
-.vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout.vml-layout--align-center {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.vml-layout.vml-layout--align-right,
-.vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout.vml-layout--align-right {
-  margin-left: auto;
-  margin-right: 0;
+/* Place the frame across the space left over after taking its width. */
+.vml-layout.vml-layout--positioned,
+.vml-live-preview:not(.vml-live-preview--wrap) > .vml-layout.vml-layout--positioned {
+  margin-left: calc((100% - var(--vml-block-width)) * var(--vml-preview-frame-offset, var(--vml-frame-offset)));
 }
 
 /* The text of a layout without media flows through columns, balanced as far as they go. */

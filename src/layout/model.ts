@@ -20,6 +20,7 @@ import {
   readBlockWidth,
   readBlockWrap,
   readColumnGap,
+  readOffset,
   readRowMeta,
   readTextColumns,
   readTextJustify,
@@ -59,7 +60,7 @@ export interface LayoutItem {
 /** Size/position settings can update existing media; content and other presentation need a redraw. */
 export function onlySizingDiffers(before: LayoutModel, after: LayoutModel): boolean {
   const content = (model: LayoutModel): unknown => {
-    const { width: _width, frameWidth: _frameWidth, align: _align, rows, ...rest } = model;
+    const { width: _width, frameWidth: _frameWidth, align: _align, frameOffset: _frameOffset, rows, ...rest } = model;
     return { ...rest, rows: rows.map(row => {
       const { height: _height, width: _rowWidth, align: _rowAlign, offset: _offset, items, ...settings } = row;
       return { ...settings, items: items.map(({ weight: _weight, height: _height, ...item }) => item) };
@@ -123,6 +124,8 @@ export interface LayoutModel {
   size: number | null;
   /** Where a layout narrower than its container sits when it does not float; null means left. */
   align: Exclude<Align, "left"> | null;
+  /** Free horizontal position of that layout, from 0 (left) to 1 (right); overrides align. */
+  frameOffset: number | null;
   extra: Record<string, unknown>;
 }
 
@@ -139,7 +142,7 @@ export type MoveTarget =
 const ALIGN_OFFSETS: ReadonlyArray<readonly [Align, number]> = [["left", 0], ["center", 0.5], ["right", 1]];
 
 export function modelFromBlock(block: V2Block): LayoutModel {
-  const { width, frameWidth, wrap, skip, valign, type, cols, gap, textAlign, size, align, caption, ...rest } = block.meta.extra;
+  const { width, frameWidth, wrap, skip, valign, type, cols, gap, textAlign, size, align, frameOffset, caption, ...rest } = block.meta.extra;
   // A layout with text beside its media does not float; its wrap settings are kept as written.
   const columns = blockHasTextColumns(block);
   const extra = columns ? { ...definedOnly({ wrap, skip }), ...rest } : rest;
@@ -179,6 +182,7 @@ export function modelFromBlock(block: V2Block): LayoutModel {
     textAlign: readTextJustify(textAlign),
     size: readTextSize(size),
     align: readBlockAlign(align),
+    frameOffset: readOffset(frameOffset),
     extra,
   };
 }
@@ -260,6 +264,7 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       ...(model.textAlign === null ? {} : { textAlign: model.textAlign }),
       ...(model.size === null ? {} : { size: model.size }),
       ...(model.align === null ? {} : { align: model.align }),
+      ...(model.frameOffset === null ? {} : { frameOffset: model.frameOffset }),
       ...(caption === null ? {} : { caption: {
         text: caption.text,
         ...(caption.align === "center" ? {} : { align: caption.align }),
@@ -278,6 +283,18 @@ export function rowEmbeds(model: LayoutModel): V2Embed[][] {
 export function rowOffset(row: LayoutRow): number {
   const align = row.align ?? "center";
   return row.offset ?? ALIGN_OFFSETS.find(([name]) => name === align)?.[1] ?? 0.5;
+}
+
+/** Where a narrow, non-floating layout sits across its container. */
+export function frameOffset(model: LayoutModel): number {
+  return model.frameOffset ?? ALIGN_OFFSETS.find(([name]) => name === model.align)?.[1] ?? 0;
+}
+
+/** Use the existing alignment setting for the three exact alignments. */
+export function setFramePosition(model: LayoutModel, offset: number): LayoutModel {
+  const value = round(Math.min(1, Math.max(0, offset)));
+  const preset = ALIGN_OFFSETS.find(([, at]) => at === value)?.[0];
+  return { ...model, align: preset === "center" || preset === "right" ? preset : null, frameOffset: preset ? null : value };
 }
 
 export function moveItem(model: LayoutModel, source: ItemPosition, target: MoveTarget): LayoutModel {
@@ -525,7 +542,7 @@ export interface TextLayout {
   gap: number | null;
   textAlign: TextJustify;
   size: number;
-  align: Align;
+  align?: Align;
 }
 
 /**
@@ -553,13 +570,14 @@ export function setTextLayout(model: LayoutModel, layout: Partial<TextLayout>): 
   }
   if (layout.align !== undefined) {
     next.align = layout.align === "left" ? null : layout.align;
+    next.frameOffset = null;
   }
   return next;
 }
 
 /** The text settings of a layout, defaults filled in. */
 export function textLayoutOf(model: LayoutModel): TextLayout {
-  return { cols: model.cols ?? 1, gap: model.gap, textAlign: model.textAlign ?? "left", size: model.size ?? 1, align: model.align ?? "left" };
+  return { cols: model.cols ?? 1, gap: model.gap, textAlign: model.textAlign ?? "left", size: model.size ?? 1, align: model.frameOffset === null ? model.align ?? "left" : undefined };
 }
 
 /**

@@ -248,14 +248,13 @@ const ROW_KEYS = new Set(["height", "widths", "width", "align", "offset", "capti
 export function readRowMeta(meta: V2RowMeta, embedCount: number): RowSettings {
   const height = finiteNumber(meta.height);
   const width = finiteNumber(meta.width);
-  const offset = finiteNumber(meta.offset);
 
   return {
     height: height === null ? null : clamp(Math.round(height), MIN_ROW_HEIGHT, MAX_ROW_HEIGHT),
     widths: positiveNumbers(meta.widths, embedCount),
     width: embedCount === 1 && width !== null && width >= 0.1 && width <= 1 ? width : null,
     align: embedCount === 1 && isAlign(meta.align) ? meta.align : null,
-    offset: embedCount === 1 && offset !== null && offset >= 0 && offset <= 1 ? offset : null,
+    offset: embedCount === 1 ? readOffset(meta.offset) : null,
     captions: captionList(meta.captions, embedCount),
     captionAlign: meta.captionAlign === "left" || meta.captionAlign === "center" ? meta.captionAlign : null,
     captionScales: Array.isArray(meta.captionScales) && meta.captionScales.length === embedCount
@@ -318,6 +317,12 @@ export function readTextSize(value: unknown): number | null {
 /** Where a layout narrower than its container and not floating sits (top-level `align`); null when unset, invalid or left. */
 export function readBlockAlign(value: unknown): Exclude<Align, "left"> | null {
   return value === "center" || value === "right" ? value : null;
+}
+
+/** The share of the available horizontal space to leave on the left. */
+export function readOffset(value: unknown): number | null {
+  const offset = finiteNumber(value);
+  return offset !== null && offset >= 0 && offset <= 1 ? offset : null;
 }
 
 export function readBlockCaption(value: unknown): CaptionSettings | null {

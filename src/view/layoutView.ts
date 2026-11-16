@@ -1,7 +1,7 @@
 import { MarkdownRenderer, type App, type Component } from "obsidian";
 
 import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, type CaptionSettings, type TextSide } from "../format/v2.ts";
-import { effectiveFrameWidth, effectiveWidth, hasTextColumns, isTextOnly, rowOffset, webHeight, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
+import { effectiveFrameWidth, effectiveWidth, frameOffset, hasTextColumns, isTextOnly, rowOffset, webHeight, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
 import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { setBounded } from "../layout/viewProjection.ts";
 import { resolveMedia } from "./media.ts";
@@ -186,10 +186,9 @@ export function applySizing(root: HTMLElement, model: LayoutModel): void {
   root.toggleClass("vml-layout--sized", width !== null);
   root.setCssProps({ "--vml-block-width": width === null ? "" : `${width * 100}%` });
   root.setCssProps({ "--vml-media-width": hasTextColumns(model) ? `${(effectiveWidth(model) ?? 0.4) * 100}%` : "" });
-  // A narrow layout that does not float sits on the left, in the middle or on the right.
-  for (const align of ["center", "right"] as const) {
-    root.toggleClass(`vml-layout--align-${align}`, width !== null && model.wrap === null && model.align === align);
-  }
+  const positioned = width !== null && model.wrap === null;
+  root.toggleClass("vml-layout--positioned", positioned);
+  root.setCssProps({ "--vml-frame-offset": positioned ? String(frameOffset(model)) : "" });
 
   for (const rowEl of Array.from(root.querySelectorAll<HTMLElement>(".vml-row"))) {
     const row = model.rows[Number(rowEl.dataset.row)];

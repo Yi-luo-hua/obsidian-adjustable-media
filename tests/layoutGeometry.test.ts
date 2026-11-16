@@ -12,6 +12,8 @@ test("frame resizing follows the moving edge for block alignment, floats and tex
   assert.equal(frameResizeDirection(model), 1);
   assert.equal(frameResizeDirection({ ...model, align: "right" }), -1);
   assert.equal(frameResizeDirection({ ...model, align: "center" }), 2);
+  assert.equal(frameResizeDirection({ ...model, align: "right", frameOffset: 0.25 }), 4 / 3);
+  assert.equal(frameResizeDirection({ ...model, frameOffset: 0.75 }), -4 / 3);
   assert.equal(frameResizeDirection({ ...model, align: "center", wrap: "left" }), 1);
   assert.equal(frameResizeDirection({ ...model, align: "center", wrap: "right" }), -1);
   const columns = findV2Blocks(["<!-- vml -->", "Left", "![[a.png]]", "Right", "<!-- /vml -->"])[0];

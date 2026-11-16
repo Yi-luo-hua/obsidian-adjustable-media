@@ -2,7 +2,7 @@ import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
 import { MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason, type LinesAround } from "../layout/edits.ts";
-import { dropTarget, frameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
+import { dropTarget, frameResizeDirection, outerFrameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
   canAddText,
   effectiveWidth,
@@ -659,7 +659,7 @@ function setUpFrame(root: HTMLElement, context: LayoutContext): void {
   // media with text on their left only, grow to the left; media between two texts grow both ways.
   const direction = frameResizeDirection(context.model);
   const columns = hasTextColumns(context.model);
-  const outerDirection = context.model.align === "right" ? -1 : context.model.align === "center" ? 2 : 1;
+  const outerDirection = outerFrameResizeDirection(context.model);
   const controls: Array<{ box: HTMLElement; edge: FrameEdge; direction: number }> = columns
     ? [
       { box, edge: "right", direction }, { box, edge: "bottom", direction },
@@ -842,7 +842,7 @@ function showItemMenu(at: MouseEvent | { x: number; y: number }, context: Layout
         .setTitle(t(label))
         .setIcon(icon)
         .setSection("vml-place")
-        .setChecked((context.model.align ?? "left") === align)
+        .setChecked(context.model.frameOffset === null && (context.model.align ?? "left") === align)
         .onClick(() => {
           void commitEdits(context.app, context.sourcePath, [planModelEdit(context.block, setTextLayout(context.model, { align }))], context);
         }));

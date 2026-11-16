@@ -1,15 +1,18 @@
 import type { WrapSide } from "../format/v2.ts";
-import { hasTextColumns, type LayoutModel, type MoveTarget } from "./model.ts";
+import { frameOffset, hasTextColumns, type LayoutModel, type MoveTarget } from "./model.ts";
 
 /** Which edge moves when a block grows, and how far its width changes per pointer pixel. */
 export function frameResizeDirection(model: LayoutModel): number {
   if (hasTextColumns(model)) {
     return model.text.left === null ? 1 : model.text.right === null ? -1 : 2;
   }
-  if (model.wrap !== null) {
-    return model.wrap === "right" ? -1 : 1;
-  }
-  return model.align === "right" ? -1 : model.align === "center" ? 2 : 1;
+  return outerFrameResizeDirection(model);
+}
+
+/** Scale the width delta by how much of it moves the handle's edge. */
+export function outerFrameResizeDirection(model: LayoutModel): number {
+  const offset = model.wrap === null ? frameOffset(model) : model.wrap === "right" ? 1 : 0;
+  return offset <= 0.5 ? 1 / (1 - offset) : -1 / offset;
 }
 
 /**
@@ -118,9 +121,8 @@ export function resizePair(widths: readonly number[], index: number, delta: numb
 }
 
 /**
- * Horizontal position of a single item dragged sideways by `delta`: how much of the row's free
- * space lies left of it, from 0 (left) to 1 (right). It snaps to left, center and right within
- * `snap` pixels. `free` is the row width minus the item width.
+ * Horizontal position after a sideways drag by `delta`: how much free space lies on the left.
+ * It snaps to left, center and right within `snap` pixels. `free` is the available travel.
  */
 export function positionOffset(startLeft: number, delta: number, free: number, snap: number): number {
   if (free <= 0) {

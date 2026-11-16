@@ -193,6 +193,10 @@ const MESSAGES = {
     zh: "布局块位置（不环绕时）",
     en: "Layout position (when not floating)",
   },
+  placeFree: {
+    zh: "自由位置",
+    en: "Free position",
+  },
   placeLeft: {
     zh: "布局块靠左",
     en: "Layout on the left",
