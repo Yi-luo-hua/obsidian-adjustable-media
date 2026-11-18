@@ -45,6 +45,7 @@ for (const scenario of [
     class Updates { open(): void { updates++; } close(): void {} }
     const loaded = await mockedModule<{ default: new () => Plugin & { onload(): Promise<void> } }>(new URL("../main.ts", import.meta.url), {
       obsidian: { Plugin },
+      "./styles.css": "",
       "./src/commands/register.ts": { registerCommands: () => {} },
       "./src/input/autoConvert.ts": { autoConvert: () => [] },
       "./src/view/crossrefView.ts": { crossrefExtension: () => [], registerCrossrefs: () => {}, setRefLanguage: () => {} },
