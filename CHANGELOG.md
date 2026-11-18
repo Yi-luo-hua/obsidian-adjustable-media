@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Restore the layout controls and image proportions when a plugin update leaves `styles.css` missing or empty.
+## 1.1.0 - 2026-11-18
+
+- Wrap remote Markdown images from their context menu in Live Preview on Obsidian 1.6.0 and later. Drag them into layouts and resize them, including images served from URLs without recognized image extensions. Existing layouts keep their media rows, text columns, and captions ([#46](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/46)).
+- Restore layout controls and image proportions on startup when an incomplete plugin update leaves `styles.css` missing or empty ([#47](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/47)).
 
 ## 1.0.0 - 2026-11-16
 
