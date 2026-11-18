@@ -1,5 +1,5 @@
-import { MAX_EMBEDS_PER_ROW, blockWrap, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Embed } from "../format/v2.ts";
-import { isEditable, wrapLines, type LineChange } from "../layout/edits.ts";
+import { MAX_EMBEDS_PER_ROW, blockWrap, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Embed, type V2Meta } from "../format/v2.ts";
+import { isEditable, type LineChange } from "../layout/edits.ts";
 import { insertItem, metaFromModel, modelFromBlock, rowEmbeds, type LayoutModel } from "../layout/model.ts";
 import { scanMarkdownContainers, scanMarkdownLines } from "../markdown/lineContext.ts";
 
@@ -44,7 +44,7 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
     // An indented line belongs to a list item, or is an indented code block, which the line scan does
     // not tell apart from text: a block written there would take it out of the list, or turn code
     // into a layout, and its rows would lose the indentation.
-    const row = contexts[line] === "text" && !/^[ \t]/.test(text) ? readEmbedRow(text, line) : null;
+    const row = contexts[line] === "text" && !/^[ \t]/.test(text) ? readEmbedRow(text, line, true) : null;
     if (!row) {
       return null;
     }
@@ -58,16 +58,14 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
     return { from: previous.openLine, to: last, replacement: serializeBlock(metaFromModel(model), rowEmbeds(model)) };
   }
 
-  const rows: string[] = [];
-  if (embeds.some(embed => embed.kind === "web")) {
-    const grouped: V2Embed[][] = [];
-    for (let start = 0; start < embeds.length; start += MAX_EMBEDS_PER_ROW) grouped.push(embeds.slice(start, start + MAX_EMBEDS_PER_ROW));
-    return { from: first, to: last, replacement: serializeBlock({ version: 3, extra: { kind: "media" }, rows: grouped.map(items => ({ items: items.length })) }, grouped) };
-  }
+  const rows: V2Embed[][] = [];
   for (let start = 0; start < embeds.length; start += MAX_EMBEDS_PER_ROW) {
-    rows.push(embeds.slice(start, start + MAX_EMBEDS_PER_ROW).map((embed) => embed.raw).join(" "));
+    rows.push(embeds.slice(start, start + MAX_EMBEDS_PER_ROW));
   }
-  return { from: first, to: last, replacement: wrapLines(rows) };
+  const meta: V2Meta = embeds.some(embed => embed.kind === "web")
+    ? { version: 3, extra: { kind: "media" }, rows: rows.map(items => ({ items: items.length })) }
+    : { rows: [], extra: {} };
+  return { from: first, to: last, replacement: serializeBlock(meta, rows) };
 }
 
 function editableBlockRightAbove(blocks: readonly V2Block[], lines: readonly string[], first: number): V2Block | null {

@@ -1,5 +1,5 @@
 import { fencedCodeBlocks, scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
-import { IFRAME_TOKEN, isNativeWebEmbed, parseWebFrame } from "./webEmbed.ts";
+import { httpUrl, IFRAME_TOKEN, isNativeWebEmbed, parseWebFrame } from "./webEmbed.ts";
 
 /**
  * v2 layout format: plain media embeds wrapped in HTML comments.
@@ -137,6 +137,8 @@ const CLOSE_PATTERN = /^<!-- \/vml -->[ \t]*$/;
 const EMBED_PATTERN = /!\[\[([^\]]+)\]\]|!\[([^\]]*)\]\(\s*(<[^>\n]*>|(?:[^()\s]|\([^()\s]*\))*)(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
 const SIZE_PATTERN = /^(\d+)(?:x\d+)?$/;
 const REMOTE_PATTERN = /^[a-z][a-z0-9+.-]*:\/\//i;
+const IMAGE_ROW_MARKER = " <!-- vml-image-row -->";
+const IMAGE_ROW_END = / <!-- vml-image-row -->[ \t]*$/;
 
 export function findV2Blocks(
   lines: readonly string[],
@@ -353,13 +355,27 @@ export function serializeOpener(meta: V2Meta): string {
 
 /** Row text made of the embeds' exact source, separated by single spaces. */
 export function serializeRow(embeds: readonly V2Embed[]): string {
-  return embeds.map((embed) => embed.raw).join(" ");
+  return markImageRow(embeds.map((embed) => embed.raw).join(" "), embeds);
+}
+
+/** A row marker gives ambiguous image URLs a meaning without changing neighboring Markdown. */
+export function markImageRow(line: string, embeds: readonly V2Embed[]): string {
+  return embeds.some(usesImageRowMarker) ? line + IMAGE_ROW_MARKER : line;
+}
+
+export function usesImageRowMarker(embed: V2Embed): boolean {
+  return embed.kind === "image" && embed.syntax === "markdown"
+    && isRemoteTarget(embed.target) && mediaKindOf(embed.target) === null;
+}
+
+export function stripImageRowMarker(line: string): string {
+  return line.replace(IMAGE_ROW_END, "");
 }
 
 export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embed[]>): string[] {
   if (meta.version === 3) {
     return [serializeOpener(meta), ...rows.flatMap((row) => row.flatMap((item) =>
-      [...item.raw.split("\n"), ...(item.syntax === "iframe" ? [""] : [])])), CLOSE_LINE];
+      [...serializeRow([item]).split("\n"), ...(item.syntax === "iframe" ? [""] : [])])), CLOSE_LINE];
   }
   return [serializeOpener(meta), ...rows.map(serializeRow), CLOSE_LINE];
 }
@@ -421,8 +437,9 @@ function buildBlock(
     const frame = !allText && meta.version === 3 && contexts[line] === "text" ? readStandaloneWebFrame(lines, line) : null;
     const diagramEnd = allText ? undefined : diagrams.get(line);
     const itemEnd = frame?.endLine ?? diagramEnd;
+    const rowText = stripImageRowMarker(text);
     const embeds: V2Embed[] | null = frame ? [frame] : diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
-      : contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
+      : contexts[line] === "text" && !allText ? readEmbedRow(rowText, line, rowText !== text) : null;
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
     } else if (right.length > 0) {
@@ -500,8 +517,8 @@ export function blockWrap(block: V2Block): WrapSide | null {
 }
 
 /** Returns the embeds of a row, or null when the line holds anything but media embeds. */
-export function readEmbedRow(text: string, line: number): V2Embed[] | null {
-  const embeds = readMediaEmbeds(text, line);
+export function readEmbedRow(text: string, line: number, remoteImages = false): V2Embed[] | null {
+  const embeds = readMediaEmbeds(text, line, remoteImages);
   let cursor = 0;
   for (const embed of embeds) {
     if (text.slice(cursor, embed.from).trim() !== "") return null;
@@ -511,7 +528,7 @@ export function readEmbedRow(text: string, line: number): V2Embed[] | null {
 }
 
 /** Media tokens in source order, including those sharing a line with ordinary text. */
-export function readMediaEmbeds(text: string, line: number): V2Embed[] {
+export function readMediaEmbeds(text: string, line: number, remoteImages = false): V2Embed[] {
   const embeds: V2Embed[] = [];
   for (const match of text.matchAll(IFRAME_TOKEN)) {
     const frame = parseWebFrame(match[0]);
@@ -525,7 +542,8 @@ export function readMediaEmbeds(text: string, line: number): V2Embed[] {
     const parsed = match[1] !== undefined
       ? { syntax: "wiki" as const, ...parseWikiEmbed(match[1]) }
       : { syntax: "markdown" as const, ...parseMarkdownEmbed(match[2] ?? "", match[3] ?? "") };
-    const kind = mediaKindOf(parsed.target);
+    const kind = mediaKindOf(parsed.target)
+      ?? (remoteImages && parsed.syntax === "markdown" && isRemoteTarget(parsed.target) && httpUrl(parsed.target) ? "image" : null);
     if (kind) {
       const link = match[1]?.split("|")[0] ?? match[3]?.replace(/^<|>$/g, "") ?? "";
       const hash = link.indexOf("#");

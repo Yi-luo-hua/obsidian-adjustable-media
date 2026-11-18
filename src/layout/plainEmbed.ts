@@ -27,7 +27,7 @@ export function takePlainEmbed(lines: readonly string[], line: number, column: n
     return null;
   }
 
-  const embeds = readEmbedRow(text, line);
+  const embeds = readEmbedRow(text, line, true);
   const embed = embeds?.find((candidate) => candidate.from === column)
     ?? embeds?.find((candidate) => candidate.from <= column && column < candidate.to);
   if (!embeds || !embed) {

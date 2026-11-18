@@ -43,7 +43,7 @@ export function isNativeWebEmbed(target: string): boolean {
     || ((host === "twitter.com" || host === "x.com") && /^\/[^/]+\/status\/\d+/.test(pathname));
 }
 
-function httpUrl(value: string): string | null {
+export function httpUrl(value: string): string | null {
   const source = value.trim().startsWith("//") ? `https:${value.trim()}` : value.trim();
   if (!/^https?:\/\//i.test(source)) return null;
   try { const url = new URL(source); return url.protocol === "https:" || url.protocol === "http:" ? source : null; }
