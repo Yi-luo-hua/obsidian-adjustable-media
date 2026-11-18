@@ -28,3 +28,5 @@ Obsidian notifies you when an update is available under **Settings → Community
 ## Updating
 
 Replace the three plugin files with those from the new release, then disable and re-enable the plugin (or restart Obsidian).
+
+If images stretch or the **Edit source** button appears below the image after an update, download `styles.css` from the installed version's GitHub release and put it in the plugin folder. Disable and re-enable Adjustable Media to reload its styles. Existing layout blocks will pick up the restored styles.

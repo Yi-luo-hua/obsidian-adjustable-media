@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { normalizePath, Plugin } from "obsidian";
 
 import { registerCommands } from "./src/commands/register.ts";
 import { autoConvert } from "./src/input/autoConvert.ts";
@@ -19,6 +19,7 @@ import { GUIDE_REVISION, shouldShowGuide } from "./src/guide/state.ts";
 import { ReleaseNotesModal } from "./src/guide/releaseModal.ts";
 import { shouldShowReleaseNotes } from "./src/guide/releaseState.ts";
 import { setUiLanguage, t } from "./src/view/messages.ts";
+import bundledStyles from "./styles.css";
 
 export default class AdjustableMediaPlugin extends Plugin {
   settings: VmlSettings = { ...DEFAULT_SETTINGS };
@@ -26,6 +27,9 @@ export default class AdjustableMediaPlugin extends Plugin {
 
   override async onload(): Promise<void> {
     this.settings = readSettings(await this.loadData());
+    await this.restoreStyles().catch((error: unknown) => {
+      console.error("Adjustable Media: could not restore styles.css", error);
+    });
     this.updateLayoutBorderColor(this.settings.layoutBorderColor);
     this.registerEvent(this.app.workspace.on("window-open", (_workspace, win) => {
       win.document.body.setCssProps({ "--vml-custom-border-color": this.settings.layoutBorderColor ?? "" });
@@ -93,6 +97,16 @@ export default class AdjustableMediaPlugin extends Plugin {
     refreshLayoutHighlights();
     this.refreshReadingHighlights();
     await this.saveData(this.settings);
+  }
+
+  private async restoreStyles(): Promise<void> {
+    const { dir } = this.manifest;
+    if (!dir) return;
+    const { adapter } = this.app.vault;
+    const path = normalizePath(`${dir}/styles.css`);
+    const stylesheet = await adapter.stat(path);
+    // Obsidian loads styles.css after onload. Restore the bundled file after an incomplete update.
+    if (!stylesheet?.size) await adapter.write(path, bundledStyles);
   }
 
   private updateLayoutBorderColor(color: string | null): void {

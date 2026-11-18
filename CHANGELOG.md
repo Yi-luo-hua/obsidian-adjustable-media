@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Restore the layout controls and image proportions when a plugin update leaves `styles.css` missing or empty.
+
 ## 1.0.0 - 2026-11-16
 
 - Freely position a narrow, non-floating layout horizontally in Live Preview by dragging its top handle. The position is saved with the layout and used in Reading View and PDF exports ([#42](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/42)).
