@@ -34,6 +34,17 @@ test("media-only rows and explicit text selections retain their existing wrappin
   assert.ok(planWrapSelection(text, 0, 0)?.replacement[0]?.includes('"type":"text"'));
 });
 
+test("the selection command puts extensionless HTTP images in a media row and preserves their source", () => {
+  const images = ['![图|240](https://example.org/assets/id?size=large "caption")', '![](http://example.org/get/42#photo)'];
+  const change = planWrapSelection(images, 0, 1);
+  assert.ok(change);
+  const [block] = findV2Blocks(change.replacement);
+  assert.deepEqual(block.rows.map(row => row.embeds.map(embed => [embed.kind, embed.raw])), [images.map(raw => ["image", raw])]);
+  assert.equal(block.meta.extra.type, undefined);
+  const [explicitText] = findV2Blocks(['<!-- vml {"v":2,"type":"text"} -->', ...images, "<!-- /vml -->"]);
+  assert.equal(explicitText.rows.length, 0);
+});
+
 test("image menu refuses non-text contexts, nested structures and existing layouts", () => {
   for (const [lines, line] of [
     [["```", "前文![[a.png]]", "```"], 1],

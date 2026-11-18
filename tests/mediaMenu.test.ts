@@ -8,7 +8,7 @@ import { mockedModule } from "./support/mockedModule.ts";
 
 const graph = ["```mermaid", "flowchart LR", "  A[Keep spaces] --> B", "```"];
 
-async function menuHarness(source: string, line: number, imageColumn?: number, excalidraw = false) {
+async function menuHarness(source: string, line: number, imageColumn?: number, excalidraw = false, remote = false) {
   let text = source, connected = true, insideLayout = false, dragging = false;
   const notices: string[] = [];
   const writes: Array<{ file: unknown; edits: BlockEdit[]; options: { view: unknown } }> = [];
@@ -16,6 +16,13 @@ async function menuHarness(source: string, line: number, imageColumn?: number, e
   let context!: (event: unknown) => void;
   const menus: MenuStub[] = [];
   class MenuStub {
+    static forEvent(event: { preventDefault(): void }) {
+      event.preventDefault();
+      const menu = new MenuStub();
+      menus.push(menu);
+      return menu;
+    }
+
     title = "";
     click!: () => void;
     addItem(build: (item: object) => void) {
@@ -34,9 +41,12 @@ async function menuHarness(source: string, line: number, imageColumn?: number, e
   }, posAtDOM: () => imageColumn ?? 0, contentDOM: { contains: () => connected } };
   const diagram = { closest: (selector: string) => selector === ".cm-editor" ? view
     : selector === ".vml-layout, .vml-text-editor, .vml-plain-image--dragging" && (insideLayout || dragging) ? {} : null };
-  const target = { closest: (selector: string) => selector === (excalidraw ? ".cm-content .excalidraw-embedded-img" : imageColumn === undefined ? ".cm-content .mermaid" : ".cm-content .image-embed") ? diagram : null };
+  const target = { closest: (selector: string) => {
+    const native = excalidraw ? ".cm-content .excalidraw-embedded-img" : imageColumn === undefined ? ".cm-content .mermaid" : ".cm-content .image-embed";
+    return selector === native || (remote && selector === ".cm-content .image-embed:not(.internal-embed)") ? diagram : null;
+  } };
   const module = await mockedModule<{ registerImageMenu(plugin: unknown): void }>(new URL("../src/view/imageMenu.ts", import.meta.url), {
-    obsidian: { Menu: MenuStub, Notice: class { constructor(message: string) { notices.push(message); } }, editorInfoField: {} },
+    obsidian: { Menu: MenuStub, Notice: class { constructor(message: string) { notices.push(message); } }, editorInfoField: {}, requireApiVersion: () => true },
     "@codemirror/view": { EditorView: { findFromDOM: () => view } },
     "../commands/plans.ts": plans, "../layout/plainEmbed.ts": plain,
     "../layout/writeBack.ts": { writeBlockEdits: async (_app: unknown, file: unknown, edits: BlockEdit[], options: { view: unknown }) => {
@@ -55,7 +65,7 @@ async function menuHarness(source: string, line: number, imageColumn?: number, e
     open() {
       let prevented = false;
       context({ preventDefault() { prevented = true; }, stopPropagation() {} });
-      if (imageColumn !== undefined && !excalidraw) {
+      if (imageColumn !== undefined && !excalidraw && !remote) {
         const menu = new MenuStub();
         handlers.get("file-menu")!(menu, file, "link-context-menu");
         if (menu.title) menus.push(menu);
@@ -85,6 +95,18 @@ test("native Excalidraw menu wraps the clicked embed verbatim and rejects change
       if (result.ok) assert.ok(result.text.includes("\r\n" + raw + "\r\n"));
     }
   }
+});
+
+test("remote images add the wrapping action without a file-menu event", async () => {
+  const raw = '![photo|200](https://example.org/assets/abc?size=large "caption")';
+  const host = await menuHarness(raw, 0, 0, false, true);
+  assert.equal(host.open(), true);
+  assert.equal(host.menus.length, 1);
+  assert.equal(host.menus[0].title, "wrapInLayout");
+  assert.equal(host.writes.length, 0);
+  host.menus[0].click();
+  assert.equal(host.writes.length, 1);
+  assert.deepEqual(applyEditsToText(raw, host.writes[0].edits), { ok: true, text: ["<!-- vml -->", raw, "<!-- /vml -->"].join("\n") });
 });
 
 test("an image menu wraps just the inline image and cancels if its source or widget changes", async () => {

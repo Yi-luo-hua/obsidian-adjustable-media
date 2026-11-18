@@ -1,5 +1,5 @@
 import { fencedCodeBlocks, scanMarkdownLines, type LineContext } from "../markdown/lineContext.ts";
-import { IFRAME_TOKEN, isNativeWebEmbed, parseWebFrame } from "./webEmbed.ts";
+import { httpUrl, IFRAME_TOKEN, isNativeWebEmbed, parseWebFrame } from "./webEmbed.ts";
 
 /**
  * v2 layout format: plain media embeds wrapped in HTML comments.
@@ -525,7 +525,8 @@ export function readMediaEmbeds(text: string, line: number): V2Embed[] {
     const parsed = match[1] !== undefined
       ? { syntax: "wiki" as const, ...parseWikiEmbed(match[1]) }
       : { syntax: "markdown" as const, ...parseMarkdownEmbed(match[2] ?? "", match[3] ?? "") };
-    const kind = mediaKindOf(parsed.target);
+    const kind = mediaKindOf(parsed.target)
+      ?? (parsed.syntax === "markdown" && isRemoteTarget(parsed.target) && httpUrl(parsed.target) ? "image" : null);
     if (kind) {
       const link = match[1]?.split("|")[0] ?? match[3]?.replace(/^<|>$/g, "") ?? "";
       const hash = link.indexOf("#");
