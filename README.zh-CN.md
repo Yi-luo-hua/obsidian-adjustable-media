@@ -8,7 +8,7 @@ Obsidian 图文布局插件：在实时预览中拖拽调整图片、视频、Me
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-最新版本：**[1.0.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [更新日志](CHANGELOG.md) · [功能示例](docs/examples/Guide.zh-CN.md) · [常见问题](docs/FAQ.md) · [文档索引](docs/README.md)
+最新版本：**[1.1.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [更新日志](CHANGELOG.md) · [功能示例](docs/examples/Guide.zh-CN.md) · [常见问题](docs/FAQ.md) · [文档索引](docs/README.md)
 
 ![Adjustable Media 效果预览](assets/demo.jpg)
 
@@ -34,7 +34,7 @@ Obsidian 图文布局插件：在实时预览中拖拽调整图片、视频、Me
 
 ### 创建布局块
 
-- **右键菜单**：在实时预览中右键独立图片、视频、Mermaid 图表、Excalidraw 预览、网页嵌入把手或顶层 Markdown 表格，选择 **包成布局块**。普通正文行里文字与图片混排时，只拆出点击的那张图片。
+- **右键菜单**：在实时预览中右键独立图片、视频、Mermaid 图表、Excalidraw 预览、网页嵌入把手或顶层 Markdown 表格，选择 **包成布局块**。Obsidian 1.6.0 或更新版本也支持右键包装 Markdown 外链图片，包括网址没有文件后缀的图片。普通正文行里文字与图片混排时，只拆出点击的那张图片。
 - **选区 / 命令**：选中几行内容后右键，或运行命令 **把选中的内容包成布局块**（默认不设快捷键，可在**设置 → 快捷键**绑定）。
 - **拖入已有布局**：把同笔记同窗格的独立图片、Mermaid、Excalidraw 把手或网页嵌入把手直接拖进已有布局块。触摸设备上长按独立 Mermaid 正文可拖动。
 - **自动转换（可选）**：在设置中开启「自动转换拖入或粘贴的图片、视频」，新拖入或粘贴的媒体会自动包成布局块。

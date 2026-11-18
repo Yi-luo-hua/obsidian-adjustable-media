@@ -8,7 +8,7 @@ An Obsidian plugin for arranging and resizing media and text in layout blocks, s
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-Latest release: **[1.0.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [Changelog](CHANGELOG.md) · [Feature examples](docs/examples/Guide.en.md) · [FAQ](docs/FAQ.md) · [Docs](docs/README.md)
+Latest release: **[1.1.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [Changelog](CHANGELOG.md) · [Feature examples](docs/examples/Guide.en.md) · [FAQ](docs/FAQ.md) · [Docs](docs/README.md)
 
 ![Adjustable Media Preview](assets/demo.jpg)
 
@@ -34,7 +34,7 @@ In Obsidian, run **Feature examples** from the command palette for an interactiv
 
 ### Creating a layout
 
-- **Context menu**: In Live Preview, right-click a standalone image, video, Mermaid diagram, Excalidraw drawing, web embed handle, or top-level Markdown table and select **Wrap in a layout**. If an image shares a normal paragraph line with text, only that image is wrapped.
+- **Context menu**: In Live Preview, right-click a standalone image, video, Mermaid diagram, Excalidraw drawing, web embed handle, or top-level Markdown table and select **Wrap in a layout**. This action supports remote Markdown images, including URLs without file extensions, on Obsidian 1.6.0 or later. If an image shares a normal paragraph line with text, only that image is wrapped.
 - **Selection / command**: Select lines and run **Wrap selection in a layout** from the right-click menu or command palette (no default hotkey; bind one in **Settings → Hotkeys**).
 - **Drag into a layout**: Drag standalone images, Mermaid diagrams, Excalidraw handles, or web embed handles from the same note and pane into an existing layout. On touch devices, long-press a standalone Mermaid diagram to drag.
 - **Auto-convert (optional)**: Enable **Convert dropped and pasted media** in settings to automatically wrap newly dropped or pasted images/videos.

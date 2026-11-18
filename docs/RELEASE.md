@@ -24,7 +24,7 @@ npm run release
 
 `npm run release` 会做生产构建，并在 `dist/adjustable-media/` 下生成 `main.js`、`manifest.json`、`styles.css`。不要附加额外文件，避免被社区目录审核标记。
 
-本地打包完成、推送标签、创建草稿和正式发布属于不同阶段：正式发布前 README 与 [项目状态](STATUS.md) 保持标注当前公开版本；发版后再同步更新，并在 `docs/releases/<版本>-readiness.md` 记录本次验证范围与附件校验值。当前公开版本为 **1.0.0**（见 [1.0.0 核验](releases/1.0.0-readiness.md)）。
+本地打包完成、推送标签、创建草稿和正式发布属于不同阶段：正式发布前 README 与 [项目状态](STATUS.md) 保持标注当前公开版本；发版后再同步更新，并在 `docs/releases/<版本>-readiness.md` 记录本次验证范围与附件校验值。当前公开版本为 **1.1.0**（见 [1.1.0 核验](releases/1.1.0-readiness.md)）。
 
 ## 3. 推送版本标签
 
