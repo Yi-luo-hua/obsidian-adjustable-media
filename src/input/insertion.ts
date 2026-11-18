@@ -1,4 +1,4 @@
-import { MAX_EMBEDS_PER_ROW, blockWrap, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, withRemoteImages, type V2Block, type V2Embed, type V2Meta } from "../format/v2.ts";
+import { MAX_EMBEDS_PER_ROW, blockWrap, findV2Blocks, hasSideText, readEmbedRow, serializeBlock, type V2Block, type V2Embed, type V2Meta } from "../format/v2.ts";
 import { isEditable, type LineChange } from "../layout/edits.ts";
 import { insertItem, metaFromModel, modelFromBlock, rowEmbeds, type LayoutModel } from "../layout/model.ts";
 import { scanMarkdownContainers, scanMarkdownLines } from "../markdown/lineContext.ts";
@@ -65,7 +65,7 @@ export function planWrap(lines: readonly string[], lineNumbers: readonly number[
   const meta: V2Meta = embeds.some(embed => embed.kind === "web")
     ? { version: 3, extra: { kind: "media" }, rows: rows.map(items => ({ items: items.length })) }
     : { rows: [], extra: {} };
-  return { from: first, to: last, replacement: serializeBlock(withRemoteImages(meta, embeds), rows) };
+  return { from: first, to: last, replacement: serializeBlock(meta, rows) };
 }
 
 function editableBlockRightAbove(blocks: readonly V2Block[], lines: readonly string[], first: number): V2Block | null {

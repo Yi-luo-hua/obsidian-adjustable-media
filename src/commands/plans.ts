@@ -1,4 +1,4 @@
-import { findV2Blocks, hasSideText, readEmbedRow, readMediaEmbeds, readStandaloneWebFrame, serializeBlock, withRemoteImages, MAX_EMBEDS_PER_ROW, type V2Block, type V2Meta } from "../format/v2.ts";
+import { findV2Blocks, hasSideText, markImageRow, readEmbedRow, readMediaEmbeds, readStandaloneWebFrame, serializeBlock, serializeRow, MAX_EMBEDS_PER_ROW, type V2Block, type V2Meta } from "../format/v2.ts";
 import { planWrap } from "../input/insertion.ts";
 import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
@@ -64,10 +64,13 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
   // as a row it would lose its indentation once rewritten, so it stays text, in a block of text.
   const columns = targets.some(isMedia) && !targets.some((line) => isMedia(line) && INDENTED.test(text(line)));
   const hasDiagram = fencedCodeBlocks(lines).some((fence) => fence.language === "mermaid" && fence.from >= first && fence.to <= last);
-  const rowItems = [...mediaRows.values()].flatMap(row => row ?? []);
+  const mediaBody = body.map((line, index) => {
+    const row = mediaRows.get(first + index);
+    return row && contexts[first + index] === "text" && !INDENTED.test(line) ? markImageRow(line, row) : line;
+  });
   const attempts = containedWeb ? [wrapLines(body, TEXT_META)] : [
-    ...(hasDiagram || hasWeb ? [wrapLines(body, withRemoteImages({ version: 3, rows: [], extra: { kind: "media" } }, rowItems))] : []),
-    ...(columns ? [wrapLines(body, withRemoteImages({ rows: [], extra: {} }, rowItems)), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)]),
+    ...(hasDiagram || hasWeb ? [wrapLines(mediaBody, { version: 3, rows: [], extra: { kind: "media" } })] : []),
+    ...(columns ? [wrapLines(mediaBody), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)]),
   ];
   for (const replacement of attempts) {
     const after = [...lines.slice(0, first), ...replacement, ...lines.slice(last + 1)];
@@ -115,7 +118,7 @@ export function planWrapImage(lines: readonly string[], line: number, column: nu
   const after = text.slice(embed.to);
   const replacement = [
     ...(before ? [before, ""] : []),
-    ...wrapLines([embed.raw], withRemoteImages({ rows: [], extra: {} }, [embed])),
+    ...wrapLines([serializeRow([embed])]),
     ...(after ? ["", after] : []),
   ];
   const result = findV2Blocks([...lines.slice(0, line), ...replacement, ...lines.slice(line + 1)]);
@@ -182,7 +185,6 @@ export function planMergeWithNext(lines: readonly string[], line: number): LineC
 function settingsKept(first: V2Block, next: V2Block): boolean {
   return Object.entries(next.meta.extra).every(([key, value]) =>
     (next.meta.version === 3 && key === "kind" && first.meta.extra.kind === undefined)
-    || (key === "remoteImages" && value === true)
     || JSON.stringify(first.meta.extra[key]) === JSON.stringify(value));
 }
 

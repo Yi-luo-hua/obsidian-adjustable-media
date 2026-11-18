@@ -6,6 +6,8 @@ import {
   isTextBlock,
   serializeBlock,
   serializeOpener,
+  stripImageRowMarker,
+  usesImageRowMarker,
   type TextSide,
   type V2Block,
   type V2Embed,
@@ -97,7 +99,7 @@ export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | n
 
 /** Multiline items and newly recognized images must read back with both text columns intact. */
 function modelReadsBack(block: V2Block, meta: V2Meta, embeds: ReadonlyArray<readonly V2Embed[]>, lines: string[]): boolean {
-  if (meta.version !== 3 && meta.extra.remoteImages !== true) return true;
+  if (meta.version !== 3 && !embeds.some(row => row.some(usesImageRowMarker))) return true;
   const [after, ...others] = findV2Blocks(lines);
   return after !== undefined && others.length === 0 && after.openLine === 0 && after.closeLine === lines.length - 1
     && after.meta.version === meta.version && isEditable(after) && sameRows(after, embeds)
@@ -204,9 +206,13 @@ export function onlyColumnTextDiffers(before: V2Block, after: V2Block, side: Tex
     && sameLines(textOf(after, side), withoutBlankEdges(lines));
 }
 
-/** Removes the two layout comments and leaves the body exactly as written. */
+/** Removes layout comments while retaining the original text and media embeds. */
 export function planUnwrap(block: V2Block): BlockEdit | null {
-  return isEditable(block) ? anchored(block, 0, block.lines.length - 1, block.lines.slice(1, -1)) : null;
+  if (!isEditable(block)) return null;
+  const marked = new Set(block.rows.flatMap(row => row.embeds.filter(usesImageRowMarker).map(embed => embed.line)));
+  const body = block.lines.slice(1, -1).map((line, index) =>
+    marked.has(block.openLine + index + 1) ? stripImageRowMarker(line) : line);
+  return anchored(block, 0, block.lines.length - 1, body);
 }
 
 /** Batch commands count and remove only layouts whose complete format can be edited. */

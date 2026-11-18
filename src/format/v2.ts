@@ -137,6 +137,8 @@ const CLOSE_PATTERN = /^<!-- \/vml -->[ \t]*$/;
 const EMBED_PATTERN = /!\[\[([^\]]+)\]\]|!\[([^\]]*)\]\(\s*(<[^>\n]*>|(?:[^()\s]|\([^()\s]*\))*)(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
 const SIZE_PATTERN = /^(\d+)(?:x\d+)?$/;
 const REMOTE_PATTERN = /^[a-z][a-z0-9+.-]*:\/\//i;
+const IMAGE_ROW_MARKER = " <!-- vml-image-row -->";
+const IMAGE_ROW_END = / <!-- vml-image-row -->[ \t]*$/;
 
 export function findV2Blocks(
   lines: readonly string[],
@@ -353,21 +355,27 @@ export function serializeOpener(meta: V2Meta): string {
 
 /** Row text made of the embeds' exact source, separated by single spaces. */
 export function serializeRow(embeds: readonly V2Embed[]): string {
-  return embeds.map((embed) => embed.raw).join(" ");
+  return markImageRow(embeds.map((embed) => embed.raw).join(" "), embeds);
 }
 
-/** Only opt in when the writer actually intends to store a newly recognized image as media. */
-export function withRemoteImages(meta: V2Meta, embeds: readonly V2Embed[]): V2Meta {
-  return meta.extra.remoteImages === true || !embeds.some(embed => embed.kind === "image"
-    && embed.syntax === "markdown" && isRemoteTarget(embed.target) && mediaKindOf(embed.target) === null)
-    ? meta
-    : { ...meta, extra: { ...meta.extra, remoteImages: true } };
+/** A row marker gives ambiguous image URLs a meaning without changing neighboring Markdown. */
+export function markImageRow(line: string, embeds: readonly V2Embed[]): string {
+  return embeds.some(usesImageRowMarker) ? line + IMAGE_ROW_MARKER : line;
+}
+
+export function usesImageRowMarker(embed: V2Embed): boolean {
+  return embed.kind === "image" && embed.syntax === "markdown"
+    && isRemoteTarget(embed.target) && mediaKindOf(embed.target) === null;
+}
+
+export function stripImageRowMarker(line: string): string {
+  return line.replace(IMAGE_ROW_END, "");
 }
 
 export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embed[]>): string[] {
   if (meta.version === 3) {
     return [serializeOpener(meta), ...rows.flatMap((row) => row.flatMap((item) =>
-      [...item.raw.split("\n"), ...(item.syntax === "iframe" ? [""] : [])])), CLOSE_LINE];
+      [...serializeRow([item]).split("\n"), ...(item.syntax === "iframe" ? [""] : [])])), CLOSE_LINE];
   }
   return [serializeOpener(meta), ...rows.map(serializeRow), CLOSE_LINE];
 }
@@ -414,7 +422,6 @@ function buildBlock(
       .map((fence) => [openLine + fence.from, openLine + fence.to])) : new Map<number, number>();
   // A block of text holds no rows: its media lines are text too.
   const allText = error === null && readBlockType(meta.extra.type) !== null;
-  const remoteImages = meta.extra.remoteImages === true;
   const rows: V2Row[] = [];
   const left: number[] = [];
   const right: number[] = [];
@@ -430,8 +437,9 @@ function buildBlock(
     const frame = !allText && meta.version === 3 && contexts[line] === "text" ? readStandaloneWebFrame(lines, line) : null;
     const diagramEnd = allText ? undefined : diagrams.get(line);
     const itemEnd = frame?.endLine ?? diagramEnd;
+    const rowText = stripImageRowMarker(text);
     const embeds: V2Embed[] | null = frame ? [frame] : diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
-      : contexts[line] === "text" && !allText ? readEmbedRow(text, line, remoteImages) : null;
+      : contexts[line] === "text" && !allText ? readEmbedRow(rowText, line, rowText !== text) : null;
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
     } else if (right.length > 0) {

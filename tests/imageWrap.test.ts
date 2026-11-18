@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { lineChangeEdit, planMergeWithNext, planWrapImage, planWrapSelection } from "../src/commands/plans.ts";
 import { findV2Blocks } from "../src/format/v2.ts";
-import { applyEditsToText, isEditable, planModelEdit } from "../src/layout/edits.ts";
+import { applyEditsToText, isEditable, planColumnText, planModelEdit, planUnwrap } from "../src/layout/edits.ts";
 import { insertItem, modelFromBlock } from "../src/layout/model.ts";
 import { takePlainEmbed } from "../src/layout/plainEmbed.ts";
 
@@ -43,7 +43,7 @@ test("the selection command puts extensionless HTTP images in a media row and pr
   const [block] = findV2Blocks(change.replacement);
   assert.deepEqual(block.rows.map(row => row.embeds.map(embed => [embed.kind, embed.raw])), [images.map(raw => ["image", raw])]);
   assert.equal(block.meta.extra.type, undefined);
-  assert.equal(block.meta.extra.remoteImages, true);
+  assert.deepEqual(planUnwrap(block)?.replacement, [images.join(" ")]);
   const [explicitText] = findV2Blocks(['<!-- vml {"v":2,"type":"text"} -->', ...images, "<!-- /vml -->"]);
   assert.equal(explicitText.rows.length, 0);
 });
@@ -63,7 +63,7 @@ test("legacy V2 and V3 layouts keep extensionless images in side text and preser
   }
 });
 
-test("moving an extensionless image adds the opt-in to its destination only when existing text still reads back", () => {
+test("a dropped extensionless image joins the row even when its exact source is also in a text column", () => {
   const taken = takePlainEmbed([remoteImage], 0, 0);
   assert.ok(taken);
   const target = { kind: "beside", position: { row: 0, index: 0 }, side: "before" } as const;
@@ -72,26 +72,48 @@ test("moving an extensionless image adds the opt-in to its destination only when
     const [block] = findV2Blocks(lines);
     const model = insertItem(modelFromBlock(block), { embed: taken.embed, weight: null, caption: null }, target);
     const edit = planModelEdit(block, model);
-    if (left.includes(remoteImage)) {
-      assert.equal(edit, null);
-      continue;
-    }
     assert.ok(edit);
     const [reread] = findV2Blocks(edit.replacement);
     assert.deepEqual(reread.leftText?.lines, left);
-    assert.equal(reread.meta.extra.remoteImages, true);
     assert.deepEqual(reread.rows[0].embeds.map(embed => embed.raw), [remoteImage, "![[local.png]]"]);
+    const newText = ["New paragraph", "", ...left, "", remoteImage];
+    const textEdit = planColumnText(reread, "left", newText.join("\n"));
+    assert.ok(textEdit.fits && textEdit.edit);
+    const updated = applyEditsToText(edit.replacement.join("\n"), [textEdit.edit]);
+    assert.ok(updated.ok);
+    const [after] = findV2Blocks(updated.text.split("\n"));
+    assert.deepEqual(after.leftText?.lines, newText);
+    assert.deepEqual(planUnwrap(after)?.replacement, [...newText, "", remoteImage + " ![[local.png]]"]);
   }
 });
 
-test("merging into an older media-only layout carries the remote image opt-in", () => {
+test("merging into an older media-only layout preserves the marked image row", () => {
   const remote = planWrapSelection([remoteImage], 0, 0);
   assert.ok(remote);
   const change = planMergeWithNext(["<!-- vml -->", "![[local.png]]", "<!-- /vml -->", "", ...remote.replacement], 1);
   assert.ok(change);
   const [block] = findV2Blocks(change.replacement);
-  assert.equal(block.meta.extra.remoteImages, true);
   assert.deepEqual(block.rows.flatMap(row => row.embeds.map(embed => embed.raw)), ["![[local.png]]", remoteImage]);
+});
+
+test("a V3 layout can group an extensionless image with a diagram and retain side text", () => {
+  const diagram = ["```mermaid", "graph LR", "```"];
+  const [block] = findV2Blocks([
+    '<!-- vml {"v":3,"kind":"media","rows":[{"items":1,"captions":["Diagram"]}]} -->',
+    remoteImage, "", ...diagram, "<!-- /vml -->",
+  ]);
+  const taken = takePlainEmbed([remoteImage], 0, 0);
+  assert.ok(taken);
+  const model = insertItem(modelFromBlock(block), { embed: taken.embed, weight: null, caption: null },
+    { kind: "beside", position: { row: 0, index: 0 }, side: "after" });
+  const edit = planModelEdit(block, model);
+  assert.ok(edit);
+  const [after] = findV2Blocks(edit.replacement);
+  assert.ok(isEditable(after));
+  assert.deepEqual(after.leftText?.lines, [remoteImage]);
+  assert.deepEqual(after.rows[0].embeds.map(embed => embed.raw), [diagram.join("\n"), remoteImage]);
+  assert.equal(modelFromBlock(after).rows[0].items[0].caption, "Diagram");
+  assert.deepEqual(planUnwrap(after)?.replacement, [remoteImage, "", ...diagram, remoteImage]);
 });
 
 test("image menu refuses non-text contexts, nested structures and existing layouts", () => {
