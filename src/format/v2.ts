@@ -356,6 +356,14 @@ export function serializeRow(embeds: readonly V2Embed[]): string {
   return embeds.map((embed) => embed.raw).join(" ");
 }
 
+/** Only opt in when the writer actually intends to store a newly recognized image as media. */
+export function withRemoteImages(meta: V2Meta, embeds: readonly V2Embed[]): V2Meta {
+  return meta.extra.remoteImages === true || !embeds.some(embed => embed.kind === "image"
+    && embed.syntax === "markdown" && isRemoteTarget(embed.target) && mediaKindOf(embed.target) === null)
+    ? meta
+    : { ...meta, extra: { ...meta.extra, remoteImages: true } };
+}
+
 export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embed[]>): string[] {
   if (meta.version === 3) {
     return [serializeOpener(meta), ...rows.flatMap((row) => row.flatMap((item) =>
@@ -406,6 +414,7 @@ function buildBlock(
       .map((fence) => [openLine + fence.from, openLine + fence.to])) : new Map<number, number>();
   // A block of text holds no rows: its media lines are text too.
   const allText = error === null && readBlockType(meta.extra.type) !== null;
+  const remoteImages = meta.extra.remoteImages === true;
   const rows: V2Row[] = [];
   const left: number[] = [];
   const right: number[] = [];
@@ -422,7 +431,7 @@ function buildBlock(
     const diagramEnd = allText ? undefined : diagrams.get(line);
     const itemEnd = frame?.endLine ?? diagramEnd;
     const embeds: V2Embed[] | null = frame ? [frame] : diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
-      : contexts[line] === "text" && !allText ? readEmbedRow(text, line) : null;
+      : contexts[line] === "text" && !allText ? readEmbedRow(text, line, remoteImages) : null;
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
     } else if (right.length > 0) {
@@ -500,8 +509,8 @@ export function blockWrap(block: V2Block): WrapSide | null {
 }
 
 /** Returns the embeds of a row, or null when the line holds anything but media embeds. */
-export function readEmbedRow(text: string, line: number): V2Embed[] | null {
-  const embeds = readMediaEmbeds(text, line);
+export function readEmbedRow(text: string, line: number, remoteImages = false): V2Embed[] | null {
+  const embeds = readMediaEmbeds(text, line, remoteImages);
   let cursor = 0;
   for (const embed of embeds) {
     if (text.slice(cursor, embed.from).trim() !== "") return null;
@@ -511,7 +520,7 @@ export function readEmbedRow(text: string, line: number): V2Embed[] | null {
 }
 
 /** Media tokens in source order, including those sharing a line with ordinary text. */
-export function readMediaEmbeds(text: string, line: number): V2Embed[] {
+export function readMediaEmbeds(text: string, line: number, remoteImages = false): V2Embed[] {
   const embeds: V2Embed[] = [];
   for (const match of text.matchAll(IFRAME_TOKEN)) {
     const frame = parseWebFrame(match[0]);
@@ -526,7 +535,7 @@ export function readMediaEmbeds(text: string, line: number): V2Embed[] {
       ? { syntax: "wiki" as const, ...parseWikiEmbed(match[1]) }
       : { syntax: "markdown" as const, ...parseMarkdownEmbed(match[2] ?? "", match[3] ?? "") };
     const kind = mediaKindOf(parsed.target)
-      ?? (parsed.syntax === "markdown" && isRemoteTarget(parsed.target) && httpUrl(parsed.target) ? "image" : null);
+      ?? (remoteImages && parsed.syntax === "markdown" && isRemoteTarget(parsed.target) && httpUrl(parsed.target) ? "image" : null);
     if (kind) {
       const link = match[1]?.split("|")[0] ?? match[3]?.replace(/^<|>$/g, "") ?? "";
       const hash = link.indexOf("#");

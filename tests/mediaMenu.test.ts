@@ -106,7 +106,9 @@ test("remote images add the wrapping action without a file-menu event", async ()
   assert.equal(host.writes.length, 0);
   host.menus[0].click();
   assert.equal(host.writes.length, 1);
-  assert.deepEqual(applyEditsToText(raw, host.writes[0].edits), { ok: true, text: ["<!-- vml -->", raw, "<!-- /vml -->"].join("\n") });
+  assert.deepEqual(applyEditsToText(raw, host.writes[0].edits), {
+    ok: true, text: ['<!-- vml {"v":2,"remoteImages":true} -->', raw, "<!-- /vml -->"].join("\n"),
+  });
 });
 
 test("an image menu wraps just the inline image and cancels if its source or widget changes", async () => {

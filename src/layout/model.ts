@@ -25,6 +25,7 @@ import {
   readTextColumns,
   readTextJustify,
   readTextSize,
+  withRemoteImages,
   type Align,
   type CaptionAlign,
   type CaptionScale,
@@ -218,7 +219,7 @@ export function canAddText(model: LayoutModel): boolean {
 export function metaFromModel(model: LayoutModel): V2Meta {
   const mediaItems = model.version === 3 || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid" || item.embed.kind === "web"));
   const { caption } = model;
-  return {
+  return withRemoteImages({
     ...(mediaItems ? { version: 3 as const } : {}),
     rows: model.rows.map((row) => {
       const single = row.items.length === 1;
@@ -272,7 +273,7 @@ export function metaFromModel(model: LayoutModel): V2Meta {
       } }),
       ...model.extra,
     },
-  };
+  }, rowEmbeds(model).flat());
 }
 
 export function rowEmbeds(model: LayoutModel): V2Embed[][] {

@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { lineChangeEdit, planWrapImage, planWrapSelection } from "../src/commands/plans.ts";
+import { lineChangeEdit, planMergeWithNext, planWrapImage, planWrapSelection } from "../src/commands/plans.ts";
 import { findV2Blocks } from "../src/format/v2.ts";
-import { applyEditsToText } from "../src/layout/edits.ts";
+import { applyEditsToText, isEditable, planModelEdit } from "../src/layout/edits.ts";
+import { insertItem, modelFromBlock } from "../src/layout/model.ts";
+import { takePlainEmbed } from "../src/layout/plainEmbed.ts";
 
 for (const [before, raw, after] of [
   ["输入几个字", "![[117436869_p0_master1200.jpg]]", ""],
@@ -41,8 +43,55 @@ test("the selection command puts extensionless HTTP images in a media row and pr
   const [block] = findV2Blocks(change.replacement);
   assert.deepEqual(block.rows.map(row => row.embeds.map(embed => [embed.kind, embed.raw])), [images.map(raw => ["image", raw])]);
   assert.equal(block.meta.extra.type, undefined);
+  assert.equal(block.meta.extra.remoteImages, true);
   const [explicitText] = findV2Blocks(['<!-- vml {"v":2,"type":"text"} -->', ...images, "<!-- /vml -->"]);
   assert.equal(explicitText.rows.length, 0);
+});
+
+const remoteImage = "![CDN](https://example.org/image/id?width=120)";
+
+test("legacy V2 and V3 layouts keep extensionless images in side text and preserve row settings", () => {
+  for (const { opener, rows } of [
+    { opener: '<!-- vml {"v":2,"rows":[{"captions":["Local"]}]} -->', rows: ["![[local.png]]"] },
+    { opener: '<!-- vml {"v":3,"kind":"media","rows":[{"items":1,"captions":["Diagram"]}]} -->', rows: ["```mermaid", "graph LR", "```"] },
+  ]) {
+    const [block] = findV2Blocks([opener, remoteImage, "Side text", "", ...rows, "<!-- /vml -->"]);
+    assert.ok(isEditable(block));
+    assert.deepEqual(block.leftText?.lines, [remoteImage, "Side text"]);
+    assert.deepEqual(block.rows.map(row => row.embeds.map(embed => embed.raw)), [[rows.join("\n")]]);
+    assert.equal(modelFromBlock(block).rows[0].items[0].caption, rows.length === 1 ? "Local" : "Diagram");
+  }
+});
+
+test("moving an extensionless image adds the opt-in to its destination only when existing text still reads back", () => {
+  const taken = takePlainEmbed([remoteImage], 0, 0);
+  assert.ok(taken);
+  const target = { kind: "beside", position: { row: 0, index: 0 }, side: "before" } as const;
+  for (const left of [["Side text"], [remoteImage, "Side text"]]) {
+    const lines = ["<!-- vml -->", ...left, "", "![[local.png]]", "<!-- /vml -->"];
+    const [block] = findV2Blocks(lines);
+    const model = insertItem(modelFromBlock(block), { embed: taken.embed, weight: null, caption: null }, target);
+    const edit = planModelEdit(block, model);
+    if (left.includes(remoteImage)) {
+      assert.equal(edit, null);
+      continue;
+    }
+    assert.ok(edit);
+    const [reread] = findV2Blocks(edit.replacement);
+    assert.deepEqual(reread.leftText?.lines, left);
+    assert.equal(reread.meta.extra.remoteImages, true);
+    assert.deepEqual(reread.rows[0].embeds.map(embed => embed.raw), [remoteImage, "![[local.png]]"]);
+  }
+});
+
+test("merging into an older media-only layout carries the remote image opt-in", () => {
+  const remote = planWrapSelection([remoteImage], 0, 0);
+  assert.ok(remote);
+  const change = planMergeWithNext(["<!-- vml -->", "![[local.png]]", "<!-- /vml -->", "", ...remote.replacement], 1);
+  assert.ok(change);
+  const [block] = findV2Blocks(change.replacement);
+  assert.equal(block.meta.extra.remoteImages, true);
+  assert.deepEqual(block.rows.flatMap(row => row.embeds.map(embed => embed.raw)), ["![[local.png]]", remoteImage]);
 });
 
 test("image menu refuses non-text contexts, nested structures and existing layouts", () => {

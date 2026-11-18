@@ -1,4 +1,4 @@
-import { findV2Blocks, hasSideText, readEmbedRow, readMediaEmbeds, readStandaloneWebFrame, serializeBlock, MAX_EMBEDS_PER_ROW, type V2Block, type V2Meta } from "../format/v2.ts";
+import { findV2Blocks, hasSideText, readEmbedRow, readMediaEmbeds, readStandaloneWebFrame, serializeBlock, withRemoteImages, MAX_EMBEDS_PER_ROW, type V2Block, type V2Meta } from "../format/v2.ts";
 import { planWrap } from "../input/insertion.ts";
 import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
@@ -28,7 +28,8 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
     return null;
   }
   const text = (line: number): string => stripCarriageReturn(lines[line] ?? "");
-  const isMedia = (line: number): boolean => readEmbedRow(text(line), line) !== null;
+  const mediaRows = new Map(targets.map(line => [line, readEmbedRow(text(line), line, true)]));
+  const isMedia = (line: number): boolean => mediaRows.get(line) != null;
   // An indented first line belongs to the list item or indented code block above it: a block
   // starting there would take it out of the list, and code would read as layout text or rows.
   if (INDENTED.test(text(first))) {
@@ -63,9 +64,10 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
   // as a row it would lose its indentation once rewritten, so it stays text, in a block of text.
   const columns = targets.some(isMedia) && !targets.some((line) => isMedia(line) && INDENTED.test(text(line)));
   const hasDiagram = fencedCodeBlocks(lines).some((fence) => fence.language === "mermaid" && fence.from >= first && fence.to <= last);
+  const rowItems = [...mediaRows.values()].flatMap(row => row ?? []);
   const attempts = containedWeb ? [wrapLines(body, TEXT_META)] : [
-    ...(hasDiagram || hasWeb ? [wrapLines(body, { version: 3, rows: [], extra: { kind: "media" } })] : []),
-    ...(columns ? [wrapLines(body), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)]),
+    ...(hasDiagram || hasWeb ? [wrapLines(body, withRemoteImages({ version: 3, rows: [], extra: { kind: "media" } }, rowItems))] : []),
+    ...(columns ? [wrapLines(body, withRemoteImages({ rows: [], extra: {} }, rowItems)), wrapLines(body, TEXT_META)] : [wrapLines(body, TEXT_META)]),
   ];
   for (const replacement of attempts) {
     const after = [...lines.slice(0, first), ...replacement, ...lines.slice(last + 1)];
@@ -103,17 +105,17 @@ export function planWrapImage(lines: readonly string[], line: number, column: nu
   const blocks = findV2Blocks(lines, contexts);
   if (contexts[line] !== "text" || INDENTED.test(text)
     || blocks.some(block => block.openLine <= line && line <= block.closeLine)) return null;
-  const embed = readMediaEmbeds(text, line).find(item => item.from <= column && column < item.to);
+  const embed = readMediaEmbeds(text, line, true).find(item => item.from <= column && column < item.to);
   if (!embed) return null;
   // Retain the existing behaviour for a row consisting entirely of media.
-  if (readEmbedRow(text, line)) return planWrapSelection(lines, line, line);
+  if (readEmbedRow(text, line, true)) return planWrapSelection(lines, line, line);
   // A block-level layout cannot split a heading, list item or quoted paragraph.
   if (/^(?:>|#{1,6}(?:\s|$)|(?:[-*+]|\d+[.)])[ \t]|\|)/.test(text)) return null;
   const before = text.slice(0, embed.from);
   const after = text.slice(embed.to);
   const replacement = [
     ...(before ? [before, ""] : []),
-    ...wrapLines([embed.raw]),
+    ...wrapLines([embed.raw], withRemoteImages({ rows: [], extra: {} }, [embed])),
     ...(after ? ["", after] : []),
   ];
   const result = findV2Blocks([...lines.slice(0, line), ...replacement, ...lines.slice(line + 1)]);
@@ -180,6 +182,7 @@ export function planMergeWithNext(lines: readonly string[], line: number): LineC
 function settingsKept(first: V2Block, next: V2Block): boolean {
   return Object.entries(next.meta.extra).every(([key, value]) =>
     (next.meta.version === 3 && key === "kind" && first.meta.extra.kind === undefined)
+    || (key === "remoteImages" && value === true)
     || JSON.stringify(first.meta.extra[key]) === JSON.stringify(value));
 }
 

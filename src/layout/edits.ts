@@ -95,12 +95,12 @@ export function planModelEdit(block: V2Block, model: LayoutModel): BlockEdit | n
   return modelReadsBack(block, meta, embeds, replacement) ? anchored(block, 0, lastLine, replacement) : null;
 }
 
-/** Multiline items must survive serialization as whole items, with both text columns intact. */
+/** Multiline items and newly recognized images must read back with both text columns intact. */
 function modelReadsBack(block: V2Block, meta: V2Meta, embeds: ReadonlyArray<readonly V2Embed[]>, lines: string[]): boolean {
-  if (meta.version !== 3) return true;
+  if (meta.version !== 3 && meta.extra.remoteImages !== true) return true;
   const [after, ...others] = findV2Blocks(lines);
   return after !== undefined && others.length === 0 && after.openLine === 0 && after.closeLine === lines.length - 1
-    && after.meta.version === 3 && isEditable(after) && sameRows(after, embeds)
+    && after.meta.version === meta.version && isEditable(after) && sameRows(after, embeds)
     && sameLines(textOf(after, "left"), textOf(block, "left"))
     && sameLines(textOf(after, "right"), textOf(block, "right"));
 }

@@ -165,7 +165,7 @@ export function autoConvert(plugin: Plugin, enabled: () => boolean): Extension {
       tr.changes.iterChanges((_fromA, _toA, fromB, _toB, inserted) => {
         let offset = fromB;
         for (const text of inserted.toString().split("\n")) {
-          const embeds = text.trim() === "" ? null : readEmbedRow(text, 0);
+          const embeds = text.trim() === "" ? null : readEmbedRow(text, 0, true);
           if (embeds) {
             entry.positions.push(offset);
             entry.seen += embeds.length;
