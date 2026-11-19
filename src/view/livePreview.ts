@@ -10,7 +10,6 @@ import { isEditable } from "../layout/edits.ts";
 import { documentSnapshot, editorDocumentOrigin, rememberDocumentSnapshot, snapshotForState, type BlockRef, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { changesMayAdd } from "../layout/changeScan.ts";
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
-import { layoutStacks, type LayoutStack } from "../layout/layoutStack.ts";
 import { PaneMeasurements, ViewProjection } from "../layout/viewProjection.ts";
 import { modelFromBlock, onlySizingDiffers } from "../layout/model.ts";
 import { mayHaveRefs } from "../markdown/crossref.ts";
@@ -20,7 +19,6 @@ import { setUpBlockMove } from "./blockDrag.ts";
 import { refContextOf, type RefContext } from "./crossrefView.ts";
 import { attachInteractions, refreshSizingHandles, type LayoutContext } from "./interactions.ts";
 import { applySizing, layoutIsRendered, renderLayout } from "./layoutView.ts";
-import { renderLayoutStack } from "./layoutStackView.ts";
 import { layoutHistory } from "./layoutHistory.ts";
 import { blockWarning, t } from "./messages.ts";
 import { isEditingText, keepWhileEditing, startTextEdit, stopTextEdit, type TextEditHost } from "./textEditing.ts";
@@ -94,7 +92,6 @@ interface Parsed extends Measurements {
   buffer: object | undefined;
   snapshot: DocumentSnapshot | null;
   blocks: V2Block[];
-  stacks: LayoutStack[];
   lines: string[];
   /** Each block's spacer skip, found once per parse: cursor moves redraw decorations, not these. */
   skips: Array<number | null>;
@@ -316,13 +313,13 @@ function parse(app: App, state: EditorState, previous: DocumentSnapshot | null =
   const measurements = { heights: new PaneMeasurements<number>(), environmentEpoch: 0, environmentSpec: PENDING_ENVIRONMENT };
   const buffer = editorOfInfo(state.field(editorInfoField, false));
   if (!state.field(editorLivePreviewField, false)) {
-    return { buffer, blocks: [], stacks: [], lines: [], skips: [], breaks: emptySpacing.breaks, spacing: emptySpacing, refs: undefined, snapshot: null, ...measurements };
+    return { buffer, blocks: [], lines: [], skips: [], breaks: emptySpacing.breaks, spacing: emptySpacing, refs: undefined, snapshot: null, ...measurements };
   }
   // Runs on every change of a note with layouts; one without them is only read in full when a change
   // may have written an opening comment (the field's update).
   const text = state.doc.toString();
   if (!text.includes(OPENING)) {
-    return { buffer, blocks: [], stacks: [], lines: [], skips: [], breaks: emptySpacing.breaks, spacing: emptySpacing, refs: undefined, snapshot: null, ...measurements };
+    return { buffer, blocks: [], lines: [], skips: [], breaks: emptySpacing.breaks, spacing: emptySpacing, refs: undefined, snapshot: null, ...measurements };
   }
   const info = state.field(editorInfoField, false);
   const origin = editorDocumentOrigin(info?.file ?? fileOfEditor(app, buffer), buffer, previous?.origin);
@@ -330,7 +327,7 @@ function parse(app: App, state: EditorState, previous: DocumentSnapshot | null =
   const blocks = snapshot.blocks.map(ref => ref.block);
   const lines = [...snapshot.lines];
   const spacing = blocks.some(isDrawable) ? estimateParagraphSpacing(lines, breakBlocks(blocks)) : emptySpacing;
-  return { buffer, snapshot, blocks, stacks: layoutStacks(lines, blocks), lines, skips: effectiveWrapSkips(lines, blocks), breaks: spacing.breaks, spacing,
+  return { buffer, snapshot, blocks, lines, skips: effectiveWrapSkips(lines, blocks), breaks: spacing.breaks, spacing,
     refs: mayHaveRefs(text) ? refContextOf(text) : undefined, ...measurements };
 }
 
@@ -344,7 +341,7 @@ function userPlaced(tr: Transaction): boolean {
 }
 
 function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCursor: boolean): LivePreviewState {
-  const { blocks, stacks, lines, refs, snapshot, skips } = parsed;
+  const { blocks, lines, refs, snapshot, skips } = parsed;
   // The numbering the layouts are drawn with, as their own widgets' keys hold it.
   const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
   rememberDocumentSnapshot(state, snapshot);
@@ -357,23 +354,8 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     && (placedCursor || !range.empty || range.head > 0);
   let hasWraps = false;
 
-  const grouped = new Set<V2Block>();
-  for (const stack of stacks) {
-    stack.members.forEach(block => grouped.add(block));
-    const from = state.doc.line(stack.openLine + 1).from;
-    const to = state.doc.line(stack.closeLine + 1).to;
-    if (state.selection.ranges.some(range => touches(range, from, to))) {
-      for (let line = stack.openLine; line <= stack.closeLine; line += 1) {
-        ranges.push(Decoration.line({ class: "vml-source-line" }).range(state.doc.line(line + 1).from));
-      }
-    } else {
-      const widget = new StackWidget(stack, app, sourcePath, refs, parsed, blankEdges(lines, stack));
-      ranges.push(Decoration.replace({ block: true, widget }).range(from, to));
-    }
-  }
-
   for (const [index, block] of blocks.entries()) {
-    if (grouped.has(block) || !isDrawable(block)) {
+    if (!isDrawable(block)) {
       continue;
     }
     const from = state.doc.line(block.openLine + 1).from;
@@ -452,7 +434,7 @@ interface BlankEdges {
   below: boolean;
 }
 
-function blankEdges(lines: readonly string[], block: Pick<V2Block, "openLine" | "closeLine">): BlankEdges {
+function blankEdges(lines: readonly string[], block: V2Block): BlankEdges {
   return { above: block.openLine === 0 || lines[block.openLine - 1]?.trim() === "", below: lines[block.closeLine + 1]?.trim() === "" };
 }
 
@@ -501,49 +483,6 @@ function watchHeight(el: HTMLElement, keys: readonly string[], heights: PaneMeas
   });
   watcher.observe(el);
   heightWatchers.set(el, watcher);
-}
-
-class StackWidget extends WidgetType {
-  private readonly key: string;
-  private readonly heightKey: string;
-  private readonly placeKey: string;
-  private readonly epoch: number;
-  private readonly heights: PaneMeasurements<number>;
-  constructor(private readonly stack: LayoutStack, private readonly app: App, private readonly sourcePath: string,
-    private readonly refs: RefContext | undefined, measurements: Measurements, private readonly edges: BlankEdges) {
-    super();
-    this.heights = measurements.heights;
-    this.epoch = this.heights.environmentEpoch;
-    const content = stack.lines.join("\n");
-    const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
-    const identity = `stack:${sourcePath}:${stack.id}`;
-    this.heightKey = this.heights.key(identity, 0, content + "\n" + numbers, "live");
-    this.placeKey = this.heights.key(identity, 0, numbers + ":stack", "live");
-    this.key = JSON.stringify([this.heightKey, stack.openLine, stack.members.map(blockIdentity), edges]);
-  }
-
-  override eq(other: StackWidget): boolean { return this.key === other.key; }
-  override get estimatedHeight(): number { return this.heights.get(this.heightKey) ?? this.heights.get(this.placeKey) ?? -1; }
-  override ignoreEvent(): boolean { return true; }
-
-  toDOM(view: EditorView): HTMLElement {
-    const el = createDiv({ cls: "vml-live-preview" });
-    const component = new Component();
-    component.load();
-    components.set(el, component);
-    renderLayoutStack(el, this.stack, { app: this.app, sourcePath: this.sourcePath, component, refs: this.refs, view });
-    applyBlankEdges(el, this.edges);
-    guardWidgetWhitespace(el);
-    watchHeight(el, [this.heightKey, this.placeKey], this.heights, () => el.isConnected && this.epoch === this.heights.environmentEpoch);
-    return el;
-  }
-
-  override destroy(dom: HTMLElement): void {
-    heightWatchers.get(dom)?.disconnect();
-    heightWatchers.delete(dom);
-    components.get(dom)?.unload();
-    components.delete(dom);
-  }
 }
 
 class LayoutWidget extends WidgetType {

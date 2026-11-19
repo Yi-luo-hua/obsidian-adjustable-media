@@ -130,7 +130,7 @@ export function pickGap(gaps: readonly GapTop[], y: number, wrapped: boolean): G
 }
 
 /** Whether putting `block` in front of `line` leaves it where it is. */
-export function isSamePlace(lines: readonly string[], block: Pick<V2Block, "openLine" | "closeLine">, line: number): boolean {
+export function isSamePlace(lines: readonly string[], block: V2Block, line: number): boolean {
   if (line === block.openLine) {
     return true;
   }
@@ -260,16 +260,10 @@ export function planPlacement(lines: readonly string[], block: V2Block, placemen
 
   // Unchanged settings keep the opening comment exactly as the user wrote it.
   const moved = [openerFor(block, model), ...block.lines.slice(1)];
+  const removal: BlockEdit = { anchorLine: block.openLine, anchorLines: block.lines, start: 0, end: block.lines.length - 1, replacement: [] };
   // The neighbor crossed upward keeps its height by carrying its pinned opening line as the target.
   const target = before && beforeModel && ordered.line === before.openLine ? openerFor(before, beforeModel) : undefined;
-  return [...planRangeMove(lines, block, ordered.line, moved, model.wrap !== null, target), ...(afterEdit ? [afterEdit] : [])];
-}
-
-/** Moves a previously validated source range to a previously selected gap. */
-export function planRangeMove(lines: readonly string[], range: Pick<V2Block, "openLine" | "lines">,
-  line: number, moved: readonly string[] = range.lines, glued = false, target?: string): BlockEdit[] {
-  return [{ anchorLine: range.openLine, anchorLines: range.lines, start: 0, end: range.lines.length - 1, replacement: [] },
-    insertion(lines, line, moved, glued, target)];
+  return [removal, insertion(lines, ordered.line, moved, model.wrap !== null, target), ...(afterEdit ? [afterEdit] : [])];
 }
 
 /** The opening comment `block` gets once its settings read as `model`; unchanged settings keep it verbatim. */

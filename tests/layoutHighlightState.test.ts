@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as stateApi from "@codemirror/state";
 import * as viewApi from "@codemirror/view";
-import * as stacks from "../src/layout/layoutStack.ts";
 import * as format from "../src/format/v2.ts";
 import * as edits from "../src/layout/edits.ts";
 import * as snapshots from "../src/layout/documentSnapshot.ts";
@@ -28,7 +27,6 @@ test("source hints follow caret heads and pane focus while toggles preserve widg
     obsidian: { editorInfoField: info, editorLivePreviewField: preview }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/blockIdentity.ts": identity, "../layout/cursorHighlight.ts": cursor, "../layout/changeScan.ts": scan,
-    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floats, "../layout/viewProjection.ts": projections, "../layout/model.ts": model,
     "../markdown/crossref.ts": crossref,
     "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,

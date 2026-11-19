@@ -1,5 +1,4 @@
 import { findV2Blocks, isDrawable } from "../format/v2.ts";
-import { layoutStacks } from "../layout/layoutStack.ts";
 
 /** What a top-level element of the export is, as far as page breaks go. */
 export type PrintElementKind = "heading" | "float" | "other";
@@ -16,17 +15,11 @@ export function keepWithNext(kinds: readonly PrintElementKind[]): boolean[] {
 /** Only the export copy gets placeholders; the vault's Markdown is never rewritten. */
 export function printPlan(text: string, token: string) {
   const lines = text.split("\n");
-  const parsed = findV2Blocks(lines);
-  const blocks = parsed.filter(isDrawable);
-  const stacks = layoutStacks(lines, parsed);
-  const starts = new Map(stacks.map(stack => [stack.openLine, stack]));
-  const covered = new Set(stacks.map(stack => stack.members[1].openLine));
+  const blocks = findV2Blocks(lines).filter(isDrawable);
   for (let index = blocks.length - 1; index >= 0; index -= 1) {
     const block = blocks[index];
-    if (covered.has(block.openLine)) continue;
-    const end = starts.get(block.openLine)?.closeLine ?? block.closeLine;
-    lines.splice(block.openLine, end - block.openLine + 1,
+    lines.splice(block.openLine, block.closeLine - block.openLine + 1,
       "", `<div data-vml-print="${token}-${index}"></div>`, "");
   }
-  return { markdown: lines.join("\n"), blocks, ...(stacks.length ? { stacks } : {}) };
+  return { markdown: lines.join("\n"), blocks };
 }

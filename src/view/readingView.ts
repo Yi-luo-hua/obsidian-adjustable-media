@@ -5,11 +5,9 @@ import { canvasPreviewHosts, isCanvasPreview, type PreviewHost } from "./canvas.
 import { documentSnapshot, type DocumentSnapshot } from "../layout/documentSnapshot.ts";
 import { drawnFrom, drawsInOpeningSection, isStale, type Drawn } from "../layout/drawn.ts";
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
-import { layoutStacks, type LayoutStack } from "../layout/layoutStack.ts";
 import { modelFromBlock } from "../layout/model.ts";
 import { ViewProjection, type SourceCoverage } from "../layout/viewProjection.ts";
 import { layoutIsRendered, layoutRenderState, renderLayout } from "./layoutView.ts";
-import { renderLayoutStack } from "./layoutStackView.ts";
 import { refContextOf, numbered, markCaptions, type RefContext } from "./crossrefView.ts";
 import { blockWarning } from "./messages.ts";
 import { sectionNoteText } from "./noteText.ts";
@@ -36,7 +34,6 @@ interface Parsed {
   lines: string[];
   offsets: number[];
   blocks: V2Block[];
-  stacks: LayoutStack[];
   /** Each block's spacer skip, found once per parse instead of once per section. */
   skips: Array<number | null>;
   drawn: Drawn;
@@ -130,8 +127,7 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
     const blocks = snapshot.blocks.map(ref => ref.block);
     const floatEnds = new Set(blocks.filter(block => isDrawable(block) && blockWrap(block) !== null).map(block => block.closeLine));
     const refs = blocks.length > 0 ? refContextOf(text) : undefined;
-    return { snapshot, lines, offsets, blocks, stacks: layoutStacks(lines, blocks),
-      skips: effectiveWrapSkips(lines, blocks), refs, drawn: drawnFrom(blocks, numbersOf(refs), lines),
+    return { snapshot, lines, offsets, blocks, skips: effectiveWrapSkips(lines, blocks), refs, drawn: drawnFrom(blocks, numbersOf(refs), lines),
       wrapped: floatEnds.size > 0, blankExtras: readingBlankExtras(lines, blocks, floatEnds) };
   };
 
@@ -368,8 +364,7 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
     releaseSection(reader, el);
     const { blocks, skips, refs, wrapped, snapshot } = reader.parsed;
     const block = sectionBlock(blocks, info);
-    const stack = sectionStack(reader.parsed.stacks, info);
-    if (blocks.some(isDrawable) && !block && !stack) {
+    if (blocks.some(isDrawable) && !block) {
       const child = ownChild(reader, el, ctx);
       child.register(alignParagraphWhitespace(el));
       child.register(alignReadingQuote(el, reader.parsed.lines, info.lineStart, info.lineEnd,
@@ -382,13 +377,7 @@ export function registerReadingView(plugin: Plugin, showLayoutHighlight: () => b
     const opening = block?.openLine === info.lineStart && info.lineStart === info.lineEnd;
     const token = crypto.randomUUID();
     const webPlan = webSectionPlan(reader.parsed.lines, blocks, info.lineStart, info.lineEnd, token);
-    if (stack) {
-      el.empty();
-      if (info.lineStart === stack.openLine) {
-        const child = ownChild(reader, el, ctx);
-        renderLayoutStack(el, stack, { app: plugin.app, sourcePath: snapshot.origin.path, component: child, refs });
-      }
-    } else if (webPlan) {
+    if (webPlan) {
       el.empty();
       if (webPlan.markdown.trim()) {
         const content = el.createDiv(), child = ownChild(reader, el, ctx, content);
@@ -612,13 +601,7 @@ function sectionRows(block: V2Block, info: MarkdownSectionInformation): number[]
   return block.rows.flatMap((row, index) => row.line >= info.lineStart && row.line <= info.lineEnd ? [index] : []);
 }
 
-function sectionStack(stacks: readonly LayoutStack[], info: MarkdownSectionInformation): LayoutStack | undefined {
-  return stacks.find(stack => info.lineStart >= stack.openLine && info.lineEnd <= stack.closeLine);
-}
-
 function sectionLayoutKey(parsed: Parsed, info: MarkdownSectionInformation): string {
-  const stack = sectionStack(parsed.stacks, info);
-  if (stack) return info.lineStart === stack.openLine ? stack.lines.join("\n") : "stack-member-section";
   const block = sectionBlock(parsed.blocks, info);
   if (!block || !isDrawable(block)) return "";
   const rows = drawsInOpeningSection(block) ? info.lineStart === block.openLine ? "whole" : "hidden" : sectionRows(block, info);

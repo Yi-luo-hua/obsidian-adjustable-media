@@ -1,6 +1,5 @@
 import { mockedModule } from "./mockedModule.ts";
 
-import * as stacks from "../../src/layout/layoutStack.ts";
 import * as format from "../../src/format/v2.ts";
 import * as snapshots from "../../src/layout/documentSnapshot.ts";
 import * as drawn from "../../src/layout/drawn.ts";
@@ -113,7 +112,6 @@ export async function readingViewHarness(initialText: string, startup = true, in
     "../markdown/readingSpacing.ts": readingSpacing,
     "../layout/documentSnapshot.ts": snapshots,
     "../layout/drawn.ts": drawn,
-    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floatOrder,
     "../layout/model.ts": model,
     "../layout/viewProjection.ts": { ...projections, ViewProjection: TrackedProjection },

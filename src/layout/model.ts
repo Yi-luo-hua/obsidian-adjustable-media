@@ -11,7 +11,6 @@ import {
   MAX_TEXT_SIZE,
   MIN_ROW_HEIGHT,
   MIN_TEXT_SIZE,
-  STACK_MEMBER_KIND,
   hasTextColumns as blockHasTextColumns,
   readBlockAlign,
   readBlockCaption,
@@ -217,11 +216,10 @@ export function canAddText(model: LayoutModel): boolean {
 }
 
 export function metaFromModel(model: LayoutModel): V2Meta {
-  const mediaItems = (model.version === 3 && model.extra.kind !== STACK_MEMBER_KIND)
-    || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid" || item.embed.kind === "web"));
+  const mediaItems = model.version === 3 || model.rows.some((row) => row.items.some((item) => item.embed.kind === "mermaid" || item.embed.kind === "web"));
   const { caption } = model;
   return {
-    ...(mediaItems || model.version === 3 ? { version: 3 as const } : {}),
+    ...(mediaItems ? { version: 3 as const } : {}),
     rows: model.rows.map((row) => {
       const single = row.items.length === 1;
       const meta: V2RowMeta = { ...row.extra };

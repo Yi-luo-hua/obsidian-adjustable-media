@@ -4,10 +4,6 @@ import type { V2Block } from "../format/v2.ts";
 
 // UI text follows Obsidian's language: Chinese for zh locales, English otherwise.
 const MESSAGES = {
-  moveStack: { zh: "移动布局组", en: "Move layout group" },
-  resizeStack: { zh: "调整布局组宽度", en: "Resize layout group" },
-  swapStackMembers: { zh: "交换两个子块", en: "Swap the two layouts" },
-  dissolveStack: { zh: "解散布局组", en: "Dissolve layout group" },
   webEmbed: { zh: "网页嵌入", en: "Web embed" },
   webEmbedActions: { zh: "网页嵌入：点击打开菜单，拖动加入布局", en: "Web embed: click for menu, drag into a layout" },
   webLayoutActions: { zh: "网页组件：拖动调整位置，点击或右键打开菜单移出布局", en: "Web component: drag to move, click or right-click for the menu to move out of the layout" },

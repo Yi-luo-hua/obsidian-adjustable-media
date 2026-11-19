@@ -525,37 +525,6 @@
   margin: 0;
 }
 
-.vml-stack {
-  border: 1px solid var(--background-modifier-border-hover);
-  border-radius: 12px;
-  box-sizing: border-box;
-  margin: 0.75em 0;
-  margin-left: calc((100% - var(--vml-stack-width)) * var(--vml-preview-frame-offset, var(--vml-stack-offset)));
-  padding: 14px;
-  position: relative;
-  width: var(--vml-stack-width);
-}
-
-.vml-live-preview > .vml-stack {
-  margin-block: 0;
-}
-
-.vml-stack__members {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.vml-stack__members > .vml-layout {
-  margin-block: 0;
-  outline: 1px solid var(--background-modifier-border);
-  padding-inline: 8px;
-}
-
-.vml-stack--interactive:hover > .vml-handle {
-  opacity: 1;
-}
-
 /* The glowing frame uses an outline so it does not change layout geometry. */
 @media screen {
   .vml-live-preview .vml-layout,
