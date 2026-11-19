@@ -7,6 +7,7 @@ import { positionOffset, wrapZone, wrappedDrop } from "../layout/geometry.ts";
 import { visualWrapSkip } from "../layout/floatOrder.ts";
 import { effectiveFrameWidth, effectiveWidth, frameOffset, hasTextColumns, setFramePosition, setWrap } from "../layout/model.ts";
 import { blockForMove, isSamePlace, moveGaps, pickGap, placeAboveEarlierFloats, planPlacement, type GapTop, type Placement } from "../layout/placement.ts";
+import { insideStack, layoutStacks, planStackMove, planStackSizing, type LayoutStack } from "../layout/layoutStack.ts";
 import { createDragGhost } from "./dragGhost.ts";
 import { DRAG_THRESHOLD, commitEdits, swallowNextClick, type LayoutContext } from "./interactions.ts";
 import { t } from "./messages.ts";
@@ -29,8 +30,8 @@ interface DropIndicator {
  * The top grip moves the whole block. A narrow non-floating frame can slide across its own line
  * when the drag starts horizontally. Other drags use the existing paragraph and wrap targets.
  */
-export function setUpBlockMove(root: HTMLElement, context: LayoutContext): void {
-  const handle = root.createDiv({ cls: "vml-handle vml-frame__move", attr: { "aria-label": t("moveLayout"), role: "button" } });
+export function setUpBlockMove(root: HTMLElement, context: LayoutContext, stack?: LayoutStack): void {
+  const handle = root.createDiv({ cls: "vml-handle vml-frame__move", attr: { "aria-label": t(stack ? "moveStack" : "moveLayout"), role: "button" } });
   setIcon(handle, "grip-horizontal");
   handle.addEventListener("pointerdown", (event) => {
     // CodeMirror finds a view from its outer element only.
@@ -41,11 +42,11 @@ export function setUpBlockMove(root: HTMLElement, context: LayoutContext): void 
     }
     event.preventDefault();
     event.stopPropagation();
-    startMove(view, root, context, event);
+    startMove(view, root, context, event, stack);
   });
 }
 
-function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, start: PointerEvent): void {
+function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, start: PointerEvent, expectedStack?: LayoutStack): void {
   const doc = root.ownerDocument;
   const win = doc.defaultView ?? window;
   const text = view.state.doc.toString();
@@ -54,15 +55,22 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
   const widget = root.closest<HTMLElement>(".vml-live-preview");
   const at = context.position?.() ?? (widget ? view.posAtDOM(widget) : null);
   const line = at === null ? context.block.openLine : view.state.doc.lineAt(at).number - 1;
-  const block = blockForMove(lines, context.block, line);
+  const movingBlocks = findV2Blocks(lines);
+  const stacks = layoutStacks(lines, movingBlocks);
+  const stack = expectedStack && stacks.find(candidate => candidate.openLine === expectedStack.openLine
+    && candidate.lines.join("\n") === expectedStack.lines.join("\n"));
+  if (expectedStack && !stack) {
+    new Notice(t("writeNotFound"));
+    return;
+  }
+  const block = stack?.members[0] ?? blockForMove(lines, context.block, line);
   if (typeof block === "string") {
     new Notice(t(block === "not-found" ? "writeNotFound" : "writeAmbiguous"));
     return;
   }
 
-  const gaps = moveGaps(lines);
+  const gaps = moveGaps(lines).filter(gap => !insideStack(stacks, gap));
   const model = context.model;
-  const movingBlocks = findV2Blocks(lines);
   const movingIndex = movingBlocks.findIndex((candidate) => candidate.openLine === block.openLine);
   const currentVisualSkip = movingIndex < 0 ? model.skip ?? 0 : visualWrapSkip(lines, movingBlocks, movingIndex);
   const layout = root.getBoundingClientRect();
@@ -87,7 +95,7 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
 
   const place = (): void => {
     const content = view.contentDOM.getBoundingClientRect();
-    const wrap = hasTextColumns(model) ? null : wrapZone(pointer.x, content.left, content.right);
+    const wrap = stack || hasTextColumns(model) ? null : wrapZone(pointer.x, content.left, content.right);
     const tops: GapTop[] = gaps.map((line) => ({ line, top: lineTop(line) }));
     const gap = pickGap(tops, pointer.y, wrap !== null);
     if (!gap) {
@@ -99,7 +107,7 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
     const lineHeight = view.defaultLineHeight;
     if (wrap === null) {
       placement = { line: gap.line, wrap: null, skip: 0 };
-      indicator.showLine(content.left, gap.top - lineHeight / 2, content.width, t("wrapNone"));
+      indicator.showLine(content.left, gap.top - lineHeight / 2, content.width, t(stack ? "moveStack" : "wrapNone"));
       return;
     }
     const samePlace = isSamePlace(lines, block, gap.line);
@@ -180,9 +188,9 @@ function startMove(view: EditorView, root: HTMLElement, context: LayoutContext, 
         new Notice(t("writeNotFound"));
         return;
       }
-      const edits = placement
-        ? planPlacement(lines, block, placement)
-        : [planModelEdit(block, setFramePosition(model, offset))];
+      const edits = stack
+        ? placement ? planStackMove(lines, stack, placement.line) : [planStackSizing(stack, stack.width, offset)]
+        : placement ? planPlacement(lines, block, placement) : [planModelEdit(block, setFramePosition(model, offset))];
       if (edits && edits.length > 0) {
         void commitEdits(context.app, context.sourcePath, edits, { ...context, view, readSet: [{ fromLine: 0, lines }] });
       }

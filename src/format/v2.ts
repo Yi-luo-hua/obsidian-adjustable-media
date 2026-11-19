@@ -110,6 +110,7 @@ export interface ResolvedRow {
 }
 
 export const CLOSE_LINE = "<!-- /vml -->";
+export const STACK_MEMBER_KIND = "stack-member";
 export const DEFAULT_ROW_HEIGHT = 220;
 export const MIN_ROW_HEIGHT = 80;
 export const MAX_ROW_HEIGHT = 900;
@@ -192,7 +193,8 @@ export function parseMeta(text: string | undefined): { meta: V2Meta; error: stri
 
   const { v: version, rows, ...extra } = parsed;
   const mediaItems = version === 3 && extra.kind === "media";
-  if (version !== undefined && version !== 2 && !mediaItems) {
+  const stackMember = version === 3 && extra.kind === STACK_MEMBER_KIND;
+  if (version !== undefined && version !== 2 && !mediaItems && !stackMember) {
     return { meta: empty, error: `Unsupported layout format version: ${JSON.stringify(version)}` };
   }
 
@@ -201,10 +203,13 @@ export function parseMeta(text: string | undefined): { meta: V2Meta; error: stri
   if (rows !== undefined && !(Array.isArray(rows) && rows.every(isRecord))) {
     return { meta: empty, error: "Layout rows must be a JSON array of objects" };
   }
+  if (extra.kind === STACK_MEMBER_KIND && (!stackMember || extra.type !== "text" || extra.wrap !== undefined || rows?.length)) {
+    return { meta: empty, error: "A stack member must be a non-floating version 3 text layout" };
+  }
 
   return {
     meta: {
-      ...(mediaItems ? { version: 3 as const } : {}),
+      ...(mediaItems || stackMember ? { version: 3 as const } : {}),
       rows: Array.isArray(rows) ? rows.map((row) => ({ ...row })) : [],
       extra,
     },

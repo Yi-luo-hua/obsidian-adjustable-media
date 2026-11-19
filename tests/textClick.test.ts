@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as stateApi from "@codemirror/state";
 import * as viewApi from "@codemirror/view";
+import * as stacks from "../src/layout/layoutStack.ts";
 import * as format from "../src/format/v2.ts";
 import * as edits from "../src/layout/edits.ts";
 import * as snapshots from "../src/layout/documentSnapshot.ts";
@@ -40,6 +41,7 @@ test("rendered text retains an existing column's focus until click, without inte
     "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/cursorHighlight.ts": highlight, "../layout/blockIdentity.ts": identity,
+    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
     "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
@@ -94,6 +96,7 @@ test("a reused stand-in opens and redraws at its current anchor after text is in
     "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
     "../layout/cursorHighlight.ts": highlight, "../layout/blockIdentity.ts": identity,
+    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
     "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,

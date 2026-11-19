@@ -5,6 +5,7 @@ import { modelFromBlock } from "../layout/model.ts";
 import { effectiveWrapSkips } from "../layout/floatOrder.ts";
 import { markCaptions, numbered, refContextOf } from "./crossrefView.ts";
 import { renderLayout } from "./layoutView.ts";
+import { renderLayoutStack } from "./layoutStackView.ts";
 import { blockWarning } from "./messages.ts";
 import { calloutImages } from "../layout/calloutImages.ts";
 import { applyCalloutImageWidths } from "./calloutImages.ts";
@@ -29,7 +30,7 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
   }
   const text = await app.vault.cachedRead(file);
   const token = crypto.randomUUID();
-  const { markdown, blocks } = printPlan(text, token);
+  const { markdown, blocks, stacks } = printPlan(text, token);
   const callouts = calloutImages(text.split("\n"));
   if (blocks.length === 0 && !callouts.some(source => source.images.some(image => image.width !== null))) {
     rendering.delete(el);
@@ -50,6 +51,11 @@ export async function renderPrintLayouts(app: App, el: HTMLElement, ctx: Markdow
   blocks.forEach((block, index) => {
     const slot = content.querySelector<HTMLElement>(`[data-vml-print="${token}-${index}"]`);
     if (slot) {
+      const stack = stacks?.find(stack => stack.openLine === block.openLine);
+      if (stack) {
+        renderLayoutStack(slot, stack, { app, sourcePath: ctx.sourcePath, component: child, refs, renderTasks: tasks, print: true });
+        return;
+      }
       renderLayout(slot, { app, sourcePath: ctx.sourcePath, model: modelFromBlock(block),
         effectiveSkip: skips[index] ?? null, editable: false,
         warning: blockWarning(block), component: child, refs, renderTasks: tasks, print: true });

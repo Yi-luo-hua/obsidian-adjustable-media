@@ -1,6 +1,6 @@
 import { Menu, Notice, TFile, setIcon, type App } from "obsidian";
 
-import { MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, type TextSide, type V2Block } from "../format/v2.ts";
+import { MAX_ROW_HEIGHT, MIN_BLOCK_WIDTH, MIN_ROW_HEIGHT, STACK_MEMBER_KIND, type TextSide, type V2Block } from "../format/v2.ts";
 import { isEditable, planModelEdit, planMoveOut, planUnwrap, type BlockEdit, type EditFailureReason, type LinesAround } from "../layout/edits.ts";
 import { dropTarget, frameResizeDirection, outerFrameResizeDirection, positionOffset, resizePair, weightsFromWidths, type ItemBox, type RowBox } from "../layout/geometry.ts";
 import {
@@ -950,11 +950,13 @@ function setUpTextBlockMenu(root: HTMLElement, context: LayoutContext): void {
     event.stopPropagation();
     const menu = new Menu();
     addSourceItem(menu, context);
-    addWrapItems(menu, context, "textWrapLeft", "textWrapRight");
     addTextLayoutItem(menu, context);
-    menu.addItem((entry) => entry.setTitle(t("unwrapText")).setIcon("log-out").setSection("vml-move").onClick(() => {
-      void commitEdits(context.app, context.sourcePath, [planUnwrap(context.block)], context);
-    }));
+    if (context.block.meta.extra.kind !== STACK_MEMBER_KIND) {
+      addWrapItems(menu, context, "textWrapLeft", "textWrapRight");
+      menu.addItem((entry) => entry.setTitle(t("unwrapText")).setIcon("log-out").setSection("vml-move").onClick(() => {
+        void commitEdits(context.app, context.sourcePath, [planUnwrap(context.block)], context);
+      }));
+    }
     menu.showAtMouseEvent(event);
   });
 }

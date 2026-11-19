@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as stateApi from "@codemirror/state";
 import * as viewApi from "@codemirror/view";
+import * as stacks from "../src/layout/layoutStack.ts";
 import * as format from "../src/format/v2.ts";
 import * as edits from "../src/layout/edits.ts";
 import * as snapshots from "../src/layout/documentSnapshot.ts";
@@ -39,6 +40,7 @@ test("editor initialization recovers from an unavailable getter and preserves su
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
@@ -122,6 +124,7 @@ test("a wrapped text box whose source shows still floats with its text drawn bes
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => refs }, "./interactions.ts": {},
@@ -161,6 +164,7 @@ test("a note without layouts is not parsed while typing, until a layout is writt
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
     "./blockDrag.ts": {}, "./crossrefView.ts": { refContextOf: () => undefined }, "./interactions.ts": {},
@@ -186,6 +190,7 @@ test("the first reading of a pane's environment draws nothing again; a later cha
   const live = await mockedModule<{ livePreviewExtension(app: unknown): stateApi.Extension; setEnvironment: stateApi.StateEffectType<string> }>(new URL("../src/view/livePreview.ts", import.meta.url), {
     obsidian: { editorInfoField, editorLivePreviewField, MarkdownView: class {}, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan,
     "../layout/viewProjection.ts": { ...projections, PaneMeasurements: TrackedMeasurements },
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser,
@@ -234,6 +239,7 @@ test("host paragraph results install only in the exact buffer version; structura
     obsidian: { editorInfoField, editorLivePreviewField, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
     "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity,
     "../format/v2.ts": format, "../layout/edits.ts": edits, "../layout/documentSnapshot.ts": snapshots,
+    "../layout/layoutStack.ts": stacks, "./layoutStackView.ts": {},
     "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan, "../layout/viewProjection.ts": projections,
     "../layout/model.ts": model, "../markdown/crossref.ts": crossref, "../markdown/paragraphBreaks.ts": paragraphBreaks,
     "../markdown/paragraphParser.ts": paragraphParser,
