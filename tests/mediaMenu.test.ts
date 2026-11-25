@@ -105,7 +105,9 @@ test("a native PDF++ rectangle offers the image wrapping action and keeps its em
   host.menus[0].click();
   await Promise.resolve();
   assert.equal(host.writes.length, 1);
-  assert.deepEqual(applyEditsToText(raw, host.writes[0].edits), { ok: true, text: ["<!-- vml -->", raw, "<!-- /vml -->"].join("\n") });
+  assert.deepEqual(applyEditsToText(raw, host.writes[0].edits), {
+    ok: true, text: ["<!-- vml -->", raw + " <!-- vml-pdf-row -->", "<!-- /vml -->"].join("\n"),
+  });
 });
 
 test("remote images add the wrapping action without a file-menu event", async () => {
