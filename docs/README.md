@@ -11,6 +11,7 @@
 | [常见问题](FAQ.md) | 兼容性、停用后行为与使用限制 |
 | [功能示例](examples/README.md) | 内置离线指南（`Guide`）、手动分栏与 Mermaid 样例 |
 | [Excalidraw 布局媒体](features/excalidraw.md) | 本地 `.excalidraw` / `.excalidraw.md` 绘图布局与预览 |
+| [PDF++ 矩形选区](features/pdf-plus.md) | PDF++ 的 `#page=N&rect=…` 嵌入作为布局媒体 |
 | [网页嵌入布局](features/web-embeds.md) | `<iframe>`、YouTube、Twitter/X 嵌入与独立高度 |
 | [Markdown 表格包装](features/tables.md) | 顶层表格右键包装为文字布局块 |
 

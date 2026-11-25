@@ -42,7 +42,7 @@ async function menuHarness(source: string, line: number, imageColumn?: number, e
   const diagram = { closest: (selector: string) => selector === ".cm-editor" ? view
     : selector === ".vml-layout, .vml-text-editor, .vml-plain-image--dragging" && (insideLayout || dragging) ? {} : null };
   const target = { closest: (selector: string) => {
-    const native = excalidraw ? ".cm-content .excalidraw-embedded-img" : imageColumn === undefined ? ".cm-content .mermaid" : ".cm-content .image-embed";
+    const native = excalidraw ? ".cm-content .excalidraw-embedded-img" : imageColumn === undefined ? ".cm-content .mermaid" : ".cm-content :is(.image-embed, .pdf-cropped-embed)";
     return selector === native || (remote && selector === ".cm-content .image-embed:not(.internal-embed)") ? diagram : null;
   } };
   const module = await mockedModule<{ registerImageMenu(plugin: unknown): void }>(new URL("../src/view/imageMenu.ts", import.meta.url), {
@@ -95,6 +95,19 @@ test("native Excalidraw menu wraps the clicked embed verbatim and rejects change
       if (result.ok) assert.ok(result.text.includes("\r\n" + raw + "\r\n"));
     }
   }
+});
+
+test("a native PDF++ rectangle offers the image wrapping action and keeps its embed verbatim", async () => {
+  const raw = "![[book.pdf#page=7&rect=45,120,500,600|book, p.7]]";
+  const host = await menuHarness(raw, 0, 3);
+  host.open();
+  assert.equal(host.menus.length, 1);
+  host.menus[0].click();
+  await Promise.resolve();
+  assert.equal(host.writes.length, 1);
+  assert.deepEqual(applyEditsToText(raw, host.writes[0].edits), {
+    ok: true, text: ["<!-- vml -->", raw + " <!-- vml-pdf-row -->", "<!-- /vml -->"].join("\n"),
+  });
 });
 
 test("remote images add the wrapping action without a file-menu event", async () => {

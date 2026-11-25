@@ -17,7 +17,7 @@ import { httpUrl, IFRAME_TOKEN, isNativeWebEmbed, parseWebFrame } from "./webEmb
  * invalid. See docs/DESIGN.md, section 1.
  */
 
-export type MediaKind = "image" | "video" | "mermaid" | "excalidraw" | "web";
+export type MediaKind = "image" | "video" | "mermaid" | "excalidraw" | "web" | "pdf";
 export type EmbedSyntax = "wiki" | "markdown" | "mermaid" | "iframe";
 export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
@@ -50,7 +50,7 @@ export interface V2Embed {
   syntax: EmbedSyntax;
   /** Vault path (decoded, without subpath) or URL (encoding preserved); no size or title. */
   target: string;
-  /** Excalidraw's complete fragment reference, including its leading #. */
+  /** Excalidraw's or a PDF region's complete fragment reference, including its leading #. */
   fragment?: string;
   alt: string;
   kind: MediaKind;
@@ -138,7 +138,8 @@ const EMBED_PATTERN = /!\[\[([^\]]+)\]\]|!\[([^\]]*)\]\(\s*(<[^>\n]*>|(?:[^()\s]
 const SIZE_PATTERN = /^(\d+)(?:x\d+)?$/;
 const REMOTE_PATTERN = /^[a-z][a-z0-9+.-]*:\/\//i;
 const IMAGE_ROW_MARKER = " <!-- vml-image-row -->";
-const IMAGE_ROW_END = / <!-- vml-image-row -->[ \t]*$/;
+const PDF_ROW_MARKER = " <!-- vml-pdf-row -->";
+const MEDIA_ROW_END = /(?: <!-- vml-(?:image|pdf)-row -->)+[ \t]*$/;
 
 export function findV2Blocks(
   lines: readonly string[],
@@ -355,21 +356,27 @@ export function serializeOpener(meta: V2Meta): string {
 
 /** Row text made of the embeds' exact source, separated by single spaces. */
 export function serializeRow(embeds: readonly V2Embed[]): string {
-  return markImageRow(embeds.map((embed) => embed.raw).join(" "), embeds);
+  return markMediaRow(embeds.map((embed) => embed.raw).join(" "), embeds);
 }
 
-/** A row marker gives ambiguous image URLs a meaning without changing neighboring Markdown. */
-export function markImageRow(line: string, embeds: readonly V2Embed[]): string {
-  return embeds.some(usesImageRowMarker) ? line + IMAGE_ROW_MARKER : line;
+/** Row markers opt into media that can also appear as ordinary Markdown in a text column. */
+export function markMediaRow(line: string, embeds: readonly V2Embed[]): string {
+  const imageMarker = embeds.some(usesImageRowMarker) ? IMAGE_ROW_MARKER : "";
+  const pdfMarker = embeds.some((embed) => embed.kind === "pdf") ? PDF_ROW_MARKER : "";
+  return line + imageMarker + pdfMarker;
 }
 
-export function usesImageRowMarker(embed: V2Embed): boolean {
+function usesImageRowMarker(embed: V2Embed): boolean {
   return embed.kind === "image" && embed.syntax === "markdown"
     && isRemoteTarget(embed.target) && mediaKindOf(embed.target) === null;
 }
 
-export function stripImageRowMarker(line: string): string {
-  return line.replace(IMAGE_ROW_END, "");
+export function usesMediaRowMarker(embed: V2Embed): boolean {
+  return embed.kind === "pdf" || usesImageRowMarker(embed);
+}
+
+export function stripMediaRowMarkers(line: string): string {
+  return line.replace(MEDIA_ROW_END, "");
 }
 
 export function serializeBlock(meta: V2Meta, rows: ReadonlyArray<readonly V2Embed[]>): string[] {
@@ -403,6 +410,38 @@ export function mediaKindOf(target: string): MediaKind | null {
   return null;
 }
 
+/** A rectangle of a PDF page, as PDF++ embeds it: `#page=N&rect=left,bottom,right,top` in PDF points. */
+export interface PdfRegion {
+  page: number;
+  rect: [number, number, number, number];
+  /** PDF++'s own display width, the `width` parameter. */
+  width: number | null;
+}
+
+/**
+ * Reads the PDF++ rectangle a `.pdf` embed's fragment selects, or null when it selects none (a whole
+ * PDF, a page, a text selection or an annotation alone): only a region is an image of fixed proportions.
+ */
+export function pdfRegion(fragment: string): PdfRegion | null {
+  const params = new URLSearchParams(fragment.replace(/^#/, ""));
+  const page = params.get("page") ?? "";
+  const coordinates = (params.get("rect") ?? "").split(",");
+  if (!/^\d+$/.test(page) || Number(page) < 1 || coordinates.length !== 4
+    || coordinates.some((value) => value.trim() === "")) return null;
+  const rect = coordinates.map(Number);
+  if (!rect.every(Number.isFinite)) return null;
+  const [left, bottom, right, top] = rect as [number, number, number, number];
+  if (left === right || bottom === top) return null;
+  const width = Number(params.get("width"));
+  return { page: Number(page), rect: [left, bottom, right, top], width: Number.isFinite(width) && width > 0 ? width : null };
+}
+
+/** A region's size in CSS pixels, the PDF at 100% zoom (72 points to 96 pixels per inch). */
+export function pdfRegionSize(region: PdfRegion): { width: number; height: number } {
+  const [left, bottom, right, top] = region.rect;
+  return { width: Math.abs(right - left) * 4 / 3, height: Math.abs(top - bottom) * 4 / 3 };
+}
+
 export function isRemoteTarget(target: string): boolean {
   return REMOTE_PATTERN.test(target);
 }
@@ -426,6 +465,7 @@ function buildBlock(
   const left: number[] = [];
   const right: number[] = [];
   let invalidLine: number | null = null;
+  let onlyPdfRegions: boolean | undefined;
 
   for (let line = openLine + 1; line < closeLine; line += 1) {
     const text = stripCarriageReturn(lines[line] ?? "");
@@ -437,9 +477,16 @@ function buildBlock(
     const frame = !allText && meta.version === 3 && contexts[line] === "text" ? readStandaloneWebFrame(lines, line) : null;
     const diagramEnd = allText ? undefined : diagrams.get(line);
     const itemEnd = frame?.endLine ?? diagramEnd;
-    const rowText = stripImageRowMarker(text);
-    const embeds: V2Embed[] | null = frame ? [frame] : diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
-      : contexts[line] === "text" && !allText ? readEmbedRow(rowText, line, rowText !== text) : null;
+    const rowText = stripMediaRowMarkers(text);
+    const markers = text.slice(rowText.length);
+    let embeds: V2Embed[] | null = frame ? [frame] : diagramEnd !== undefined ? [mermaidEmbed(lines, line, diagramEnd)]
+      : contexts[line] === "text" && !allText ? readEmbedRow(rowText, line, markers.includes(IMAGE_ROW_MARKER)) : null;
+    // Unmarked V2 blocks made entirely of crops get resize handles on upgrade. In mixed
+    // blocks an unmarked crop was text, so keep the established text and media boundaries.
+    if (embeds?.some((embed) => embed.kind === "pdf") && !markers.includes(PDF_ROW_MARKER)
+      && !(onlyPdfRegions ??= meta.version !== 3 && hasOnlyPdfRegions(lines, contexts, openLine + 1, closeLine))) {
+      embeds = null;
+    }
     if (!embeds) {
       (rows.length === 0 ? left : right).push(line);
     } else if (right.length > 0) {
@@ -480,6 +527,15 @@ function buildBlock(
     metaError,
     invalidLine,
   };
+}
+
+function hasOnlyPdfRegions(lines: readonly string[], contexts: readonly LineContext[], from: number, to: number): boolean {
+  return lines.slice(from, to).every((raw, index) => {
+    const text = stripCarriageReturn(raw);
+    const line = from + index;
+    return text.trim() === "" || (contexts[line] === "text"
+      && readEmbedRow(text, line)?.every((embed) => embed.kind === "pdf") === true);
+  });
 }
 
 function textPart(lines: readonly string[], textLines: readonly number[]): V2Text | null {
@@ -542,13 +598,15 @@ export function readMediaEmbeds(text: string, line: number, remoteImages = false
     const parsed = match[1] !== undefined
       ? { syntax: "wiki" as const, ...parseWikiEmbed(match[1]) }
       : { syntax: "markdown" as const, ...parseMarkdownEmbed(match[2] ?? "", match[3] ?? "") };
-    const kind = mediaKindOf(parsed.target)
+    const link = match[1]?.split("|")[0] ?? match[3]?.replace(/^<|>$/g, "") ?? "";
+    const hash = link.indexOf("#");
+    const region = hash >= 0 && !isRemoteTarget(parsed.target) && /\.pdf$/i.test(parsed.target) ? pdfRegion(link.slice(hash)) : null;
+    const kind = mediaKindOf(parsed.target) ?? (region ? "pdf" : null)
       ?? (remoteImages && parsed.syntax === "markdown" && isRemoteTarget(parsed.target) && httpUrl(parsed.target) ? "image" : null);
     if (kind) {
-      const link = match[1]?.split("|")[0] ?? match[3]?.replace(/^<|>$/g, "") ?? "";
-      const hash = link.indexOf("#");
-      const fragment = kind === "excalidraw" && hash >= 0 ? { fragment: link.slice(hash) } : {};
-      embeds.push({ raw: match[0], ...parsed, ...fragment, kind, line, from, to: from + match[0].length });
+      const fragment = (kind === "excalidraw" || kind === "pdf") && hash >= 0 ? { fragment: link.slice(hash) } : {};
+      const nativeWidth = parsed.nativeWidth ?? region?.width ?? null;
+      embeds.push({ raw: match[0], ...parsed, nativeWidth, ...fragment, kind, line, from, to: from + match[0].length });
     }
   }
   return embeds.sort((a, b) => a.from - b.from);

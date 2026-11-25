@@ -271,7 +271,7 @@ test("print renders web links without starting external frames or native provide
   const module = await mockedModule<{ renderLayout(el: unknown, options: unknown): void }>(new URL('../src/view/layoutView.ts', import.meta.url), {
     obsidian: { MarkdownRenderer: { render: unexpected } }, '../format/v2.ts': format, '../layout/model.ts': models,
     '../layout/viewProjection.ts': {}, '../markdown/textColumns.ts': {}, './crossrefView.ts': {},
-    './media.ts': { resolveMedia: () => null }, './mediaControls.ts': {}, './videoSource.ts': {}, './messages.ts': {}, './excalidraw.ts': {},
+    './media.ts': { resolveMedia: () => null }, './mediaControls.ts': {}, './videoSource.ts': {}, './messages.ts': {}, './excalidraw.ts': {}, './pdfRegion.ts': {},
     './webEmbed.ts': { renderWebFrame: unexpected, renderWebLink: (_el: unknown, embed: format.V2Embed) => links.push(embed.target) },
   });
   const block = blockOf(youtube + '\n' + native, [{ items: 2 }]);

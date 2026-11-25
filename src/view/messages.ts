@@ -101,6 +101,7 @@ const MESSAGES = {
   mermaidDiagram: { zh: "Mermaid 图表", en: "Mermaid diagram" },
   excalidrawUnavailable: { zh: "请启用 Excalidraw 插件以显示此绘图。", en: "Enable the Excalidraw plugin to display this drawing." },
   excalidrawFailed: { zh: "Excalidraw 绘图预览失败，可双击打开原图。", en: "Excalidraw preview failed. Double-click to open the drawing." },
+  pdfPlusUnavailable: { zh: "请启用 PDF++ 插件以显示此 PDF 区域，可双击打开 PDF。", en: "Enable the PDF++ plugin to display this PDF region. Double-click to open the PDF." },
   editSource: {
     zh: "编辑源码",
     en: "Edit source",

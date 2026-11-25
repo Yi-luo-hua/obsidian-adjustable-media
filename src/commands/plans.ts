@@ -1,4 +1,4 @@
-import { findV2Blocks, hasSideText, markImageRow, readEmbedRow, readMediaEmbeds, readStandaloneWebFrame, serializeBlock, serializeRow, MAX_EMBEDS_PER_ROW, type V2Block, type V2Meta } from "../format/v2.ts";
+import { findV2Blocks, hasSideText, markMediaRow, readEmbedRow, readMediaEmbeds, readStandaloneWebFrame, serializeBlock, serializeRow, MAX_EMBEDS_PER_ROW, type V2Block, type V2Meta } from "../format/v2.ts";
 import { planWrap } from "../input/insertion.ts";
 import { isEditable, wrapLines, type BlockEdit, type LineChange } from "../layout/edits.ts";
 import { metaFromModel, modelFromBlock, rowEmbeds } from "../layout/model.ts";
@@ -66,7 +66,7 @@ export function planWrapSelection(lines: readonly string[], fromLine: number, to
   const hasDiagram = fencedCodeBlocks(lines).some((fence) => fence.language === "mermaid" && fence.from >= first && fence.to <= last);
   const mediaBody = body.map((line, index) => {
     const row = mediaRows.get(first + index);
-    return row && contexts[first + index] === "text" && !INDENTED.test(line) ? markImageRow(line, row) : line;
+    return row && contexts[first + index] === "text" && !INDENTED.test(line) ? markMediaRow(line, row) : line;
   });
   const attempts = containedWeb ? [wrapLines(body, TEXT_META)] : [
     ...(hasDiagram || hasWeb ? [wrapLines(mediaBody, { version: 3, rows: [], extra: { kind: "media" } })] : []),

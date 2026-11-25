@@ -1,6 +1,6 @@
 import { MarkdownRenderer, type App, type Component } from "obsidian";
 
-import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, type CaptionSettings, type TextSide } from "../format/v2.ts";
+import { DEFAULT_COLUMN_GAP, DEFAULT_ROW_HEIGHT, pdfRegion, pdfRegionSize, type CaptionSettings, type TextSide } from "../format/v2.ts";
 import { effectiveFrameWidth, effectiveWidth, frameOffset, hasTextColumns, isTextOnly, rowOffset, webHeight, type LayoutItem, type LayoutModel, type LayoutRow } from "../layout/model.ts";
 import { markCaptions, numbered, type RefContext } from "./crossrefView.ts";
 import { setBounded } from "../layout/viewProjection.ts";
@@ -10,6 +10,7 @@ import { videoPreviewUrl } from "./videoSource.ts";
 import { t } from "./messages.ts";
 import { splitTextColumns } from "../markdown/textColumns.ts";
 import { renderExcalidraw, renderExcalidrawMarkdown } from "./excalidraw.ts";
+import { renderPdfRegion } from "./pdfRegion.ts";
 import { renderWebFrame, renderWebLink } from "./webEmbed.ts";
 
 export interface LayoutViewOptions {
@@ -299,6 +300,27 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
     }));
   } else if (!media) {
     itemEl.createDiv({ cls: "vml-item__missing", text: t("missingMedia", { target: item.embed.target }) });
+  } else if (item.embed.kind === "pdf") {
+    itemEl.addClass("vml-item--pdf");
+    const region = itemEl.createDiv({ cls: "vml-item__media vml-item__pdf markdown-rendered" });
+    const applySize = (size: MediaSize): void => {
+      diagramMeasurements.set(region, size);
+      region.setCssProps({ "--vml-diagram-ratio": String(size.width / size.height) });
+      useSize(itemEl, region, size, !single && !itemEl.hasClass("vml-item--weighted"));
+    };
+    // The rectangle gives the size up front, so the layout keeps its shape while PDF++ draws.
+    const rect = pdfRegion(item.embed.fragment ?? "");
+    const size = rect ? pdfRegionSize(rect) : { width: 300, height: 200 };
+    applySize(size);
+    if (options.component) {
+      const task = renderPdfRegion(options.app, item.embed, region, options.sourcePath, options.component, (drawn) => {
+        const ratio = drawn.width / drawn.height;
+        if (Math.abs(ratio / (size.width / size.height) - 1) < 0.01) return;
+        const area = size.width * size.height;
+        applySize({ width: Math.sqrt(area * ratio), height: Math.sqrt(area / ratio) });
+      });
+      options.renderTasks?.push(task);
+    }
   } else {
     const known = mediaSizes.get(media.url);
     const size: Record<string, string> = known ? { width: String(known.width), height: String(known.height) } : {};
