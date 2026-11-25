@@ -37,7 +37,8 @@ export function registerImageMenu(plugin: Plugin): void {
   }, { capture: true }));
 
   plugin.registerEvent(plugin.app.workspace.on("file-menu", (menu, _file, source) => {
-    const embedEl = source === "link-context-menu" ? clicked?.closest<HTMLElement>(".cm-content .image-embed") : null;
+    // PDF++ draws a PDF rectangle as an image in its own embed element.
+    const embedEl = source === "link-context-menu" ? clicked?.closest<HTMLElement>(".cm-content :is(.image-embed, .pdf-cropped-embed)") : null;
     if (embedEl) planImageAction(plugin, embedEl)?.(menu);
   }));
 }

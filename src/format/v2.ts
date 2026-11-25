@@ -17,7 +17,7 @@ import { httpUrl, IFRAME_TOKEN, isNativeWebEmbed, parseWebFrame } from "./webEmb
  * invalid. See docs/DESIGN.md, section 1.
  */
 
-export type MediaKind = "image" | "video" | "mermaid" | "excalidraw" | "web";
+export type MediaKind = "image" | "video" | "mermaid" | "excalidraw" | "web" | "pdf";
 export type EmbedSyntax = "wiki" | "markdown" | "mermaid" | "iframe";
 export type Align = "left" | "center" | "right";
 export type CaptionAlign = "left" | "center";
@@ -50,7 +50,7 @@ export interface V2Embed {
   syntax: EmbedSyntax;
   /** Vault path (decoded, without subpath) or URL (encoding preserved); no size or title. */
   target: string;
-  /** Excalidraw's complete fragment reference, including its leading #. */
+  /** Excalidraw's or a PDF region's complete fragment reference, including its leading #. */
   fragment?: string;
   alt: string;
   kind: MediaKind;
@@ -403,6 +403,35 @@ export function mediaKindOf(target: string): MediaKind | null {
   return null;
 }
 
+/** A rectangle of a PDF page, as PDF++ embeds it: `#page=N&rect=left,bottom,right,top` in PDF points. */
+export interface PdfRegion {
+  page: number;
+  rect: [number, number, number, number];
+  /** PDF++'s own display width, the `width` parameter. */
+  width: number | null;
+}
+
+/**
+ * Reads the PDF++ rectangle a `.pdf` embed's fragment selects, or null when it selects none (a whole
+ * PDF, a page, a text selection or an annotation alone): only a region is an image of fixed proportions.
+ */
+export function pdfRegion(fragment: string): PdfRegion | null {
+  const params = new URLSearchParams(fragment.replace(/^#/, ""));
+  const page = params.get("page") ?? "";
+  const rect = (params.get("rect") ?? "").split(",").map(Number);
+  if (!/^\d+$/.test(page) || Number(page) < 1 || rect.length !== 4 || !rect.every(Number.isFinite)) return null;
+  const [left, bottom, right, top] = rect as [number, number, number, number];
+  if (left === right || bottom === top) return null;
+  const width = Number(params.get("width"));
+  return { page: Number(page), rect: [left, bottom, right, top], width: params.has("width") && width > 0 ? width : null };
+}
+
+/** A region's size in CSS pixels, the PDF at 100% zoom (72 points to 96 pixels per inch). */
+export function pdfRegionSize(region: PdfRegion): { width: number; height: number } {
+  const [left, bottom, right, top] = region.rect;
+  return { width: Math.abs(right - left) * 4 / 3, height: Math.abs(top - bottom) * 4 / 3 };
+}
+
 export function isRemoteTarget(target: string): boolean {
   return REMOTE_PATTERN.test(target);
 }
@@ -542,13 +571,15 @@ export function readMediaEmbeds(text: string, line: number, remoteImages = false
     const parsed = match[1] !== undefined
       ? { syntax: "wiki" as const, ...parseWikiEmbed(match[1]) }
       : { syntax: "markdown" as const, ...parseMarkdownEmbed(match[2] ?? "", match[3] ?? "") };
-    const kind = mediaKindOf(parsed.target)
+    const link = match[1]?.split("|")[0] ?? match[3]?.replace(/^<|>$/g, "") ?? "";
+    const hash = link.indexOf("#");
+    const region = hash >= 0 && !isRemoteTarget(parsed.target) && /\.pdf$/i.test(parsed.target) ? pdfRegion(link.slice(hash)) : null;
+    const kind = mediaKindOf(parsed.target) ?? (region ? "pdf" : null)
       ?? (remoteImages && parsed.syntax === "markdown" && isRemoteTarget(parsed.target) && httpUrl(parsed.target) ? "image" : null);
     if (kind) {
-      const link = match[1]?.split("|")[0] ?? match[3]?.replace(/^<|>$/g, "") ?? "";
-      const hash = link.indexOf("#");
-      const fragment = kind === "excalidraw" && hash >= 0 ? { fragment: link.slice(hash) } : {};
-      embeds.push({ raw: match[0], ...parsed, ...fragment, kind, line, from, to: from + match[0].length });
+      const fragment = (kind === "excalidraw" || kind === "pdf") && hash >= 0 ? { fragment: link.slice(hash) } : {};
+      const nativeWidth = parsed.nativeWidth ?? region?.width ?? null;
+      embeds.push({ raw: match[0], ...parsed, nativeWidth, ...fragment, kind, line, from, to: from + match[0].length });
     }
   }
   return embeds.sort((a, b) => a.from - b.from);

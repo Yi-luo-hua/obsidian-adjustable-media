@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Arrange PDF++ rectangle selections (`![[file.pdf#page=N&rect=…]]`) in layouts like images: resize them, set column widths, float them, and add captions. Previously a layout of these embeds became a text block with only a width handle. Right-click a standalone selection in Live Preview to wrap it in a layout. Requires the PDF++ plugin ([#50](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/50)).
+
 ## 1.1.0 - 2026-11-18
 
 - Wrap remote Markdown images from their context menu in Live Preview on Obsidian 1.6.0 and later. Drag them into layouts and resize them, including images served from URLs without recognized image extensions. Existing layouts keep their media rows, text columns, and captions ([#46](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/46)).

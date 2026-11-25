@@ -145,6 +145,40 @@
   object-fit: contain;
 }
 
+/* PDF++ draws a PDF rectangle as an image; the layout owns its display size and its pointer input. */
+.vml-item__pdf {
+  aspect-ratio: var(--vml-diagram-ratio, 1.5);
+  overflow: hidden;
+}
+
+.vml-item__pdf > *,
+.vml-item__pdf .internal-embed.pdf-cropped-embed {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  pointer-events: none;
+}
+
+.vml-item__pdf img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  object-fit: contain;
+}
+
+.vml-item__pdf--unavailable {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  font-size: var(--font-ui-small);
+  justify-content: center;
+  padding: 8px;
+  text-align: center;
+}
+
 .vml-excalidraw-embed {
   display: inline-block;
   width: var(--vml-excalidraw-width, 100%);

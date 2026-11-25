@@ -18,7 +18,7 @@ In Obsidian, run **Feature examples** from the command palette for an interactiv
 
 ## Features
 
-- **Side-by-side media grids**: Arrange images, videos, Mermaid diagrams, local Excalidraw drawings (requires the Excalidraw plugin), and web embeds (`<iframe>`, YouTube, Twitter/X) up to 4 items per row with automatic row height equalization.
+- **Side-by-side media grids**: Arrange images, videos, Mermaid diagrams, local Excalidraw drawings (requires the Excalidraw plugin), PDF++ rectangle selections (requires the PDF++ plugin), and web embeds (`<iframe>`, YouTube, Twitter/X) up to 4 items per row with automatic row height equalization.
 - **Direct resizing**: Drag the divider between items to adjust column widths (double-click to reset to aspect ratios), drag a row's bottom edge to change row height, drag a web embed's bottom edge for an independent height, or drag the outer frame to scale the whole block.
 - **Positioning & text wrapping**: Slide the item in a single-item row horizontally (snaps to left, center, right, or any offset). Drag the top grip of a narrow, non-floating block sideways to position the entire layout horizontally across the line (preserved in Reading View and PDF exports). Float a media or text block left or right so surrounding paragraphs, lists, quotes, headings, and code wrap around it; a top-level horizontal rule (`---`) ends wrapping below.
 - **Text columns beside media**: Add Markdown columns on the left, right, or both sides of media, aligned to the top, middle, or bottom. Click the text in Live Preview to edit in place with Live Preview styling, hanging list indents, <kbd>Tab</kbd>/<kbd>Enter</kbd>, `[[` link suggestions, and your formatting hotkeys. Drag the outer frame independently of the media column width.
@@ -34,7 +34,7 @@ In Obsidian, run **Feature examples** from the command palette for an interactiv
 
 ### Creating a layout
 
-- **Context menu**: In Live Preview, right-click a standalone image, video, Mermaid diagram, Excalidraw drawing, web embed handle, or top-level Markdown table and select **Wrap in a layout**. This action supports remote Markdown images, including URLs without file extensions, on Obsidian 1.6.0 or later. If an image shares a normal paragraph line with text, only that image is wrapped.
+- **Context menu**: In Live Preview, right-click a standalone image, video, Mermaid diagram, Excalidraw drawing, PDF++ rectangle selection, web embed handle, or top-level Markdown table and select **Wrap in a layout**. This action supports remote Markdown images, including URLs without file extensions, on Obsidian 1.6.0 or later. If an image shares a normal paragraph line with text, only that image is wrapped.
 - **Selection / command**: Select lines and run **Wrap selection in a layout** from the right-click menu or command palette (no default hotkey; bind one in **Settings → Hotkeys**).
 - **Drag into a layout**: Drag standalone images, Mermaid diagrams, Excalidraw handles, or web embed handles from the same note and pane into an existing layout. On touch devices, long-press a standalone Mermaid diagram to drag.
 - **Auto-convert (optional)**: Enable **Convert dropped and pasted media** in settings to automatically wrap newly dropped or pasted images/videos.
