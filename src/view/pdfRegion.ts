@@ -5,6 +5,8 @@ import { t } from "./messages.ts";
 
 /** How long a layout waits for PDF++ to draw a region before counting it as drawn (export waits on it). */
 const RENDER_TIMEOUT = 10000;
+// Native PDF embeds may fail without emitting an image or reporting an error to MarkdownRenderer.
+const LIVE_QUEUE_WAIT = 1000;
 const liveQueues = new WeakMap<Window, Promise<void>>();
 
 function pdfPlusLoaded(app: App): boolean {
@@ -30,8 +32,10 @@ export function renderPdfRegion(app: App, embed: V2Embed, el: HTMLElement, sourc
   }
   let active = true;
   component.register(() => { active = false; });
-  const draw = (): Promise<void> =>
-    MarkdownRenderer.render(app, embed.raw, el, sourcePath, component).then(() => active ? waitForImage(el, component, sized) : undefined);
+  const draw = async (): Promise<void> => {
+    await MarkdownRenderer.render(app, embed.raw, el, sourcePath, component);
+    if (active) await waitForImage(el, component, sized);
+  };
   return defer ? drawWhenVisible(el, component, draw) : draw();
 }
 
@@ -39,6 +43,7 @@ export function renderPdfRegion(app: App, embed: V2Embed, el: HTMLElement, sourc
 function drawWhenVisible(el: HTMLElement, component: Component, draw: () => Promise<void>): Promise<void> {
   const win = el.win as Window & typeof window;
   let visible = false, queued = false, disposed = false;
+  let release: (() => void) | undefined;
   return new Promise((resolve, reject) => {
     const observer = new win.IntersectionObserver(entries => {
       visible = entries.at(-1)?.isIntersecting ?? false;
@@ -46,12 +51,17 @@ function drawWhenVisible(el: HTMLElement, component: Component, draw: () => Prom
       queued = true;
       const task = (liveQueues.get(win) ?? Promise.resolve())
         .then(() => new Promise<void>(ready => win.setTimeout(ready, 0)))
-        .then(async () => {
+        .then(() => {
           queued = false;
           if (disposed || !visible) return;
           observer.disconnect();
-          await draw();
-          resolve();
+          return new Promise<void>(next => {
+            // Release the queue even if the embed never finishes. A late image can still correct its size.
+            const timer = win.setTimeout(next, LIVE_QUEUE_WAIT);
+            const advance = (): void => { win.clearTimeout(timer); next(); };
+            release = advance;
+            void draw().then(resolve, reject).then(advance);
+          });
         });
       liveQueues.set(win, task.catch(reject));
     });
@@ -59,6 +69,7 @@ function drawWhenVisible(el: HTMLElement, component: Component, draw: () => Prom
     component.register(() => {
       disposed = true;
       observer.disconnect();
+      release?.();
       resolve();
     });
   });
