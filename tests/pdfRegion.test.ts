@@ -124,12 +124,19 @@ test("wrapping PDF region lines makes a media layout; explicit text blocks stay 
 async function regionHarness(loaded: boolean, defer = false) {
   const opened: string[] = [], rendered: string[] = [], timers = new Map<number, () => void>();
   const visibility = new Map<object, (entries: Array<{ isIntersecting: boolean }>) => void>();
-  let observed: (() => void) | null = null, timer = 0;
+  const mutations = new Map<object, () => void>();
+  let timer = 0;
   const image = { complete: false, naturalWidth: 0, naturalHeight: 0, listeners: new Map<string, () => void>(),
     addEventListener(name: string, callback: () => void) { this.listeners.set(name, callback); },
     removeEventListener(name: string) { this.listeners.delete(name); } };
   const win = {
-    MutationObserver: class { constructor(callback: () => void) { observed = callback; } observe() {} disconnect() { observed = null; } },
+    MutationObserver: class {
+      target: object | null = null;
+      callback: () => void;
+      constructor(callback: () => void) { this.callback = callback; }
+      observe(target: object) { this.target = target; mutations.set(target, this.callback); }
+      disconnect() { if (this.target) mutations.delete(this.target); }
+    },
     IntersectionObserver: class {
       target: object | null = null;
       callback: (entries: Array<{ isIntersecting: boolean }>) => void;
@@ -158,9 +165,10 @@ async function regionHarness(loaded: boolean, defer = false) {
     const el = makeElement(), cleanup: Array<() => void> = [];
     const done = module.renderPdfRegion(app, embed, el, "note.md", { register: (callback: () => void) => cleanup.push(callback) },
       (size: { width: number; height: number }) => sizes.push({ ...size }), defer);
-    return { el, done, cleanup, visible: (isIntersecting: boolean) => visibility.get(el)?.([{ isIntersecting }]) };
+    return { el, done, cleanup, mutate: () => mutations.get(el)?.(),
+      visible: (isIntersecting: boolean) => visibility.get(el)?.([{ isIntersecting }]) };
   };
-  return { ...addCrop(), addCrop, image, opened, rendered, sizes, timers, mutate: () => observed?.() };
+  return { ...addCrop(), addCrop, image, opened, rendered, sizes, timers };
 }
 
 test("a PDF region waits for PDF++'s image, and without PDF++ explains what is missing", async () => {
@@ -232,4 +240,39 @@ test("live PDF crops wait for visibility and the preceding crop's render", async
   await scrolledAway.done;
   await disposed.done;
   assert.deepEqual(host.rendered, [crop, crop, crop]);
+});
+
+test("a live crop that never produces an image releases the queue before the image deadline", async () => {
+  const host = await regionHarness(true, true);
+  const next = host.addCrop();
+  const tick = (): Promise<void> => new Promise(resolve => setImmediate(resolve));
+  const runTimer = async (): Promise<void> => {
+    const [id, callback] = host.timers.entries().next().value!;
+    host.timers.delete(id);
+    callback();
+    await tick();
+  };
+  host.visible(true);
+  next.visible(true);
+  await tick();
+  await runTimer();
+  assert.deepEqual(host.rendered, [crop]);
+  const [queueTimer, imageTimer] = host.timers.keys();
+  await runTimer();
+  assert.ok(!host.timers.has(queueTimer) && host.timers.has(imageTimer));
+
+  Object.assign(host.image, { complete: true, naturalWidth: 900, naturalHeight: 300 });
+  // The next crop has a ready image. Its start timer came after the first crop's image timer.
+  next.el.child = host.image;
+  const [nextId, startNext] = [...host.timers].at(-1)!;
+  host.timers.delete(nextId);
+  startNext();
+  await next.done;
+  assert.deepEqual(host.rendered, [crop, crop]);
+  assert.ok(host.timers.has(imageTimer));
+
+  host.el.child = host.image;
+  host.mutate();
+  await host.done;
+  assert.deepEqual(host.sizes, [{ width: 900, height: 300 }, { width: 900, height: 300 }]);
 });
