@@ -30,6 +30,8 @@ export interface LayoutViewOptions {
   /** Export waits for the Markdown inside the layout before printing. */
   renderTasks?: Promise<void>[];
   print?: boolean;
+  /** Live Preview can draw PDF crops as they enter the viewport. */
+  deferPdfRegions?: boolean;
 }
 
 interface MediaSize {
@@ -318,7 +320,7 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
         if (Math.abs(ratio / (size.width / size.height) - 1) < 0.01) return;
         const area = size.width * size.height;
         applySize({ width: Math.sqrt(area * ratio), height: Math.sqrt(area / ratio) });
-      });
+      }, options.deferPdfRegions);
       options.renderTasks?.push(task);
     }
   } else {

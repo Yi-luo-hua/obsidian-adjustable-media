@@ -121,20 +121,31 @@ test("wrapping PDF region lines makes a media layout; explicit text blocks stay 
   assert.deepEqual(text.leftText?.lines, [crop]);
 });
 
-async function regionHarness(loaded: boolean) {
-  const opened: string[] = [], rendered: string[] = [], cleanup: Array<() => void> = [], timers = new Map<number, () => void>();
+async function regionHarness(loaded: boolean, defer = false) {
+  const opened: string[] = [], rendered: string[] = [], timers = new Map<number, () => void>();
+  const visibility = new Map<object, (entries: Array<{ isIntersecting: boolean }>) => void>();
   let observed: (() => void) | null = null, timer = 0;
   const image = { complete: false, naturalWidth: 0, naturalHeight: 0, listeners: new Map<string, () => void>(),
     addEventListener(name: string, callback: () => void) { this.listeners.set(name, callback); },
     removeEventListener(name: string) { this.listeners.delete(name); } };
-  const el = {
+  const win = {
+    MutationObserver: class { constructor(callback: () => void) { observed = callback; } observe() {} disconnect() { observed = null; } },
+    IntersectionObserver: class {
+      target: object | null = null;
+      callback: (entries: Array<{ isIntersecting: boolean }>) => void;
+      constructor(callback: (entries: Array<{ isIntersecting: boolean }>) => void) { this.callback = callback; }
+      observe(target: object) { this.target = target; visibility.set(target, this.callback); }
+      disconnect() { if (this.target) visibility.delete(this.target); }
+    },
+    setTimeout: (callback: () => void) => { timers.set(++timer, callback); return timer; }, clearTimeout: (id: number) => timers.delete(id),
+  };
+  const makeElement = () => ({
     text: "", classes: [] as string[], child: null as typeof image | null, listeners: new Map<string, (event: object) => void>(),
-    win: { MutationObserver: class { constructor(callback: () => void) { observed = callback; } observe() {} disconnect() { observed = null; } },
-      setTimeout: (callback: () => void) => { timers.set(++timer, callback); return timer; }, clearTimeout: (id: number) => timers.delete(id) },
+    win,
     addEventListener(name: string, callback: (event: object) => void) { this.listeners.set(name, callback); },
     addClass(cls: string) { this.classes.push(cls); }, setText(text: string) { this.text = text; },
-    querySelector() { return this.child; },
-  };
+    querySelector(): typeof image | null { return this.child; },
+  });
   const app = { plugins: { plugins: loaded ? { "pdf-plus": {} } : {} }, workspace: { openLinkText: async (link: string) => { opened.push(link); } } };
   const module = await mockedModule<{ renderPdfRegion(...args: unknown[]): Promise<void> }>(
     new URL("../src/view/pdfRegion.ts", import.meta.url), {
@@ -143,8 +154,13 @@ async function regionHarness(loaded: boolean) {
     });
   const sizes: Array<{ width: number; height: number }> = [];
   const embed = format.readEmbedRow(crop, 0)![0];
-  const done = module.renderPdfRegion(app, embed, el, "note.md", { register: (callback: () => void) => cleanup.push(callback) }, (size: { width: number; height: number }) => sizes.push({ ...size }));
-  return { el, image, done, opened, rendered, sizes, timers, cleanup, mutate: () => observed?.() };
+  const addCrop = () => {
+    const el = makeElement(), cleanup: Array<() => void> = [];
+    const done = module.renderPdfRegion(app, embed, el, "note.md", { register: (callback: () => void) => cleanup.push(callback) },
+      (size: { width: number; height: number }) => sizes.push({ ...size }), defer);
+    return { el, done, cleanup, visible: (isIntersecting: boolean) => visibility.get(el)?.([{ isIntersecting }]) };
+  };
+  return { ...addCrop(), addCrop, image, opened, rendered, sizes, timers, mutate: () => observed?.() };
 }
 
 test("a PDF region waits for PDF++'s image, and without PDF++ explains what is missing", async () => {
@@ -175,4 +191,45 @@ test("a PDF region waits for PDF++'s image, and without PDF++ explains what is m
   await missing.done;
   assert.equal(missing.el.text, "pdfPlusUnavailable");
   assert.deepEqual(missing.rendered, []);
+});
+
+test("live PDF crops wait for visibility and the preceding crop's render", async () => {
+  const host = await regionHarness(true, true);
+  const next = host.addCrop(), scrolledAway = host.addCrop(), disposed = host.addCrop();
+  const tick = async () => { await new Promise(resolve => setImmediate(resolve)); };
+  const runTimer = async () => {
+    const [id, callback] = host.timers.entries().next().value!;
+    host.timers.delete(id);
+    callback();
+    await tick();
+  };
+  await tick();
+  assert.deepEqual(host.rendered, []);
+  host.visible(true);
+  next.visible(true);
+  scrolledAway.visible(true);
+  disposed.visible(true);
+  scrolledAway.visible(false);
+  for (const dispose of disposed.cleanup) dispose();
+  await tick();
+  await runTimer();
+  assert.deepEqual(host.rendered, [crop]);
+  Object.assign(host.image, { complete: true, naturalWidth: 900, naturalHeight: 300 });
+  host.el.child = host.image;
+  host.mutate();
+  await host.done;
+  await tick();
+  next.el.child = host.image;
+  await runTimer();
+  await next.done;
+  await runTimer();
+  await runTimer();
+  assert.deepEqual(host.rendered, [crop, crop]);
+  scrolledAway.visible(true);
+  await tick();
+  scrolledAway.el.child = host.image;
+  await runTimer();
+  await scrolledAway.done;
+  await disposed.done;
+  assert.deepEqual(host.rendered, [crop, crop, crop]);
 });

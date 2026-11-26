@@ -19,7 +19,6 @@ PDF++ 的「Copy embed link to rectangular selection」复制出 `![[a.pdf#page=
 - 实时预览右键块外的选区，选择「包成布局块」；也可以选中几行后用「把选中的内容包成布局块」命令。
 - 包装时插件在 PDF 媒体行末尾添加上例的注释标记。已有的纯矩形选区 V2 块自动显示为媒体布局。给这样的块加文字栏或在源码里加入其他媒体时，先给选区行加上标记；在文字栏里保留按普通 Markdown 显示的选区时，直接使用嵌入。
 - 双击布局里的选区打开 PDF 对应位置。
-- 在实时预览中，右键 PDF 选区或布局边框，选择「编辑源码」。
 - 嵌入原文、别名、`color`、`width` 等参数原样保存。
 - 只有带 `page` 和 `rect` 的嵌入才接管；整份 PDF、单页、文字选区、批注仍按 Obsidian 原样显示（布局里是文字）。
 - 未启用 PDF++ 时显示提示；启用后重开笔记或重载 Adjustable Media。
@@ -29,6 +28,8 @@ PDF++ 的「Copy embed link to rectangular selection」复制出 `![[a.pdf#page=
 ## 接入方式
 
 解析见 `pdfRegion`（`src/format/v2.ts`），显示见 `src/view/pdfRegion.ts`。显示时用 `MarkdownRenderer` 渲染原嵌入，交给 PDF++ 在 Obsidian 嵌入注册表里的 PDF 处理器画成图片，不调用 PDF++ 的内部 API，只用 `app.plugins.plugins["pdf-plus"]` 判断它是否已加载（非官方 App 类型）。矩形（PDF 点）按 72pt→96px 给出原始尺寸，图片加载前布局就有正确的宽高比；加载后比例不同（旋转页）时按面积不变修正。嵌入内容不接收指针事件，以免 PDF++ 的双击／点击处理和图片原生拖动与布局操作冲突。
+
+实时预览先按矩形保留尺寸，选区进入视口后再交给 PDF++ 渲染。同一窗口逐张渲染，减少打开大量选区时画布绘制和 PNG 编码对光标操作的影响。
 
 ## 本轮验证
 
