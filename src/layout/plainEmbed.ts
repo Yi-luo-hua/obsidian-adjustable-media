@@ -9,7 +9,7 @@ export interface TakenEmbed {
 }
 
 /**
- * Takes one embed off a plain media line (a line of image or video embeds outside any layout), so it
+ * Takes one embed off a plain media line outside any layout, so it
  * can move into a layout. `column` is the embed's start, or any position inside it. The embed itself
  * moves verbatim; the rest of the line keeps its text and only loses the spaces that followed the
  * embed. A line left empty is removed.
@@ -33,7 +33,8 @@ export function takePlainEmbed(lines: readonly string[], line: number, column: n
   if (!embeds || !embed) {
     return null;
   }
-  if (embed.kind === "web" && !scanMarkdownContainers(lines).topLevel[line]) return null;
+  if (embed.kind === "pdf" && /^[ \t]/.test(text)) return null;
+  if ((embed.kind === "web" || embed.kind === "pdf") && !scanMarkdownContainers(lines).topLevel[line]) return null;
 
   const before = text.slice(0, embed.from);
   const after = text.slice(embed.to);

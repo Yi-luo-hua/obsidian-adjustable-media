@@ -12,13 +12,14 @@ import { t } from "./messages.ts";
 import { trackPointer } from "./pointer.ts";
 import { eventElement } from "./windows.ts";
 
-/** Images Obsidian itself draws in live preview, for wiki and Markdown embeds alike. */
-const PLAIN_IMAGE = ".image-embed > .image-wrapper > img";
+const PDF_CROP = ".pdf-cropped-embed";
+/** Images drawn by Obsidian or by PDF++ in Live Preview. */
+const PLAIN_IMAGE = `.image-embed > .image-wrapper > img, ${PDF_CROP} > img`;
 
 /**
- * Live preview: an image or complete Mermaid outside a layout can be dropped into a layout of the same
- * note. Obsidian's image click, resize corner, menu and Mermaid source button remain available.
- * Nothing moves until the pointer has moved, and only images on a line of plain
+ * Live preview: an image, PDF crop or complete Mermaid outside a layout can be dropped into a layout
+ * of the same note. The native click, menu and other controls remain available.
+ * Nothing moves until the pointer has moved, and only items on a line of plain
  * media embeds or complete top-level Mermaid fences can move. Released off a layout, they stay put.
  *
  * Listeners go on the editor's DOM directly: CodeMirror hands no events from Obsidian's image
@@ -62,7 +63,8 @@ export function plainMediaDrag(app: App): Extension {
       }
       // Excalidraw already owns body gestures for links and opening the drawing.
       if (diagram?.matches(".vml-plain-excalidraw") && !target?.closest(".vml-plain-media__grip")) return;
-      const hold = diagram !== null && event.pointerType === "touch" && !target?.closest(".vml-plain-media__grip");
+      const hold = (diagram !== null || media.closest(PDF_CROP) !== null)
+        && event.pointerType === "touch" && !target?.closest(".vml-plain-media__grip");
       if (hold && target?.closest("button, a, input, textarea")) return;
       const info = view.state.field(editorInfoField, false);
       const sourcePath = (info?.file ?? fileOfEditor(app, info?.editor))?.path;
@@ -195,8 +197,9 @@ async function dropPlain(app: App, view: EditorView, taken: TakenEmbed | null, s
 
 function take(view: EditorView, media: HTMLElement): TakenEmbed | null {
   const diagram = media.matches(".mermaid");
+  const crop = media.closest<HTMLElement>(PDF_CROP);
   const embedEl = diagram ? media : media.closest<HTMLElement>(".vml-plain-excalidraw")
-    ?? media.closest<HTMLElement>(".excalidraw-embedded-img") ?? media.closest<HTMLElement>(".image-embed")
+    ?? media.closest<HTMLElement>(".excalidraw-embedded-img") ?? crop ?? media.closest<HTMLElement>(".image-embed")
     ?? (media.querySelector(".excalidraw-embedded-img") ? media : null);
   if (!embedEl) {
     return null;
@@ -205,7 +208,9 @@ function take(view: EditorView, media: HTMLElement): TakenEmbed | null {
     const pos = view.posAtDOM(embedEl);
     const line = view.state.doc.lineAt(pos);
     const lines = view.state.doc.toString().split("\n");
-    return diagram ? takePlainMermaid(lines, line.number - 1) : takePlainEmbed(lines, line.number - 1, pos - line.from);
+    if (diagram) return takePlainMermaid(lines, line.number - 1);
+    const taken = takePlainEmbed(lines, line.number - 1, pos - line.from);
+    return crop && taken?.embed.kind !== "pdf" ? null : taken;
   } catch {
     // The media is no longer part of the editor.
     return null;

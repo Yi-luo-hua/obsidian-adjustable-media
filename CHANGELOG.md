@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Arrange PDF++ rectangle selections (`![[file.pdf#page=N&rect=…]]`) in layouts like images: resize them, set column widths, float them, and add captions. Previously a layout of these embeds became a text block with only a width handle. Right-click a standalone selection in Live Preview to wrap it in a layout. Requires the PDF++ plugin ([#50](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/50)).
+- Arrange PDF++ rectangle selections (`![[file.pdf#page=N&rect=…]]`) in layouts like images: resize them, set column widths, float them, and add captions. Previously a layout of these embeds became a text block with only a width handle. In Live Preview, right-click a standalone selection to wrap it, or drag it into an existing layout. Requires the PDF++ plugin ([#50](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/50)).
 
 ## 1.1.0 - 2026-11-18
 
