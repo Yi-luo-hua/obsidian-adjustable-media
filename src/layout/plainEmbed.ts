@@ -33,7 +33,7 @@ export function takePlainEmbed(lines: readonly string[], line: number, column: n
   if (!embeds || !embed) {
     return null;
   }
-  if (embed.kind === "pdf" && /^[ \t]/.test(text)) return null;
+  if (embed.kind === "pdf" && (/^[ \t]/.test(text) || /^(?:=+|-+)$/.test(stripCarriageReturn(lines[line + 1] ?? "")))) return null;
   if ((embed.kind === "web" || embed.kind === "pdf") && !scanMarkdownContainers(lines).topLevel[line]) return null;
 
   const before = text.slice(0, embed.from);

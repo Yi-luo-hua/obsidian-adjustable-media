@@ -96,9 +96,15 @@ test("PDF crops can only be taken from top-level media lines", () => {
   assert.equal(takePlainEmbed([wiki], 0, 0)?.embed.raw, wiki);
   for (const lines of [
     [`    ${wiki}`], ["- List", wiki], [`> ${wiki}`], [`${wiki} description`], ["```md", wiki, "```"],
+    ["> Quote", wiki], ["> > Nested quote", "Continuation", wiki], ["> - A quoted item", wiki], ["> # Quoted heading", wiki],
+    ["> ---", wiki], ["> Quote", ">", wiki], ["> Quote", "2. More quote text", wiki], ["> Quote", wiki, "==="],
     ["<!-- vml -->", wiki, "<!-- /vml -->"], ["![[report.pdf#page=3]]"], ["![[report.pdf#page=3&rect=0,,200,100]]"],
   ]) {
     assert.ok(lines.every((line, index) => takePlainEmbed(lines, index, line.indexOf("!")) === null));
+  }
+  for (const lines of [["> Quote", "", wiki], ["> Quote", "# Heading", wiki], ["> Quote", "Title", "===", wiki],
+    ["> Quote", "<!-- comment -->", wiki], ["> Quote", "---", wiki]]) {
+    assert.equal(takePlainEmbed(lines, lines.length - 1, 0)?.embed.raw, wiki);
   }
 });
 
