@@ -668,14 +668,16 @@ function drawWidget(
   guardWidgetWhitespace(el);
   setUpText(host);
 
-  // On the media, where it hides none of the text beside them.
-  const buttonHost = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
-  const button = buttonHost.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    editSource();
-  });
+  // The floating button can cover the crop itself. PDF layouts offer source editing in their menu.
+  if (!model.rows.some(row => row.items.some(item => item.embed.kind === "pdf"))) {
+    const buttonHost = root.querySelector<HTMLElement>(":scope > .vml-layout__media") ?? root;
+    const button = buttonHost.createEl("button", { cls: "vml-edit-source", text: t("editSource") });
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      editSource();
+    });
+  }
   widgetHosts.set(el, host);
   return host;
 }
