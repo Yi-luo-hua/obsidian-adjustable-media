@@ -21,6 +21,52 @@ import { mockedModule } from "./support/mockedModule.ts";
 
 const media = 'Intro\n\n<!-- vml -->\n![[same.png]]\n<!-- /vml -->\n\nTail';
 
+test("dragging a selection keeps layout geometry until release in either direction", async () => {
+  const editorInfoField = stateApi.StateField.define({ create: () => ({ editor: {}, file: { path: "note.md" } }), update: value => value });
+  const editorLivePreviewField = stateApi.StateField.define({ create: () => true, update: value => value });
+  const live = await mockedModule<{
+    livePreviewExtension(app: unknown): stateApi.Extension;
+    setLayoutSelectionDrag: stateApi.StateEffectType<boolean>;
+  }>(new URL("../src/view/livePreview.ts", import.meta.url), {
+    obsidian: { editorInfoField, editorLivePreviewField, Component: class {} }, "@codemirror/state": stateApi, "@codemirror/view": viewApi,
+    "../layout/cursorHighlight.ts": highlightCursor, "../layout/blockIdentity.ts": highlightIdentity, "../format/v2.ts": format, "../layout/edits.ts": edits,
+    "../layout/documentSnapshot.ts": snapshots, "../layout/floatOrder.ts": floatOrder, "../layout/changeScan.ts": changeScan,
+    "../layout/viewProjection.ts": projections, "../layout/model.ts": model, "../markdown/crossref.ts": crossref,
+    "../markdown/paragraphBreaks.ts": paragraphBreaks, "../markdown/paragraphParser.ts": paragraphParser, "../editor/editorInfo.ts": editorInfo,
+    "./blockDrag.ts": {}, "./crossrefView.ts": {}, "./interactions.ts": {}, "./layoutView.ts": {}, "./layoutHistory.ts": { layoutHistory: () => [] },
+    "./hangingIndent.ts": { nativeListHanging: () => [] }, "./messages.ts": {}, "./textEditing.ts": {}, "./wrapGuard.ts": { wrapGuard: () => [] },
+    "./viewEnvironment.ts": {}, "./obsidianInternals.ts": { fileOfEditor: () => null }, "./widgetWhitespace.ts": { guardWidgetWhitespace() {} }, "./windows.ts": {},
+  });
+  const extensions = [editorInfoField, editorLivePreviewField, live.livePreviewExtension({})];
+  const sourceVisible = (state: stateApi.EditorState): boolean => {
+    let visible = false;
+    for (const decorations of state.facet(viewApi.EditorView.decorations)) {
+      if (typeof decorations !== "function") decorations.between(0, state.doc.length, (_from, _to, deco) => {
+        const { class: className } = deco.spec as { class?: string };
+        if (className?.startsWith("vml-source-line")) visible = true;
+      });
+    }
+    return visible;
+  };
+  for (const [anchor, edge, head] of [[media.length, media.indexOf("\n\nTail"), 2], [2, media.indexOf("<!-- vml"), media.length]]) {
+    const start = stateApi.EditorState.create({ doc: media, selection: { anchor }, extensions });
+    let dragging = start.update({ effects: live.setLayoutSelectionDrag.of(true) }).state;
+    dragging = dragging.update({ selection: { anchor, head: edge }, userEvent: "select.pointer" }).state;
+    assert.equal(sourceVisible(dragging), false, "touching the layout boundary leaves the widget in place");
+    dragging = dragging.update({ selection: { anchor, head }, userEvent: "select.pointer" }).state;
+    assert.equal(sourceVisible(dragging), false, "crossing the layout leaves the widget in place");
+    const released = dragging.update({ effects: live.setLayoutSelectionDrag.of(false) }).state;
+    assert.equal(sourceVisible(released), true);
+    assert.ok(released.selection.eq(dragging.selection), "releasing keeps the original selection");
+    assert.equal(sourceVisible(start.update({ selection: { anchor, head }, userEvent: "select" }).state), true);
+  }
+  const opened = stateApi.EditorState.create({ doc: media, selection: { anchor: media.indexOf("same.png") }, extensions });
+  const dragging = opened.update({ effects: live.setLayoutSelectionDrag.of(true) }).state;
+  const outside = dragging.update({ selection: { anchor: 2 }, userEvent: "select.pointer" }).state;
+  assert.equal(sourceVisible(outside), true, "a source already visible when dragging starts stays open");
+  assert.equal(sourceVisible(outside.update({ effects: live.setLayoutSelectionDrag.of(false) }).state), false);
+});
+
 test("editor initialization recovers from an unavailable getter and preserves subsequent layout identity and writes", async () => {
   const file = { path: "note.md" };
   const editor = {};
