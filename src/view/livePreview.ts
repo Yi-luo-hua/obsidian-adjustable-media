@@ -233,7 +233,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
       drawMeasurement: (el, view, anchor, sourcePath) => {
         const component = new Component(); component.load(); components.set(el, component);
         renderLayout(el, { app, sourcePath, model: modelFromBlock(anchor.block), effectiveSkip: anchor.skip,
-          editable: false, warning: null, component, refs: currentRefs(view) });
+          editable: false, warning: null, component, refs: currentRefs(view), pdfRegions: "measure" });
       },
       keepStandIn: (el, block) => keepWhileEditing(el, block),
       resizeStandIn: (el, anchor, path) => {
@@ -548,7 +548,7 @@ class LayoutWidget extends WidgetType {
       component.load();
       components.set(el, component);
       renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block), effectiveSkip: this.effectiveSkip,
-        editable: false, warning: blockWarning(this.block), component, refs: this.refs });
+        editable: false, warning: blockWarning(this.block), component, refs: this.refs, pdfRegions: "visible" });
     } else {
       drawWidget(el, view, this.app, this.block, this.sourcePath, this.refs, this.effectiveSkip);
     }
@@ -636,7 +636,8 @@ function drawWidget(
   const component = new Component();
   component.load();
   components.set(el, component);
-  const root = renderLayout(el, { app, sourcePath, model, effectiveSkip, editable: isEditable(block), warning: blockWarning(block), component, refs });
+  const root = renderLayout(el, { app, sourcePath, model, effectiveSkip, editable: isEditable(block), warning: blockWarning(block),
+    component, refs, pdfRegions: "visible" });
   markHighlightWidget(el, view, block);
   // Resolved when asked: the block may have moved since the widget was drawn.
   const position = (): number => standIn ?? view.posAtDOM(el);
@@ -751,7 +752,7 @@ class RevealedWrapWidget extends WidgetType {
     component.load();
     components.set(el, component);
     renderLayout(el, { app: this.app, sourcePath: this.sourcePath, model: modelFromBlock(this.block),
-      effectiveSkip: this.effectiveSkip, editable: false, warning: null, component, refs: this.refs });
+      effectiveSkip: this.effectiveSkip, editable: false, warning: null, component, refs: this.refs, pdfRegions: "visible" });
     markHighlightWidget(el, view, this.block);
     return el;
   }

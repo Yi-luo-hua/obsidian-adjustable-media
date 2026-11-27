@@ -29,6 +29,8 @@ PDF++ 的「Copy embed link to rectangular selection」复制出 `![[a.pdf#page=
 
 解析见 `pdfRegion`（`src/format/v2.ts`），显示见 `src/view/pdfRegion.ts`。显示时用 `MarkdownRenderer` 渲染原嵌入，交给 PDF++ 在 Obsidian 嵌入注册表里的 PDF 处理器画成图片，不调用 PDF++ 的内部 API，只用 `app.plugins.plugins["pdf-plus"]` 判断它是否已加载（非官方 App 类型）。矩形（PDF 点）按 72pt→96px 给出原始尺寸，图片加载前布局就有正确的宽高比；加载后比例不同（旋转页）时按面积不变修正。嵌入内容不接收指针事件，以免 PDF++ 的双击／点击处理和图片原生拖动与布局操作冲突。
 
+实时预览先按矩形保留尺寸，视口外的浮动布局也用这个尺寸测量。选区进入视口后，同一窗口排队交给 PDF++ 渲染；上一张出图、卸载或等待满 1 秒后开始下一张，避免坏链接拖住同窗口的其他选区。迟到的图片仍可校正尺寸。
+
 ## 本轮验证
 
 - Node 24：`npm run check` 通过（新增 `tests/pdfRegion.test.ts`，覆盖解析、非选区 PDF 不接管、改设置／移动／移出时嵌入逐字保留、包装命令、渲染等待与卸载、未启用 PDF++ 的提示；`tests/mediaMenu.test.ts` 覆盖右键包装）。

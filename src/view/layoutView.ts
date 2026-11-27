@@ -30,6 +30,8 @@ export interface LayoutViewOptions {
   /** Export waits for the Markdown inside the layout before printing. */
   renderTasks?: Promise<void>[];
   print?: boolean;
+  /** Live Preview draws visible crops and uses the source rectangle for offscreen measurements. */
+  pdfRegions?: "visible" | "measure";
 }
 
 interface MediaSize {
@@ -312,13 +314,13 @@ function renderItem(rowEl: HTMLElement, row: LayoutRow, item: LayoutItem, index:
     const rect = pdfRegion(item.embed.fragment ?? "");
     const size = rect ? pdfRegionSize(rect) : { width: 300, height: 200 };
     applySize(size);
-    if (options.component) {
+    if (options.component && options.pdfRegions !== "measure") {
       const task = renderPdfRegion(options.app, item.embed, region, options.sourcePath, options.component, (drawn) => {
         const ratio = drawn.width / drawn.height;
         if (Math.abs(ratio / (size.width / size.height) - 1) < 0.01) return;
         const area = size.width * size.height;
         applySize({ width: Math.sqrt(area * ratio), height: Math.sqrt(area / ratio) });
-      });
+      }, options.pdfRegions === "visible");
       options.renderTasks?.push(task);
     }
   } else {
