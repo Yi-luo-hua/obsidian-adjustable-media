@@ -33,6 +33,7 @@ import { nativeListHanging } from "./hangingIndent.ts";
 export const setEnvironment = StateEffect.define<string>();
 /** Results are owned by an exact pane snapshot, including its buffer and source revision. */
 export const setParagraphSections = StateEffect.define<{ snapshot: DocumentSnapshot; sections: MarkdownSection[] | null }>();
+export const setLayoutSelectionDrag = StateEffect.define<boolean>();
 /** The environment of a pane before its first reading (viewEnvironment.ts). */
 const PENDING_ENVIRONMENT = "pending";
 /** How every layout block opens; a note without it has no layouts. */
@@ -86,6 +87,7 @@ interface LivePreviewState extends Parsed {
    * its cursor at its very start, where it touches a layout written first; that cursor shows no source.
    */
   placedCursor: boolean;
+  dragSelection: { ranges: readonly SelectionRange[]; placedCursor: boolean } | null;
 }
 
 interface Parsed extends Measurements {
@@ -103,8 +105,8 @@ interface Parsed extends Measurements {
 
 /**
  * Live preview. Each v2 block is replaced with its rendered layout; while the cursor or a selection
- * touches the block, its source shows again (docs/DESIGN.md, section 4). The note is parsed only when
- * it changes; a cursor move just recomputes which blocks show their source.
+ * touches the block, its source shows again (docs/DESIGN.md, section 4). A mouse drag keeps the
+ * previous layout geometry until release. The note is parsed only when it changes.
  *
  * An editor showing a note with editable layouts gets the class `vml-has-layouts`: images outside
  * the layouts can then be dragged into them, and show a grab cursor. One showing a note with
@@ -148,14 +150,22 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
         }
         return withDecorations(app, tr.state, { ...parsed, ...measurements }, placedCursor);
       }
+      let dragSelection = value.dragSelection;
+      const drag = tr.effects.find(effect => effect.is(setLayoutSelectionDrag));
+      if (drag) {
+        dragSelection = drag.value ? { ranges: tr.startState.selection.ranges, placedCursor: value.placedCursor } : null;
+      } else if (tr.selection && !tr.isUserEvent("select.pointer")) {
+        dragSelection = null;
+      }
       const paragraphs = tr.effects.find(effect => effect.is(setParagraphSections));
       if (paragraphs?.is(setParagraphSections) && paragraphs.value.snapshot === value.snapshot) {
         const { sections } = paragraphs.value;
         const breaks = sections ? hostParagraphBreaks(value.lines, breakBlocks(value.blocks), sections) : value.spacing.breaks;
-        return withDecorations(app, tr.state, { ...value, ...measurements, breaks }, placedCursor);
+        return withDecorations(app, tr.state, { ...value, ...measurements, breaks }, placedCursor, dragSelection);
       }
-      if (tr.selection || environment || placedCursor !== value.placedCursor || tr.effects.some(effect => effect.is(setLayoutHighlight))) {
-        return withDecorations(app, tr.state, { ...value, ...measurements }, placedCursor);
+      if (tr.selection || environment || dragSelection !== value.dragSelection || placedCursor !== value.placedCursor
+        || tr.effects.some(effect => effect.is(setLayoutHighlight))) {
+        return withDecorations(app, tr.state, { ...value, ...measurements }, placedCursor, dragSelection);
       }
       rememberDocumentSnapshot(tr.state, value.snapshot);
       return value;
@@ -176,6 +186,7 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
     highlightField.init(() => ({ cursorOnly: !keepLayoutHighlight(), focused: false, columnId: null })),
     layoutHistory(),
     Prec.high(field),
+    layoutSelectionDrag(field),
     nativeListHanging(view => view.state.field(field).blocks.some(isDrawable)),
     ViewPlugin.define(view => {
       let destroyed = false;
@@ -307,6 +318,48 @@ export function livePreviewExtension(app: App, keepLayoutHighlight: () => boolea
   ];
 }
 
+function layoutSelectionDrag(field: StateField<LivePreviewState>): Extension {
+  return ViewPlugin.define(view => {
+    let stop: (() => void) | undefined;
+    const finish = (): void => {
+      stop?.();
+      stop = undefined;
+      if (view.state.field(field).dragSelection) view.dispatch({ effects: setLayoutSelectionDrag.of(false) });
+    };
+    return {
+      start(event: MouseEvent): void {
+        if (event.button !== 0 || !view.state.field(field).blocks.some(isDrawable)) return;
+        finish();
+        const doc = view.contentDOM.doc;
+        const win = view.contentDOM.win;
+        let moved = false;
+        const move = (event: MouseEvent): void => {
+          if ((event.buttons & 1) === 0) {
+            finish();
+          } else if (!moved) {
+            // Showing source before the drag ends changes which position the pointer hits.
+            moved = true;
+            view.dispatch({ effects: setLayoutSelectionDrag.of(true) });
+          }
+        };
+        const release = (event: MouseEvent): void => { if (event.button === 0) finish(); };
+        doc.addEventListener("mousemove", move, true);
+        doc.addEventListener("dragstart", finish, true);
+        // CodeMirror completes its selection on the document's mouseup before it reaches the window.
+        win.addEventListener("mouseup", release);
+        win.addEventListener("blur", finish);
+        stop = () => {
+          doc.removeEventListener("mousemove", move, true);
+          doc.removeEventListener("dragstart", finish, true);
+          win.removeEventListener("mouseup", release);
+          win.removeEventListener("blur", finish);
+        };
+      },
+      destroy() { stop?.(); },
+    };
+  }, { eventObservers: { mousedown(event) { this.start(event); } } });
+}
+
 const emptySpacing: ParagraphSpacing = { breaks: [], structure: [] };
 
 function parse(app: App, state: EditorState, previous: DocumentSnapshot | null = null, changes?: ChangeDesc): Parsed {
@@ -340,7 +393,8 @@ function userPlaced(tr: Transaction): boolean {
   return ["select", "input", "delete", "move", "undo", "redo"].some((event) => tr.isUserEvent(event));
 }
 
-function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCursor: boolean): LivePreviewState {
+function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCursor: boolean,
+  dragSelection: LivePreviewState["dragSelection"] = null): LivePreviewState {
   const { blocks, lines, refs, snapshot, skips } = parsed;
   // The numbering the layouts are drawn with, as their own widgets' keys hold it.
   const numbers = refs ? `${refs.language} ${refs.index.signature}` : "";
@@ -349,9 +403,11 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
   const sourcePath = snapshot?.origin.path ?? state.field(editorInfoField, false)?.file?.path ?? "";
   const anchors: WrapAnchor[] = [];
   const active = state.field(highlightField).cursorOnly ? highlightedBlocks(state, placedCursor) : new Set<string>();
+  const sourceRanges = dragSelection?.ranges ?? state.selection.ranges;
+  const sourceCursorPlaced = dragSelection?.placedCursor ?? placedCursor;
   // A cursor nobody put at the start of the note touches nothing there.
   const touches = (range: SelectionRange, from: number, to: number): boolean => range.from <= to && range.to >= from
-    && (placedCursor || !range.empty || range.head > 0);
+    && (sourceCursorPlaced || !range.empty || range.head > 0);
   let hasWraps = false;
 
   for (const [index, block] of blocks.entries()) {
@@ -360,7 +416,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     }
     const from = state.doc.line(block.openLine + 1).from;
     const to = state.doc.line(block.closeLine + 1).to;
-    const revealed = state.selection.ranges.some((range) => touches(range, from, to));
+    const revealed = sourceRanges.some((range) => touches(range, from, to));
     const wraps = blockWrap(block) !== null;
     const effectiveSkip = skips[index] ?? null;
     const ref = snapshot!.blocks[index];
@@ -401,7 +457,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     }
     if (after.openLine - before.closeLine > 2) continue;
     const gap = state.doc.sliceString(state.doc.line(before.closeLine + 1).to, state.doc.line(after.openLine + 1).from);
-    if (gap.trim() !== "" || state.selection.ranges.some((range) => touches(range, state.doc.line(before.openLine + 1).from, state.doc.line(after.closeLine + 1).to))) {
+    if (gap.trim() !== "" || sourceRanges.some((range) => touches(range, state.doc.line(before.openLine + 1).from, state.doc.line(after.closeLine + 1).to))) {
       continue;
     }
     for (let line = before.closeLine + 1; line < after.openLine; line += 1) {
@@ -422,7 +478,7 @@ function withDecorations(app: App, state: EditorState, parsed: Parsed, placedCur
     ranges.push(Decoration.line({ class: cls }).range(from));
   }
 
-  return { ...parsed, decorations: Decoration.set(ranges, true), anchors, hasWraps, placedCursor };
+  return { ...parsed, decorations: Decoration.set(ranges, true), anchors, hasWraps, placedCursor, dragSelection };
 }
 
 /** What Obsidian draws for the text beside a layout's media lives as long as the widget's element. */
