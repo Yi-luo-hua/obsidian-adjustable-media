@@ -8,7 +8,7 @@ Obsidian 图文布局插件：在实时预览中拖拽调整图片、视频、Me
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-最新版本：**[1.1.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [更新日志](CHANGELOG.md) · [功能示例](docs/examples/Guide.zh-CN.md) · [常见问题](docs/FAQ.md) · [文档索引](docs/README.md)
+最新版本：**[1.2.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [更新日志](CHANGELOG.md) · [功能示例](docs/examples/Guide.zh-CN.md) · [常见问题](docs/FAQ.md) · [文档索引](docs/README.md)
 
 ![Adjustable Media 效果预览](assets/demo.jpg)
 

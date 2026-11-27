@@ -1,6 +1,6 @@
 # 项目状态
 
-更新于 2026-11-18。当前公开最新版本为 **1.1.0**。尚未完成与待推进事项统一维护在 [待办与路线图](plans/layout-redesign/09-progress-and-next-steps.md)。
+更新于 2026-11-27。当前公开最新版本为 **1.2.0**。尚未完成与待推进事项统一维护在 [待办与路线图](plans/layout-redesign/09-progress-and-next-steps.md)。
 
 ## 版本与交付状态
 
@@ -8,7 +8,8 @@
 
 | 版本 | 日期 | 主要内容 | 核验记录 |
 | --- | --- | --- | --- |
-| **1.1.0** | 2026-11-18 | 外链图片包装与拖入布局、升级后自动恢复缺失样式 | [1.1.0 核验](releases/1.1.0-readiness.md) |
+| **1.2.0** | 2026-11-27 | PDF++ 矩形选区布局与拖入、实时预览渲染优化、连续浮动滚动和跨布局拖选修复 | [1.2.0 核验](releases/1.2.0-readiness.md) |
+| 1.1.0 | 2026-11-18 | 外链图片包装与拖入布局、升级后自动恢复缺失样式 | [1.1.0 核验](releases/1.1.0-readiness.md) |
 | 1.0.0 | 2026-11-16 | 窄块横向自由摆放、自定义边框颜色、阅读视图浮动后空行保留与首帧切阅读稳定性、Maple 水平线与 Cursor-Smith 空行光标修复 | [1.0.0 核验](releases/1.0.0-readiness.md) |
 | 0.9.8 | 2026-11-15 | 整组图注、阅读模式布局边框开关 | [0.9.8 核验](releases/0.9.8-readiness.md) |
 | 0.9.7 | 2026-11-13 | 围栏旁输入防抖、普通/环绕布局留白对齐、默认关闭边框常亮 | [0.9.7 核验](releases/0.9.7-readiness.md) |
@@ -27,7 +28,7 @@
 
 - **Issue [#37](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/37)**（Open，未认定修复）：报告阅读模式两列图片破图。常规路径测试均正常；在临时覆盖附件文件的受控场景下曾复现编辑缓存与阅读刷新不同步（[排查记录](archive/2026-11-04-reading-image-issue37.md)），仍待原始笔记与环境复现信息。
 - **Issue [#29](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/29)**（Open，未认定修复）：报告靠右浮动图片使上方正文变半宽。测试库暂未复现，仍待最小复现笔记与主题/CSS 片段信息。
-- **移动端验证范围边界**：`0.8.0` 完成了 Android / iPhone / iPad 基础验证；`0.9.0`–`1.1.0` 新增与调整的功能（包括 Canvas、Callout 缩放、Excalidraw、表格包装、网页嵌入、整组图注、窄块横向摆放、外链图片与样式恢复）均未在移动端真机复测，详见 [移动适配记录](plans/layout-redesign/mobile-adaptation.md)。
+- **移动端验证范围边界**：`0.8.0` 完成了 Android / iPhone / iPad 基础验证；`0.9.0`–`1.2.0` 新增与调整的功能（包括 Canvas、Callout 缩放、Excalidraw、表格包装、网页嵌入、整组图注、窄块横向摆放、外链图片、样式恢复与 PDF++ 矩形选区布局）均未在移动端真机复测，详见 [移动适配记录](plans/layout-redesign/mobile-adaptation.md)。
 - **功能边界**：
   - 全库批量移除只处理 Markdown 文件中可编辑的顶层布局注释，不扫描 Canvas 文字卡片，也不移除 Callout 图片设置。
   - Canvas 仅支持卡片内部布局，不支持跨卡片拖放布局或 Canvas 内交叉引用跳转。
