@@ -6,14 +6,14 @@ import { mockedModule } from "./support/mockedModule.ts";
 
 test("update notes appear once for their bundled version", () => {
   assert.equal(shouldShowReleaseNotes("", RELEASE_NOTES_VERSION), true);
-  assert.equal(shouldShowReleaseNotes("1.0.0", RELEASE_NOTES_VERSION), true);
+  assert.equal(shouldShowReleaseNotes("1.1.0", RELEASE_NOTES_VERSION), true);
   assert.equal(shouldShowReleaseNotes(RELEASE_NOTES_VERSION, RELEASE_NOTES_VERSION), false);
-  assert.equal(shouldShowReleaseNotes(RELEASE_NOTES_VERSION, "1.0.0"), false);
+  assert.equal(shouldShowReleaseNotes(RELEASE_NOTES_VERSION, "1.1.0"), false);
 });
 
 for (const scenario of [
   { name: "existing users see update notes and persist the version", seen: "", guide: GUIDE_REVISION, updates: 1, guides: 0, unload: false },
-  { name: "upgrading from 1.0.0 shows the release notes", seen: "1.0.0", guide: GUIDE_REVISION, updates: 1, guides: 0, unload: false },
+  { name: "upgrading from 1.1.0 shows the release notes", seen: "1.1.0", guide: GUIDE_REVISION, updates: 1, guides: 0, unload: false },
   { name: "reloading the same release does not show update notes again", seen: RELEASE_NOTES_VERSION, guide: GUIDE_REVISION, updates: 0, guides: 0, unload: false },
   { name: "first-use guide does not stack an update modal", seen: "", guide: 0, updates: 0, guides: 1, unload: false },
   { name: "unloading before layout readiness prevents automatic modals", seen: "", guide: GUIDE_REVISION, updates: 0, guides: 0, unload: true },

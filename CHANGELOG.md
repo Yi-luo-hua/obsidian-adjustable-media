@@ -2,9 +2,12 @@
 
 ## Unreleased
 
-- Arrange PDF++ rectangle selections (`![[file.pdf#page=N&rect=…]]`) in layouts like images: resize them, set column widths, float them, and add captions. Previously a layout of these embeds became a text block with only a width handle. In Live Preview, right-click a standalone selection to wrap it, or drag it into an existing layout. Requires the PDF++ plugin ([#50](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/50)).
+## 1.2.0 - 2026-11-27
 
-- Keep layout previews stable while dragging a text selection across them in Live Preview.
+- Arrange PDF++ rectangle selections alongside other media. Resize them, adjust column widths, float the layout, and add captions. In Live Preview, right-click a standalone selection to wrap it or drag it into an existing layout. Requires [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) ([#50](https://github.com/Yi-luo-hua/obsidian-adjustable-media/issues/50), [#55](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/55)).
+- Keep Live Preview responsive in notes with many PDF++ crops by starting their rendering as they enter the viewport ([#52](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/52)).
+- Fix scroll jumps around horizontal rules after consecutive floating layouts ([#53](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/53)).
+- Keep layout previews stable while dragging a text selection across them in Live Preview. Apply the usual source reveal behavior when the mouse button is released ([#54](https://github.com/Yi-luo-hua/obsidian-adjustable-media/pull/54)).
 
 ## 1.1.0 - 2026-11-18
 
