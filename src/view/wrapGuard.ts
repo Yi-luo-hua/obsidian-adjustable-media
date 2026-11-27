@@ -1,6 +1,6 @@
 import { editorInfoField } from "obsidian";
 import { StateEffect, StateField, type ChangeDesc, type EditorState, type Extension, type Range } from "@codemirror/state";
-import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, type BlockInfo, type DecorationSet, type ViewUpdate } from "@codemirror/view";
+import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 
 import type { V2Block } from "../format/v2.ts";
 import { snapshotForState } from "../layout/documentSnapshot.ts";
@@ -587,7 +587,7 @@ class WrapGuard {
     const view = this.view;
     const anchors = this.source.anchors(view.state);
     const first = view.lineBlockAt(view.viewport.from);
-    if (anchors.length === 0 || !startsWithText(first)) {
+    if (anchors.length === 0) {
       return [];
     }
 
@@ -612,7 +612,8 @@ class WrapGuard {
     }
     // Drawn in this order, each below the ones before it.
     const plans = stackProxies(planned.map(({ plan }) => plan), floor);
-    // In front of the wrap gaps at the same position (side -1): the float starts at the line's top.
+    // Place the floats before the first block, including a replaced line such as a horizontal rule.
+    // They also precede its wrap gaps (side -1), since the gap accounts for their clearance.
     return planned.map(({ anchor, side }, index) => Decoration.widget({
       widget: new ProxyWidget(this.source, anchor, sourcePath, side, plans[index]), block: true, side: -2,
     }).range(first.from));
@@ -641,16 +642,6 @@ function onSelectionLine(view: EditorView, from: number, to = from): boolean {
 function isReady(layout: HTMLElement): boolean {
   return layoutIsRendered(layout) && Array.from(layout.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"))
     .every(media => media.instanceOf(HTMLImageElement) ? media.complete : media.readyState > 0);
-}
-
-/**
- * Whether a line block starts with text: a line, possibly behind block widgets (stand-ins, wrap
- * gaps), not a layout's widget.
- */
-function startsWithText(block: BlockInfo): boolean {
-  const parts = Array.isArray(block.type) ? (block.type as readonly BlockInfo[]) : [block];
-  return parts.every((part) => part.type === BlockType.Text || part.type === BlockType.WidgetBefore)
-    && parts.some((part) => part.type === BlockType.Text);
 }
 
 /** Bottom edge of the margin boxes of the floats inside `el`, in document pixels. */

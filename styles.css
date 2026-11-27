@@ -1495,10 +1495,12 @@ body.vml-is-dragging * {
  * Live preview. Frame handles extend outside every layout widget, including ordinary layouts in
  * notes without floats. Obsidian's paint containment would clip their visible and clickable area.
  * Themes can also make all non-editable widgets scroll containers, clipping the same handles.
- * Wrapped layouts and their stand-ins also need their floats to extend outside the anchor widget.
+ * Wrapped layouts and their stand-ins need their floats to extend outside the anchor widget.
+ * The clearance gap must also stay in the normal block flow so the floats cannot push it down.
  */
 .markdown-source-view.mod-cm6 .cm-content > .vml-live-preview[contenteditable="false"],
-.markdown-source-view.mod-cm6 .cm-content > .vml-wrap-proxy[contenteditable="false"] {
+.markdown-source-view.mod-cm6 .cm-content > .vml-wrap-proxy[contenteditable="false"],
+.markdown-source-view.mod-cm6 .cm-content > .vml-wrap-gap[contenteditable="false"] {
   contain: none !important;
   overflow: visible;
 }
@@ -1524,10 +1526,10 @@ body.vml-is-dragging * {
 
 /*
  * Rules end text wrapping on both sides; fenced code also starts below floats.
- * Reading rules must clear even before the postprocessor installs the wrapping classes on a mode switch.
+ * Reading rules must clear even before the postprocessor runs. Obsidian may use a generic section div.
  */
 .vml-has-wraps .cm-content > .cm-line:is(.hr, .HyperMD-hr),
-.markdown-preview-sizer > .el-hr > hr,
+.markdown-preview-sizer > div > hr,
 .vml-print-content > hr,
 .vml-has-wraps .cm-content > .cm-line.HyperMD-codeblock-begin,
 .markdown-rendered .vml-rv-wrapping pre,

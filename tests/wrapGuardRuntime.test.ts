@@ -102,3 +102,34 @@ test("an unseen float waits for rendered nonzero geometry and releases its read-
   assert.equal(released, 1, "valid geometry releases the renderer without another media or viewport event");
   guard.destroy(); assert.equal(released, 1);
 });
+
+test("an upstream float keeps its stand-in when the first drawn block is a horizontal rule", async () => {
+  const info = stateApi.StateField.define({ create: () => ({}), update: value => value });
+  const module = await mockedModule<{ wrapGuard(source: unknown): unknown[] }>(new URL("../src/view/wrapGuard.ts", import.meta.url), {
+    obsidian: { editorInfoField: info }, "@codemirror/state": stateApi,
+    "@codemirror/view": { ...viewApi, ViewPlugin: { define: (create: unknown) => create } },
+    "../layout/model.ts": model, "../layout/wrapGaps.ts": gaps, "../layout/convergenceBudget.ts": budget,
+    "../layout/documentSnapshot.ts": { snapshotForState: () => null }, "./layoutView.ts": {},
+  }, { queueMicrotask });
+  const doc = '<!-- vml {"v":2,"type":"text","wrap":"right"} -->\nText\n<!-- /vml -->\n\n---\nBody';
+  const from = doc.indexOf("---"), block = findV2Blocks(doc.split("\n"))[0];
+  const anchor = { from: 0, to: from - 2, key: "float", skip: 0, numbers: "", block };
+  const source = { anchors: () => [anchor], hasWraps: () => true, environmentEpoch: () => 0 };
+  class Observer { observe() {} disconnect() {} }
+  const rule = { from, to: from + 3, top: 24, height: 210,
+    type: [{ from, to: from, top: 24, height: 206, type: viewApi.BlockType.WidgetBefore },
+      { from, to: from + 3, top: 230, height: 4, type: viewApi.BlockType.WidgetRange }] };
+  const view = { state: stateApi.EditorState.create({ doc, selection: { anchor: doc.length } }),
+    viewport: { from, to: doc.length }, dom: { win: { ResizeObserver: Observer } }, defaultLineHeight: 24,
+    requestMeasure() {}, dispatch() {},
+    lineBlockAt: (pos: number) => pos === from ? rule : { from: pos, to: pos, top: 0, height: 0, type: viewApi.BlockType.Text } };
+  type Guard = { sizes: Map<string, gaps.FloatSize>; proxies(): stateApi.Range<viewApi.Decoration>[]; destroy(): void };
+  const guard = (module.wrapGuard(source)[2] as (view: unknown) => Guard)(view);
+  guard.sizes.set(anchor.key, { side: "right", layoutTop: 72, layoutHeight: 150, width: 200, margin: 0, marginBottom: 8 });
+  const planned = guard.proxies();
+  assert.equal(planned.length, 1);
+  assert.equal(planned[0].from, from);
+  assert.equal(planned[0].to, from);
+  assert.equal((planned[0].value.spec as { side: number }).side, -2, "the float goes before the rule's clearance spacer");
+  guard.destroy();
+});
