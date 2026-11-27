@@ -71,6 +71,43 @@ test("nothing is written when the plain line changed in the meantime", () => {
   assert.deepEqual(applyEditsToText("![[a.png|200]]", [taken.edit]), { ok: false, reason: "not-found" });
 });
 
+const pdfCrop = "![Crop](<report file.pdf#page=2&rect=1,2,30,40&width=210>)";
+
+test("a PDF crop moves into a mixed layout with its original link and leaves the other embed in place", () => {
+  const lines = ["<!-- vml -->", "![[photo.png]]", "<!-- /vml -->", "", `![[other.png]]  ${pdfCrop}`];
+  const [block] = findV2Blocks(lines);
+  const taken = takePlainEmbed(lines, 4, lines[4].indexOf(pdfCrop));
+  assert.ok(block && taken);
+  assert.equal(taken.embed.kind, "pdf");
+  const edit = planModelEdit(block, insertItem(modelFromBlock(block), { embed: taken.embed, weight: null, caption: null }, {
+    kind: "beside", position: { row: 0, index: 0 }, side: "after",
+  }));
+  assert.ok(edit);
+  const text = lines.join("\r\n");
+  const edited = applyEditsToText(text, [taken.edit, edit]);
+  assert.deepEqual(edited, { ok: true, text: [
+    "<!-- vml -->", `![[photo.png]] ${pdfCrop} <!-- vml-pdf-row -->`, "<!-- /vml -->", "", "![[other.png]]  ",
+  ].join("\r\n") });
+  assert.deepEqual(applyEditsToText(text.replace("width=210", "width=230"), [taken.edit, edit]), { ok: false, reason: "not-found" });
+});
+
+test("PDF crops can only be taken from top-level media lines", () => {
+  const wiki = "![[report.pdf#page=3&rect=0,0,200,100|Original name]]";
+  assert.equal(takePlainEmbed([wiki], 0, 0)?.embed.raw, wiki);
+  for (const lines of [
+    [`    ${wiki}`], ["- List", wiki], [`> ${wiki}`], [`${wiki} description`], ["```md", wiki, "```"],
+    ["> Quote", wiki], ["> > Nested quote", "Continuation", wiki], ["> - A quoted item", wiki], ["> # Quoted heading", wiki],
+    ["> ---", wiki], ["> Quote", ">", wiki], ["> Quote", "2. More quote text", wiki], ["> Quote", wiki, "==="],
+    ["<!-- vml -->", wiki, "<!-- /vml -->"], ["![[report.pdf#page=3]]"], ["![[report.pdf#page=3&rect=0,,200,100]]"],
+  ]) {
+    assert.ok(lines.every((line, index) => takePlainEmbed(lines, index, line.indexOf("!")) === null));
+  }
+  for (const lines of [["> Quote", "", wiki], ["> Quote", "# Heading", wiki], ["> Quote", "Title", "===", wiki],
+    ["> Quote", "<!-- comment -->", wiki], ["> Quote", "---", wiki]]) {
+    assert.equal(takePlainEmbed(lines, lines.length - 1, 0)?.embed.raw, wiki);
+  }
+});
+
 const diagram = ["```mermaid", "flowchart LR", "%% Keep <!-- /vml --> and blank lines", "", "    A[输入] --> B[输出]", "```"];
 
 test("taking a standalone diagram moves the whole fence and preserves surrounding CRLF text", () => {

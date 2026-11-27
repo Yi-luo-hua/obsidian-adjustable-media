@@ -31,6 +31,9 @@ const TEXT: ScanState = { kind: "text" };
 // then the fence run and its info string.
 const FENCE_PATTERN = /^((?:[ \t]*>)*)([ \t]*(?:(?:[-*+]|\d{1,9}[.)])[ \t]+)?)(`{3,}|~{3,})(.*)$/;
 const INLINE_CODE_PATTERN = /(`+)[\s\S]*?\1/g;
+const THEMATIC_BREAK = /^([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
+const ATX_HEADING = /^#{1,6}(?:[ \t]|$)/;
+const LIST_ITEM = /^([ \t]*)([-*+]|(\d{1,9})[.)])([ \t]+|$)(.*)$/;
 
 export function scanMarkdownLines(lines: readonly string[], includeEnd = false): LineContext[] {
   const contexts: LineContext[] = [];
@@ -76,7 +79,7 @@ export function fencedCodeBlocks(lines: readonly string[]): FencedCodeBlock[] {
   return scanMarkdownContainers(lines).fences;
 }
 
-/** Shared top-level ownership for multiline media; lazy list continuations stay in the list. */
+/** Shared top-level ownership for media; lazy continuations stay in their container. */
 export function scanMarkdownContainers(lines: readonly string[]): {
   fences: FencedCodeBlock[];
   unclosedFenceFrom: number | undefined;
@@ -91,19 +94,23 @@ export function scanMarkdownContainers(lines: readonly string[]): {
   let listIndent = 0;
   let afterBlank = true;
   let paragraph = false;
+  let quoteParagraph = false;
   for (const [index, line] of lines.entries()) {
     const text = stripCarriageReturn(line);
     const [, next] = classifyLine(text, index, state);
+    const quote = /^[ \t]*>/.test(text);
     if (state.kind === "text") {
       const trimmed = text.trimStart();
       if (trimmed.trim() === "") {
         afterBlank = true;
         paragraph = false;
+        quoteParagraph = false;
       } else {
         const indent = measureIndent(/^[ \t]*/.exec(text)?.[0] ?? "");
-        const rule = /^([-*_])(?:[ \t]*\1){2,}[ \t]*$/.test(trimmed);
-        const item = rule ? null : /^([ \t]*)([-*+]|(\d{1,9})[.)])([ \t]+|$)(.*)$/.exec(text);
-        const own = next.kind !== "text" || rule || /^#{1,6}(?:[ \t]|$)/.test(trimmed) || trimmed.startsWith(">");
+        const rule = THEMATIC_BREAK.test(trimmed);
+        const item = rule ? null : LIST_ITEM.exec(text);
+        const heading = ATX_HEADING.test(trimmed);
+        const own = next.kind !== "text" || rule || heading || quote;
         // Native Markdown keeps a comment/math continuation in the preceding list paragraph.
         const lazy = paragraph && !afterBlank && !item && (!own || next.kind === "html-comment" || next.kind === "math");
         if (!lazy && indent < listIndent) listIndent = 0;
@@ -113,9 +120,16 @@ export function scanMarkdownContainers(lines: readonly string[]): {
         }
         afterBlank = false;
         paragraph = next.kind === "text" && !own;
+        if (quote) quoteParagraph = true;
+        else if (quoteParagraph) {
+          // Obsidian also ends a quote before an unprefixed Setext heading or HTML comment.
+          const setext = /^(?:=+|-+)$/.test(stripCarriageReturn(lines[index + 1] ?? ""));
+          const startsItem = item?.[5]?.trim() && (!item[3] || item[3] === "1");
+          quoteParagraph = !own && !setext && !startsItem && !trimmed.startsWith("<!--");
+        }
       }
     }
-    topLevel.push(state.kind === "text" && listIndent === 0 && !/^[ \t]*>/.test(text));
+    topLevel.push(state.kind === "text" && listIndent === 0 && !quote && !quoteParagraph);
     if (state.kind === "text" && next.kind === "code") {
       const fence = next.fence;
       opening = fence.quoteDepth === 0 && !fence.listMarker && fence.indent <= 3 && (listIndent === 0 || fence.indent < listIndent)

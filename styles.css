@@ -905,7 +905,8 @@
 }
 
 /* Images outside the layouts of a note can be dragged into them. */
-.vml-has-layouts .cm-content .image-embed > .image-wrapper > img {
+.vml-has-layouts .cm-content .image-embed > .image-wrapper > img,
+.vml-has-layouts .cm-content .pdf-cropped-embed:not(.vml-layout *, .vml-text-editor *) > img {
   cursor: grab;
 }
 
