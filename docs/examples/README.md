@@ -9,6 +9,7 @@ This directory contains demonstration notes and bundled media for Adjustable Med
 ## 包含文档
 
 - **综合指南**：[简体中文](Guide.zh-CN.md) · [English](Guide.en.md) —— 在 Obsidian 命令面板运行「功能示例」（`Feature examples`）即可预览或一键在库中创建带素材的示例笔记。
+- **Agent 排版参考指南**：[简体中文](AgentGuide.zh-CN.md) · [English](AgentGuide.en.md) —— 面向直接编辑 Markdown 源码的 AI Agent，包含精确注释格式、JSON 字段约束、失效边界与标准模板；同样可在「功能示例」弹窗中一键生成。
 - **手动文字分栏（`+++`）**：[简体中文](ManualColumns.zh-CN.md) · [English](ManualColumns.en.md) —— 可直接复制 Markdown 到笔记中使用（0.7.3 更新弹窗曾内嵌此样例创建入口）。
 - **Mermaid 布局示例**：[简体中文](Mermaid.zh-CN.md) · [English](Mermaid.en.md) —— 可直接复制 Markdown 到笔记中使用（0.8.0 更新弹窗曾内嵌此样例创建入口）。
 

@@ -2,7 +2,7 @@ import { Modal, Notice, type App, type TFile } from "obsidian";
 
 import { writeExampleNote } from "../layout/writeBack.ts";
 import { currentLanguage, t } from "../view/messages.ts";
-import { GUIDE_TEXT, guideAssets, type GuideLanguage } from "./content.ts";
+import { AGENT_GUIDE_TEXT, GUIDE_TEXT, guideAssets, type GuideLanguage } from "./content.ts";
 
 /**
  * Feature overview modal shown on initial install or opened via command.
@@ -43,7 +43,7 @@ export class GuideModal extends Modal {
       this.render();
     });
 
-    // 2. Features Grid: 5 Core Capabilities
+    // 2. Features Grid: 6 Core Capabilities
     contentEl.createEl("h3", { text: t("guideFeaturesTitle", {}, this.language), cls: "vml-guide__section-title" });
     const grid = contentEl.createDiv({ cls: "vml-guide__grid" });
 
@@ -67,6 +67,10 @@ export class GuideModal extends Modal {
       {
         title: t("guideFeatureCrossrefTitle", {}, this.language),
         desc: t("guideFeatureCrossrefDesc", {}, this.language),
+      },
+      {
+        title: t("guideFeatureMediaTitle", {}, this.language),
+        desc: t("guideFeatureMediaDesc", {}, this.language),
       },
     ];
 
@@ -108,32 +112,43 @@ export class GuideModal extends Modal {
 
     // 4. Footer & Action Buttons
     const footer = contentEl.createDiv({ cls: "vml-guide__footer" });
+    const footerActions = footer.createDiv({ cls: "vml-guide__footer-actions" });
 
-    const createBtn = footer.createEl("button", {
+    const createBtn = footerActions.createEl("button", {
       cls: "mod-cta vml-guide__create-btn",
       text: t("guideCreate", {}, this.language),
     });
+    const createAgentBtn = footerActions.createEl("button", {
+      cls: "vml-guide__create-btn",
+      text: t("agentGuideCreate", {}, this.language),
+    });
 
-    createBtn.addEventListener("click", () => {
+    const createGuide = (kind: "user" | "agent", button: HTMLButtonElement, labelKey: "guideCreate" | "agentGuideCreate"): void => {
       if (this.creating) return;
       this.creating = true;
       createBtn.disabled = true;
-      createBtn.setText(t("guideCreating", {}, this.language));
-      void this.createNote()
+      createAgentBtn.disabled = true;
+      button.setText(t("guideCreating", {}, this.language));
+      const run = kind === "user" ? this.createNote() : this.createAgentNote();
+      void run
         .then(() => {
-          new Notice(t("guideCreated", {}, this.language));
+          new Notice(t(kind === "user" ? "guideCreated" : "agentGuideCreated", {}, this.language));
           this.close();
         })
         .catch((error: unknown) => {
-          console.error("Adjustable Media: example note creation failed", error);
-          new Notice(t("guideFailed", {}, this.language));
+          console.error(`Adjustable Media: ${kind} guide creation failed`, error);
+          new Notice(t(kind === "user" ? "guideFailed" : "agentGuideFailed", {}, this.language));
         })
         .finally(() => {
           this.creating = false;
           createBtn.disabled = false;
-          createBtn.setText(t("guideCreate", {}, this.language));
+          createAgentBtn.disabled = false;
+          button.setText(t(labelKey, {}, this.language));
         });
-    });
+    };
+
+    createBtn.addEventListener("click", () => createGuide("user", createBtn, "guideCreate"));
+    createAgentBtn.addEventListener("click", () => createGuide("agent", createAgentBtn, "agentGuideCreate"));
 
     const closeBtn = footer.createEl("button", {
       cls: "vml-guide__start-btn",
@@ -147,6 +162,15 @@ export class GuideModal extends Modal {
     const name = this.language === "zh" ? "Adjustable Media 使用指南" : "Adjustable Media Guide";
     const folder = t("exampleFolderName", {}, this.language);
     const file = await writeExampleNote(this.app, name, text, guideAssets(), folder);
+    await this.app.workspace.getLeaf("tab").openFile(file, { state: { mode: "source", source: false } });
+    return file;
+  }
+
+  private async createAgentNote(): Promise<TFile> {
+    const text = AGENT_GUIDE_TEXT[this.language];
+    const name = t("agentGuideName", {}, this.language);
+    const folder = t("exampleFolderName", {}, this.language);
+    const file = await writeExampleNote(this.app, name, text, [], folder);
     await this.app.workspace.getLeaf("tab").openFile(file, { state: { mode: "source", source: false } });
     return file;
   }

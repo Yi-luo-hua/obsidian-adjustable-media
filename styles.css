@@ -1937,6 +1937,12 @@ body.vml-is-dragging * {
   border-top: 1px solid var(--background-modifier-border);
 }
 
+.vml-guide__footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .vml-guide__create-btn {
   padding: 6px 16px;
 }

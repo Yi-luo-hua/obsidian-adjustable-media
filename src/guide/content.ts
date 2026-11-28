@@ -1,5 +1,7 @@
 import zh from "../../docs/examples/Guide.zh-CN.md";
 import en from "../../docs/examples/Guide.en.md";
+import agentZh from "../../docs/examples/AgentGuide.zh-CN.md";
+import agentEn from "../../docs/examples/AgentGuide.en.md";
 import loraArch from "../../docs/examples/assets/lora-arch.png";
 import loraEval from "../../docs/examples/assets/lora-eval.png";
 import gpt2Perf from "../../docs/examples/assets/gpt2-perf.png";
@@ -7,6 +9,7 @@ import video from "../../docs/examples/assets/window.webm";
 
 export type GuideLanguage = "zh" | "en";
 export const GUIDE_TEXT = { zh, en };
+export const AGENT_GUIDE_TEXT = { zh: agentZh, en: agentEn };
 
 function decodeBase64(base64: string): Uint8Array<ArrayBuffer> {
   const binary = atob(base64);

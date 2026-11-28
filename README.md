@@ -8,7 +8,7 @@ An Obsidian plugin for arranging and resizing media and text in layout blocks, s
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-Latest release: **[1.2.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [Changelog](CHANGELOG.md) · [Feature examples](docs/examples/Guide.en.md) · [FAQ](docs/FAQ.md) · [Docs](docs/README.md)
+Latest release: **[1.2.0](https://github.com/Yi-luo-hua/obsidian-adjustable-media/releases/latest)** · [Changelog](CHANGELOG.md) · [Feature examples](docs/examples/Guide.en.md) · [Agent guide](docs/examples/AgentGuide.en.md) · [FAQ](docs/FAQ.md) · [Docs](docs/README.md)
 
 ![Adjustable Media Preview](assets/demo.jpg)
 

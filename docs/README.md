@@ -9,7 +9,7 @@
 | [README（English）](../README.md) / [简体中文](../README.zh-CN.md) | 功能总览、操作方法与存储格式 |
 | [安装说明](INSTALL.md) | 社区插件市场与手动安装步骤 |
 | [常见问题](FAQ.md) | 兼容性、停用后行为与使用限制 |
-| [功能示例](examples/README.md) | 内置离线指南（`Guide`）、手动分栏与 Mermaid 样例 |
+| [功能示例](examples/README.md) | 内置离线指南（`Guide`）、Agent 参考指南（`AgentGuide`）、手动分栏与 Mermaid 样例 |
 | [Excalidraw 布局媒体](features/excalidraw.md) | 本地 `.excalidraw` / `.excalidraw.md` 绘图布局与预览 |
 | [PDF++ 矩形选区](features/pdf-plus.md) | PDF++ 的 `#page=N&rect=…` 嵌入作为布局媒体 |
 | [网页嵌入布局](features/web-embeds.md) | `<iframe>`、YouTube、Twitter/X 嵌入与独立高度 |
