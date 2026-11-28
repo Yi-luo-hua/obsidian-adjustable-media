@@ -29,8 +29,10 @@ export async function writeExampleNote(
   let folder = folderName;
   for (let suffix = 2; app.vault.getAbstractFileByPath(folder); suffix++) folder = `${folderName} ${suffix}`;
   await app.vault.createFolder(folder);
-  await app.vault.createFolder(`${folder}/assets`);
-  for (const asset of assets) await app.vault.createBinary(`${folder}/assets/${asset.name}`, asset.data.buffer);
+  if (assets.length > 0) {
+    await app.vault.createFolder(`${folder}/assets`);
+    for (const asset of assets) await app.vault.createBinary(`${folder}/assets/${asset.name}`, asset.data.buffer);
+  }
   return app.vault.create(`${folder}/${name}.md`, text);
 }
 
