@@ -51,7 +51,7 @@ Numbers are rounded to 3 decimal places when serialized by the plugin. Omit defa
 | `kind` | `"media"` | — | Required when `v` is `3`. |
 | `scope` | `"callout-image"` | — | Only for single-image Callout width wrappers; do not combine with general layout fields. |
 | `type` | `"text"` | — | Forces the entire block to render as text: embedded media lines inside render as inline figures instead of splitting rows/columns. |
-| `width` | `number` (`0.2`–`1`) | full (`0.4` when wrapped or beside text) | Block's share of container width (for media+text blocks, the **media column's** share). Max effective width when `wrap` is set is `0.8`. Omit if `1`. |
+| `width` | `number` (`0.2`–`1`) | full (`0.4` when wrapped or beside text) | Block's share of container width (for media+text blocks, the **media column's** share). Use `0.2`–`0.8` when writing a floating block, matching the editor's width range. Hand-written values above `0.8` and below `1` are used as written. Omit `width` to use the default. |
 | `frameWidth` | `number` (`0.2`–`1`) | full | Media+text blocks only: outer frame's share of container width (independent of `width`). |
 | `align` | `"left"` \| `"center"` \| `"right"` | `"left"` | Horizontal alignment for a narrower non-floating block (`width < 1` or `frameWidth < 1`). |
 | `frameOffset` | `number` (`0`–`1`) | — | Free horizontal offset (left margin share of remaining width) for a narrower non-floating block; overrides `align`. |
@@ -98,7 +98,7 @@ A non-blank top-level line containing **only** valid media embeds forms a media 
 | **Remote image (with extension)** | `![alt](https://example.com/a.png)` | V2 / V3 | Recognized automatically when URL path ends with a supported image extension. |
 | **Remote image (extensionless URL)** | `![alt](https://example.com/img?id=1)` | V2 / V3 | **Must append ` <!-- vml-image-row -->`** at the end of that media line; otherwise it is treated as text. |
 | **Excalidraw drawing** | Local `.excalidraw` or `.excalidraw.md` (with optional `#group=...` / `#area=...` fragment) | V2 / V3 | Requires the Excalidraw plugin enabled; plain `.md` notes stay text. |
-| **PDF++ rectangle selection** | `![[doc.pdf#page=7&rect=45,120,500,600\|label]]` (`page >= 1`, 4 finite non-zero-area numbers) | V2 / V3 | **Append ` <!-- vml-pdf-row -->`** at the end of the row line when mixing with text columns or other media (unmarked all-PDF-region V2 blocks also upgrade, but always adding the marker is safest). |
+| **PDF++ rectangle selection** | `![[doc.pdf#page=7&rect=45,120,500,600\|label]]` (`page >= 1`, 4 finite non-zero-area numbers) | V2 / V3 | **Append ` <!-- vml-pdf-row -->`** to each media row containing a PDF++ selection, including in all-PDF V3 blocks. Only legacy V2 blocks containing exclusively unmarked PDF++ selections support omitting the marker. |
 | **Mermaid diagram** | Complete ` ```mermaid ... ``` ` (or `~~~mermaid`) fence | **V3 required** | Each complete fence occupies its own lines as 1 media item; group items into rows via `rows[i].items`. |
 | **Web embed** | Complete HTTP/HTTPS `<iframe ...></iframe>` (no `srcdoc`), or native `![](YouTube/youtu.be/twitter.com/x.com status URL)` | **V3 required** | **Always leave at least one blank line after `</iframe>`** so subsequent Markdown or `<!-- /vml -->` is not swallowed into the HTML block. |
 
@@ -137,6 +137,7 @@ Inside a text block (no media rows, or `"type":"text"`), write `+++` on its **ow
 - **Equations**: Include `\label{eq:label}` inside `$$ ... $$` math blocks (if `\tag`/`\notag`/`\nonumber` is already present, only `\label` is stripped).
 - **Citations**: Write `@fig:label`, `@tbl:label`, or `@eq:label` in body text or captions (renders as `Figure 1` / `图 1`, `Table 1` / `表 1`, `Eq. (1)` / `式 (1)` with click-to-scroll; unresolved labels render as red `??`).
 - **Label IDs**: Match `[A-Za-z0-9_][\w.:-]*[\w-]|[A-Za-z0-9_]` — **never end an ID with `.` or `:`**. Duplicate IDs number at their first occurrence.
+- **Figure IDs in JSON captions**: Avoid consecutive hyphens (`--`). Use `fig:loss-curve` for example. The required JSON escape for `--` in `rows[].captions` or `caption.text` prevents the cross-reference index from recognizing that ID.
 
 ---
 
@@ -167,6 +168,7 @@ This prose appears to the right of the figure. Move it above the embed line to p
 **Hyperparameters**
 - Learning rate: `3e-4`
 - Batch size: `64`
+
 <!-- /vml -->
 Body prose wraps to the left of the floating card above. Add a top-level horizontal rule below whenever full-width flow should resume.
 
